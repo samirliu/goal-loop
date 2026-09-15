@@ -57,6 +57,10 @@ criteria` section body (between its header and the next `^## ` or EOF).
 - inside a git work tree: sha1 over `git rev-parse HEAD` newline `git status --porcelain | sort`
 - outside git: sha1 over the sorted `path cksum` list of all files, excluding
   `.goal/` and `.git/`
+- `.goal/evidence/` is where checker commands write GENERATED files
+  (screenshots, dumps): under `.goal/` it stays digest-excluded, so re-running
+  a check never moves the binding. In-tree evidence outputs are a
+  contract-design fault (they churn the digest on every re-run).
 Deterministic; a file edited then restored to identical content may still move
 the digest (porcelain records) - that is admissible, it over-flags, never
 under-flags.

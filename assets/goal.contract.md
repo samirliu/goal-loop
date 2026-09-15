@@ -25,6 +25,11 @@ per_check_fail_cap=3  panel_max=4  wallclock=1800
 
 ## Approval
 
+Approval mode: gate | auto   <!-- gate (default): stamp only on explicit user
+sign-off. auto: show the contract, stamp immediately with the marker "auto",
+log approval=auto in loop-log and delivery; irreversible-side-effect
+objectives are refused in both modes. Smoke-run every named check first. -->
+
 approved: <first 8 hex of sha1 over the Acceptance-criteria section body> <YYYY-MM-DD>
 
 <!-- Write the stamp ONLY after the user explicitly approves. The gate

@@ -54,3 +54,16 @@ into the AC's NAMED CHECK field verbatim-ready. At panel time: an item whose
 type has an applicable row here cannot be UNVERIFIABLE without a recorded
 reason why the pattern is inapplicable in this case (no network, no such
 tooling, outside the machine's reach) - "hard" or "slow" is no reason.
+
+## 7 Metric robustness (contract authoring)
+
+- Prefer byte-exact diffs, file/row counts, existence checks, and rerun-rc
+  checks over textual metrics - they survive extractor differences.
+- NEVER word-count CJK text with `wc -w`-style metrics: tokenization varies
+  by extractor (one real document measured 798, 804, 848, 886 and 892 under
+  five extractors, straddling an 800 threshold). If a textual metric is
+  unavoidable, NAME the exact extraction command in the AC - that command's
+  number IS the metric - and place the bound comfortably inside extractor
+  noise, not at its edge.
+- Smoke-run the named check before stamping (references/modes.md section 4):
+  a subcommand that does not exist is a contract defect, not a panel problem.

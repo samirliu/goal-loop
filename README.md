@@ -58,6 +58,16 @@ bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check
    (0=GO, 2=NO-GO, 3=BLOCKED, 4=state error).
    每轮末尾的状态块门控**故意不读**；唯一权威是门控退出码。
 
+## Modes & flags / 模式与参数（v1.1）
+
+```
+/goal-loop --mode=quick|standard|deep [--max-iterations=N] [--min-acs=N] [--auto] <objective>
+```
+
+**EN** — `quick` = 3 iterations / 2-4 ACs · `standard` = 6 / 4-6 · `deep` = 12 / 6-10 with a **mandatory adversarial seat** (one checker is assigned to legitimately break a check each iteration, exercising the fix→recheck path). `--auto` skips the approval wait: the contract is still shown in full, stamped immediately, and the ledger records `approval=auto` for after-the-fact audit. In-session bookkeeping is one Bash call: `scripts/goal_ctl.sh close-iteration ...`.
+
+**中文** — `quick` = 3 轮 / 2-4 条 AC · `standard` = 6 / 4-6 · `deep` = 12 / 6-10 且带**强制对抗席**（每轮一个检查席专职合法搞挂一项检查，逼出修复路径）。`--auto` 跳过审批等待：契约仍完整呈现、立即盖章，账本记 `approval=auto` 供事后审计。会话内记账一条命令：`scripts/goal_ctl.sh close-iteration ...`。
+
 ## Unattended mode / 无人值守模式（可选）
 
 ```bash

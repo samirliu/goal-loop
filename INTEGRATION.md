@@ -65,6 +65,26 @@ bash ~/.claude/skills/goal-loop/scripts/goal_loop.sh --continue \
   `.goal/logs/loop.log`（10MB × 4 轮转）。
 - 需要 `claude` 在 PATH；`CLAUDE_BIN` 可覆盖二进制路径。
 
+## 3.5 模式与参数（v1.1）
+
+```bash
+/goal-loop [--mode=quick|standard|deep] [--max-iterations=N] [--min-acs=N] [--auto] <目标>
+```
+
+- **quick**：3 轮 / 2-4 条 AC；**standard**（默认）：6 轮 / 4-6 条 AC；
+  **deep**：12 轮 / 6-10 条 AC，且每迭代有一个**强制对抗席**——它的职责就是
+  合法地搞挂一项检查，逼出 fix→recheck 修复路径（全程一轮全绿不配出deep）。
+- **`--auto`（无审批模式）**：契约仍在会话里完整呈现，但立即盖章开跑不等
+  确认；账本与交付物记 `approval=auto` 供事后审计。R3 冻结、假完成熔断、
+  证据强制照常；不可逆动作两种模式下都硬拒绝。默认仍是带审批。
+- **检查预检**：契约盖章前每条 named check 先冒烟跑一次，跑不了的当场改写。
+- **会话内记账**：`bash scripts/goal_ctl.sh close-iteration --project . --task
+  ID --files LIST --checks-pass N --checks-fail N --checks-unverifiable N`
+  一条命令完成指纹+账本+状态+门控中继（`init`/`stamp`/`bind` 子命令见
+  `goal_ctl.sh --help`）。
+- **证据隔离**：检查类命令的产出物（截图/转储）写 `.goal/evidence/`——天然
+  被树指纹排除，复跑检查不再移动绑定。
+
 ## 4. 门控速查（退出码即真相）
 
 | rc | 含义 | 常见 reason |

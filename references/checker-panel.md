@@ -26,6 +26,12 @@ Read this when assembling the panel for a finished artifact.
 Escalate to adjudication sparingly: one adjudicator, disputed ids only, it
 does not re-check the rest.
 
+Deep mode (`--mode=deep`, references/modes.md) adds one adversarial seat per
+iteration: its brief assigns ONE check plus the duty to make it FAIL
+legitimately - a real input, edge, or environment that breaks it. A caught
+FAIL is a success: it routes through fix-and-recheck. A deep run whose every
+iteration passes everything on the first sweep has not earned its exit.
+
 ## 3 The brief (verbatim template; fill, do not embellish)
 
 ```

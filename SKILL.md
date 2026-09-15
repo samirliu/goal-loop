@@ -12,13 +12,15 @@ description: |-
   pure Q&A, or actions needing immediate irreversible side effects.
 ---
 
-# Goal Loop (v1)
+# Goal Loop (v1.1)
 
 Contract-first, loop-per-iteration, gate-decides. Authority is split: you (the
 controller) execute and delegate; independent checkers judge; the gate (a shell
 script, not you) certifies completion. Fuses ralph-claude-code's dual-condition
 exit gate with fable-mode's checker-panel discipline; design reimplementation,
 no verbatim source text.
+
+Invocation: `/goal-loop [flags] <objective>` - flags `--mode=quick|standard|deep`, `--max-iterations=N`, `--min-acs=N`, `--auto` (semantics: references/modes.md); unknown flags are an error.
 
 ## When NOT to run
 
@@ -36,6 +38,7 @@ effect outside the workspace (money moved, messages sent, systems deleted).
 | loop-log.md | one block per iteration, `key=value` lines, append-only | controller |
 | verdicts.rec | `id|verdict|iter|digest|command|evidence` records, append-only | controller (from checkers) |
 | logs/ | unattended outer-loop output, rotated | goal_loop.sh |
+| evidence/ | checker-produced artifacts (screenshots, dumps) | named checks |
 
 `grep` is the query language; all five files are line-oriented on purpose.
 Workers must never touch `.goal/` (R6). See references/exit-gate.md for schemas.
@@ -48,14 +51,20 @@ Workers must never touch `.goal/` (R6). See references/exit-gate.md for schemas.
    statement in the user's words, (b) the NAMED CHECK - the exact command,
    file comparison, or observable that settles it. Pick check patterns from
    references/domain-patterns.md for the artifact type; a check must be able
-   to FAIL; "looks right" is not a check.
+   to FAIL; "looks right" is not a check. Before stamping, smoke-run EVERY named
+   check once; a check that cannot execute as written is rewritten here, never
+   stamped (modes.md section 4).
 3. Derive work-plan.md (tasks -> the ACs they realize) and init state.rec
    (iteration=0, breaker=CLOSED, false_completes=0, replans=0, fail caps from
    budget).
-4. Present the contract to the user. ONLY on explicit approval, stamp
-   `approved: <sha1-8-of-AC-body> <date>` in goal.md. No stamp -> the gate
-   answers NO-GO; never iterate. The user may amend freely until stamping;
-   after stamping, you propose amendments, you do not apply them (R3).
+4. Approval: default (gate mode) - present the contract to the user; ONLY on
+   explicit approval, stamp `approved: <sha1-8-of-AC-body> <date>` in goal.md.
+   With `--auto`, still show the contract in full, then stamp immediately,
+   appending the marker `auto` (loop-log and delivery carry `approval=auto`
+   for after-the-fact audit). No stamp -> the gate answers NO-GO; never
+   iterate. The user may amend freely until stamping; after stamping, you
+   propose amendments, you do not apply them (R3). Irreversible-side-effect
+   refusals hold in both modes.
 
 ## Phase 2 - Iteration (one task per loop, one pass per turn)
 
@@ -69,7 +78,10 @@ At each iteration:
    Brief each with: bounded task, exact output path, needed context, pass
    condition, and "return evidence (command + output) with your report".
    Workers do not spawn workers. No Agent tool -> work inline and log
-   `WEAKER VERIFICATION: cold self-check, no sub-agents`.
+   `WEAKER VERIFICATION: cold self-check, no sub-agents`. Agent tool present
+   but the named goal-* types unregistered -> spawn general-purpose with the
+   agent definition's role text injected verbatim; discipline unchanged
+   (cold brief, ternary verdicts), and log the substitution.
 4. Skeptical self-review of the artifact: name a real weakness or state
    plainly it is clean; never manufacture findings, never rubber-stamp.
 5. Before closing the task, assemble the checker panel
@@ -83,7 +95,8 @@ At each iteration:
 6. Append verdicts to verdicts.rec: `id|verdict|iter|digest|command|evidence`;
    verdict in PASS/FAIL/UNVERIFIABLE; a PASS without a quoted output line is
    void. Bind each record to the iteration number and the current tree digest
-   (`bash scripts/goal_gate.sh --digest`).
+   (`bash scripts/goal_gate.sh --digest`). Checks that generate files
+   (screenshots, dumps) write them under `.goal/evidence/` (digest-excluded).
 7. FIX any FAIL, then RE-RUN ONLY the failed check (per-check fail cap 3 ->
    at cap, mark task blocked and ask the user). A re-run is illegal if the
    covered files did not change since the FAIL (recompute the digest first,
@@ -93,6 +106,9 @@ At each iteration:
    state.rec counters. Progress accounting: `no_progress_limit` consecutive
    no-progress iterations -> change strategy, not the goal (replans<=2; a
    third replan -> ask the user); two identical error blocks -> BLOCKED.
+   Close the iteration in ONE Bash call: `bash scripts/goal_ctl.sh close-iteration
+   --project . --task ID --files LIST --checks-pass N --checks-fail N --checks-unverifiable N`
+   (computes digest + loop-log block + state + gate relay).
 
 ## Phase 3 - Exit gate (the only arbiter)
 
@@ -138,6 +154,7 @@ contract; late findings go to the user as proposals.
 
 max_iterations=12  no_progress_limit=2  max_replans=2  per_check_fail_cap=3
 panel_max=4  wallclock=1800s (unattended)
+Modes and `--auto`: references/modes.md. Bookkeeping helper: `bash scripts/goal_ctl.sh --help`.
 
 ## Unattended outer loop (opt-in, never default)
 
@@ -148,4 +165,5 @@ Honors HTTP(S)_PROXY. On Windows/git-bash: no jq, CR-stripping and
 `LC_ALL=C.UTF-8` are already handled in the scripts.
 
 References: read exit-gate.md before every gate decision; checker-panel.md
-when assembling the panel; domain-patterns.md when writing the contract.
+when assembling the panel; domain-patterns.md when writing the contract;
+modes.md for flags, approval modes and the helper script.
