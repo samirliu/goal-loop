@@ -122,7 +122,7 @@ bash ~/.claude/skills/goal-loop/scripts/goal_loop.sh --continue \
 
 - **语义**：整个 loop 的墙钟保险丝，单位秒。盖章即起表：
   `goal_ctl.sh stamp --time-budget=1800` 把 `time_budget=1800` 和
-  `deadline=<epoch>` 种进 state.rec。到期后门控 check 3b 返回
+  `deadline=<epoch>` 种进 state.rec。到期后门控 check 2c 返回
   **rc=3 `time-budget-exhausted`**——与 forge `budget-fuse` 同类的优雅熔断：
   跑完在飞任务、关账本、跑门控，然后交付 best-so-far + 未决清单；
   控制器在 deadline 已过时不再开新任务（Phase 2 步骤 1）。

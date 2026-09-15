@@ -159,7 +159,7 @@ A whole-loop wall-clock fuse in SECONDS. The deadline is seeded at approval:
 `bash scripts/goal_ctl.sh stamp --project . --time-budget=1800` writes
 `time_budget=1800` and `deadline=<epoch>` into state.rec (stamping is the
 loop's official start, so the clock starts there). The GATE enforces it -
-check 3b: `now > deadline` -> rc=3 `time-budget-exhausted`, the same
+check 2c: `now > deadline` -> rc=3 `time-budget-exhausted`, the same
 graceful-fuse class as forge's `budget-fuse`:
 
 - graceful end, not a hard abort: finish the task in flight, close the

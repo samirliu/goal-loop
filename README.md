@@ -85,8 +85,7 @@ forge). Any budget can carry either policy — `--forge` is just sugar for
 | `--min-acs=N` | 契约 AC 条数下限 floor for AC count | per mode |
 | `--auto` | 契约仍完整呈现，但立即盖章开跑不等确认；账本与交付物记 `approval=auto` 供事后审计。不可逆动作照样硬拒 | off |
 | `--forge` | = 契约 `exit: forge` + deep 预算（见下） | off |
-| `--time-budget=N` | 整个 loop 的墙钟保险丝，秒。盖章即起表；到期 rc=3 `time-budget-exhausted` **优雅收尾**：跑完在飞任务、交付 best-so-far + 未决清单，不是硬中断。续期 = 用户批准后改 state.rec 的 `deadline=` 行。到期前地板全过照常 GO | off |
-| | （勿与 unattended 的 `goal_loop.sh --wallclock=SEC` 混淆——那个限制单次 `claude` 调用时长） | |
+| `--time-budget=N` | 整个 loop 的墙钟保险丝，秒。盖章即起表；到期 rc=3 `time-budget-exhausted` **优雅收尾**：跑完在飞任务、交付 best-so-far + 未决清单，不是硬中断。续期 = 用户批准后改 state.rec 的 `deadline=` 行。到期前地板全过照常 GO（勿与 unattended 的 `--wallclock=SEC` 混淆——那个限制单次 `claude` 调用时长） | off |
 
 ### Contract grammar in one view / 契约语法一览（v1.2.1）
 

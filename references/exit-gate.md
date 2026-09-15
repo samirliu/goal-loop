@@ -101,12 +101,13 @@ decorative there, state.rec is authoritative. v1.1 contracts carry no
 0b. exit: forge -> dry_streak/dry_limit present           else exit 4 (missing-key)
 1.  stamp present AND recomputed AC-body hash matches     else exit 2 (no-approval / contract-tampered)  [R3]
 2.  breaker=OPEN or false_completes>=2                    else exit 3 (blocked)
-3.  iteration <= max_iterations                           else exit 2 (budget-exhausted)
-    ... on forge:                                         else exit 3 (budget-fuse: a fuse, ask the user)
-3b. now <= deadline (when time_budget>0; v1.3 wall-clock
-    fuse)                                                 else exit 3 (time-budget-exhausted: graceful
+2c. now <= deadline (when time_budget>0; v1.3 wall-clock
+    fuse; BEFORE the iteration budget so expiry always
+    answers the graceful rc=3)                            else exit 3 (time-budget-exhausted: graceful
                                                           best-so-far delivery, extension = user-approved
                                                           rewrite of deadline= in state.rec)
+3.  iteration <= max_iterations                           else exit 2 (budget-exhausted)
+    ... on forge:                                         else exit 3 (budget-fuse: a fuse, ask the user)
 4.  no_progress_streak <= no_progress_limit               else exit 3 (stagnation)
 4b. last two loop blocks share the same non-none
     error_signature (grind on one wall)                   else exit 3 (repeated-error)
