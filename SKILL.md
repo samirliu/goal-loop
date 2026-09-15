@@ -94,8 +94,10 @@ At each iteration:
    re-check everything).
 6. Append verdicts to verdicts.rec: `id|verdict|iter|digest|command|evidence`;
    verdict in PASS/FAIL/UNVERIFIABLE; a PASS without a quoted output line is
-   void. Bind each record to the iteration number and the current tree digest
-   (`bash scripts/goal_gate.sh --digest`). Checks that generate files
+   void. Bind each record to the iteration number - the IN-FLIGHT value
+   (state.rec's iteration + 1, the number this close-iteration will record;
+   binding the stale value yields a guaranteed NO-GO) - and the current tree
+   digest (`bash scripts/goal_gate.sh --digest`). Checks that generate files
    (screenshots, dumps) write them under `.goal/evidence/` (digest-excluded).
 7. FIX any FAIL, then RE-RUN ONLY the failed check (per-check fail cap 3 ->
    at cap, mark task blocked and ask the user). A re-run is illegal if the
@@ -166,4 +168,5 @@ Honors HTTP(S)_PROXY. On Windows/git-bash: no jq, CR-stripping and
 
 References: read exit-gate.md before every gate decision; checker-panel.md
 when assembling the panel; domain-patterns.md when writing the contract;
-modes.md for flags, approval modes and the helper script.
+modes.md for flags, approval modes and the helper script; INTEGRATION.md for
+install, flags-in-Chinese and troubleshooting.

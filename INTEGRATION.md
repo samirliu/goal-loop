@@ -15,13 +15,16 @@
 ## 1. 安装（两件套，缺一不可）
 
 1. skill 本体 → `~/.claude/skills/goal-loop/`（Windows:
-   `C:\Users\<你>\.claude\skills\goal-loop\`），7 个文件：
-   `SKILL.md`、`assets/goal.contract.md`、
-   `references/{exit-gate,checker-panel,domain-patterns}.md`、
-   `scripts/{goal_gate.sh,goal_loop.sh}`，以及可选的本指南。
+   `C:\Users\<你>\.claude\skills\goal-loop\`），10 个文件：
+   `SKILL.md`、`INTEGRATION.md`、`assets/goal.contract.md`、
+   `references/{exit-gate,checker-panel,domain-patterns,modes}.md`、
+   `scripts/{goal_gate.sh,goal_loop.sh,goal_ctl.sh}`。
 2. 5 个 agent 定义 → `~/.claude/agents/`：
    `goal-worker.md`、`goal-mech-worker.md`、`goal-checker-mech.md`、
    `goal-checker-req.md`、`goal-adjudicator.md`。
+   （`.skill` 包不含 agents——从本仓库取：
+   `git clone https://github.com/samirliu/goal-loop && cp goal-loop/agents/*.md ~/.claude/agents/`；
+   缺失时降级可跑，见下。）
 
 - 从 `.skill` 包安装：它就是 zip，解压到 skills 目录即可。
 - agent 文件缺失也能跑：控制器降级为 general-purpose + 角色文本注入

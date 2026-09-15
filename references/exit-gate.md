@@ -83,9 +83,12 @@ under-flags.
 9. unverifiable*3 <= total                                 else exit 2 (unverifiable-excessive) [R4]
    PASS -> print "GATE: GO digest=<d> iter=<n> ac=<total> pass=<p> unverified=<u>"
 ```
-When check 5-9 fails while exit_signal=yes was claimed, print additionally
-`GATE: NOTE false-complete suspected; controller: append false_complete=yes
-and increment false_completes in state.rec`.
+When check 6 (digest mismatch) fails while exit_signal=yes was claimed, the
+gate prints `GATE: NOTE false-complete suspected; controller: append
+false_complete=yes and increment false_completes in state.rec`. Other check
+5-9 failures on a claimed exit print no NOTE; the controller still logs
+false_complete=yes per SKILL.md Phase 3 (the two-strikes BLOCKED rule is
+enforced through state, not through the NOTE).
 
 The gate also prints `GATE: NOTE loop-log-missing-keys:<keys>` (stderr, no
 exit-code change) when the last loop block omits any of the canonical schema
