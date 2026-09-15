@@ -1,27 +1,36 @@
 #!/usr/bin/env bash
-# goal_gate.sh - the EXTERNAL arbiter of goal-loop. Read-only: it decides,
-# it never writes. The controller performs every state update it is told to.
+# goal_gate.sh - the EXTERNAL arbiter of goal-loop. It decides; it never
+# writes state. Since v1.2 it also RERUNS the contract's DETERMINISTIC named
+# checks itself (inline at --check, standalone via --verify). Those commands
+# come from the stamped, smoke-run contract; a tree digest taken before and
+# after the rerun fails check-mutated-tree if any check modified the tree.
+# Verdicts for judged ACs still come from the checker seats (stored records,
+# digest-bound). The gate remains the only authority on "done".
 # Usage:
-#   bash goal_gate.sh --check  [--project DIR]   # 0 GO / 2 NO-GO / 3 BLOCKED / 4 state error
-#   bash goal_gate.sh --digest [--project DIR]   # print 12-hex tree digest
+#   bash goal_gate.sh --check  [--project DIR]              # 0 GO / 2 NO-GO / 3 BLOCKED / 4 state error
+#   bash goal_gate.sh --digest [--project DIR]              # print 12-hex tree digest
+#   bash goal_gate.sh --verify [--project DIR] [AC-ID ...]  # rerun deterministic checks; 0 all-pass / 2 FAIL-or-broken / 4 state error
 set -u
 export LC_ALL=C.UTF-8
 
-usage(){ sed -n '2,5p' "$0"; }
+usage(){ sed -n '2,12p' "$0"; }
 
-project="." mode=""
+project="." mode="" positional=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --check)  mode=check ;;
     --digest) mode=digest ;;
+    --verify) mode=verify ;;
     --project) [ $# -ge 2 ] || { echo "GATE: NO-GO reason=missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
     --help|-h) usage; exit 0 ;;
-    *) echo "GATE: NO-GO reason=unknown-flag:$1" >&2; exit 4 ;;
+    -*) echo "GATE: NO-GO reason=unknown-flag:$1" >&2; exit 4 ;;
+    *) positional="$positional $1" ;;                  # AC-IDs for --verify
   esac
   shift
 done
 
-[ -n "$mode" ] || { echo "GATE: NO-GO reason=no-mode (use --check or --digest)" >&2; exit 4; }
+[ -n "$mode" ] || { echo "GATE: NO-GO reason=no-mode (use --check, --digest or --verify)" >&2; exit 4; }
+[ -z "${positional# }" ] || [ "$mode" = verify ] || { echo "GATE: NO-GO reason=unknown-arg:$positional" >&2; exit 4; }
 
 sd="$project/.goal"
 r(){ tr -d '\r'; }                                    # CR scrubber for every read
@@ -78,16 +87,102 @@ fail(){ echo "GATE: NO-GO reason=$1" >&2; exit 2; }
 blocked(){ echo "GATE: BLOCKED reason=$1" >&2; exit 3; }
 state_err(){ echo "GATE: ERROR reason=$1" >&2; exit 4; }
 
+# ---- contract parsing (v1.2) ----------------------------------------------
+# AC line grammar:  - AC-N | statement | check: `<command>` | expected: <spec>
+# expected spec: exit=0 (default) | <op><number> | judged      (no "|" inside)
+# AC lines are NOT parsed by "|" splitting (commands contain pipes); the
+# command is the backtick-quoted span, the expectation is the line tail.
+contract_mode(){ r < "$sd/goal.md" | grep -qE '^exit: *forge' && echo forge || echo threshold; }
+all_ac_ids(){ r < "$sd/goal.md" | grep -oE '^- AC-[0-9]+' | sort -u | sed 's/^- //'; }
+ac_line_for(){ r < "$sd/goal.md" | awk -v id="$1" '$0 ~ "^- "id"[ |]"'; }
+ac_check_cmd(){ ac_line_for "$1" | sed -nE 's/^.*check: *`([^`]*)`.*/\1/p' | tail -1; }
+ac_expected(){ ac_line_for "$1" | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1; }
+classify_expected(){                                   # $1 raw -> exit0 | judged | "metric <op> <num>"
+  v=$(printf '%s' "$1" | tr -d '[:space:]')
+  case "$v" in
+    ''|exit=0) echo "exit0" ;;
+    judged)    echo "judged" ;;
+    *)
+      op=$(printf '%s' "$v" | sed -nE 's/^([<>=!]+)[0-9].*/\1/p')
+      num=$(printf '%s' "$v" | sed -nE 's/^[<>=!]+([0-9][0-9.]*)$/\1/p')
+      if [ -n "$op" ] && [ -n "$num" ]; then
+        case "$op" in
+          '>='|'<='|'>'|'<'|'=='|'!=') echo "metric $op $num"; return ;;
+        esac
+      fi
+      echo "judged" ;;                                 # prose (incl. v1.1) -> judged
+  esac
+}
+
+run_one_check(){                                       # $1 id $2 class $3 op $4 num -> "id|VERDICT|detail"
+  id="$1"; cls="$2"; m_op="${3:-}"; m_num="${4:-}"
+  cmd=$(ac_check_cmd "$id")
+  if [ -z "$cmd" ]; then printf '%s|BROKEN|no check command in AC line\n' "$id"; return; fi
+  if command -v timeout >/dev/null 2>&1; then
+    out=$(cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$cmd" 2>/dev/null); rc=$?
+  else
+    out=$(cd "$project" 2>/dev/null && bash -c "$cmd" 2>/dev/null); rc=$?   # without coreutils timeout a hang hangs; documented
+  fi
+  case "$cls" in
+    exit0)
+      if [ "$rc" -eq 0 ]; then printf '%s|PASS|exit=0\n' "$id"
+      elif [ "$rc" -eq 127 ] || [ "$rc" -eq 124 ]; then printf '%s|BROKEN|check not executable (rc=%d)\n' "$id" "$rc"
+      else printf '%s|FAIL|exit=%d\n' "$id" "$rc"; fi ;;
+    metric\ *)
+      last=$(printf '%s\n' "$out" | grep -vE '^[[:space:]]*$' | tail -1)
+      case "$last" in
+        ''|*[!0-9.\-]*)
+          printf '%s|BROKEN|last stdout line is not a number: %s\n' "$id" "${last:-<empty>}"; return ;;
+      esac
+      v=$(awk -v a="$last" -v b="$m_num" -v o="$m_op" \
+          'BEGIN{ok=(o==">=")?(a>=b):(o=="<=")?(a<=b):(o==">")?(a>b):(o=="<")?(a<b):(o=="==")?(a==b):(a!=b); print ok?"PASS":"FAIL"}')
+      printf '%s|%s|observed=%s expect=%s%s\n' "$id" "$v" "$last" "$m_op" "$m_num" ;;
+    *)
+      printf '%s|BROKEN|unroutable expectation class\n' "$id" ;;
+  esac
+}
+
 digest=$(tree_digest) || state_err "unreadable-project"
 if [ "$mode" = digest ]; then echo "$digest"; exit 0; fi
 
 # -0. state present and complete -----------------------------------------
 [ -d "$sd" ] || state_err "no-goal-dir"
 [ -f "$sd/goal.md" ] || state_err "no-goal-md"
+tmo=$(state_get check_timeout); [ -n "$tmo" ] || tmo=120
+
+if [ "$mode" = verify ]; then
+  want="$positional "
+  d0="$digest"; nfail=0; nbroken=0; nchecked=0
+  for id in $(all_ac_ids); do
+    if [ -n "${want// /}" ]; then case "$want" in *" $id "*) ;; *) continue ;; esac; fi
+    cls=$(classify_expected "$(ac_expected "$id")")
+    if [ "$cls" = judged ]; then echo "GATE: VERIFY $id|SKIP|judged"; continue; fi
+    line=$(run_one_check "$id" "$cls" ${cls#metric})
+    echo "GATE: VERIFY $line"
+    nchecked=$((nchecked+1))
+    case "$line" in
+      *'|FAIL|'*)   nfail=$((nfail+1)) ;;
+      *'|BROKEN|'*) nbroken=$((nbroken+1)) ;;
+    esac
+  done
+  d1=$(tree_digest)
+  [ "$d0" = "$d1" ] || { echo "GATE: NO-GO reason=check-mutated-tree:before=$d0 after=$d1" >&2; exit 2; }
+  [ "$nchecked" -gt 0 ] || { echo "GATE: VERIFY-OK nothing-deterministic"; exit 0; }
+  if [ $((nfail+nbroken)) -eq 0 ]; then echo "GATE: VERIFY-OK checked=$nchecked"; exit 0; fi
+  echo "GATE: NO-GO reason=verify-failures:fail=$nfail broken=$nbroken" >&2
+  exit 2
+fi
+
 required="iteration breaker false_completes replans no_progress_streak max_iterations no_progress_limit"
 for k in $required; do
   [ -n "$(state_get "$k")" ] || state_err "missing-key:$k"
 done
+exit_mode=$(contract_mode)
+if [ "$exit_mode" = forge ]; then
+  for k in dry_streak dry_limit; do
+    [ -n "$(state_get "$k")" ] || state_err "missing-key:$k (required for exit: forge)"
+  done
+fi
 iter=$(state_get iteration); breaker=$(state_get breaker)
 fc=$(state_get false_completes); streak=$(state_get no_progress_streak)
 maxit=$(state_get max_iterations); npl=$(state_get no_progress_limit)
@@ -97,15 +192,16 @@ case "$iter$breaker$fc$streak$maxit$npl" in *[!0-9A-Z_a-z_]*) state_err "unparse
 stamp=$(r < "$sd/goal.md" | grep -E '^approved: [0-9a-f]{6,}' | tail -1 | awk '{print $2}')
 [ -n "$stamp" ] || fail "no-approval"
 body=$(ac_body_hash)
-if [ "${stamp#"$body"}" = "$stamp" ] && [ "$body" != "${stamp:0:${#body}}" ]; then
-  fail "contract-tampered:stam=$stamp recomputed=$body"
-fi
 [ "${stamp:0:8}" = "$body" ] || fail "contract-tampered:stam=$stamp recomputed=$body"
 
-# -2..-4b. breaker, budget, stagnation, grind -----------------------------
+# -2..-4b. breaker, budget (forge: fuse), stagnation, grind ---------------
 [ "$breaker" = OPEN ] && blocked "breaker-open"
 [ "${fc:-0}" -ge 2 ] && blocked "false-completes>=2"
-[ "${iter:-0}" -le "${maxit:-12}" ] || fail "budget-exhausted:iter=$iter max=$maxit"
+if [ "$exit_mode" = forge ]; then
+  [ "${iter:-0}" -le "${maxit:-12}" ] || blocked "budget-fuse:iter=$iter max=$maxit (forge: budget is a fuse - extend it or deliver best-so-far)"
+else
+  [ "${iter:-0}" -le "${maxit:-12}" ] || fail "budget-exhausted:iter=$iter max=$maxit"
+fi
 [ "${streak:-0}" -le "${npl:-2}" ] || blocked "stagnation:streak=$streak limit=$npl"
 
 # -4b. repeated-error grind (SKILL.md phase 2 step 8, mechanized): the last
@@ -139,11 +235,27 @@ claim=$(printf '%s\n' "$lb" | grep -E '^exit_signal=' | tail -1 | cut -d= -f2-)
 lbdigest=$(printf '%s\n' "$lb" | grep -E '^digest=' | tail -1 | cut -d= -f2-)
 [ "$lbdigest" = "$digest" ] || { echo "GATE: NOTE false-complete suspected; controller: append false_complete=yes and increment false_completes in state.rec" >&2; fail "verdicts-stale:block=$lbdigest current=$digest"; }
 
-ac_ids=$(r < "$sd/goal.md" | grep -oE '^- AC-[0-9]+' | sort -u | sed 's/^- //')
+ac_ids=$(all_ac_ids)
 [ -n "$ac_ids" ] || fail "contract-empty:no AC ids"
 lv=$(latest_verdicts)
 total=0; passn=0; unv=0
 for id in $ac_ids; do
+  cls=$(classify_expected "$(ac_expected "$id")")
+  if [ "$cls" != judged ]; then
+    # Deterministic AC: the gate reruns the check NOW. Stored verdicts for
+    # these ids are mid-loop bookkeeping only; the rerun is the evidence.
+    line=$(run_one_check "$id" "$cls" ${cls#metric})
+    v=$(printf '%s' "$line" | cut -d'|' -f2)
+    detail=$(printf '%s' "$line" | cut -d'|' -f3-)
+    case "$v" in
+      PASS)   total=$((total+1)); passn=$((passn+1)) ;;
+      FAIL)   fail "open-FAIL:$id (gate rerun: $detail)" ;;
+      BROKEN) fail "check-broken:$id ($detail)" ;;
+      *)      fail "check-unknown:$id ($line)" ;;
+    esac
+    continue
+  fi
+  # Judged AC: the stored seat verdict must be fresh (R7) and evidenced (R5).
   rec=$(printf '%s\n' "$lv" | gawk -F'|' -v want="$id" '$1==want{print}')
   v=$(printf '%s' "$rec" | cut -d'|' -f2)
   vi=$(printf '%s' "$rec" | cut -d'|' -f3)
@@ -165,5 +277,15 @@ for id in $ac_ids; do
 done
 [ $((unv*3)) -le "$total" ] || fail "unverifiable-excessive:unv=$unv total=$total"
 
-echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv"
+# -10. guard against checks that mutated the tree mid-verification --------
+digest2=$(tree_digest)
+[ "$digest" = "$digest2" ] || fail "check-mutated-tree:before=$digest after=$digest2"
+
+# -11. forge: floors alone are not an exit; exhaustion is -----------------
+if [ "$exit_mode" = forge ]; then
+  dry=$(state_get dry_streak); dl=$(state_get dry_limit)
+  [ "${dry:-0}" -ge "${dl:-3}" ] || fail "not-dry:dry_streak=${dry:-0} limit=$dl (forge exits on verification exhaustion, not on floors alone)"
+fi
+
+echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode"
 exit 0

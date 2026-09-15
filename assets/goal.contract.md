@@ -6,22 +6,50 @@ Status: DRAFT            <!-- flip to APPROVED only by the stamp below -->
 
 <the user's objective, in the user's own words>
 
+## Exit policy
+
+exit: threshold
+<!-- threshold (default): deliver when every AC floor passes.
+     forge: maximization objectives ("as good as possible") - deliver on
+     verification exhaustion: dry_limit consecutive dry rounds (no new
+     evidence-backed finding, fix-now discoveries closed) + an empty
+     completeness-critic answer; max_iterations becomes a pure fuse.
+     Smoke-run every named check before stamping (modes.md section 5). -->
+
 ## Acceptance criteria
 
-<!-- verbatim, frozen by the stamp; each ends in its named check;
-     pick check patterns from references/domain-patterns.md -->
+<!-- verbatim, frozen by the stamp. Grammar per line:
+     - AC-N | <yes/no statement> | check: `<command>` | expected: <spec>
+     spec: exit=0 (default) | metric comparison (>=60, <=1.8, ...) | judged
+     - a metric command aggregates internally (N repeats / percentile) and
+       prints ONE number on its last stdout line; set thresholds beyond the
+       measured noise floor (domain-patterns.md section 4)
+     - `judged` needs a written rubric anchor or a pairwise A/B protocol
+       (checker-panel.md section 5)
+     - the command runs at project root and must not modify the tree;
+       generated evidence goes to .goal/evidence/
+     - the spec value must not contain "|"
+     pick check shapes from references/domain-patterns.md -->
 
-- AC-1 | <yes/no decision statement> | check: `<exact command or comparison>` | expected: <observable>
-- AC-2 | <...> | check: `<...>` | expected: <...>
+- AC-1 | <yes/no decision statement> | check: `<exact command>` | expected: exit=0
+- AC-2 | <...metric...> | check: `<command printing one number>` | expected: >=<value>
+- AC-3 | <...quality claim...> | check: - | expected: judged
 
 ## Out of scope
 
 - <what will NOT be delivered - agreed, so late additions go to proposals>
 
+## Patterns (optional)
+
+patterns: <relative path to this project's check-recipes file>
+<!-- authoring-time input only; its commands are written INTO the AC lines
+     above and smoke-run like any other; the gate never reads it -->
+
 ## Budget knobs (override before approval if needed)
 
 max_iterations=12  no_progress_limit=2  max_replans=2
-per_check_fail_cap=3  panel_max=4  wallclock=1800
+per_check_fail_cap=3  panel_max=4  dry_limit=3  check_timeout=120
+wallclock=1800
 
 ## Approval
 

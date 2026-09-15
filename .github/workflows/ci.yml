@@ -17,3 +17,7 @@ jobs:
           bash -n scripts/goal_loop.sh
           bash -n scripts/goal_ctl.sh
           echo "All three scripts passed bash -n"
+      - name: Scenario test suite (gate semantics, no API needed)
+        run: |
+          bash tests/run_tests.sh
+          bash tests/run_tests.sh 2>/dev/null | grep -E '^== results'
