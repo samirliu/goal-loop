@@ -16,7 +16,7 @@ set -u
 export LC_ALL=C.UTF-8
 
 here=$(cd "$(dirname "$0")" && pwd)
-cmd="" project="." auto=0 no_gate=0 max_iterations=12
+cmd="" project="." auto=0 no_gate=0 max_iterations=12 time_budget=""
 task="" files="" cp="" cf="" cu="" progress=yes exit_signal=no errsig=none fcomplete=no dry=""
 
 while [ $# -gt 0 ]; do
@@ -24,6 +24,7 @@ while [ $# -gt 0 ]; do
     init|stamp|bind|close-iteration) cmd="$1" ;;
     --project) [ $# -ge 2 ] || { echo "CTL: ERROR missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
     --auto) auto=1 ;;
+    --time-budget=*) time_budget="${1#*=}" ;;
     --no-gate) no_gate=1 ;;
     --max-iterations=*) max_iterations="${1#*=}" ;;
     --task) [ $# -ge 2 ] || { echo "CTL: ERROR missing-task" >&2; exit 4; }; task="$2"; shift ;;
@@ -51,7 +52,7 @@ case "$cmd" in
   init)
     [ -d "$sd" ] || mkdir -p "$sd/logs"
     if [ -f "$sd/goal.md" ]; then echo "CTL: ERROR already-initialized ($sd/goal.md)" >&2; exit 2; fi
-    printf 'iteration=0\nbreaker=CLOSED\nfalse_completes=0\nreplans=0\nno_progress_streak=0\nlast_progress_iteration=0\nmax_iterations=%s\nno_progress_limit=2\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=0\ndry_limit=3\ncheck_timeout=120\n' "$max_iterations" > "$sd/state.rec"
+    printf 'iteration=0\nbreaker=CLOSED\nfalse_completes=0\nreplans=0\nno_progress_streak=0\nlast_progress_iteration=0\nmax_iterations=%s\nno_progress_limit=2\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=0\ndry_limit=3\ncheck_timeout=120\ntime_budget=0\ndeadline=0\n' "$max_iterations" > "$sd/state.rec"
     : > "$sd/loop-log.md"; : > "$sd/verdicts.rec"; : > "$sd/work-plan.md"; mkdir -p "$sd/evidence"
     echo "CTL: INIT ok - fill $sd/goal.md, then: goal_ctl.sh stamp --project $project" ;;
 
@@ -63,6 +64,13 @@ case "$cmd" in
     h=$( { r < "$sd/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
            r < "$sd/goal.md" | grep -E '^exit:' || true
          } | sha1sum | cut -c1-8)
+    case "${time_budget:-}" in                            # optional wall-clock fuse, stamped at approval
+      ''|0) : ;;
+      *[!0-9]*) echo "CTL: ERROR bad-time-budget:$time_budget" >&2; exit 4 ;;
+      *) { grep -vE '^(time_budget|deadline)=' "$sd/state.rec"
+           printf 'time_budget=%s\ndeadline=%s\n' "$time_budget" "$(( $(date +%s) + time_budget ))"
+         } > "$sd/state.rec.new" && mv "$sd/state.rec.new" "$sd/state.rec" ;;
+    esac
     marker=""; [ "$auto" -eq 1 ] && marker=" auto"
     sed -i "s/^approved: .*/approved: $h $(date +%F)$marker/" "$sd/goal.md"
     grep -E '^approved:' "$sd/goal.md" | head -1 ;;
@@ -117,8 +125,10 @@ case "$cmd" in
     if [ "$dry" = yes ]; then drys=$((drys+1)); else drys=0; fi
     dlimit=$(state_get dry_limit); [ -n "$dlimit" ] || dlimit=3
     ctmo=$(state_get check_timeout); [ -n "$ctmo" ] || ctmo=120
-    printf 'iteration=%s\nbreaker=%s\nfalse_completes=%s\nreplans=%s\nno_progress_streak=%s\nlast_progress_iteration=%s\nmax_iterations=%s\nno_progress_limit=%s\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=%s\ndry_limit=%s\ncheck_timeout=%s\n' \
-      "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" > "$sd/state.rec"
+    tb=$(state_get time_budget); [ -n "$tb" ] || tb=0
+    dl=$(state_get deadline); [ -n "$dl" ] || dl=0
+    printf 'iteration=%s\nbreaker=%s\nfalse_completes=%s\nreplans=%s\nno_progress_streak=%s\nlast_progress_iteration=%s\nmax_iterations=%s\nno_progress_limit=%s\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=%s\ndry_limit=%s\ncheck_timeout=%s\ntime_budget=%s\ndeadline=%s\n' \
+      "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" > "$sd/state.rec"
     echo "CTL: CLOSE ok iter=$new digest=$digest"
     [ "$no_gate" -eq 1 ] && exit 0
     bash "$here/goal_gate.sh" --check --project "$project"; exit $? ;;

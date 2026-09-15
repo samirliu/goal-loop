@@ -24,6 +24,8 @@ panel_max=4
 dry_streak=0              # forge only: consecutive dry rounds
 dry_limit=3               # forge only: rounds of exhaustion required to exit
 check_timeout=120         # seconds per gate-rerun check (coreutils timeout)
+time_budget=0             # seconds; 0 = no wall-clock fuse (v1.3)
+deadline=0                # epoch set at stamping via --time-budget; 0 = off
 ```
 `dry_streak`/`dry_limit` are REQUIRED only when goal.md declares
 `exit: forge` (missing -> exit 4 missing-key).
@@ -101,6 +103,10 @@ decorative there, state.rec is authoritative. v1.1 contracts carry no
 2.  breaker=OPEN or false_completes>=2                    else exit 3 (blocked)
 3.  iteration <= max_iterations                           else exit 2 (budget-exhausted)
     ... on forge:                                         else exit 3 (budget-fuse: a fuse, ask the user)
+3b. now <= deadline (when time_budget>0; v1.3 wall-clock
+    fuse)                                                 else exit 3 (time-budget-exhausted: graceful
+                                                          best-so-far delivery, extension = user-approved
+                                                          rewrite of deadline= in state.rec)
 4.  no_progress_streak <= no_progress_limit               else exit 3 (stagnation)
 4b. last two loop blocks share the same non-none
     error_signature (grind on one wall)                   else exit 3 (repeated-error)

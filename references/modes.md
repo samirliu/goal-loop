@@ -2,7 +2,8 @@
 
 Contents: [1 invocation grammar] [2 the three budget modes] [3 forge exit]
 [4 auto approval] [5 pre-stamp smoke rule] [6 evidence directory]
-[7 check-expectation grammar] [8 mechanical bundling] [9 goal_ctl.sh].
+[7 check-expectation grammar] [8 mechanical bundling] [9 goal_ctl.sh]
+[10 time budget].
 
 ## 1 Invocation grammar
 
@@ -13,6 +14,7 @@ Contents: [1 invocation grammar] [2 the three budget modes] [3 forge exit]
   --min-acs=N                  floor for the contract's AC count
   --auto                       no-approval mode (section 4)
   --forge                      sugar: contract gets `exit: forge` + deep budget
+  --time-budget=N              whole-loop wall-clock fuse in seconds (section 10)
 ```
 Unknown flags are an error: report them, never silently ignore. Budget and
 exit policy are ORTHOGONAL axes - any budget mode may combine with either
@@ -150,3 +152,28 @@ finding this round and fix-now discoveries closed); the helper refuses
 without it. `close-iteration` recomputes the tree digest, appends the
 loop-log block, updates state (streak/breaker/dry_streak) and relays
 `goal_gate.sh --check` unless `--no-gate`.
+
+## 10 Time budget (`--time-budget=N`, v1.3)
+
+A whole-loop wall-clock fuse in SECONDS. The deadline is seeded at approval:
+`bash scripts/goal_ctl.sh stamp --project . --time-budget=1800` writes
+`time_budget=1800` and `deadline=<epoch>` into state.rec (stamping is the
+loop's official start, so the clock starts there). The GATE enforces it -
+check 3b: `now > deadline` -> rc=3 `time-budget-exhausted`, the same
+graceful-fuse class as forge's `budget-fuse`:
+
+- graceful end, not a hard abort: finish the task in flight, close the
+  iteration, run the gate, then deliver best-so-far with the open-items
+  list (per SKILL.md Phase 2 step 1 the controller does not START a new
+  task once the deadline has passed);
+- passing floors before expiry still GOs normally - the fuse only fires
+  when the loop would otherwise keep iterating;
+- extension = explicit user approval, then rewrite `deadline=<new-epoch>`
+  in state.rec (state.rec is controller bookkeeping; goal.md stays
+  untouched, so R3 is not involved);
+- `time_budget=0` / absent = no fuse (the default);
+- NOT the same knob as unattended `goal_loop.sh --wallclock=SEC`, which
+  caps ONE claude invocation, not the whole loop.
+
+Example: `/goal-loop --time-budget=3600 "审计这个仓库的依赖并升级补丁版本"`
+- 1 hour from approval, then whatever passed the gate ships.

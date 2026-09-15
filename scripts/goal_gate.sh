@@ -208,6 +208,13 @@ body=$(ac_body_hash)
 # -2..-4b. breaker, budget (forge: fuse), stagnation, grind ---------------
 [ "$breaker" = OPEN ] && blocked "breaker-open"
 [ "${fc:-0}" -ge 2 ] && blocked "false-completes>=2"
+dl=$(state_get deadline)                               # optional wall-clock fuse (v1.3)
+case "$dl" in
+  ''|0) : ;;
+  *[!0-9]*) state_err "bad-deadline:$dl" ;;
+  *) now=$(date +%s)
+     [ "$now" -gt "$dl" ] && blocked "time-budget-exhausted:deadline=$dl now=$now (graceful: finish the current task, deliver best-so-far; extend = user-approved rewrite of deadline= in state.rec)" ;;
+esac
 if [ "$exit_mode" = forge ]; then
   [ "${iter:-0}" -le "${maxit:-12}" ] || blocked "budget-fuse:iter=$iter max=$maxit (forge: budget is a fuse - extend it or deliver best-so-far)"
 else

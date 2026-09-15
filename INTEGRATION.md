@@ -35,7 +35,7 @@
 ```bash
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --help        # 打印用法（含 --verify）
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check       # 无 .goal/ 时应 rc=4, reason=no-goal-dir
-bash ~/.claude/skills/goal-loop/tests/run_tests.sh                 # 场景套件，应 52/52 全绿
+bash ~/.claude/skills/goal-loop/tests/run_tests.sh                 # 场景套件，应 57/57 全绿
 ```
 
 ## 2. 会话内使用（默认方式）
@@ -117,6 +117,23 @@ bash ~/.claude/skills/goal-loop/scripts/goal_loop.sh --continue \
   `check_timeout` 非数字 → rc=4 状态错误。
 - unattended 提示：含 judged AC 的契约每轮会全量重判面板——无人值守
   契约应尽量全确定性。
+
+## 5.6 v1.3.0：时间预算 `--time-budget=N`
+
+- **语义**：整个 loop 的墙钟保险丝，单位秒。盖章即起表：
+  `goal_ctl.sh stamp --time-budget=1800` 把 `time_budget=1800` 和
+  `deadline=<epoch>` 种进 state.rec。到期后门控 check 3b 返回
+  **rc=3 `time-budget-exhausted`**——与 forge `budget-fuse` 同类的优雅熔断：
+  跑完在飞任务、关账本、跑门控，然后交付 best-so-far + 未决清单；
+  控制器在 deadline 已过时不再开新任务（Phase 2 步骤 1）。
+- 到期前地板全过 → 照常 GO，保险丝只在"还要继续迭代"时才触发。
+- **续期** = 用户明示批准后改 state.rec 的 `deadline=<新epoch>` 行
+  （state.rec 是控制器记账，不涉及 R3；goal.md 不动）。
+- **不迁移**：旧 `.goal/state.rec` 缺这两个键 = 熔断关闭（time_budget=0
+  语义），init/`goal_loop.sh --init` 新播种的都带。
+- **不要与 `goal_loop.sh --wallclock=SEC` 混淆**：那个限制的是无人值守
+  模式里单次 `claude` 调用的时长，不是整个 loop。
+- 示例：`/goal-loop --time-budget=3600 "审计这个仓库的依赖并升级补丁版本"`。
 
 ## 6. v1.1 → v1.2 迁移
 

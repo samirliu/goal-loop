@@ -1,8 +1,8 @@
 # goal-loop
 
-**EN** — A Claude Code skill that fuses two open-source disciplines into one loop: *ralph-claude-code*'s dual-condition exit gate with *fable-mode*'s adversarial checker panel. The core promise (v1.2.1): **the model can never self-declare completion** — only an external shell gate (`goal_gate.sh`) can certify GO, and since v1.2 the gate **re-runs every deterministic check itself** (zero model in the trust chain); judged quality claims go to cold checker seats. For open-ended "make it as good as possible" objectives, the `forge` exit ends the loop on **verification exhaustion** (K consecutive dry adversarial rounds), not on floors alone. v1.2.1 hardens the gate: the approval stamp also freezes the exit policy, negative assertions (`expected: exit=N`) and CR-safe metric reads are deterministic, and same-digest judged PASSes carry forward without re-seating.
+**EN** — A Claude Code skill that fuses two open-source disciplines into one loop: *ralph-claude-code*'s dual-condition exit gate with *fable-mode*'s adversarial checker panel. The core promise (v1.2.1): **the model can never self-declare completion** — only an external shell gate (`goal_gate.sh`) can certify GO, and since v1.2 the gate **re-runs every deterministic check itself** (zero model in the trust chain); judged quality claims go to cold checker seats. For open-ended "make it as good as possible" objectives, the `forge` exit ends the loop on **verification exhaustion** (K consecutive dry adversarial rounds), not on floors alone. v1.2.1 hardens the gate: the approval stamp also freezes the exit policy, negative assertions (`expected: exit=N`) and CR-safe metric reads are deterministic, and same-digest judged PASSes carry forward without re-seating. v1.3 adds `--time-budget=N` — a whole-loop wall-clock fuse with a graceful best-so-far ending.
 
-**中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺（v1.2.1）：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且 v1.2 起门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明才交冷检查席。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。v1.2.1 加固门控：批准戳同时冻结退出策略（exit: 行）、负向断言（`expected: exit=N`）与 CR 安全的指标读数归入确定性、同指纹的 judged PASS 可 carry-forward 免重开席位。
+**中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺（v1.2.1）：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且 v1.2 起门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明才交冷检查席。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。v1.2.1 加固门控：批准戳同时冻结退出策略（exit: 行）、负向断言（`expected: exit=N`）与 CR 安全的指标读数归入确定性、同指纹的 judged PASS 可 carry-forward 免重开席位。v1.3 新增 `--time-budget=N`——整个 loop 的墙钟保险丝，到期优雅交付 best-so-far。
 
 ```
 objective → contract (AC-1..N, each with a NAMED failable check) → user approval stamp
@@ -63,7 +63,7 @@ bash ~/.claude/skills/goal-loop/tests/run_tests.sh
    (0=GO, 2=NO-GO, 3=BLOCKED, 4=state error).
    每轮末尾的状态块门控**故意不读**；唯一权威是门控退出码。
 
-## Modes & flags / 模式与参数（v1.2.1）
+## Modes & flags / 模式与参数（v1.3）
 
 ```
 /goal-loop --mode=quick|standard|deep [--max-iterations=N] [--min-acs=N] [--auto] [--forge] <objective>
@@ -85,6 +85,8 @@ forge). Any budget can carry either policy — `--forge` is just sugar for
 | `--min-acs=N` | 契约 AC 条数下限 floor for AC count | per mode |
 | `--auto` | 契约仍完整呈现，但立即盖章开跑不等确认；账本与交付物记 `approval=auto` 供事后审计。不可逆动作照样硬拒 | off |
 | `--forge` | = 契约 `exit: forge` + deep 预算（见下） | off |
+| `--time-budget=N` | 整个 loop 的墙钟保险丝，秒。盖章即起表；到期 rc=3 `time-budget-exhausted` **优雅收尾**：跑完在飞任务、交付 best-so-far + 未决清单，不是硬中断。续期 = 用户批准后改 state.rec 的 `deadline=` 行。到期前地板全过照常 GO | off |
+| | （勿与 unattended 的 `goal_loop.sh --wallclock=SEC` 混淆——那个限制单次 `claude` 调用时长） | |
 
 ### Contract grammar in one view / 契约语法一览（v1.2.1）
 

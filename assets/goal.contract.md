@@ -52,6 +52,9 @@ patterns: <relative path to this project's check-recipes file>
 max_iterations=12  no_progress_limit=2  max_replans=2
 per_check_fail_cap=3  panel_max=4  dry_limit=3  check_timeout=120
 wallclock=1800
+<!-- in-session wall-clock fuse: invoke with --time-budget=N (seconds);
+     the deadline is seeded into state.rec at stamping, enforced by the
+     gate as rc=3 time-budget-exhausted (graceful best-so-far end) -->
 
 ## Approval
 

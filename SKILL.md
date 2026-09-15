@@ -16,7 +16,7 @@ description: |-
   tasks, pure Q&A, or actions needing immediate irreversible side effects.
 ---
 
-# Goal Loop (v1.2.1)
+# Goal Loop (v1.3.0)
 
 Contract-first, loop-per-iteration, gate-decides. Authority is split: you (the
 controller) execute and delegate; independent checkers judge quality claims;
@@ -25,7 +25,8 @@ deterministic check itself. Design reimplements ralph-claude-code's dual-
 condition exit gate with fable-mode's checker-panel discipline.
 
 Invocation: `/goal-loop [flags] <objective>` - flags `--mode=quick|standard|deep`,
-`--max-iterations=N`, `--min-acs=N`, `--auto`, `--forge` (semantics:
+`--max-iterations=N`, `--min-acs=N`, `--auto`, `--forge`, `--time-budget=N`
+(seconds; whole-loop wall-clock fuse, graceful end - semantics:
 references/modes.md); unknown flags are an error.
 
 ## When NOT to run
@@ -71,14 +72,21 @@ Workers must never touch `.goal/` (R6). Schemas: references/exit-gate.md.
    explicit approval, stamp `approved: <sha1-8-of-AC-body> <date>` in
    goal.md. With `--auto`, still show the contract in full, then stamp
    immediately, appending `auto` (audit marker). No stamp -> the gate
-   answers NO-GO; never iterate. The user may amend freely until stamping;
-   after stamping, you propose amendments, you do not apply them (R3).
-   Irreversible-side-effect refusals hold in both modes.
+   answers NO-GO; never iterate. With `--time-budget=N`, stamp via
+   `bash scripts/goal_ctl.sh stamp --project . --time-budget=N` - it seeds
+   `deadline=<now+N>` into state.rec; the gate turns it into a graceful
+   wall-clock fuse (Phase 2 step 1, Phase 3). The user may amend freely
+   until stamping; after stamping, you propose amendments, you do not
+   apply them (R3). Irreversible-side-effect refusals hold in both modes.
 
 ## Phase 2 - Iteration (one task per loop, one pass per turn)
 
 1. Re-read `.goal/state.rec` + last 3 blocks of loop-log.md. If
-   breaker=OPEN or false_completes>=2 -> stop, report BLOCKED.
+   breaker=OPEN or false_completes>=2 -> stop, report BLOCKED. Time
+   budget: if state.rec has `deadline>0` and now >= deadline, do NOT
+   start another task - finish/bookkeep what is in flight and deliver
+   best-so-far (the gate's rc=3 `time-budget-exhausted` is the backstop;
+   extension = user-approved rewrite of `deadline=` in state.rec).
 2. Take the highest-priority unchecked task of work-plan.md. Purely
    mechanical, mutually independent actions (rename/format/补全类) MAY be
    bundled: cap 5 actions, disjoint files, mark the entry `[bundle]`; on
@@ -160,7 +168,10 @@ bash scripts/goal_gate.sh --check    # 0=GO 2=NO-GO 3=BLOCKED 4=state error
 Exit 0 -> deliver. Exit 2 -> continue iterating (or stop at budget).
 Exit 3 -> stop, report BLOCKED with reasons; on forge, rc=3
 `budget-fuse` means the budget ran out WITHOUT exhaustion - ask the user
-to extend or deliver best-so-far. If you claimed EXIT_SIGNAL true and the
+to extend or deliver best-so-far; rc=3 `time-budget-exhausted` means the
+`--time-budget` wall clock ran out - graceful end: deliver best-so-far
+with the open-items list, or extend the deadline on explicit user
+approval. If you claimed EXIT_SIGNAL true and the
 gate answered NO-GO, log `false_complete=yes`; two -> halt BLOCKED. Never
 deliver with an open FAIL.
 
@@ -193,7 +204,8 @@ outside the contract; late findings go to the user as proposals.
 ## Budget knobs (contract may override; sane defaults)
 
 max_iterations=12  no_progress_limit=2  max_replans=2  per_check_fail_cap=3
-panel_max=4  dry_limit=3  check_timeout=120  wallclock=1800s (unattended)
+panel_max=4  dry_limit=3  check_timeout=120  time_budget=0 (off; `--time-budget=N` seconds)
+wallclock=1800s (unattended per-round claude timeout - different knob)
 Modes, `--auto`, DSL grammar: references/modes.md.
 
 ## Unattended outer loop (opt-in, never default)

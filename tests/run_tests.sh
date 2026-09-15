@@ -21,7 +21,7 @@ assert_has(){ printf '%s' "$3" | grep -qE "$2" && ok "$1" || no "$1"; }
 
 mkproj(){ p="$T/$1"; mkdir -p "$p"; bash "$CTL" init --project "$p" >/dev/null; }
 
-contract(){ # $1 proj NAME under $T; $2.. = AC lines; optional FORGE=1 env
+contract(){ # $1 proj NAME under $T; $2.. = AC lines; optional FORGE=1 / TB=seconds env
   local p="$T/$1"; shift
   forge_line=""; [ "${FORGE:-0}" = 1 ] && forge_line="exit: forge"
   {
@@ -30,7 +30,7 @@ contract(){ # $1 proj NAME under $T; $2.. = AC lines; optional FORGE=1 env
     for l in "$@"; do printf '%s\n' "$l"; done
     printf '\n%s\n\n## Out of scope\n\n- nothing\n\n## Approval\n\napproved: PENDING\n' "$forge_line"
   } > "$p/.goal/goal.md"
-  bash "$CTL" stamp --project "$p" --auto >/dev/null
+  bash "$CTL" stamp --project "$p" --auto ${TB:+--time-budget=$TB} >/dev/null
 }
 
 bind_v(){ # $1 proj NAME under $T; $2 verdict-line with DIGEST placeholder
@@ -236,6 +236,25 @@ echo new > "$T/t27/b.txt"; close_iter t27
 printf 'AC-1|PASS|3|%s|cmd|"ok carried=yes"\n' "$dOld" | bash "$CTL" bind --project "$T/t27" >/dev/null
 out=$(bash "$GATE" --check --project "$T/t27" 2>&1); assert_rc "27 stale re-bind -> rc2" 2 $?
 assert_has "27 reason not-covered" 'not-covered:AC-1' "$out"
+
+# 28 time-budget fuse fires when expired (rc=3, graceful class)
+mkproj t28 >/dev/null; TB=1 contract t28 "- AC-1 | f | check: \`true\` | expected: exit=0"
+sleep 1.3
+close_iter t28
+out=$(bash "$GATE" --check --project "$T/t28" 2>&1); assert_rc "28 expired time-budget -> rc3" 3 $?
+assert_has "28 reason time-budget-exhausted" 'time-budget-exhausted' "$out"
+
+# 29 time-budget in the future: loop runs normally -> GO
+mkproj t29 >/dev/null; TB=3600 contract t29 "- AC-1 | f | check: \`true\` | expected: exit=0"
+close_iter t29
+bash "$GATE" --check --project "$T/t29" >/dev/null 2>&1; assert_rc "29 future deadline GO -> rc0" 0 $?
+
+# 30 close-iteration preserves the time-budget keys
+mkproj t30 >/dev/null; TB=60 contract t30 "- AC-1 | f | check: \`true\` | expected: exit=0"
+close_iter t30
+grep -q '^time_budget=60$' "$T/t30/.goal/state.rec" && ok "30 close preserves time_budget" || no "30 time_budget lost on close"
+d=$(grep '^deadline=' "$T/t30/.goal/state.rec" | cut -d= -f2)
+[ -n "$d" ] && [ "$d" -gt 0 ] && ok "30 close preserves deadline" || no "30 deadline lost on close"
 
 echo
 echo "== results: pass=$pass fail=$failn =="
