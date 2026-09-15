@@ -1,0 +1,19 @@
+name: CI
+
+"on": [push, workflow_dispatch]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Shellcheck the shipped scripts
+        run: shellcheck scripts/*.sh
+      - name: Bash syntax check (bash -n)
+        run: |
+          echo "Running bash -n on all three shipped scripts"
+          bash -n scripts/goal_gate.sh
+          bash -n scripts/goal_loop.sh
+          bash -n scripts/goal_ctl.sh
+          echo "All three scripts passed bash -n"
