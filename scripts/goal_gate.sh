@@ -53,9 +53,11 @@ tree_digest(){                                         # 12 hex, deterministic
     fi )
 }
 
-ac_body_hash(){                                        # first 8 hex over AC section body
-  r < "$sd/goal.md" |
-  awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f' | hash_std | cut -c1-8
+ac_body_hash(){                                        # 8 hex over AC body + every ^exit: line
+  { r < "$sd/goal.md" |
+    awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
+    r < "$sd/goal.md" | grep -E '^exit:' || true
+  } | hash_std | cut -c1-8
 }
 
 state_get(){                                           # $1 key -> value or empty
@@ -102,6 +104,7 @@ classify_expected(){                                   # $1 raw -> exit0 | judge
   case "$v" in
     ''|exit=0) echo "exit0" ;;
     judged)    echo "judged" ;;
+    exit=[0-9]*) echo "rc ${v#exit=}" ;;
     *)
       op=$(printf '%s' "$v" | sed -nE 's/^([<>=!]+)[0-9].*/\1/p')
       num=$(printf '%s' "$v" | sed -nE 's/^[<>=!]+([0-9][0-9.]*)$/\1/p')
@@ -123,11 +126,18 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   else
     out=$(cd "$project" 2>/dev/null && bash -c "$cmd" 2>/dev/null); rc=$?   # without coreutils timeout a hang hangs; documented
   fi
+  out=$(printf '%s\n' "$out" | r)                    # CR scrub: Windows-native checks print CRLF
   case "$cls" in
     exit0)
       if [ "$rc" -eq 0 ]; then printf '%s|PASS|exit=0\n' "$id"
       elif [ "$rc" -eq 127 ] || [ "$rc" -eq 124 ]; then printf '%s|BROKEN|check not executable (rc=%d)\n' "$id" "$rc"
       else printf '%s|FAIL|exit=%d\n' "$id" "$rc"; fi ;;
+    rc\ *)                                            # negative assertion: rc==N passes
+      want=${cls#rc }
+      if [ "$rc" -eq "$want" ]; then printf '%s|PASS|exit=%d\n' "$id" "$rc"
+      elif [ "$rc" -eq 124 ] && [ "$want" != 124 ]; then printf '%s|BROKEN|timed out (rc=124)\n' "$id"
+      elif [ "$rc" -eq 127 ] && [ "$want" != 127 ]; then printf '%s|BROKEN|check not executable (rc=127)\n' "$id"
+      else printf '%s|FAIL|exit=%d expect=exit=%s\n' "$id" "$rc" "$want"; fi ;;
     metric\ *)
       last=$(printf '%s\n' "$out" | grep -vE '^[[:space:]]*$' | tail -1)
       case "$last" in
@@ -149,6 +159,7 @@ if [ "$mode" = digest ]; then echo "$digest"; exit 0; fi
 [ -d "$sd" ] || state_err "no-goal-dir"
 [ -f "$sd/goal.md" ] || state_err "no-goal-md"
 tmo=$(state_get check_timeout); [ -n "$tmo" ] || tmo=120
+case "$tmo" in ''|*[!0-9]*) state_err "bad-check-timeout:$tmo" ;; esac
 
 if [ "$mode" = verify ]; then
   want="$positional "

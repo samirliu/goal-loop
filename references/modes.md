@@ -51,6 +51,12 @@ declares `exit: forge`; GO requires floors AND exhaustion:
   under `.goal/`), express ACs as metric deltas against it, and report
   deltas at delivery. Stagnation in metrics with findings still flowing is
   NOT dry - keep iterating or triage.
+- Dry rounds usually leave the tree untouched (nothing to fix). Then the
+  seats' DISCOVERY duty still runs - dryness is earned by finding nothing
+  new, not by skipping the panel - but already-judged artifacts do NOT
+  need re-seating: re-bind their PASSes at the current iteration under
+  carry-forward (exit-gate.md R7). This is the main token saving of a
+  long forge run.
 - Honesty note: the dry streak is controller-bookkept and can only be
   discipline-audited, not mechanically proven; the gate's mechanical teeth
   are the deterministic rerun on claimed exits (a FAIL found there counts
@@ -95,6 +101,7 @@ AC line: `- AC-N | <yes/no statement> | check: \`<command>\` | expected: <spec>`
 | spec | class | gate behavior |
 |---|---|---|
 | `exit=0` or omitted | deterministic | rerun command; rc 0 = PASS; rc != 0 = FAIL; rc 124/127 = check-broken |
+| `exit=N` (N>0) | deterministic negative | rc == N = PASS; asserts a failure mode is ABSENT (`repro.sh` expected `exit=1` = the crash no longer reproduces); other rc = FAIL; rc 124/127 (unless N) = check-broken |
 | `>=N` `<=N` `>N` `<N` `==N` `!=N` | deterministic metric | rerun; LAST non-empty stdout line must be the number; compare |
 | `judged` | judgment | seat verdict from verdicts.rec, digest-bound |
 | anything else (prose) | judgment | routed as judged (v1.1 contracts keep working) |

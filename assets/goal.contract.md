@@ -9,7 +9,9 @@ Status: DRAFT            <!-- flip to APPROVED only by the stamp below -->
 ## Exit policy
 
 exit: threshold
-<!-- threshold (default): deliver when every AC floor passes.
+<!-- NOTE: every `exit:` line is covered by the approval stamp - changing
+     the policy after stamping is contract-tampered.
+     threshold (default): deliver when every AC floor passes.
      forge: maximization objectives ("as good as possible") - deliver on
      verification exhaustion: dry_limit consecutive dry rounds (no new
      evidence-backed finding, fix-now discoveries closed) + an empty

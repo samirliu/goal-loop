@@ -200,6 +200,43 @@ for k in dry_streak dry_limit check_timeout; do
   grep -q "^$k=" "$T/t22/.goal/state.rec" && ok "22 state seeds $k" || no "22 state missing $k"
 done
 
+# 23 exit-policy lines are covered by the stamp (v1.2.1)
+FORGE=1 mkproj t23; FORGE=1 contract t23 "- AC-1 | f | check: \`true\` | expected: exit=0"
+sed -i 's/^exit: forge/exit: threshold/' "$T/t23/.goal/goal.md"   # now threshold: no --dry needed
+close_iter t23
+out=$(bash "$GATE" --check --project "$T/t23" 2>&1); assert_rc "23a exit flip after stamp -> rc2" 2 $?
+assert_has "23a reason contract-tampered" 'contract-tampered' "$out"
+mkproj t24; contract t24 "- AC-1 | f | check: \`true\` | expected: exit=0"
+sed -i 's/^## Out of scope/exit: forge\n## Out of scope/' "$T/t24/.goal/goal.md"
+close_iter t24 --dry yes        # line now reads forge to ctl too - keep it writable
+out=$(bash "$GATE" --check --project "$T/t24" 2>&1); assert_rc "23b exit line smuggled -> rc2" 2 $?
+assert_has "23b reason contract-tampered" 'contract-tampered' "$out"
+
+# 24 negative assertion exit=N passes; --verify path too
+mkproj t25; contract t25 "- AC-1 | crash absent | check: \`false\` | expected: exit=1"
+close_iter t25
+out=$(bash "$GATE" --check --project "$T/t25" 2>&1); assert_rc "24 exit=1 negative GO -> rc0" 0 $?
+out=$(bash "$GATE" --verify --project "$T/t25" 2>&1); assert_has "24 --verify PASS on rc match" 'AC-1\|PASS' "$out"
+
+# 25 negative assertion wrong rc -> FAIL
+mkproj t26; contract t26 "- AC-1 | w | check: \`false\` | expected: exit=3"
+close_iter t26
+out=$(bash "$GATE" --check --project "$T/t26" 2>&1); assert_rc "25 exit=3 vs rc1 -> rc2" 2 $?
+assert_has "25 reason open-FAIL w/ expect" 'open-FAIL:AC-1' "$out"
+
+# 26 carry-forward: same digest, later iteration -> GO without re-seat
+mkproj t27; contract t27 "- AC-1 | j | check: \`true\` | expected: judged"
+close_iter t27; bind_v t27 'AC-1|PASS|1|DIGEST|cmd|"ok"'
+close_iter t27; bind_v t27 'AC-1|PASS|2|DIGEST|cmd|"ok carried=yes"'
+out=$(bash "$GATE" --check --project "$T/t27" 2>&1); assert_rc "26 carry-forward GO -> rc0" 0 $?
+
+# 27 no sharding: after digest moved, re-bind at stale digest -> not-covered
+dOld=$(bash "$GATE" --digest --project "$T/t27")
+echo new > "$T/t27/b.txt"; close_iter t27
+printf 'AC-1|PASS|3|%s|cmd|"ok carried=yes"\n' "$dOld" | bash "$CTL" bind --project "$T/t27" >/dev/null
+out=$(bash "$GATE" --check --project "$T/t27" 2>&1); assert_rc "27 stale re-bind -> rc2" 2 $?
+assert_has "27 reason not-covered" 'not-covered:AC-1' "$out"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

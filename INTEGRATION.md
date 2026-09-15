@@ -35,7 +35,7 @@
 ```bash
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --help        # 打印用法（含 --verify）
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check       # 无 .goal/ 时应 rc=4, reason=no-goal-dir
-bash ~/.claude/skills/goal-loop/tests/run_tests.sh                 # v1.2 场景套件，应 41/41 全绿
+bash ~/.claude/skills/goal-loop/tests/run_tests.sh                 # 场景套件，应 52/52 全绿
 ```
 
 ## 2. 会话内使用（默认方式）
@@ -100,6 +100,23 @@ bash ~/.claude/skills/goal-loop/scripts/goal_loop.sh --continue \
   测量不是工作）；契约盖章后冻结；judged UNVERIFIABLE 不得超过三分之一且
   必须给出 PROBE/REASON；判断席简报只带 AC 原文与路径；worker 禁触
   `.goal/`；judged 裁决绑定 (iter, digest)；发现项必须绑证据。
+
+## 5.5 v1.2.1（安全与效率补丁）
+
+- **批准戳现在覆盖所有 `exit:` 行**：盖戳后翻转 `exit: forge`→`threshold`
+  （或偷偷加一行）= `contract-tampered` NO-GO。goal.md 里的 budget-knob
+  行仍不被覆盖——那里是摆设，state.rec 才是权威。v1.1 契约没有 `exit:`
+  行，旧戳照常验证通过。
+- `expected: exit=N`（N>0）：负向断言（"崩溃不再复现"），门控重跑 rc==N
+  即 PASS。此前这类检查会被静默路由为 judged。
+- **carry-forward**：digest 未动的 judged PASS 可重绑到新迭代
+  （`carried=yes`，引证原 evidence），不重开席位——forge 干轮的主要
+  节省。FAIL/UNVERIFIABLE 永不 carry；digest 一动全部作废（不分片，
+  防漏声明）。
+- 门控重跑的输出会剥 CR（Windows 原生程序 CRLF 不再毒死 metric 读数）；
+  `check_timeout` 非数字 → rc=4 状态错误。
+- unattended 提示：含 judged AC 的契约每轮会全量重判面板——无人值守
+  契约应尽量全确定性。
 
 ## 6. v1.1 → v1.2 迁移
 

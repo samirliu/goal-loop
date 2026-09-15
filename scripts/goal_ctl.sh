@@ -60,7 +60,9 @@ case "$cmd" in
     if grep -qE '^approved: [0-9a-f]{6,}' "$sd/goal.md"; then
       echo "CTL: ERROR already-stamped (R3: one stamp; amendments go to the user)" >&2; exit 2
     fi
-    h=$(r < "$sd/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f' | sha1sum | cut -c1-8)
+    h=$( { r < "$sd/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
+           r < "$sd/goal.md" | grep -E '^exit:' || true
+         } | sha1sum | cut -c1-8)
     marker=""; [ "$auto" -eq 1 ] && marker=" auto"
     sed -i "s/^approved: .*/approved: $h $(date +%F)$marker/" "$sd/goal.md"
     grep -E '^approved:' "$sd/goal.md" | head -1 ;;

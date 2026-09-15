@@ -73,7 +73,12 @@ voids a PASS.
 - `exit: forge` line anywhere in goal.md switches the exit policy.
 
 Stamp line matches `^approved: [0-9a-f]{8} [0-9]{4}-`; the stamp value is
-the first 8 hex of sha1 over the `## Acceptance criteria` section body.
+the first 8 hex of sha1 over the `## Acceptance criteria` section body PLUS
+every line matching `^exit:` (the exit policy is part of the frozen
+contract - flipping `exit: forge` to `threshold` after approval is
+contract-tampered). Budget-knob lines in goal.md are NOT covered: they are
+decorative there, state.rec is authoritative. v1.1 contracts carry no
+`^exit:` line, so their stamps verify unchanged.
 
 ## 2 Tree digest + mutation guard (12 hex; `goal_gate.sh --digest`)
 
@@ -106,6 +111,9 @@ the first 8 hex of sha1 over the `## Acceptance criteria` section body.
                                                           not executable / non-numeric -> exit 2 (check-broken)
     judged        -> LATEST stored verdict with
     iter==iteration and digest==recomputed, none FAIL     else exit 2 (not-covered / open-FAIL)  [R1,R7]
+    (iter==iteration is satisfied by a CARRY-FORWARD re-bind: appending the
+    same PASS at the current iter while the digest is unchanged from the
+    original verdict - same bytes, same truth, no re-seat)
 8.  judged PASS records have non-empty quoted evidence    else exit 2 (evidence-missing)   [R5]
 9.  unverifiable*3 <= total (judged UNVERIFIABLE only)    else exit 2 (unverifiable-excessive) [R4]
 10. tree digest unchanged after the rerun batch           else exit 2 (check-mutated-tree)
@@ -124,7 +132,9 @@ exit_signal and digest are hard-checked.
 
 `--verify [AC-ID ...]` reruns deterministic checks standalone (0 all-pass /
 2 fail-or-broken-or-mutated / 4 state error), skipping judged ids with a
-SKIP line. Use it for fix-loop verification; the controller still binds
+SKIP line. It reads the contract WITHOUT consulting the stamp - measurement
+is safe either way; only `--check` requires a frozen, approved contract.
+Use it for fix-loop verification; the controller still binds
 bookkeeping records if it wants the audit trail.
 
 ## 4 Circuit breaker (controller bookkeeps, gate enforces)
@@ -157,7 +167,12 @@ block resets streak to 0 and the breaker to CLOSED.
   BLOCKED; only the controller writes state files (via goal_ctl.sh).
 - R7 stale verdicts: judged verdicts bind to (iter, digest); anything after
   a digest move is stale and must be re-judged. Deterministic ACs are
-  exempt (the gate recomputes at every exit).
+  exempt (the gate recomputes at every exit). Carry-forward: a judged PASS
+  may be re-bound to a later iteration while the digest is UNCHANGED
+  (cite the original evidence; `carried=yes` in the evidence field). FAIL
+  and UNVERIFIABLE are never carried. No covered-set sharding: a moved
+  digest voids verdicts on untouched artifacts too - that hole is
+  deliberate (scope-declaration risk outweighs the saved re-seats).
 - R8 make-work (forge): a discovery item or adversarial finding is
   legitimate only if it binds evidence - a check that produced (or, run,
   would produce) a FAIL, or a critic-named dimension with a concrete probe.

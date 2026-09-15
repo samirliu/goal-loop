@@ -27,7 +27,7 @@ Read this when assembling the panel for a finished artifact.
 | deterministic | anything a command settles (exit codes, counts, diffs, metric comparisons) | NONE - `goal_gate.sh --verify` / inline at --check | - | 0 |
 | requirements | AC coverage by the artifact itself, internal consistency, claim NOMINATION (falsifiable claims the controller missed -> propose them as new named checks) | goal-checker-req | sonnet | 1 |
 | judgment | quality claims marked `expected: judged` (see section 5) | goal-checker-req (or a judged-role seat) | sonnet | 0-1 |
-| forge critic | "which dimension is still missing?" cold answer; zero-answer = clear | goal-checker-critic | opus | 1 (forge only; not counted in panel_max) |
+| forge critic | "which dimension is still missing?" cold answer; zero-answer = clear | goal-critic | opus | 1 (forge only; not counted in panel_max) |
 | adjudication | only ids where seats split, or a disputed refutation / make-work claim | goal-adjudicator | opus | 0-1 |
 
 The v1.1 mechanical seats (goal-checker-mech) are GONE: "run a command and

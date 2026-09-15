@@ -16,7 +16,7 @@ description: |-
   tasks, pure Q&A, or actions needing immediate irreversible side effects.
 ---
 
-# Goal Loop (v1.2)
+# Goal Loop (v1.2.1)
 
 Contract-first, loop-per-iteration, gate-decides. Authority is split: you (the
 controller) execute and delegate; independent checkers judge quality claims;
@@ -98,7 +98,7 @@ Workers must never touch `.goal/` (R6). Schemas: references/exit-gate.md.
    (references/checker-panel.md) FOR THIS ARTIFACT's claims and the ACs it
    realizes - not the whole contract. Deterministic ACs need NO seat: the
    gate re-runs them. Spawn `goal-checker-req` x1 (requirements coverage +
-   claim nomination + seam hunt); on forge, add `goal-checker-critic` x1;
+   claim nomination + seam hunt); on forge, add `goal-critic` x1;
    deep adds an adversarial seat; on split, escalate `goal-adjudicator`.
    Seats receive the AC text VERBATIM + artifact paths ONLY - never your
    reasoning, never hunches. On checker disagreement escalate one
@@ -108,7 +108,12 @@ Workers must never touch `.goal/` (R6). Schemas: references/exit-gate.md.
    a judged PASS without a quoted output line is void. Bind each record to
    the IN-FLIGHT iteration number (state.iteration + 1) and the current
    tree digest (`bash scripts/goal_gate.sh --digest`). For deterministic
-   ACs the bind is bookkeeping; the gate's rerun is the evidence. Checks
+   ACs the bind is bookkeeping; the gate's rerun is the evidence.
+   Carry-forward: a judged PASS may be RE-BOUND to the current iteration
+   with the original evidence (mark `carried=yes`) when the tree digest is
+   UNCHANGED since that verdict - same bytes, so the judgment still stands;
+   never re-seat for it. A FAIL/UNVERIFIABLE is never carried; once the
+   digest moves, the verdict is dead (R7 - no covered-set shortcuts). Checks
    that generate files write them under `.goal/evidence/` (digest-excluded).
 7. FIX any FAIL. Deterministic: re-run via the gate
    (`goal_gate.sh --verify [AC-ID]`) - its exit code is the verdict, no
@@ -198,7 +203,11 @@ Modes, `--auto`, DSL grammar: references/modes.md.
 shell loop trusts ONLY the gate's exit code, never the status block's
 claims. Honors HTTP(S)_PROXY. On Windows/git-bash: no jq, CR-stripping and
 `LC_ALL=C.UTF-8` are handled in the scripts; check commands run at project
-root; without coreutils `timeout` a hung check hangs (documented).
+root; without coreutils `timeout` a hung check hangs (documented). Note:
+because R7 binds judged verdicts to the tree digest, an unattended run over
+a contract containing judged ACs re-judges the whole panel every round -
+contracts meant to run unattended should be all-deterministic (the gate
+re-runs those at script cost).
 
 Self-test: `bash tests/run_tests.sh` (scenario suite, no API needed).
 
