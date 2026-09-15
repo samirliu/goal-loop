@@ -1,8 +1,8 @@
 # goal-loop
 
-**EN** — A Claude Code skill that fuses two open-source disciplines into one loop: *ralph-claude-code*'s dual-condition exit gate with *fable-mode*'s adversarial checker panel. The core promise (v1.2): **the model can never self-declare completion** — only an external shell gate (`goal_gate.sh`) can certify GO, and since v1.2 the gate **re-runs every deterministic check itself** (zero model in the trust chain); judged quality claims go to cold checker seats. For open-ended "make it as good as possible" objectives, the `forge` exit ends the loop on **verification exhaustion** (K consecutive dry adversarial rounds), not on floors alone.
+**EN** — A Claude Code skill that fuses two open-source disciplines into one loop: *ralph-claude-code*'s dual-condition exit gate with *fable-mode*'s adversarial checker panel. The core promise (v1.2.1): **the model can never self-declare completion** — only an external shell gate (`goal_gate.sh`) can certify GO, and since v1.2 the gate **re-runs every deterministic check itself** (zero model in the trust chain); judged quality claims go to cold checker seats. For open-ended "make it as good as possible" objectives, the `forge` exit ends the loop on **verification exhaustion** (K consecutive dry adversarial rounds), not on floors alone. v1.2.1 hardens the gate: the approval stamp also freezes the exit policy, negative assertions (`expected: exit=N`) and CR-safe metric reads are deterministic, and same-digest judged PASSes carry forward without re-seating.
 
-**中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺（v1.2）：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且 v1.2 起门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明才交冷检查席。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。
+**中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺（v1.2.1）：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且 v1.2 起门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明才交冷检查席。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。v1.2.1 加固门控：批准戳同时冻结退出策略（exit: 行）、负向断言（`expected: exit=N`）与 CR 安全的指标读数归入确定性、同指纹的 judged PASS 可 carry-forward 免重开席位。
 
 ```
 objective → contract (AC-1..N, each with a NAMED failable check) → user approval stamp
@@ -63,15 +63,90 @@ bash ~/.claude/skills/goal-loop/tests/run_tests.sh
    (0=GO, 2=NO-GO, 3=BLOCKED, 4=state error).
    每轮末尾的状态块门控**故意不读**；唯一权威是门控退出码。
 
-## Modes & flags / 模式与参数（v1.2）
+## Modes & flags / 模式与参数（v1.2.1）
 
 ```
 /goal-loop --mode=quick|standard|deep [--max-iterations=N] [--min-acs=N] [--auto] [--forge] <objective>
 ```
 
-**EN** — `quick` = 3 iterations / 2-4 ACs · `standard` = 6 / 4-6 · `deep` = 12 / 6-10 with a **mandatory adversarial seat** (one checker is assigned to legitimately break a check each iteration, exercising the fix→recheck path). `--auto` skips the approval wait: the contract is still shown in full, stamped immediately, and the ledger records `approval=auto` for after-the-fact audit. **`--forge`** (or `exit: forge` in the contract) switches the exit policy for maximization objectives: GO requires floors **plus** a K-round dry streak (`dry_limit`, default 3 — panel + adversarial seat + completeness critic find no new evidence-backed finding) **plus** an empty completeness-critic answer; `max_iterations` becomes a pure fuse (rc=3 `budget-fuse` → extend or deliver best-so-far). In-session bookkeeping is one Bash call: `scripts/goal_ctl.sh close-iteration ...` (`--dry` is mandatory on forge contracts).
+两个轴互相正交 / the two axes are orthogonal: `--mode` sets the **budget** (iterations,
+AC count, panel size); `exit:` in the contract sets the **exit policy** (threshold vs
+forge). Any budget can carry either policy — `--forge` is just sugar for
+"`exit: forge` + deep budget".
 
-**中文** — `quick` = 3 轮 / 2-4 条 AC · `standard` = 6 / 4-6 · `deep` = 12 / 6-10 且带**强制对抗席**（每轮一个检查席专职合法搞挂一项检查，逼出修复路径）。`--auto` 跳过审批等待：契约仍完整呈现、立即盖章，账本记 `approval=auto` 供事后审计。**`--forge`**（或契约写 `exit: forge`）为最大化目标切换退出策略：GO = 地板全过 **且** 连续 `dry_limit`（默认 3）轮"面板+对抗席+completeness critic 挖不出任何有证据的新发现、fix-now 发现项清零" **且** critic 冷答案为空；`max_iterations` 退化为纯保险丝（rc=3 `budget-fuse` → 续期或交付 best-so-far）。会话内记账一条命令：`scripts/goal_ctl.sh close-iteration ...`（forge 契约必带 `--dry`）。
+### Flag reference / 参数一览
+
+| flag | 作用 / effect | 默认 default |
+|---|---|---|
+| `--mode=quick` | 3 轮 / 2-4 条 AC / 仅 req 席 · for small but multi-check tasks | — |
+| `--mode=standard` | 6 轮 / 4-6 条 AC / req 席 · everyday default | ✓ |
+| `--mode=deep` | 12 轮 / 6-10 条 AC / req 席 + **每轮强制对抗席**（一个检查席专职合法搞挂一项检查，逼出 fix→recheck 路径；全程一轮全绿不配出 deep） | — |
+| `--max-iterations=N` | 覆写模式的轮数预算 override the mode's budget | per mode |
+| `--min-acs=N` | 契约 AC 条数下限 floor for AC count | per mode |
+| `--auto` | 契约仍完整呈现，但立即盖章开跑不等确认；账本与交付物记 `approval=auto` 供事后审计。不可逆动作照样硬拒 | off |
+| `--forge` | = 契约 `exit: forge` + deep 预算（见下） | off |
+
+### Contract grammar in one view / 契约语法一览（v1.2.1）
+
+```
+exit: threshold        # 或 forge —— 每一行 exit: 都被批准戳覆盖，盖戳后改 = contract-tampered
+- AC-1 | 产物仍是合法 HTML              | check: `bash validate.sh`          | expected: exit=0
+- AC-2 | 空输入崩溃不再复现（负向断言） | check: `bash repro_crash.sh`       | expected: exit=1
+- AC-3 | 压缩率不低于基线+5%            | check: `python ratio.py`           | expected: >=42.0
+- AC-4 | 压缩后代码仍可被人读懂         | check: -                           | expected: judged
+```
+
+| `expected:` | 语义 meaning | 谁裁决 who decides |
+|---|---|---|
+| `exit=0`（或省略） | 命令成功即 PASS | **门控重跑**，零模型 |
+| `exit=N` (N>0) | 负向断言：命令必须以 N 退出（"故障不再复现"） | **门控重跑** |
+| `>=N` `<N` `==N` 等 | 指标：stdout 末行非空行必须是数字 | **门控重跑** |
+| `judged`（或任意散文） | 质量声明，程序判不了（v1.1 旧契约自动落此路由） | 冷检查席，裁决须引证 |
+
+`exit=N` 与 metric 是 v1.2.1 新增：以前"期望命令失败"和"数值阈值"要么写死在命令里、
+要么被静默路由成 judged 烧席位——现在都是确定性项，归门控。
+
+### Worked examples / 逐模式实例
+
+**quick — 小目标也要真验证 small-but-multi-check:**
+```
+/goal-loop --mode=quick "把 src/ 里 AUTH_TIMEOUT 全改成 session_ttl，测试保持全绿"
+```
+契约 2-3 条 AC，全是确定性：`exit=1`（旧名消失，负向断言）+ `exit=0`（测试套件）。
+两轮收工，门控重跑代替面板烧席。
+
+**standard — 日常默认:**
+```
+/goal-loop "写一个 CSV 去重工具，含 CLI、错误处理和 README"
+```
+6 轮预算，功能 AC（确定性）+ 文档质量 1 条 `judged`。
+
+**deep — 对抗席常驻 adversarial seat every round:**
+```
+/goal-loop --mode=deep "给这个解析器补齐边界输入测试并修复暴露的 bug"
+```
+每轮对抗席专职合法搞挂一项检查——它抓到 FAIL 是成功不是失败。
+
+**forge — 优化到挖不动为止（v1.2 退出策略，v1.2.1 效率补丁）:**
+```
+/goal-loop --forge "把这个 HTML 压缩器推到尽可能接近无损最优"
+```
+契约如上面的语法示例（`exit: forge` + 一条 metric AC）。GO 条件：地板全过 **且**
+连续 `dry_limit`（默认 3）轮干轮（面板+对抗席+critic 挖不出有证据的新发现、
+fix-now 清零）**且** critic 冷答案为空（归档 `.goal/evidence/critic-iter-N.md`）。
+记账：`bash scripts/goal_ctl.sh close-iteration --project . --task T4 --files minify.py \
+  --checks-pass 3 --checks-fail 0 --checks-unverifiable 0 --dry yes` ——
+`--dry` 在 forge 契约上必填；`--dry yes` 与 `checks-fail>0` 并存会被拒（rc=4）。
+干轮树通常没动：已判工件的 PASS 按 carry-forward 重绑（`carried=yes`）即可，
+不重开席位——这是 forge 长跑最大的 token 节省（v1.2.1）。预算用尽但没干透 →
+rc=3 `budget-fuse`：问你续期还是交付 best-so-far，保险丝从不认证完成。
+
+**--auto — 批量活不想等审批:**
+```
+/goal-loop --auto "把仓库里 47 个配置文件补齐缺失的字段注释"
+```
+契约秒盖章开跑，账本与交付物带 `approval=auto`；涉及不可逆外部动作的目标两种模式
+下都直接拒绝执行。
 
 ## Unattended mode / 无人值守模式（可选）
 
@@ -83,7 +158,10 @@ bash ~/.claude/skills/goal-loop/scripts/goal_loop.sh --continue --max-iterations
 
 The outer shell loop trusts **only the gate's exit code** — 0 DELIVERED, 3 BLOCKED,
 4 state error, anything else → next round. `--dry-run` exercises it without calling
-the API. 外层循环只信退出码；`--dry-run` 可不调 API 演练。
+the API. Prefer all-deterministic contracts here: R7 binds judged verdicts to the
+tree digest, so a contract with judged ACs re-judges the whole panel every round
+unattended. 外层循环只信退出码；`--dry-run` 可不调 API 演练。无人值守契约应尽量
+全确定性——judged AC 每轮都会被 R7 强制全量重判。
 
 ## The gate / 门控速查
 
@@ -92,24 +170,29 @@ the API. 外层循环只信退出码；`--dry-run` 可不调 API 演练。
 | 0 | GO, deliverable / 可交付 | — |
 | 2 | NO-GO, keep iterating / 继续迭代 | no-approval, contract-tampered, not-claimed, verdicts-stale, open-FAIL, **check-broken, check-mutated-tree**, evidence-missing, unverifiable-excessive, **not-dry (forge)**, budget-exhausted |
 | 3 | BLOCKED, stop & report / 停止上报 | breaker-open, false-completes≥2, stagnation, repeated-error, **budget-fuse (forge)** |
-| 4 | state error / 状态错误 | no-goal-dir, missing-key, unknown-flag |
+| 4 | state error / 状态错误 | no-goal-dir, missing-key, unknown-flag, **bad-check-timeout (v1.2.1)** |
 
 Every judged verdict is bound to `(iteration, tree-digest)`. Touch one file under audit and
 all judged verdicts go stale — the loop must re-judge (R7); deterministic ACs are exempt —
-the gate re-runs them at every exit. Check 4b blocks the loop when two consecutive
+the gate re-runs them at every exit. Exception (v1.2.1): a judged PASS whose digest is
+UNCHANGED may be re-bound to a later iteration (`carried=yes`, original evidence cited) —
+same bytes, same truth, no re-seat; FAIL/UNVERIFIABLE never carry, and there is no
+covered-set sharding across digests. Check 4b blocks the loop when two consecutive
 iterations grind on the same error signature.
 判断类裁决绑定 `(迭代号, 树指纹)`；树一动全部过期、强制重判（R7）；确定性 AC 豁免——门控
-每次出口亲自重跑。连续两轮踩同一错误签名会被熔断（4b）。
+每次出口亲自重跑。v1.2.1 例外：digest 未变的 judged PASS 可重绑到新迭代（`carried=yes`，
+引证原 evidence），不重开席位；FAIL/UNVERIFIABLE 永不 carry；跨指纹不搞覆盖集分片。
+连续两轮踩同一错误签名会被熔断（4b）。
 
 ## Anti-gaming rules R1–R8 / 防作弊八规
 
 - **R1** false-complete counting: two gate-caught false claims → halt BLOCKED / 假完成两次即熔断
 - **R2** re-running a **seat judgment** is illegal while its files are unchanged (gate re-runs are measurement, always legal) / 指纹未动的判断席复跑不算工作（门控重跑是测量，不受限）
-- **R3** the stamped contract is frozen / 契约盖章即冻结
+- **R3** the stamped contract is frozen — since v1.2.1 including every `exit:` line (flipping forge→threshold after stamping is contract-tampered) / 契约盖章即冻结——v1.2.1 起所有 `exit:` 行一并入戳，盖戳后翻转退出策略 = contract-tampered
 - **R4** UNVERIFIABLE ≤ ⅓ of judged ACs, always with PROBE/REASON / 不可验证项限额且必须给出探测与理由
 - **R5** checker briefs carry verbatim AC text + paths only — never the producer's reasoning (judged seats; deterministic ACs are gate-evidenced) / 简报零污染
 - **R6** workers never touch `.goal/` / worker 禁触状态目录
-- **R7** stale judged verdicts are void after any digest move / 过期裁决作废
+- **R7** stale judged verdicts are void after any digest move; same-digest PASSes may carry forward (v1.2.1) / 过期裁决作废；同指纹 PASS 可 carry-forward 免重席
 - **R8** findings must bind evidence — manufactured discoveries are as forbidden as manufactured passes / 发现项必须绑证据：制造发现与制造通过同罪
 
 ## State / 状态文件（`.goal/`，纯文本，grep 即查询）
