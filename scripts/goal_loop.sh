@@ -15,9 +15,9 @@ project="." mode="" max_iterations=12 wallclock=1800 rate=5 dry=0 resume=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --init) mode=init ;;
-    --continue) mode=continue ;;
-    --check-only) mode=check ;;
+    --init) mode="init" ;;
+    --continue) mode="continue" ;;
+    --check-only) mode="check" ;;
     --max-iterations=*) max_iterations="${1#*=}" ;;
     --wallclock=*) wallclock="${1#*=}" ;;
     --dry-run) dry=1 ;;

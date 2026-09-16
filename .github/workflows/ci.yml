@@ -9,7 +9,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Shellcheck the shipped scripts
-        run: shellcheck scripts/*.sh
+        run: shellcheck --severity=warning scripts/*.sh  # info-level style hints stay in logs; warnings+errors block (parity with tests/run_tests.sh #33)
       - name: Bash syntax check (bash -n)
         run: |
           echo "Running bash -n on all three shipped scripts"

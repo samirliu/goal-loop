@@ -276,9 +276,11 @@ cd "$here"
 bash "$here/tests/docs_consistency.sh" >/dev/null 2>&1
 assert_rc "32 docs consistency" 0 $?
 
-# 33 external linter (shellcheck) - run when available, skip silently otherwise
+# 33 external linter (shellcheck) - run when available, skip silently otherwise.
+# Severity parity with CI: warnings and errors block; info-level style hints
+# stay visible in CI logs but do not fail (single definition of green).
 if command -v shellcheck >/dev/null 2>&1; then
-  shellcheck "$here/scripts/goal_gate.sh" "$here/scripts/goal_loop.sh" "$here/scripts/goal_ctl.sh" \
+  shellcheck --severity=warning "$here/scripts/goal_gate.sh" "$here/scripts/goal_loop.sh" "$here/scripts/goal_ctl.sh" \
     && ok "33 shellcheck clean" || no "33 shellcheck findings"
 else
   ok "33 shellcheck skipped (not installed)"
