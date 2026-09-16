@@ -1,4 +1,4 @@
-# goal-loop 接入指南（Claude Code）— v1.2
+# goal-loop 接入指南（Claude Code）— v1.3.1
 
 一句话：把"契约 → 循环 → 外部门控"装进 Claude Code。模型永远不能自我宣布
 完成——只有 shell 门控 `goal_gate.sh` 能发 GO；**v1.2 起门控还会亲自重跑每条
@@ -18,9 +18,10 @@
 
 1. skill 本体 → `~/.claude/skills/goal-loop/`（Windows:
    `C:\Users\<你>\.claude\skills\goal-loop\`）：
-   `SKILL.md`、`INTEGRATION.md`、`assets/goal.contract.md`、
+   `SKILL.md`、`INTEGRATION.md`、`VERSION`、`assets/{goal.contract.md,evidence_cache.sh}`、
    `references/{exit-gate,checker-panel,domain-patterns,modes}.md`、
-   `scripts/{goal_gate.sh,goal_loop.sh,goal_ctl.sh}`、`tests/run_tests.sh`。
+   `scripts/{goal_gate.sh,goal_loop.sh,goal_ctl.sh}`、
+   `tests/{run_tests.sh,docs_consistency.sh}`。
 2. 5 个 agent 定义 → `~/.claude/agents/`：
    `goal-worker.md`、`goal-mech-worker.md`、`goal-checker-req.md`、
    `goal-critic.md`（v1.2 新增，forge 专用）、`goal-adjudicator.md`。
@@ -35,10 +36,13 @@
 ```bash
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --help        # 打印用法（含 --verify）
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check       # 无 .goal/ 时应 rc=4, reason=no-goal-dir
-bash ~/.claude/skills/goal-loop/tests/run_tests.sh                 # 场景套件，应 57/57 全绿
+bash ~/.claude/skills/goal-loop/tests/run_tests.sh                 # 场景套件，应全绿
+bash ~/.claude/skills/goal-loop/tests/docs_consistency.sh          # 文档一致性，应 CONSISTENT
 ```
 
 ## 2. 会话内使用（默认方式）
+
+模式预算（详见 `references/modes.md`）：quick = 3 轮 / 2-4 条 AC · standard = 6 轮 / 4-6 条 AC · deep = 12 轮 / 6-10 条 AC（deep 每迭代含强制对抗席）。
 
 - 触发：`/goal-loop <目标>`；或自然语言"进入循环直到 100% 满意 / 优化到
   不再提升为止 / 每个角度都构建检查"。

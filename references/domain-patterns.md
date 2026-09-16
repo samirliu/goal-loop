@@ -2,7 +2,8 @@
 
 Contents: [1 how to read] [2 executable-correctness] [3 behavioral]
 [4 quantitative] [5 perceptual/quality] [6 data] [7 documents]
-[8 long-running] [9 metric robustness] [10 project patterns slot].
+[8 long-running] [9 metric robustness] [10 project patterns slot]
+[11 measurement-once / evidence cache].
 This file is deliberately DOMAIN-FREE: it names claim families and the
 shape a failable check must have - never tools or industries. Concrete
 recipes belong to each project (section 10).
@@ -119,3 +120,21 @@ commands) and reference it from the contract (`patterns: <path>`). Rules:
 
 This keeps the skill generic and the specifics where they belong: in the
 project that knows them.
+
+## 11 Measurement-once / evidence cache
+
+Checks whose evidence is EXPENSIVE (headless renders, long logs, big dumps)
+must produce it ONCE per input state, not once per check:
+
+- the producing check writes the artifact under `.goal/evidence/` plus a key
+  file `evidence-key` holding a hash of the INPUTS (e.g.
+  `sha1sum main.js index.html`), never a bare timestamp;
+- sibling checks read the cached artifact instead of re-measuring; they
+  regenerate only when the key changed (same input bytes + deterministic
+  renderer = same output - nothing is lost);
+- every evidence path stays under `.goal/evidence/` (digest-excluded), so
+  the gate's check-mutated-tree guard still passes;
+- measured cost of ignoring this shape: one real audit spent ~100
+  environment invocations across a multi-hour loop because two sibling
+  checks re-measured the same artifacts every gate exit - the
+  measurement-once shape cuts that to one pass per input state.

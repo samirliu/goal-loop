@@ -256,6 +256,34 @@ grep -q '^time_budget=60$' "$T/t30/.goal/state.rec" && ok "30 close preserves ti
 d=$(grep '^deadline=' "$T/t30/.goal/state.rec" | cut -d= -f2)
 [ -n "$d" ] && [ "$d" -gt 0 ] && ok "30 close preserves deadline" || no "30 deadline lost on close"
 
+# 31 evidence_cache: measurement-once semantics (domain-patterns.md section 11)
+mkproj t31 >/dev/null
+printf 'v1\n' > "$T/t31/in.txt"
+cd "$T/t31"
+EC="bash $here/assets/evidence_cache.sh t31cache -- in.txt --"
+cmd31='c=$(cat counter 2>/dev/null || echo 0); c=$((c+1)); printf "%s" "$c" > counter; echo run#$c; echo 42'
+out1=$($EC -- "$cmd31"); c1=$(cat counter)
+out2=$($EC -- "$cmd31"); c2=$(cat counter)
+assert_has "31a cache hit replays metric 42" '42' "$out2"
+[ "$c1" = "$c2" ] && ok "31b command ran once for unchanged input" || no "31b ran twice (c1=$c1 c2=$c2)"
+[ -f .goal/evidence/t31cache.out ] && ok "31c stdout archived under .goal/evidence" || no "31c archive missing"
+printf 'v2\n' >> in.txt
+out3=$($EC -- "$cmd31"); c3=$(cat counter)
+assert_has "31d rerun after input change" 'run#2' "$out3"
+cd "$here"
+
+# 32 docs_consistency: the skill's own docs stay mechanically consistent
+bash "$here/tests/docs_consistency.sh" >/dev/null 2>&1
+assert_rc "32 docs consistency" 0 $?
+
+# 33 external linter (shellcheck) - run when available, skip silently otherwise
+if command -v shellcheck >/dev/null 2>&1; then
+  shellcheck "$here/scripts/goal_gate.sh" "$here/scripts/goal_loop.sh" "$here/scripts/goal_ctl.sh" \
+    && ok "33 shellcheck clean" || no "33 shellcheck findings"
+else
+  ok "33 shellcheck skipped (not installed)"
+fi
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

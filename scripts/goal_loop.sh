@@ -69,14 +69,12 @@ run_claude(){
 
 case "$mode" in
   init)
-    mkdir -p "$sd/logs"
     if [ -f "$sd/goal.md" ]; then
       echo "GOAL_LOOP: already initialized ($sd/goal.md) - editing the contract means re-approval (R3)" >&2; exit 2
     fi
     [ -f "$template" ] || { echo "GOAL_LOOP: ERROR template-missing $template" >&2; exit 4; }
+    bash "$here/goal_ctl.sh" init --project "$project" --max-iterations="$max_iterations" >/dev/null || exit 4
     cp "$template" "$sd/goal.md"
-    printf 'iteration=0\nbreaker=CLOSED\nfalse_completes=0\nreplans=0\nno_progress_streak=0\nlast_progress_iteration=0\nmax_iterations=%s\nno_progress_limit=2\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=0\ndry_limit=3\ncheck_timeout=120\ntime_budget=0\ndeadline=0\n' "$max_iterations" > "$sd/state.rec"
-    : > "$sd/loop-log.md"; : > "$sd/verdicts.rec"; : > "$sd/work-plan.md"
     echo "GOAL_LOOP: INIT ok - fill $sd/goal.md, get user approval, then --continue"
     exit 0 ;;
   check)

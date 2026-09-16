@@ -34,6 +34,14 @@ environment that breaks it. A caught FAIL is a success: it routes through
 fix-and-recheck and exercises the loop's repair path. A deep run whose every
 iteration passes everything on the first sweep has NOT earned its exit.
 Under forge this duty is what feeds the dry streak.
+Probe discipline (environment-agnostic - applies to any measured surface:
+renderers, CLIs, network calls, long test suites): the adversarial seat gets
+a budget (<=6 probes, ~10 min per round) and a ROTATION ledger - each round
+targets a surface CLASS no prior round covered (the general classes: input
+validation, error/refusal paths, timing and concurrency, state reuse across
+repeats, boundary values, configuration surfaces) and appends one line to
+.goal/evidence/adv-coverage.md (`round=<n> target=<class> result=<clean|FAIL-found>`).
+Depth comes from rotating classes, not from re-walking covered ground.
 
 ## 3 Forge exit (`exit: forge`) - maximization objectives
 
@@ -88,6 +96,14 @@ tool name, missing subcommand, unavailable binary) is rewritten at contract
 time - never stamped and later excused by the panel. This rule exists
 because it failed once: a contract named a CLI subcommand that did not
 exist. The gate's `check-broken` reason is what catches survivors.
+Two more smoke duties, both born of real waste:
+- Negation test: run the check against a deliberately BROKEN copy of its
+  input (truncated/emptied scratch copy) - it must FAIL. A check that
+  cannot fail on garbage measures nothing.
+- Duration probe: run it twice, take the slower wall time, and set
+  `check_timeout` in the contract knobs to at least 3x that. One audit
+  burned two full gate rounds on timeouts a 10-second measurement would
+  have prevented.
 
 ## 6 Evidence directory (.goal/evidence/)
 

@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# docs_consistency.sh - form-level regression for the skill's documentation.
+# Protocol changes are cheap to make and expensive to notice when they rot;
+# this catches the mechanical rot classes in seconds:
+#   C1 every referenced skill-internal file exists
+#   C2 the version markers agree with the VERSION file
+#   C3 every numbered TOC entry has a matching ## heading
+#   C4 the three mode budgets agree between modes.md and INTEGRATION.md
+# Run from anywhere:  bash tests/docs_consistency.sh
+# Exit 0 = consistent. (Semantic review still belongs to humans + the loop.)
+set -u
+export LC_ALL=C.UTF-8
+
+here=$(cd "$(dirname "$0")/.." && pwd)
+cd "$here"
+fail=0
+ok(){ echo "  ok   - $1"; }
+bad(){ fail=1; echo "  FAIL - $1"; }
+
+# C1 file-reference resolution (docs may cite skill-internal paths, or paths
+# of OTHER installed skills - e.g. the packager of skill-creator)
+refs=$(grep -ohE '(references|scripts|assets|tests)/[A-Za-z0-9_][A-Za-z0-9_./-]*' \
+        SKILL.md INTEGRATION.md references/*.md assets/goal.contract.md 2>/dev/null |
+      sed 's/[.,;:)]*$//' | sort -u)
+missing=0
+while IFS= read -r r; do
+  [ -n "$r" ] || continue
+  [ -f "$r" ] && continue
+  ls "$HOME/.claude/skills/"*/"$r" >/dev/null 2>&1 && continue
+  bad "C1 broken reference: $r"; missing=$((missing+1))
+done <<< "$refs"
+[ "$missing" -eq 0 ] && ok "C1 all cited files exist"
+
+# C2 version agreement with the VERSION file
+if [ -f VERSION ]; then
+  V=$(tr -d '[:space:]' < VERSION)
+  grep -q "(v$V)" SKILL.md && ok "C2 SKILL.md title says v$V" || bad "C2 SKILL.md title does not say (v$V)"
+  grep -q "v$V" INTEGRATION.md && ok "C2 INTEGRATION.md says v$V" || bad "C2 INTEGRATION.md does not mention v$V"
+else
+  bad "C2 VERSION file missing"
+fi
+
+# C3 numbered TOC entries (from the Contents line ONLY) have matching ## headings
+for f in references/*.md; do
+  cont=$(grep '^Contents:' "$f") || continue
+  for n in $(printf '%s\n' "$cont" | grep -oE '\[[0-9]+' | tr -d '[' | sort -un); do
+    grep -qE "^## $n( |:|\$)" "$f" && ok "C3 $f TOC $n has a heading" || bad "C3 $f TOC entry $n has no ## heading"
+  done
+done
+
+# C4 mode budgets agree between modes.md (authoritative table) and INTEGRATION.md
+while IFS='|' read -r _ mode iters _; do
+  mode=$(printf '%s' "$mode" | tr -d ' '); iters=$(printf '%s' "$iters" | tr -d ' ')
+  [ -n "$mode" ] || continue
+  { grep -q "$mode" INTEGRATION.md && grep -q "$iters" INTEGRATION.md; } \
+    && ok "C4 budget $mode=$iters present in INTEGRATION.md" \
+    || bad "C4 budget $mode=$iters not found in INTEGRATION.md"
+done < <(grep -E '^\| (quick|standard|deep) ' references/modes.md)
+
+echo "== docs consistency: $([ $fail -eq 0 ] && echo CONSISTENT || echo DRIFT) =="
+exit $fail

@@ -54,6 +54,14 @@ Rules:
 - Findings must bind evidence (R8): name the check that produced or would
   produce the FAIL, or the missing dimension with a concrete probe. An
   evidence-free finding is void.
+- Image budget: read each provided image at most twice (first view + one
+  zoom batch); judge from the pre-cropped bands in .goal/evidence/ when
+  present. Re-reading full images to re-confirm what you already described
+  burns the session - it adds no evidence.
+- Probe budget (adversarial seat): at most 6 invocations of the measured
+  environment and ~10 minutes per round; rotate the attack surface per the
+  coverage ledger (.goal/evidence/adv-coverage.md) - extend it, never repeat
+  a covered surface.
 - No subagents.
 Output format, one line per item:
 id|verdict|command|evidence
