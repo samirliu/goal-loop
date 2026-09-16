@@ -27,13 +27,25 @@ Read this when assembling the panel for a finished artifact.
 | deterministic | anything a command settles (exit codes, counts, diffs, metric comparisons) | NONE - `goal_gate.sh --verify` / inline at --check | - | 0 |
 | requirements | AC coverage by the artifact itself, internal consistency, claim NOMINATION (falsifiable claims the controller missed -> propose them as new named checks) | goal-checker-req | sonnet | 1 |
 | judgment | quality claims marked `expected: judged` (see section 5) | goal-checker-req (or a judged-role seat) | sonnet | 0-1 |
-| forge critic | "which dimension is still missing?" cold answer; zero-answer = clear | goal-critic | opus | 1 (forge only; not counted in panel_max) |
+| forge critic | "which dimension is still missing?" cold answer; zero-answer = clear | goal-critic | opus | 0-1 (forge, candidate-dry rounds ONLY - see below) |
 | adjudication | only ids where seats split, or a disputed refutation / make-work claim | goal-adjudicator | opus | 0-1 |
 
 The v1.1 mechanical seats (goal-checker-mech) are GONE: "run a command and
 quote its output" is now the gate's job - cheaper and honest (no model in
 the trust chain). What a seat adds over the gate is judgment and fresh-eyes
 nomination, so that is all seats do.
+
+GATE-ONLY ROUNDS: an iteration whose artifact is all deterministic surface
+and introduces no new judged claims (the recurring polish/bundle round in
+optimization loops) spawns ZERO seats - the gate is the whole panel and
+costs a few bash invocations. Seats follow judgment, not ritual.
+
+CRITIC-ON-DEMAND (forge): the completeness critic runs only when the
+adversarial seat came back clean - a candidate-dry round. A round with a
+FAIL is not dry, so the critic has nothing to arbitrate there; its cost is
+paid only where it can change the outcome, and the dry guarantee is
+unchanged (every round counting toward the streak still needs the empty
+critic answer, archived per round).
 
 ## 3 The brief (verbatim template; fill, do not embellish)
 

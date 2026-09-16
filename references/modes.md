@@ -48,12 +48,16 @@ Depth comes from rotating classes, not from re-walking covered ground.
 For "as good as possible / until it stops improving" goals. The contract
 declares `exit: forge`; GO requires floors AND exhaustion:
 
-- dry streak: `dry_limit` (default 3) consecutive rounds in which the panel,
-  the adversarial seat and the completeness critic produced no new
-  evidence-backed finding, and all fix-now discovery items are closed
-  (R8 governs what counts as evidence-backed; checker-panel.md section 8).
-- the critic's cold answer ("which dimension is still missing?") is empty;
-  archived per round under `.goal/evidence/critic-iter-N.md`.
+- dry streak: `dry_limit` (default 3) consecutive rounds in which no new
+  evidence-backed finding emerged and all fix-now discovery items are
+  closed (R8 governs what counts as evidence-backed; checker-panel.md
+  section 8).
+- the completeness critic runs on CANDIDATE-DRY ROUNDS ONLY - when the
+  adversarial seat came back clean. A round with a FAIL is not dry, so
+  spending the critic there buys nothing; its cold answer ("which
+  dimension is still missing?") must be empty for every round that counts
+  toward the streak, archived under `.goal/evidence/critic-iter-N.md`.
+  Same guarantee, critic cost paid only where it can change the outcome.
 - max_iterations is a FUSE: exhausted without dry -> gate rc=3 budget-fuse
   -> ask the user to extend or deliver best-so-far. It never certifies
   completion.

@@ -283,11 +283,53 @@ assert_rc "32 docs consistency" 0 $?
 # Severity parity with CI: warnings and errors block; info-level style hints
 # stay visible in CI logs but do not fail (single definition of green).
 if command -v shellcheck >/dev/null 2>&1; then
-  shellcheck --severity=warning "$here/scripts/goal_gate.sh" "$here/scripts/goal_loop.sh" "$here/scripts/goal_ctl.sh" \
+  shellcheck --severity=warning "$here/scripts/goal_gate.sh" "$here/scripts/goal_loop.sh" "$here/scripts/goal_ctl.sh" "$here/scripts/goal_hook.sh" \
     && ok "33 shellcheck clean" || no "33 shellcheck findings"
 else
   ok "33 shellcheck skipped (not installed)"
 fi
+
+# 34-39: Stop hook (goal_hook.sh) - the physical tooth. The hook reads
+# .goal/ relative to its cwd; run each scenario from inside the fixture.
+# 34 no .goal/ -> allow (rc0)
+mkdir -p "$T/h34"
+(cd "$T/h34" && bash "$here/scripts/goal_hook.sh") >/dev/null 2>&1
+assert_rc "34 hook no-goal allows stop" 0 $?
+
+# 35 claimed + gate GO -> allow
+mkproj h35 >/dev/null; contract h35 "- AC-1 | f | check: \`true\` | expected: exit=0"
+close_iter h35
+(cd "$T/h35" && bash "$here/scripts/goal_hook.sh") >/dev/null 2>&1
+assert_rc "35 hook claimed+GO allows stop" 0 $?
+
+# 36 claimed + gate rc2 -> BLOCK (rc2), sanitized reason with prefix
+mkproj h36 >/dev/null; contract h36 "- AC-1 | f | check: \`false\` | expected: exit=0"
+close_iter h36
+(cd "$T/h36" && bash "$here/scripts/goal_hook.sh") >/dev/null 2>"$T/h36.err"
+assert_rc "36 hook claimed+NO-GO blocks (rc2)" 2 $?
+grep -q 'GOAL_LOOP_GATE' "$T/h36.err" && ok "36 block reason carries GOAL_LOOP_GATE prefix" || no "36 missing GOAL_LOOP_GATE prefix"
+grep -qE 'open-FAIL:AC-1' "$T/h36.err" && ok "36 gate reason preserved in block message" || no "36 gate reason lost"
+
+# 37 unclaimed stop -> allow
+mkproj h37 >/dev/null; contract h37 "- AC-1 | f | check: \`true\` | expected: exit=0"
+bash "$CTL" close-iteration --project "$T/h37" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --exit-signal no --no-gate >/dev/null 2>&1
+(cd "$T/h37" && bash "$here/scripts/goal_hook.sh") >/dev/null 2>&1
+assert_rc "37 hook unclaimed allows stop" 0 $?
+
+# 38 BLOCKED state (breaker OPEN, rc3) -> allow: user decision, not a grind
+mkproj h38 >/dev/null; contract h38 "- AC-1 | f | check: \`true\` | expected: exit=0"
+close_iter h38
+sed -i 's/^breaker=.*/breaker=OPEN/' "$T/h38/.goal/state.rec"
+(cd "$T/h38" && bash "$here/scripts/goal_hook.sh") >/dev/null 2>&1
+assert_rc "38 hook rc3 state allows stop" 0 $?
+
+# 39 broken state (state.rec gone, rc4) -> fail-open
+mkproj h39 >/dev/null; contract h39 "- AC-1 | f | check: \`true\` | expected: exit=0"
+close_iter h39
+rm "$T/h39/.goal/state.rec"
+(cd "$T/h39" && bash "$here/scripts/goal_hook.sh") >/dev/null 2>&1
+assert_rc "39 hook rc4 fail-open allows stop" 0 $?
 
 echo
 echo "== results: pass=$pass fail=$failn =="

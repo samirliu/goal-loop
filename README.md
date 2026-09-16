@@ -63,7 +63,7 @@ bash ~/.claude/skills/goal-loop/tests/run_tests.sh
    (0=GO, 2=NO-GO, 3=BLOCKED, 4=state error).
    每轮末尾的状态块门控**故意不读**；唯一权威是门控退出码。
 
-## Modes & flags / 模式与参数（v1.3.1）
+## Modes & flags / 模式与参数（v1.4.0）
 
 ```
 /goal-loop --mode=quick|standard|deep [--max-iterations=N] [--min-acs=N] [--auto] [--forge] [--time-budget=N] <objective>
@@ -118,6 +118,43 @@ iterations grind on the same error signature.
 
 `goal.md`（契约+批准戳）· `state.rec`（计数器）· `loop-log.md`（迭代账本）·
 `verdicts.rec`（裁决记录，6 字段管道分隔）· `logs/`（无人值守日志）
+
+## goal-loop vs the built-in /goal / 与内置 /goal 的对位
+
+Claude Code ships a harness-native `/goal` (Stop hook + prompt evaluator).
+Ground truth from the bundled sidecar JS: on **every stop** it spawns a
+tool-using evaluator agent (full tool array, structured `{ok, reason}`,
+fail-closed on evaluator error), sanitizes the denial reason (`<>&` strip,
+240-char cap) into `Goal continuing: <reason>`, and rebuilds the goal
+state from the transcript on resume. 内置 /goal 每次停顿起一个带工具的评估
+agent（结构化输出、评估器出错 fail-closed、reason 消毒回注、transcript 重建状态）。
+
+| axis / 维度 | /goal (built-in) | goal-loop (this skill) |
+|---|---|---|
+| verification / 验证 | discretionary - a fresh agent decides each stop what to check / 裁量式，每次停顿自定查什么 | pinned - named checks frozen in the stamped contract, the gate re-runs them exactly / 钉死在契约里，门控原样重跑 |
+| regression protection / 回归保护 | none structurally / 结构性缺失 | every deterministic check re-runs at every exit / 出口全量重跑 |
+| "done" definition / 完成定义 | one sentence, interpreted post-hoc / 一句话事后解释 | AC-1..N frozen at stamping, user-owned / 盖章冻结，定义权在用户 |
+| failure semantics / 失败语义 | continue until the user kills it / 只有不结束 | BLOCKED · breakers · budget-fuse · time-budget · best-so-far |
+| cost shape / 成本形态 | pays every stop (evaluator tax), even with nothing claimed / 每次停顿都付 | pays per panel; gate reruns are bash; gate-only rounds ~free / 按面板付费，门控重跑≈0 |
+| audit / 审计 | transcript grep only | verdicts.rec + digest binding + evidence/ |
+| setup / 门槛 | zero ceremony / 零仪式 | contract + approval, one-time / 契约+审批，一次性 |
+
+**Don't stack them / 不要叠加**：/goal 的评估器会把 goal-loop 的 BLOCKED 判成
+"未完成"强行续跑——两个外层循环打架，熔断语义被废。二选一。
+
+Rule of thumb / 经验法则: a vague one-sentence objective with a human watching
+→ `/goal` is the cheaper tool; there is no shame in it. Anything that must be
+defended later — deliverables, optimization with metric deltas, auditable
+completion — needs the pinned checks, regression re-runs and fuse semantics
+that only goal-loop has; for optimization specifically, /goal cannot pin a
+baseline or a noise floor, so "better" is judged on vibes while goal-loop
+spends its tokens on deltas against a measured baseline. 一句话模糊目标、有人
+盯着 → /goal 更省；要交付物、要指标 delta、要可审计完成 → goal-loop。
+
+**Physical tooth, deterministic arbiter / 物理的牙，确定性的仲裁**：register
+`scripts/goal_hook.sh` as a Stop hook (INTEGRATION.md §5.7) and the harness
+blocks stopping only when a claimed exit is denied by the gate (rc=2) — /goal's
+tooth, without its discretionary evaluator. rc=0/3/4 pass, fail-open.
 
 ## More docs / 更多文档
 

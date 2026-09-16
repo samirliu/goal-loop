@@ -16,7 +16,7 @@ description: |-
   tasks, pure Q&A, or actions needing immediate irreversible side effects.
 ---
 
-# Goal Loop (v1.3.1)
+# Goal Loop (v1.4.0)
 
 Contract-first, loop-per-iteration, gate-decides. Authority is split: you (the
 controller) execute and delegate; independent checkers judge quality claims;
@@ -92,16 +92,19 @@ Workers must never touch `.goal/` (R6). Schemas: references/exit-gate.md.
    bundled: cap 5 actions, disjoint files, mark the entry `[bundle]`; on
    any FAIL, unbundle for the fix round. Reasoning-heavy tasks stay
    one-task-per-loop.
-3. Delegate artifact production via the Agent tool: reasoning-heavy ->
-   `goal-worker`, bulk mechanical -> `goal-mech-worker`. Brief each with:
-   bounded task, exact output path, needed context, pass condition, and
-   "return evidence (command + output) with your report". Briefs whose
+3. Produce the artifact - cost default INLINE on the main thread for
+   bounded, well-specified tasks: a worker subagent duplicates context
+   without adding verification strength (fresh eyes are the panel's job,
+   not the producer's). Spawn a subagent only when it pays: reasoning-heavy
+   -> `goal-worker`, bulk mechanical -> `goal-mech-worker`. Brief each
+   with: bounded task, exact output path, needed context, pass condition,
+   and "return evidence (command + output) with your report". Briefs whose
    evidence includes images (or any large artifact a seat/worker must view)
    cap the reads: each artifact at most twice, prefer the pre-cropped bands
    under .goal/evidence/ - agents stacking full reads die of token
-   accumulation mid-task. Workers do not
-   spawn workers. No Agent tool -> work inline and log `WEAKER
-   VERIFICATION: cold self-check, no sub-agents`. Named goal-* types
+   accumulation mid-task. Workers do not spawn workers. On a surface with
+   no Agent tool, work inline and label the report `WEAKER VERIFICATION:
+   cold self-check, no sub-agents`. Named goal-* types
    unregistered -> general-purpose with role text injected verbatim; log
    the substitution.
 4. Skeptical self-review of the artifact: name a real weakness or state
@@ -109,12 +112,19 @@ Workers must never touch `.goal/` (R6). Schemas: references/exit-gate.md.
 5. Before closing the task, assemble the panel
    (references/checker-panel.md) FOR THIS ARTIFACT's claims and the ACs it
    realizes - not the whole contract. Deterministic ACs need NO seat: the
-   gate re-runs them. Spawn `goal-checker-req` x1 (requirements coverage +
-   claim nomination + seam hunt); on forge, add `goal-critic` x1;
-   deep adds an adversarial seat; on split, escalate `goal-adjudicator`.
-   Seats receive the AC text VERBATIM + artifact paths ONLY - never your
-   reasoning, never hunches. On checker disagreement escalate one
-   adjudicator (it adjudicates, it does not re-check everything).
+   gate re-runs them. GATE-ONLY ROUNDS: an iteration whose artifact is all
+   deterministic surface and introduces no new judged claims (the
+   recurring case in optimization polish rounds and [bundle] rounds)
+   spawns ZERO seats - the gate is the whole panel, and the gate is bash.
+   Spawn `goal-checker-req` x1 when there is judged surface or a NEW
+   artifact worth nominating claims on; on forge, add `goal-critic` x1
+   ONLY on candidate-dry rounds (the adversarial seat came back clean - a
+   round with a FAIL is not dry, so the critic has nothing to arbitrate
+   there); deep adds an adversarial seat; on split, escalate
+   `goal-adjudicator`. Seats receive the AC text VERBATIM + artifact paths
+   ONLY - never your reasoning, never hunches. On checker disagreement
+   escalate one adjudicator (it adjudicates, it does not re-check
+   everything).
 6. Append verdicts to verdicts.rec:
    `id|verdict|iter|digest|command|evidence`; verdict PASS/FAIL/UNVERIFIABLE;
    a judged PASS without a quoted output line is void. Bind each record to
@@ -183,10 +193,14 @@ deliver with an open FAIL.
 
 Threshold floors alone cannot certify "optimal". Forge adds two conjuncts:
 (1) dry streak - `dry_limit` (default 3) consecutive iterations in which
-the panel + adversarial seat + completeness critic produced NO new
-evidence-backed finding and all fix-now discovery items are closed;
+no new evidence-backed finding emerged and all fix-now discovery items
+are closed;
 (2) the completeness critic's cold answer to "which dimension is still
-missing" is empty, archived under `.goal/evidence/critic-iter-N.md`.
+missing" is empty - the critic runs on CANDIDATE-DRY ROUNDS ONLY (the
+adversarial seat came back clean; a round with a FAIL is not dry, so the
+critic has nothing to arbitrate there), archived under
+`.goal/evidence/critic-iter-N.md`. Same guarantee, critic cost paid only
+where it can change the outcome.
 max_iterations degrades to a pure fuse (rc=3 budget-fuse, ask the user).
 The dry streak is controller-bookkept and discipline-audited, not
 mechanically provable - the gate's teeth against false dry claims are the
@@ -194,6 +208,19 @@ deterministic rerun (a FAIL it finds on a claimed exit counts as a
 false-complete) and R8's evidence rule on findings. Symmetric
 anti-gaming: manufactured findings are as forbidden as manufactured
 passes (R8).
+
+## Stop-hook tooth (opt-in) - do not stop on a denied claim
+
+Register `scripts/goal_hook.sh` as a Claude Code Stop hook (INTEGRATION.md
+section 5.7) and the harness itself blocks stopping at exactly one moment:
+the last loop-log block claims `exit_signal=yes` while `goal_gate.sh
+--check` answers rc=2. The gate reason is injected back, sanitized
+(/goal-style: strip <>&, collapse whitespace, cap 240 chars,
+`GOAL_LOOP_GATE:` prefix). rc=0/3/4 and unclaimed stops pass untouched -
+fail-open by design (rc=3 is a user decision, rc=4 needs a human, not a
+grind). This imports the built-in /goal's physical tooth without importing
+its discretionary evaluator: the arbitration stays the deterministic gate.
+The user can always override with Esc.
 
 ## Delivery format
 

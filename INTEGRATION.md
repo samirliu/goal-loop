@@ -1,4 +1,4 @@
-# goal-loop 接入指南（Claude Code）— v1.3.1
+# goal-loop 接入指南（Claude Code）— v1.4.0
 
 一句话：把"契约 → 循环 → 外部门控"装进 Claude Code。模型永远不能自我宣布
 完成——只有 shell 门控 `goal_gate.sh` 能发 GO；**v1.2 起门控还会亲自重跑每条
@@ -20,7 +20,7 @@
    `C:\Users\<你>\.claude\skills\goal-loop\`）：
    `SKILL.md`、`INTEGRATION.md`、`VERSION`、`assets/{goal.contract.md,evidence_cache.sh}`、
    `references/{exit-gate,checker-panel,domain-patterns,modes}.md`、
-   `scripts/{goal_gate.sh,goal_loop.sh,goal_ctl.sh}`、
+   `scripts/{goal_gate.sh,goal_loop.sh,goal_ctl.sh,goal_hook.sh}`、
    `tests/{run_tests.sh,docs_consistency.sh}`。
 2. 5 个 agent 定义 → `~/.claude/agents/`：
    `goal-worker.md`、`goal-mech-worker.md`、`goal-checker-req.md`、
@@ -139,8 +139,37 @@ bash ~/.claude/skills/goal-loop/scripts/goal_loop.sh --continue \
   模式里单次 `claude` 调用的时长，不是整个 loop。
 - 示例：`/goal-loop --time-budget=3600 "审计这个仓库的依赖并升级补丁版本"`。
 
-## 6. v1.1 → v1.2 迁移
+## 5.7 v1.4.0：Stop hook 物理拦截 + 成本三刀
 
+- **goal_hook.sh（opt-in）**：把内置 /goal 的"物理不让停"移植过来，仲裁仍
+  是确定性门控。只在唯一时刻阻停：最后一个 loop block 声称
+  `exit_signal=yes` 且 `goal_gate.sh --check` 返回 rc=2（假完成高危时刻）。
+  注入 reason 经 /goal 式消毒（剥 `<>&`、折叠空白、240 截断、
+  `GOAL_LOOP_GATE:` 前缀）。rc=0（GO）/ rc=3（熔断类，用户决策）/
+  rc=4（状态坏，fail-open——坏契约需要人修，不是继续磨）/ 未声称退出
+  → 一律放行。用户 Esc 可随时越过。hook 以 cwd 下的 `.goal/` 判断是否
+  激活，非 goal-loop 项目里是 no-op。安装（settings.json）：
+
+  ```json
+  {"hooks": {"Stop": [{"hooks": [{"type": "command",
+      "command": "bash ~/.claude/skills/goal-loop/scripts/goal_hook.sh"}]}]}}
+  ```
+
+- **成本三刀**（目标：验证开销降到与内置 /goal 的每次停顿评估税同量级）：
+  1. **inline-first**：有界、清晰的任务默认主线程直接做——worker 子代理
+     复制上下文却不增加验证强度（新鲜眼睛是面板的职责，不是产者的）；
+     推理密集或批量机械才 spawn。
+  2. **gate-only 轮**：工件全是确定性面、无新 judged 声明的迭代（优化
+     polish 轮与 [bundle] 轮的常态）**零席位**——门控即面板，门控是 bash。
+  3. **critic-on-demand**：forge 的 completeness critic 只在候选干轮
+     （对抗席干净）跑——对抗席出 FAIL 的轮本来就不是干轮，critic 在那里
+     无可仲裁。干轮保证不变，成本只花在能改变结果的地方。
+- 与内置 /goal 的完整对位（成本模型、何时各自赢、为什么不叠加）见仓库
+  README "goal-loop vs the built-in /goal" 一节。
+
+
+
+## 6. v1.1 → v1.2 迁移
 - 旧契约不用改：无 `exit:` 行按 threshold；`expected:` 是散文的 AC 自动
   路由为 judged（v1.1 里散文期望本来就是模型在判），显式 `exit=0`/数字的
   才进门控重跑。

@@ -12,11 +12,13 @@ jobs:
         run: shellcheck --severity=warning scripts/*.sh  # info-level style hints stay in logs; warnings+errors block (parity with tests/run_tests.sh #33)
       - name: Bash syntax check (bash -n)
         run: |
-          echo "Running bash -n on all three shipped scripts"
+          echo "Running bash -n on all shipped scripts"
           bash -n scripts/goal_gate.sh
           bash -n scripts/goal_loop.sh
           bash -n scripts/goal_ctl.sh
-          echo "All three scripts passed bash -n"
+          bash -n scripts/goal_hook.sh
+          bash -n assets/evidence_cache.sh
+          echo "All shipped scripts passed bash -n"
       - name: Scenario test suite (gate semantics, no API needed)
         run: |
           bash tests/run_tests.sh
