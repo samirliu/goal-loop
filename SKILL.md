@@ -16,7 +16,7 @@ description: |-
   tasks, pure Q&A, or actions needing immediate irreversible side effects.
 ---
 
-# Goal Loop (v1.4.0)
+# Goal Loop (v1.5.0)
 
 Contract-first, loop-per-iteration, gate-decides. Authority is split: you (the
 controller) execute and delegate; independent checkers judge quality claims;
@@ -24,16 +24,30 @@ the gate (a shell script, not you) certifies completion AND re-runs every
 deterministic check itself. Design reimplements ralph-claude-code's dual-
 condition exit gate with fable-mode's checker-panel discipline.
 
-Invocation: `/goal-loop [flags] <objective>` - flags `--mode=quick|standard|deep`,
-`--max-iterations=N`, `--min-acs=N`, `--auto`, `--forge`, `--time-budget=N`
-(seconds; whole-loop wall-clock fuse, graceful end - semantics:
-references/modes.md); unknown flags are an error.
+Invocation: `/goal-loop <objective>` - that is the whole interface. With an
+active `.goal/` and no arguments, `/goal-loop` prints a progress summary
+(`goal_ctl.sh status`) and CONTINUES the loop. Everything else is YOUR
+inference from the objective, shown in the approval summary for veto:
+exit policy (deliver/build -> threshold; optimize/as-good-as-possible ->
+forge), budget mode, baseline markers. Flags exist only as overrides
+(--mode, --max-iterations, --min-acs, --auto, --forge, --time-budget=N;
+semantics: references/modes.md); unknown flags are an error.
 
 ## When NOT to run
 
 One obvious approach, fits in a single pass -> do it directly, no ceremony.
 Refuse the loop when the deliverable's failure mode is an irreversible side
 effect outside the workspace (money moved, messages sent, systems deleted).
+
+## User interaction budget
+
+The user's entire part is: one command, one approval glance, at most a few
+one-word answers, one delivery report. Everything else - contract syntax,
+exit policy, budget modes, baseline markers - is controller judgment shown
+in the summary, never a question. The loop asks the user ONLY for: the
+approval (Phase 1), BLOCKED reports, and fuse extensions (rc=3). Protocol
+jargon (digest, breaker, dry_streak, carry-forward) stays in files and
+logs; user-facing lines are plain language.
 
 ## State layout (project root `.goal/`) — CONTROLLED, never hand-edit mid-run
 
@@ -68,16 +82,29 @@ Workers must never touch `.goal/` (R6). Schemas: references/exit-gate.md.
    exhaustion; see Phase 3). Optimization-type objectives SHOULD declare
    metric ACs against a measured baseline stored under `.goal/`.
 3. Derive work-plan.md (tasks -> the ACs they realize) and init state.rec.
-4. Approval: default (gate mode) - present the contract to the user; ONLY on
-   explicit approval, stamp `approved: <sha1-8-of-AC-body> <date>` in
-   goal.md. With `--auto`, still show the contract in full, then stamp
-   immediately, appending `auto` (audit marker). No stamp -> the gate
-   answers NO-GO; never iterate. With `--time-budget=N`, stamp via
-   `bash scripts/goal_ctl.sh stamp --project . --time-budget=N` - it seeds
-   `deadline=<now+N>` into state.rec; the gate turns it into a graceful
-   wall-clock fuse (Phase 2 step 1, Phase 3). The user may amend freely
-   until stamping; after stamping, you propose amendments, you do not
-   apply them (R3). Irreversible-side-effect refusals hold in both modes.
+4. Approval: present the COMPACT SUMMARY - one screen, plain language:
+   objective line; exit policy + budget stated as your inference; one row
+   per AC ([自动检查] or [冷席判断]) with its check command VERBATIM and
+   baseline value where applicable; then ask for a one-word approval. `y`
+   IS explicit approval - stamp `approved: <sha1-8-of-AC-body> <date>` in
+   goal.md. The user amends freely until stamping; after stamping, you
+   propose amendments, you do not apply them (R3). Inference rules you
+   own and state (never ask): exit policy per the objective's wording;
+   metric ACs get `baseline: delta` when a current value is measurable,
+   `baseline: abs` when the capability is new. Forge contracts: the
+   pre-stamp smoke run IS the baseline measurement - write
+   `.goal/baseline.md` (`AC-id | observed=<v> | repeats=<N>=2 |
+   cmd=<check verbatim>` per delta metric AC) BEFORE stamping; the stamp
+   REFUSES (rc=2) otherwise. With `--time-budget=N`, stamp via
+   `bash scripts/goal_ctl.sh stamp --project . --time-budget=N` - it
+   seeds `deadline=<now+N>` into state.rec; the gate turns it into a
+   graceful wall-clock fuse (Phase 2 step 1, Phase 3). With `--auto`,
+   still show the summary, then stamp immediately with the `auto` marker
+   (audited). No stamp -> the gate answers NO-GO; never iterate.
+   First run in a session: if `scripts/goal_hook.sh` is not registered
+   in ~/.claude/settings.json, ask the user ONCE (install? default:
+   user-level), record the choice, do not re-ask. Irreversible-side-
+   effect refusals hold in all modes.
 
 ## Phase 2 - Iteration (one task per loop, one pass per turn)
 

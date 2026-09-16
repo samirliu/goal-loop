@@ -4,8 +4,9 @@
 # nothing; goal_gate.sh stays the only arbiter and is never written to.
 # Usage:
 #   bash goal_ctl.sh init  --project DIR [--max-iterations=N]
-#   bash goal_ctl.sh stamp --project DIR [--auto]
+#   bash goal_ctl.sh stamp --project DIR [--auto] [--time-budget=N]
 #   bash goal_ctl.sh bind  --project DIR            # verdict lines on stdin
+#   bash goal_ctl.sh status --project DIR           # human progress summary
 #   bash goal_ctl.sh close-iteration --project DIR --task ID --files LIST
 #        --checks-pass N --checks-fail N --checks-unverifiable N
 #        [--progress yes|no] [--exit-signal yes|no] [--error-signature none]
@@ -21,7 +22,7 @@ task="" files="" cp="" cf="" cu="" progress=yes exit_signal=no errsig=none fcomp
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    init|stamp|bind|close-iteration) cmd="$1" ;;
+    init|stamp|bind|close-iteration|status) cmd="$1" ;;
     --project) [ $# -ge 2 ] || { echo "CTL: ERROR missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
     --auto) auto=1 ;;
     --time-budget=*) time_budget="${1#*=}" ;;
@@ -42,7 +43,7 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
-[ -n "$cmd" ] || { echo "CTL: ERROR no-command (init|stamp|bind|close-iteration)" >&2; exit 4; }
+[ -n "$cmd" ] || { echo "CTL: ERROR no-command (init|stamp|bind|close-iteration|status)" >&2; exit 4; }
 
 sd="$project/.goal"
 r(){ tr -d '\r'; }
@@ -60,6 +61,15 @@ case "$cmd" in
     [ -f "$sd/goal.md" ] || { echo "CTL: ERROR no-goal-md" >&2; exit 4; }
     if grep -qE '^approved: [0-9a-f]{6,}' "$sd/goal.md"; then
       echo "CTL: ERROR already-stamped (R3: one stamp; amendments go to the user)" >&2; exit 2
+    fi
+    # forge contracts: baseline must cover every delta metric AC BEFORE the
+    # stamp - t=0 exposure, never a mid-loop rc=4 surprise (v1.5)
+    if grep -qE '^exit: *forge' "$sd/goal.md" 2>/dev/null; then
+      if ! bl=$(bash "$here/goal_gate.sh" --baseline-check --project "$project" 2>&1); then
+        printf '%s\n' "$bl" >&2
+        echo "CTL: ERROR stamp-refused: baseline validation failed (forge contract) - run the metric checks against the pre-work artifact and write .goal/baseline.md" >&2
+        exit 2
+      fi
     fi
     h=$( { r < "$sd/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
            r < "$sd/goal.md" | grep -E '^exit:' || true
@@ -132,4 +142,23 @@ case "$cmd" in
     echo "CTL: CLOSE ok iter=$new digest=$digest"
     [ "$no_gate" -eq 1 ] && exit 0
     bash "$here/goal_gate.sh" --check --project "$project"; exit $? ;;
+
+  status)
+    [ -f "$sd/state.rec" ] || { echo "CTL: STATUS no active goal-loop ledger ($sd/state.rec missing)" >&2; exit 4; }
+    g(){ state_get "$1"; }
+    left="off"
+    d=$(g deadline); if [ -n "$d" ] && [ "$d" != 0 ]; then left=$(( d - $(date +%s) ))s; [ "$left" = "" ] && left=0s; fi
+    printf 'CTL: STATUS iter=%s/%s breaker=%s dry_streak=%s/%s time_left=%s\n' \
+      "$(g iteration)" "$(g max_iterations)" "$(g breaker)" "$(g dry_streak)" "$(g dry_limit)" "$left"
+    lb=$(awk '
+      /^## iteration/ { delete l; next }
+      { line=$0; sub(/\r$/,"",line)
+        if (line ~ /=/) { p=index(line,"="); l[substr(line,1,p-1)]=substr(line,p+1) } }
+    END { printf "task=%s checks=%s pass / %s fail / %s unverifiable progress=%s digest=%s",
+      l["task"], l["checks_pass"], l["checks_fail"], l["checks_unverifiable"], l["progress"], l["digest"] }
+    ' "$sd/loop-log.md" 2>/dev/null)
+    echo "CTL: LAST $lb"
+    next=$(grep -m1 -E '^- \[ \]' "$sd/work-plan.md" 2>/dev/null | sed 's/^- \[ \] //' | cut -c1-120)
+    echo "CTL: NEXT ${next:-none (all tasks closed)}"
+    exit 0 ;;
 esac

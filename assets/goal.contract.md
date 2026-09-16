@@ -21,11 +21,15 @@ exit: threshold
 ## Acceptance criteria
 
 <!-- verbatim, frozen by the stamp. Grammar per line:
-     - AC-N | <yes/no statement> | check: `<command>` | expected: <spec>
+     - AC-N | <yes/no statement> | check: `<command>` | [baseline: delta|abs] | expected: <spec>
      spec: exit=0 (default) | metric comparison (>=60, <=1.8, ...) | judged
      - a metric command aggregates internally (N repeats / percentile) and
        prints ONE number on its last stdout line; set thresholds beyond the
        measured noise floor (domain-patterns.md section 4)
+     - baseline: delta (default for metric ACs) requires a .goal/baseline.md
+       row `AC-N | observed=<v> | repeats=<N>=2 | cmd=<check verbatim>` -
+       the pre-stamp smoke run IS the measurement; abs = new capability,
+       no baseline owed. Controller infers delta/abs, never asks the user.
      - `judged` needs a written rubric anchor or a pairwise A/B protocol
        (checker-panel.md section 5)
      - the command runs at project root and must not modify the tree;
@@ -34,7 +38,7 @@ exit: threshold
      pick check shapes from references/domain-patterns.md -->
 
 - AC-1 | <yes/no decision statement> | check: `<exact command>` | expected: exit=0
-- AC-2 | <...metric...> | check: `<command printing one number>` | expected: >=<value>
+- AC-2 | <...metric...> | check: `<command printing one number>` | baseline: delta | expected: >=<value>
 - AC-3 | <...quality claim...> | check: - | expected: judged
 
 ## Out of scope

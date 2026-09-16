@@ -10,10 +10,11 @@
 #   bash goal_gate.sh --check  [--project DIR]              # 0 GO / 2 NO-GO / 3 BLOCKED / 4 state error
 #   bash goal_gate.sh --digest [--project DIR]              # print 12-hex tree digest
 #   bash goal_gate.sh --verify [--project DIR] [AC-ID ...]  # rerun deterministic checks; 0 all-pass / 2 FAIL-or-broken / 4 state error
+#   bash goal_gate.sh --baseline-check [--project DIR]      # forge contracts: baseline.md covers every delta metric AC; 0 ok / 2 problem
 set -u
 export LC_ALL=C.UTF-8
 
-usage(){ sed -n '2,12p' "$0"; }
+usage(){ sed -n '2,13p' "$0"; }
 
 project="." mode="" positional=""
 while [ $# -gt 0 ]; do
@@ -21,6 +22,7 @@ while [ $# -gt 0 ]; do
     --check)  mode=check ;;
     --digest) mode=digest ;;
     --verify) mode=verify ;;
+    --baseline-check) mode=baseline ;;
     --project) [ $# -ge 2 ] || { echo "GATE: NO-GO reason=missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
     --help|-h) usage; exit 0 ;;
     -*) echo "GATE: NO-GO reason=unknown-flag:$1" >&2; exit 4 ;;
@@ -29,7 +31,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-[ -n "$mode" ] || { echo "GATE: NO-GO reason=no-mode (use --check, --digest or --verify)" >&2; exit 4; }
+[ -n "$mode" ] || { echo "GATE: NO-GO reason=no-mode (use --check, --digest, --verify or --baseline-check)" >&2; exit 4; }
 [ -z "${positional# }" ] || [ "$mode" = verify ] || { echo "GATE: NO-GO reason=unknown-arg:$positional" >&2; exit 4; }
 
 sd="$project/.goal"
@@ -99,6 +101,33 @@ all_ac_ids(){ r < "$sd/goal.md" | grep -oE '^- AC-[0-9]+' | sort -u | sed 's/^- 
 ac_line_for(){ r < "$sd/goal.md" | awk -v id="$1" '$0 ~ "^- "id"[ |]"'; }
 ac_check_cmd(){ ac_line_for "$1" | sed -nE 's/^.*check: *`([^`]*)`.*/\1/p' | tail -1; }
 ac_expected(){ ac_line_for "$1" | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1; }
+ac_baseline_marker(){ ac_line_for "$1" | sed -nE 's/^.*baseline: *(delta|abs).*/\1/p' | tail -1; }
+# Baseline validation (forge only): every delta metric AC needs a
+# .goal/baseline.md line `AC-N | ... | repeats=<N>=2 | cmd=<check verbatim>`.
+# The cmd match is the "same yardstick" rule made mechanical; repeats>=2
+# mechanizes the noise-floor discipline. Absent marker -> delta.
+baseline_validate(){                                   # fail-fast via fail(); forge paths only
+  need=0
+  for id in $(all_ac_ids); do
+    cls=$(classify_expected "$(ac_expected "$id")")
+    case "$cls" in metric*) [ "$(ac_baseline_marker "$id")" = abs ] || need=1 ;; esac
+  done
+  [ "$need" = 1 ] || return 0                          # no delta metric AC -> no baseline owed
+  bl="$sd/baseline.md"
+  [ -f "$bl" ] || fail "missing-baseline (forge: run every metric check against the pre-work artifact - the smoke run IS the measurement - and write .goal/baseline.md: AC-id | observed=<v> | repeats=<N>=2 | cmd=<check verbatim>)"
+  for id in $(all_ac_ids); do
+    cls=$(classify_expected "$(ac_expected "$id")")
+    case "$cls" in metric*) : ;; *) continue ;; esac
+    [ "$(ac_baseline_marker "$id")" = abs ] && continue
+    cmd=$(ac_check_cmd "$id")
+    line=$(r < "$bl" | grep -E "^$id \|.*cmd=" | tail -1)
+    [ -n "$line" ] || fail "missing-baseline:$id (no baseline row for a delta metric AC)"
+    bcmd=$(printf '%s' "$line" | sed -nE 's/^.* cmd=(.*)[[:space:]]*$/\1/p')
+    [ "$bcmd" = "$cmd" ] || fail "baseline-cmd-mismatch:$id (baseline must be measured by the AC's own check command, verbatim)"
+    rep=$(printf '%s' "$line" | sed -nE 's/^.* repeats=([0-9]+).*$/\1/p')
+    { [ -n "$rep" ] && [ "$rep" -ge 2 ]; } || fail "baseline-weak:$id (repeats>=2 required - single runs game the metric)"
+  done
+}
 classify_expected(){                                   # $1 raw -> exit0 | judged | "metric <op> <num>"
   v=$(printf '%s' "$1" | tr -d '[:space:]')
   case "$v" in
@@ -184,6 +213,15 @@ if [ "$mode" = verify ]; then
   exit 2
 fi
 
+if [ "$mode" = baseline ]; then
+  # stamp-time validation: contract + baseline.md only; no state needed
+  contract_mode=$(contract_mode)
+  if [ "$contract_mode" != forge ]; then echo "GATE: BASELINE-OK not-forge"; exit 0; fi
+  baseline_validate
+  echo "GATE: BASELINE-OK"
+  exit 0
+fi
+
 required="iteration breaker false_completes replans no_progress_streak max_iterations no_progress_limit"
 for k in $required; do
   [ -n "$(state_get "$k")" ] || state_err "missing-key:$k"
@@ -217,6 +255,7 @@ case "$dl" in
 esac
 if [ "$exit_mode" = forge ]; then
   [ "${iter:-0}" -le "${maxit:-12}" ] || blocked "budget-fuse:iter=$iter max=$maxit (forge: budget is a fuse - extend it or deliver best-so-far)"
+  baseline_validate                                   # belt+braces: baseline.md must still cover every delta metric AC
 else
   [ "${iter:-0}" -le "${maxit:-12}" ] || fail "budget-exhausted:iter=$iter max=$maxit"
 fi

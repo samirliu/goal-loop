@@ -1,4 +1,4 @@
-# goal-loop 接入指南（Claude Code）— v1.4.0
+# goal-loop 接入指南（Claude Code）— v1.5.0
 
 一句话：把"契约 → 循环 → 外部门控"装进 Claude Code。模型永远不能自我宣布
 完成——只有 shell 门控 `goal_gate.sh` 能发 GO；**v1.2 起门控还会亲自重跑每条
@@ -168,6 +168,27 @@ bash ~/.claude/skills/goal-loop/scripts/goal_loop.sh --continue \
   README "goal-loop vs the built-in /goal" 一节。
 
 
+
+## 5.8 v1.5.0：基线强制 + 无参续跑 + 用户使用预算
+
+- **forge 基线强制**：`exit: forge` 契约中每个 metric AC 默认 `baseline:
+  delta`（全新能力显式标 `baseline: abs`，控制器推断、从不问用户）。
+  盖章前须写 `.goal/baseline.md`（每行
+  `AC-id | observed=<值> | repeats=<N≥2> | cmd=<与该 AC 的 check 命令逐字一致>`）
+  ——**冒烟跑就是基线测量**，同一个具名命令打在未优化工件上，写下来即可。
+  `goal_ctl.sh stamp` 校验不合规拒签（rc=2，t=0 暴露）；gate 每次出口复查
+  （防删改）。repeats≥2 把噪声底纪律机械化。threshold 契约完全不受影响。
+- **无参续跑**：`/goal-loop` 不带参数 + cwd 有活跃 `.goal/` → 打印进度摘要
+  （`goal_ctl.sh status`）并接续循环。status 输出人话行：迭代进度、上轮
+  任务与检查计数、下一个任务、收敛轮、剩余时间。
+- **hook 自动提议**：会话内首次 Phase 1 时检测 `goal_hook.sh` 未注册于
+  `~/.claude/settings.json` → 问一次（默认 user 级安装），记录选择不再
+  重复问。
+- **用户使用预算（原则，写进 SKILL.md）**：用户的全部参与 = 一条命令 +
+  一眼审批 + 几个单词回答 + 一份交付报告。exit 策略、预算、mode、
+  delta/abs 全部由控制器从目标措辞推断并在摘要中声明，用户只否决；
+  旗标只是覆写，不是必学项；协议黑话（digest/breaker/dry_streak）不进入
+  用户可见文案。
 
 ## 6. v1.1 → v1.2 迁移
 - 旧契约不用改：无 `exit:` 行按 threshold；`expected:` 是散文的 AC 自动

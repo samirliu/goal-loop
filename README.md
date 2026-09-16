@@ -63,7 +63,7 @@ bash ~/.claude/skills/goal-loop/tests/run_tests.sh
    (0=GO, 2=NO-GO, 3=BLOCKED, 4=state error).
    每轮末尾的状态块门控**故意不读**；唯一权威是门控退出码。
 
-## Modes & flags / 模式与参数（v1.4.0）
+## Modes & flags / 模式与参数（v1.5.0）
 
 ```
 /goal-loop --mode=quick|standard|deep [--max-iterations=N] [--min-acs=N] [--auto] [--forge] [--time-budget=N] <objective>
@@ -73,7 +73,7 @@ bash ~/.claude/skills/goal-loop/tests/run_tests.sh
 
 **EN** — `quick` = 3 iterations / 2-4 ACs · `standard` = 6 / 4-6 · `deep` = 12 / 6-10 with a **mandatory adversarial seat** (one checker is assigned to legitimately break a check each iteration, exercising the fix→recheck path). `--auto` skips the approval wait: the contract is still shown in full, stamped immediately, and the ledger records `approval=auto` for after-the-fact audit. **`--forge`** (or `exit: forge` in the contract) switches the exit policy for maximization objectives: GO requires floors **plus** a K-round dry streak (`dry_limit`, default 3 — panel + adversarial seat + completeness critic find no new evidence-backed finding) **plus** an empty completeness-critic answer; `max_iterations` becomes a pure fuse (rc=3 `budget-fuse` → extend or deliver best-so-far). In-session bookkeeping is one Bash call: `scripts/goal_ctl.sh close-iteration ...` (`--dry` is mandatory on forge contracts).
 
-**中文** — `quick` = 3 轮 / 2-4 条 AC · `standard` = 6 / 4-6 · `deep` = 12 / 6-10 且带**强制对抗席**（每轮一个检查席专职合法搞挂一项检查，逼出修复路径）。`--auto` 跳过审批等待：契约仍完整呈现、立即盖章，账本记 `approval=auto` 供事后审计。**`--forge`**（或契约写 `exit: forge`）为最大化目标切换退出策略：GO = 地板全过 **且** 连续 `dry_limit`（默认 3）轮"面板+对抗席+completeness critic 挖不出任何有证据的新发现、fix-now 发现项清零" **且** critic 冷答案为空；`max_iterations` 退化为纯保险丝（rc=3 `budget-fuse` → 续期或交付 best-so-far）。会话内记账一条命令：`scripts/goal_ctl.sh close-iteration ...`（forge 契约必带 `--dry`）。
+**中文** — `quick` = 3 轮 / 2-4 条 AC · `standard` = 6 / 4-6 · `deep` = 12 / 6-10 且带**强制对抗席**（每轮一个检查席专职合法搞挂一项检查，逼出修复路径）。`--auto` 跳过审批等待：契约仍完整呈现、立即盖章，账本记 `approval=auto` 供事后审计。**`--forge`**（或契约写 `exit: forge`）为最大化目标切换退出策略：GO = 地板全过 **且** 连续 `dry_limit`（默认 3）轮"面板+对抗席+completeness critic 挖不出任何有证据的新发现、fix-now 发现项清零" **且** critic 冷答案为空；`max_iterations` 退化为纯保险丝（rc=3 `budget-fuse` → 续期或交付 best-so-far）。v1.5：forge 契约的 metric AC 默认 `baseline: delta`——盖章前须有 `.goal/baseline.md`（冒烟跑即基线测量，repeats≥2，cmd 与 AC 检查逐字一致），不合规拒签；`/goal-loop` 无参 = 打印进度摘要并接续；用户的全部参与 = 一条命令 + 一眼审批 + 一份交付报告（exit 策略/预算/mode/基线标记由控制器推断，旗标只是覆写）。会话内记账一条命令：`scripts/goal_ctl.sh close-iteration ...`（forge 契约必带 `--dry`）。
 
 ## Unattended mode / 无人值守模式（可选）
 

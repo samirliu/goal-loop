@@ -21,7 +21,7 @@ assert_has(){ printf '%s' "$3" | grep -qE "$2" && ok "$1" || no "$1"; }
 
 mkproj(){ p="$T/$1"; mkdir -p "$p"; bash "$CTL" init --project "$p" >/dev/null; }
 
-contract(){ # $1 proj NAME under $T; $2.. = AC lines; optional FORGE=1 / TB=seconds env
+contract(){ # $1 proj NAME under $T; $2.. = AC lines; optional FORGE=1 / TB=seconds / NOSTAMP=1 env
   local p="$T/$1"; shift
   forge_line=""; [ "${FORGE:-0}" = 1 ] && forge_line="exit: forge"
   {
@@ -30,7 +30,7 @@ contract(){ # $1 proj NAME under $T; $2.. = AC lines; optional FORGE=1 / TB=seco
     for l in "$@"; do printf '%s\n' "$l"; done
     printf '\n%s\n\n## Out of scope\n\n- nothing\n\n## Approval\n\napproved: PENDING\n' "$forge_line"
   } > "$p/.goal/goal.md"
-  bash "$CTL" stamp --project "$p" --auto ${TB:+--time-budget=$TB} >/dev/null
+  [ "${NOSTAMP:-0}" = 1 ] || bash "$CTL" stamp --project "$p" --auto ${TB:+--time-budget=$TB} >/dev/null
 }
 
 bind_v(){ # $1 proj NAME under $T; $2 verdict-line with DIGEST placeholder
@@ -330,6 +330,60 @@ close_iter h39
 rm "$T/h39/.goal/state.rec"
 (cd "$T/h39" && bash "$here/scripts/goal_hook.sh") >/dev/null 2>&1
 assert_rc "39 hook rc4 fail-open allows stop" 0 $?
+
+# 40-45: baseline enforcement (forge contracts, v1.5)
+# 40 stamp refused without baseline.md, goal.md left unstamped
+NOSTAMP=1 mkproj h40 >/dev/null; FORGE=1 NOSTAMP=1 contract h40 "- AC-1 | m | check: \`echo 7\` | baseline: delta | expected: >=5"
+bash "$CTL" stamp --project "$T/h40" --auto >/dev/null 2>&1
+assert_rc "40 stamp without baseline refused rc2" 2 $?
+grep -qE '^approved: [0-9a-f]{6,}' "$T/h40/.goal/goal.md" && no "40 stamped despite refusal" || ok "40 goal.md left unstamped"
+
+# 41 valid baseline -> stamp ok -> forge GO (dry_streak forced to limit)
+printf 'AC-1 | observed=7 | repeats=3 | cmd=echo 7\n' > "$T/h40/.goal/baseline.md"
+bash "$CTL" stamp --project "$T/h40" --auto >/dev/null 2>&1
+assert_rc "41 stamp with baseline ok" 0 $?
+echo x > "$T/h40/a.txt"; close_iter h40 --dry yes
+sed -i 's/^dry_streak=.*/dry_streak=3/' "$T/h40/.goal/state.rec"
+bash "$GATE" --check --project "$T/h40" >/dev/null 2>&1
+assert_rc "41 forge GO with baseline satisfied" 0 $?
+
+# 42 cmd mismatch -> baseline-cmd-mismatch
+NOSTAMP=1 mkproj h42 >/dev/null; FORGE=1 NOSTAMP=1 contract h42 "- AC-1 | m | check: \`echo 9\` | baseline: delta | expected: >=5"
+printf 'AC-1 | observed=7 | repeats=3 | cmd=echo 8\n' > "$T/h42/.goal/baseline.md"
+bash "$GATE" --baseline-check --project "$T/h42" >/dev/null 2>&1
+assert_rc "42 cmd mismatch rc2" 2 $?
+bash "$GATE" --baseline-check --project "$T/h42" 2>&1 | grep -q baseline-cmd-mismatch && ok "42 reason baseline-cmd-mismatch" || no "42 wrong reason"
+
+# 43 abs marker: new capability, no baseline owed -> stamp ok + GO
+NOSTAMP=1 mkproj h43 >/dev/null; FORGE=1 NOSTAMP=1 contract h43 "- AC-1 | m | check: \`echo 7\` | baseline: abs | expected: >=5"
+bash "$CTL" stamp --project "$T/h43" --auto >/dev/null 2>&1
+assert_rc "43 abs stamp ok without baseline" 0 $?
+close_iter h43 --dry yes; sed -i 's/^dry_streak=.*/dry_streak=3/' "$T/h43/.goal/state.rec"
+bash "$GATE" --check --project "$T/h43" >/dev/null 2>&1
+assert_rc "43 abs forge GO" 0 $?
+
+# 44 threshold contracts ignore baseline entirely
+mkproj h44 >/dev/null; contract h44 "- AC-1 | m | check: \`echo 7\` | baseline: delta | expected: >=5"
+bash "$GATE" --baseline-check --project "$T/h44" >/dev/null 2>&1
+assert_rc "44 baseline-check not-forge ok" 0 $?
+close_iter h44
+bash "$GATE" --check --project "$T/h44" >/dev/null 2>&1
+assert_rc "44 threshold GO without baseline" 0 $?
+
+# 45 repeats=1 -> baseline-weak refused
+NOSTAMP=1 mkproj h45 >/dev/null; FORGE=1 NOSTAMP=1 contract h45 "- AC-1 | m | check: \`echo 7\` | baseline: delta | expected: >=5"
+printf 'AC-1 | observed=7 | repeats=1 | cmd=echo 7\n' > "$T/h45/.goal/baseline.md"
+bash "$GATE" --baseline-check --project "$T/h45" >/dev/null 2>&1
+assert_rc "45 single-run baseline refused rc2" 2 $?
+
+# 46 status subcommand: human progress summary
+mkproj h46 >/dev/null; contract h46 "- AC-1 | f | check: \`true\` | expected: exit=0"
+printf -- '- [ ] T1 | do the thing\n' > "$T/h46/.goal/work-plan.md"
+close_iter h46
+out=$(bash "$CTL" status --project "$T/h46" 2>&1)
+assert_has "46 status prints iteration line" 'CTL: STATUS iter=1/' "$out"
+assert_has "46 status prints last block" 'CTL: LAST task=T1' "$out"
+assert_has "46 status prints next task" 'CTL: NEXT T1 | do the thing' "$out"
 
 echo
 echo "== results: pass=$pass fail=$failn =="
