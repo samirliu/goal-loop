@@ -239,7 +239,10 @@ assert_has "27 reason not-covered" 'not-covered:AC-1' "$out"
 
 # 28 time-budget fuse fires when expired (rc=3, graceful class)
 mkproj t28 >/dev/null; TB=1 contract t28 "- AC-1 | f | check: \`true\` | expected: exit=0"
-sleep 1.3
+# deterministically expired: deadline=1 (epoch 1) is always in the past - no
+# reliance on machine speed (a fast runner used to hit the same-second
+# boundary and wrongly answer GO)
+sed -i 's/^deadline=.*/deadline=1/' "$T/t28/.goal/state.rec"
 close_iter t28
 out=$(bash "$GATE" --check --project "$T/t28" 2>&1); assert_rc "28 expired time-budget -> rc3" 3 $?
 assert_has "28 reason time-budget-exhausted" 'time-budget-exhausted' "$out"
