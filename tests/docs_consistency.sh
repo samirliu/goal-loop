@@ -44,7 +44,6 @@ done <<< "$refs"
 if [ -f VERSION ]; then
   V=$(tr -d '[:space:]' < VERSION)
   grep -q "(v$V)" SKILL.md && ok "C2 SKILL.md title says v$V" || bad "C2 SKILL.md title does not say (v$V)"
-  grep -q "v$V" INTEGRATION.md && ok "C2 INTEGRATION.md says v$V" || bad "C2 INTEGRATION.md does not mention v$V"
 else
   bad "C2 VERSION file missing"
 fi
@@ -56,15 +55,6 @@ for f in references/*.md; do
     grep -qE "^## $n( |:|\$)" "$f" && ok "C3 $f TOC $n has a heading" || bad "C3 $f TOC entry $n has no ## heading"
   done
 done
-
-# C4 mode budgets agree between modes.md (authoritative table) and INTEGRATION.md
-while IFS='|' read -r _ mode iters _; do
-  mode=$(printf '%s' "$mode" | tr -d ' '); iters=$(printf '%s' "$iters" | tr -d ' ')
-  [ -n "$mode" ] || continue
-  { grep -q "$mode" INTEGRATION.md && grep -q "$iters" INTEGRATION.md; } \
-    && ok "C4 budget $mode=$iters present in INTEGRATION.md" \
-    || bad "C4 budget $mode=$iters not found in INTEGRATION.md"
-done < <(grep -E '^\| (quick|standard|deep) ' references/modes.md)
 
 echo "== docs consistency: $([ $fail -eq 0 ] && echo CONSISTENT || echo DRIFT) =="
 exit $fail

@@ -16,7 +16,7 @@ exit: threshold
      verification exhaustion: dry_limit consecutive dry rounds (no new
      evidence-backed finding, fix-now discoveries closed) + an empty
      completeness-critic answer; max_iterations becomes a pure fuse.
-     Smoke-run every named check before stamping (modes.md section 5). -->
+     Smoke-run every named check before stamping (SKILL.md Step 1). -->
 
 ## Acceptance criteria
 
@@ -31,11 +31,11 @@ exit: threshold
        the pre-stamp smoke run IS the measurement; abs = new capability,
        no baseline owed. Controller infers delta/abs, never asks the user.
      - `judged` needs a written rubric anchor or a pairwise A/B protocol
-       (checker-panel.md section 5)
+       (crew.md section 6)
      - the command runs at project root and must not modify the tree;
        generated evidence goes to .goal/evidence/
      - the spec value must not contain "|"
-     pick check shapes from references/domain-patterns.md -->
+     pick check shapes from references/patterns.md -->
 
 - AC-1 | <yes/no decision statement> | check: `<exact command>` | expected: exit=0
 - AC-2 | <...metric...> | check: `<command printing one number>` | baseline: delta | expected: >=<value>

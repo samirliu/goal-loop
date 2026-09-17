@@ -1,6 +1,8 @@
 # goal-loop
 
-**EN** — A Claude Code skill that fuses two open-source disciplines into one loop: *ralph-claude-code*'s dual-condition exit gate with *fable-mode*'s adversarial checker panel. The core promise (v1.2): **the model can never self-declare completion** — only an external shell gate (`goal_gate.sh`) can certify GO, and since v1.2 the gate **re-runs every deterministic check itself** (zero model in the trust chain); judged quality claims go to cold checker seats. For open-ended "make it as good as possible" objectives, the `forge` exit ends the loop on **verification exhaustion** (K consecutive dry adversarial rounds), not on floors alone.
+**EN** — goal-loop combines the DRIVE of the harness /goal (never stop until done) with the CREW of /team (parallel teammates on one deliverable) plus the layer both lack: an external acceptance gate with a frozen contract. **/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
+
+**EN (v1 lineage)** — A Claude Code skill that fuses two open-source disciplines into one loop: *ralph-claude-code*'s dual-condition exit gate with *fable-mode*'s adversarial checker panel. The core promise (v1.2): **the model can never self-declare completion** — only an external shell gate (`goal_gate.sh`) can certify GO, and since v1.2 the gate **re-runs every deterministic check itself** (zero model in the trust chain); judged quality claims go to cold checker seats. For open-ended "make it as good as possible" objectives, the `forge` exit ends the loop on **verification exhaustion** (K consecutive dry adversarial rounds), not on floors alone.
 
 **中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺（v1.2）：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且 v1.2 起门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明才交冷检查席。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。
 
