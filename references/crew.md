@@ -4,15 +4,22 @@
 
 Decompose the objective; crew applies when the split yields ≥2 task domains
 with DISJOINT file scopes and stateable interfaces. Interfaces you cannot
-state -> serial single-task (log the reason). Crew is controller-elected;
-there is no flag.
+state -> serial single-task (log the reason). Crew composition is
+controller-elected (no flag). Backend selection does take a flag: default
+one-shot subagents; `--teams` opts into the Teams backend (§7).
 
 ## 2 Interface first
 
 Before dispatching, write `.goal/interfaces.md`: module boundaries, shared
 types, naming conventions, who owns which files. Frozen at crew start;
-changes are proposals (R3 spirit). Workers coordinate ONLY through files +
-your briefs - a plain text reply from a worker is invisible to the others.
+changes are proposals (R3 spirit).
+
+Coordination channel by backend:
+- Default: workers coordinate ONLY through files + your briefs - a plain
+  text reply from a worker is invisible to the others.
+- Teams: workers MAY SendMessage to negotiate mid-wave. Negotiation is
+  never binding on its own - an interface change counts only after it
+  lands as a file write to interfaces.md (R3 spirit).
 
 ## 3 The brief (per worker)
 
@@ -28,20 +35,26 @@ Interface contract: <relevant excerpt of interfaces.md>
 
 Dispatch up to 3 workers in ONE message (they run concurrently). Their
 execution craft is theirs - do not put goal-loop rules in the brief.
+Teams backend: each roster member's TeamPlan prompt carries the same
+brief fields below; the shared task item description repeats Task /
+Output paths / Scope / Pass condition so the backlog is self-describing.
 
 ## 4 Join
 
-All workers returned -> merge review: run the pass conditions, read the
-seams (interfaces between their outputs), fix trivial mismatches yourself.
-Interface conflict needing a redesign -> one serial repair round; two
-failed repairs -> fall back to serial execution (log it).
+Wave finished (default: all workers returned; Teams: all wave items
+closed or you call the wave) -> merge review: run the pass conditions,
+read the seams (interfaces between their outputs), fix trivial mismatches
+yourself. Interface conflict needing a redesign -> one serial repair
+round; two failed repairs -> fall back to serial execution (log it).
+Join is bookkeeping. It is not GO - only the gate decides that.
 
 ## 5 FAIL attribution
 
 Deterministic FAIL after join: fix within the owning worker's scope, then
 `goal_gate.sh --verify [AC-ID]`. A FAIL that cannot be attributed -> rerun
 the batch serially (bundle unbundle rule). Loop-log the wave as
-`task=T2[crew:3]` with each worker's file list.
+`task=T2[crew:3]` with each worker's file list (`task=T2[teams:3]` when the
+Teams backend below is in use).
 
 ## 6 Final review (judged ACs - once, before claiming exit)
 
@@ -59,8 +72,67 @@ Perspective note for reviewers: a far wing-tip or tail plane may PROJECT
 above the fuselage silhouette from a quarter view - normal geometry, not a
 floating defect; call detached only with a 3D gap across views.
 
-## 7 Degradation
+## 7 Teams backend (opt-in)
+
+Default = the one-shot subagents above. `--teams` (or the user asking for
+Agent Teams) swaps Step 2's dispatch for a TeamCreate crew. Contract, loop,
+gate, and every rule stay identical - only the execution surface changes.
+Prefer the default; this backend is for long unattended multi-role runs
+where named continuity, a shared backlog, and the panel justify one extra
+roster glance.
+
+### 7.1 Dual layer (non-negotiable)
+
+`.goal/` already owns a work queue (`work-plan.md`, what `goal_ctl.sh
+status` reads). The Team task list is a **projection** of that queue for
+the panel and self-claim - it is not a second source of truth.
+
+| | Work tracking | Court |
+|---|---|---|
+| where | `.goal/work-plan.md` + Team task list (mirror) | contract + gate + verdicts |
+| says a work item is done | controller ticks work-plan; TaskUpdate=completed | — |
+| says the GOAL is done | — | `goal_gate.sh` rc=0 only |
+
+**`TaskUpdate = completed` (and a ticked work-plan item) is NEVER a GO signal.**
+The gate is the only completion authority. Teammates still never touch
+`.goal/` (R6). If work-plan and the Team task list disagree, work-plan wins
+and the team queue is repaired to match.
+
+### 7.2 Lifecycle
+
+1. Contract stamped (unchanged).
+2. TeamCreate + TeamPlan submit - user reviews the roster in the team
+   panel (the one extra glance this backend costs). Approval starts the
+   run. Summary line already declared `派工: teams`.
+   **No `isolation: worktree`** - teammates edit the shared workspace.
+   A worktree would hide their diffs from the digest and poison R7
+   verdict binding. This is a hard ban, not a preference.
+3. Waves: keep `work-plan.md` as plan of record; mirror each open item
+   to TaskCreate -> worker implements -> TaskUpdate (queue only) ->
+   controller join (§4) -> `gate --check` exactly as usual.
+4. Delivery/fuse: TeamDelete. Resume: team still alive -> reconnect;
+   team gone -> degrade to the default backend and log the fallback.
+
+### 7.3 Coordination
+
+- Interfaces stay frozen in `.goal/interfaces.md`.
+- Workers MAY SendMessage to negotiate details mid-wave.
+- A negotiated interface change is binding only after it lands as a file
+  write to interfaces.md (R3 spirit). Talk is cheap; the file is the
+  contract.
+- Briefs unchanged (paths, scope, pass condition, evidence, no `.goal/`,
+  no spawn).
+- The judged cold seat is NEVER a team member - dispatch one fresh
+  independent Agent. Production context voids a judge.
+
+## 8 Degradation
 
 No Agent tool on the surface -> work inline, self-verify cold from the
 claims list and artifact alone (not from production memory), label the
 report `WEAKER VERIFICATION: cold self-check`.
+
+Teams backend requested but TeamCreate/TeamPlan unavailable or refused ->
+fall back to the default backend, close the wave with
+`task=T2[crew:3]` and a task-suffix note `(fallback:teams-unavailable)`,
+continue. Do not invent new loop-log keys (schema is exact). The gate
+does not care which backend produced the artifacts.

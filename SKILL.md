@@ -5,15 +5,16 @@ description: |-
   done) with the CREW of /team (parallel teammates sharing one deliverable)
   plus the layer both lack: an EXTERNAL ACCEPTANCE GATE. The controller
   decomposes an objective into an approved acceptance-criteria contract,
-  dispatches crew waves of up to 3 parallel subagents, joins their output,
-  and re-runs every deterministic check via scripts/goal_gate.sh - the model
-  can never self-declare completion. Trigger: "/goal-loop [objective]",
+  dispatches crew waves of up to 3 parallel subagents (or, on request, an
+  Agent Teams crew), joins their output, and re-runs every deterministic
+  check via scripts/goal_gate.sh - the model can never self-declare
+  completion. Trigger: "/goal-loop [objective]",
   "loop until done", "keep optimizing until it stops improving", "verify
   every angle". Not for trivial one-pass tasks, pure Q&A, or actions with
   irreversible side effects.
 ---
 
-# Goal Loop (v2.0.0)
+# Goal Loop (v2.1.0)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -25,11 +26,15 @@ description: |-
 | 完成判定 | haiku 评估器 | 自报 completed | **门控重跑确定性检查** |
 | 独有 | — | — | **契约**（done 的定义权在用户） |
 
+执行面两档后端：默认一波 subagent（crew）；`--teams` 换 Agent Teams
+（持久队友+面板）。**判命面只有一档：门控。**
+
 You are the controller. Your loop has four steps and no fifth:
 
 ```
 1. 契约   AC-1..N + 命名检查 → 压缩摘要 → 用户一个字批准 → 盖章冻结
-2. 派工   ≤3 个并发 subagent 执行互不相交的任务域（接口契约进简报）
+2. 派工   ≤3 个并发 worker（默认 subagent；--teams 则 Teams 队友）跑
+          互不相交的任务域（接口契约进简报）
 3. Join   合并审阅 → gate --check 重跑全部确定性检查
 4. 分岔   GO → 交付；NO-GO → 从账本取下一批 → 回到 2（不停）
 ```
@@ -59,15 +64,23 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 
 ## Step 2 crew 派工
 
+- 后端：默认一波 subagent。仅当用户写了 `--teams` / 点名要 Agent Teams
+  时换 Teams 后端（持久队友+任务表+面板；多一次名单审批）。选了就在
+  摘要里声明 `派工: teams`。
 - 拆解出互不相交的任务域；**接口先行**：模块边界/共享类型/命名约定写入
-  `.goal/interfaces.md`（crew 启动时冻结，改走提案）——worker 间唯一的
-  协作通道是文件与你的简报。
-- 同一消息并发 ≤3 个 Agent 调用（general-purpose + 角色注入；未注册
-  goal-* 类型属正常）。每个简报：任务、确切输出路径、文件域（"只碰
-  这些"）、通过条件、"返回证据（命令+输出）"、禁触 `.goal/`、禁 spawn。
+  `.goal/interfaces.md`（crew 启动时冻结，改走提案）——默认后端 worker
+  间只靠文件与简报协作；Teams 后端可互发消息协商，但接口变更落文件才算数。
+- 同一消息并发 ≤3 个 worker（general-purpose + 角色注入；未注册
+  goal-* 类型属正常；Teams 后端 = 同等任务域进任务表派给队友，**禁止
+  worktree 隔离**——否则指纹测不到改动，R7 作废）。每个简报：任务、
+  确切输出路径、文件域（"只碰这些"）、通过条件、"返回证据（命令+输出）"、
+  禁触 `.goal/`、禁 spawn。
 - 拆解不出 ≥2 个说得清接口的模块 → 退串行单任务（记录原因）。
 - Worker 的执行工艺（怎么调试、怎么组织代码）是它自己的事——不把
   goal-loop 的规则塞进简报。
+- Teams 后端铁律：**任务表/工作计划标完成永远不是 GO 信号**（任务队列
+  以 `.goal/work-plan.md` 为准，team 任务表只是它的镜像）；完成判定只
+  认门控。细节见 references/crew.md §7。
 
 ## Step 3 Join + gate
 
@@ -75,7 +88,7 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   两轮未解 → 退回串行并记录。
 - `bash scripts/goal_gate.sh --check`：重跑全部确定性检查、校验指纹与
   账本——这是唯一的完成判定。`--verify [AC-ID]` 单独复跑。
-- loop-log 记 `task=T2[crew:3]` + 各 worker 文件清单。
+- loop-log 记 `task=T2[crew:3]`（Teams 后端 `task=T2[teams:3]`）+ 各 worker 文件清单。
 
 ## Step 4 分岔
 
@@ -95,7 +108,7 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 · verdicts.rec（裁决绑 iter+指纹）· evidence/（席与检查的证据）·
 interfaces.md。格式 v1.x 兼容，中断的 run 可续：`/goal-loop` 无参 =
 status 摘要 + 接续。规则 R1–R8 与门控 check 顺序见 references/gate.md；
-crew 协议与终验简报模板见 references/crew.md；检查形状库见
+crew 协议、Teams 后端与终验简报模板见 references/crew.md；检查形状库见
 references/patterns.md。
 
 ## 脚本与自检

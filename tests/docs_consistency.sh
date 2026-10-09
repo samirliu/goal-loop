@@ -5,7 +5,7 @@
 #   C1 every referenced skill-internal file exists
 #   C2 the version markers agree with the VERSION file
 #   C3 every numbered TOC entry has a matching ## heading
-#   C4 the three mode budgets agree between modes.md and INTEGRATION.md
+#   C5 teams-backend protocol markers stay wired (dual-layer rule)
 # Run from anywhere:  bash tests/docs_consistency.sh
 # Exit 0 = consistent. (Semantic review still belongs to humans + the loop.)
 set -u
@@ -55,6 +55,30 @@ for f in references/*.md; do
     grep -qE "^## $n( |:|\$)" "$f" && ok "C3 $f TOC $n has a heading" || bad "C3 $f TOC entry $n has no ## heading"
   done
 done
+
+# C5 teams backend: dual-layer iron rule and both wave markers stay in the docs.
+# The backend is opt-in, but once documented the "team queue != court" split is
+# load-bearing - silent drift here re-opens the dual-truth hole it closed.
+while IFS='|' read -r f needle; do
+  [ -n "$f" ] || continue
+  if grep -qF "$needle" "$f" 2>/dev/null; then
+    ok "C5 $f has: $needle"
+  else
+    bad "C5 $f missing: $needle"
+  fi
+done <<'EOF'
+references/crew.md|Teams backend
+references/crew.md|NEVER a GO signal
+references/crew.md|task=T2[teams:3]
+references/crew.md|work-plan.md
+references/crew.md|No `isolation: worktree`
+references/crew.md|fallback:teams-unavailable
+references/crew.md|Do not invent new loop-log keys
+references/gate.md|task=T2[teams:3]
+SKILL.md|task=T2[teams:3]
+SKILL.md|禁止
+SKILL.md|worktree
+EOF
 
 echo "== docs consistency: $([ $fail -eq 0 ] && echo CONSISTENT || echo DRIFT) =="
 exit $fail

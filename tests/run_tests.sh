@@ -385,6 +385,14 @@ assert_has "46 status prints iteration line" 'CTL: STATUS iter=1/' "$out"
 assert_has "46 status prints last block" 'CTL: LAST task=T1' "$out"
 assert_has "46 status prints next task" 'CTL: NEXT T1 | do the thing' "$out"
 
+# 47 teams-backend wave marker is free-form in the log (task= is not gated)
+mkproj t47; contract t47 "- AC-1 | f | check: \`true\` | expected: exit=0"
+bash "$CTL" close-iteration --project "$T/t47" --task 'T2[teams:3]' --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate >/dev/null 2>&1
+out=$(bash "$CTL" status --project "$T/t47" 2>&1)
+assert_has "47 status echoes teams wave marker" 'CTL: LAST task=T2\[teams:3\]' "$out"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

@@ -15,7 +15,8 @@ dry_streak dry_limit check_timeout time_budget deadline.
 `.goal/loop-log.md` append-only blocks, exact keys:
 `## iteration N` + task files_modified checks_pass checks_fail
 checks_unverifiable error_signature progress exit_signal false_complete
-digest. `task=T2[crew:3]` marks a crew wave.
+digest. `task=T2[crew:3]` marks a one-shot crew wave, `task=T2[teams:3]`
+a Teams-backend wave (same gate authority either way).
 
 `.goal/verdicts.rec` 6 fields: `id|verdict|iter|digest|command|evidence`.
 Deterministic ACs: records are bookkeeping; the gate's rerun is the
