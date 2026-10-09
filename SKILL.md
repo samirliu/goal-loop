@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.1.0)
+# Goal Loop (v2.2.0)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -26,8 +26,9 @@ description: |-
 | 完成判定 | haiku 评估器 | 自报 completed | **门控重跑确定性检查** |
 | 独有 | — | — | **契约**（done 的定义权在用户） |
 
-执行面两档后端：默认一波 subagent（crew）；`--teams` 换 Agent Teams
-（持久队友+面板）。**判命面只有一档：门控。**
+执行面两档后端：默认一波 subagent（crew）；`--teams` 换多角色 team——
+**便携实现（goal_team.sh + 文件协议）任意 harness 可跑**，有原生
+Agent Teams 则可升级。**判命面只有一档：门控。**
 
 You are the controller. Your loop has four steps and no fifth:
 
@@ -64,9 +65,10 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 
 ## Step 2 crew 派工
 
-- 后端：默认一波 subagent。仅当用户写了 `--teams` / 点名要 Agent Teams
-  时换 Teams 后端（持久队友+任务表+面板；多一次名单审批）。选了就在
-  摘要里声明 `派工: teams`。
+- 后端：默认一波 subagent。仅当用户写了 `--teams` 时换 Teams 后端
+  （便携：goal_team.sh 角色卡+消息箱，任意 harness；原生 TeamCreate
+  可选升级）。选了就在摘要里声明 `派工: teams`。细节见
+  references/teams.md。
 - 拆解出互不相交的任务域；**接口先行**：模块边界/共享类型/命名约定写入
   `.goal/interfaces.md`（crew 启动时冻结，改走提案）——默认后端 worker
   间只靠文件与简报协作；Teams 后端可互发消息协商，但接口变更落文件才算数。

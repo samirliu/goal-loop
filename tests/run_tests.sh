@@ -10,6 +10,7 @@ export LC_ALL=C.UTF-8
 here=$(cd "$(dirname "$0")/.." && pwd)   # skill root
 GATE="$here/scripts/goal_gate.sh"
 CTL="$here/scripts/goal_ctl.sh"
+TEAM="$here/scripts/goal_team.sh"
 T=$(mktemp -d)
 trap 'rm -rf "$T"' EXIT
 
@@ -392,6 +393,49 @@ bash "$CTL" close-iteration --project "$T/t47" --task 'T2[teams:3]' --files a.tx
   --exit-signal no --no-gate >/dev/null 2>&1
 out=$(bash "$CTL" status --project "$T/t47" 2>&1)
 assert_has "47 status echoes teams wave marker" 'CTL: LAST task=T2\[teams:3\]' "$out"
+
+# 48-52 portable team layer (goal_team.sh) — cc-haha-shaped file protocol
+mkproj t48
+out=$(bash "$TEAM" init --project "$T/t48" --team goal --description 'run' 2>&1)
+assert_rc "48 team init ok" 0 $?
+assert_has "48 init echoes team" 'TEAM: INIT ok team=goal' "$out"
+[ -f "$T/t48/.goal/team/config.json" ] && ok "48 config.json written" || no "48 config.json missing"
+[ -d "$T/t48/.goal/team/inboxes" ] && ok "48 inboxes dir" || no "48 inboxes dir missing"
+
+out=$(bash "$TEAM" init --project "$T/t48" --team goal 2>&1); assert_rc "48b double init refused" 2 $?
+
+out=$(bash "$TEAM" roster --project "$T/t48" --add --name w1 --role backend \
+  --prompt 'do X' --scope 'src/api' 2>&1)
+assert_rc "49 roster add" 0 $?
+assert_has "49 roster add echoes name" 'ROSTER add name=w1' "$out"
+out=$(bash "$TEAM" roster --project "$T/t48" --add --name w1 --role other --prompt 'x' 2>&1)
+assert_rc "49b duplicate name refused" 2 $?
+
+bash "$TEAM" roster --project "$T/t48" --add --name w2 --role frontend --prompt 'do Y' >/dev/null
+out=$(bash "$TEAM" send --project "$T/t48" --from w1 --to w2 \
+  --text 'field renamed' --summary 'rename notice' 2>&1)
+assert_rc "50 send to w2" 0 $?
+assert_has "50 send echoes to" 'SEND ok to=w2' "$out"
+grep -q 'field renamed' "$T/t48/.goal/team/inboxes/w2.jsonl" && ok "50 inbox has text" || no "50 inbox missing text"
+grep -q '"from":"w1"' "$T/t48/.goal/team/inboxes/w2.jsonl" && ok "50 message from field" || no "50 from field missing"
+grep -q '"read":false' "$T/t48/.goal/team/inboxes/w2.jsonl" && ok "50 unread flag" || no "50 read flag wrong"
+
+out=$(bash "$TEAM" send --project "$T/t48" --from controller --to '*' --text 'wave note' 2>&1)
+assert_rc "51 broadcast" 0 $?
+assert_has "51 broadcast delivered=2" 'delivered=2' "$out"
+grep -q 'wave note' "$T/t48/.goal/team/inboxes/w1.jsonl" && ok "51 w1 got broadcast" || no "51 w1 missed broadcast"
+grep -q 'wave note' "$T/t48/.goal/team/inboxes/w2.jsonl" && ok "51 w2 got broadcast" || no "51 w2 missed broadcast"
+
+out=$(bash "$TEAM" inbox --project "$T/t48" --name w2 --unread 2>&1)
+assert_has "52 unread listing" 'field renamed' "$out"
+out=$(bash "$TEAM" inbox --project "$T/t48" --name w2 --mark-read 2>&1)
+assert_rc "52 mark-read" 0 $?
+grep -q '"read":true' "$T/t48/.goal/team/inboxes/w2.jsonl" && ok "52 marked read" || no "52 not marked read"
+out=$(bash "$TEAM" status --project "$T/t48" 2>&1)
+assert_has "52 status shows roster" 'w1' "$out"
+
+bash "$TEAM" delete --project "$T/t48" >/dev/null
+[ ! -d "$T/t48/.goal/team" ] && ok "52b delete removes team dir" || no "52b team dir remains"
 
 echo
 echo "== results: pass=$pass fail=$failn =="

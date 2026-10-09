@@ -74,12 +74,15 @@ floating defect; call detached only with a 3D gap across views.
 
 ## 7 Teams backend (opt-in)
 
-Default = the one-shot subagents above. `--teams` (or the user asking for
-Agent Teams) swaps Step 2's dispatch for a TeamCreate crew. Contract, loop,
+Default = the one-shot subagents above. `--teams` swaps Step 2's dispatch
+for a multi-role team. **Portable by default**: `scripts/goal_team.sh`
+implements the cc-haha file protocol (roster + inboxes + TeammateMessage)
+so this works on ANY harness — no TeamCreate required. If the harness
+does have native TeamCreate/SendMessage, upgrade to it for true persistent
+teammates and the panel; same dual-layer rules either way. Contract, loop,
 gate, and every rule stay identical - only the execution surface changes.
-Prefer the default; this backend is for long unattended multi-role runs
-where named continuity, a shared backlog, and the panel justify one extra
-roster glance.
+Prefer the default; `--teams` is for long unattended multi-role runs.
+Protocol details: references/teams.md.
 
 ### 7.1 Dual layer (non-negotiable)
 
@@ -101,22 +104,27 @@ and the team queue is repaired to match.
 ### 7.2 Lifecycle
 
 1. Contract stamped (unchanged).
-2. TeamCreate + TeamPlan submit - user reviews the roster in the team
-   panel (the one extra glance this backend costs). Approval starts the
-   run. Summary line already declared `派工: teams`.
+2. Team up:
+   - Portable (always available): `goal_team.sh init` + `roster --add` per
+     role (≤3). Summary line already declared `派工: teams`.
+   - Native (if TeamCreate exists): TeamCreate + TeamPlan submit — user
+     reviews the roster in the panel. Approval starts the run.
    **No `isolation: worktree`** - teammates edit the shared workspace.
    A worktree would hide their diffs from the digest and poison R7
    verdict binding. This is a hard ban, not a preference.
-3. Waves: keep `work-plan.md` as plan of record; mirror each open item
-   to TaskCreate -> worker implements -> TaskUpdate (queue only) ->
-   controller join (§4) -> `gate --check` exactly as usual.
-4. Delivery/fuse: TeamDelete. Resume: team still alive -> reconnect;
-   team gone -> degrade to the default backend and log the fallback.
+3. Waves: keep `work-plan.md` as plan of record; dispatch role-card
+   workers -> they implement (notes home via `MSG: to=...` the controller
+   `send`s) -> controller join (§4) -> `gate --check` exactly as usual.
+4. Delivery/fuse: `goal_team.sh delete` (or TeamDelete). Resume: team dir
+   still there -> continue; gone -> rebuild roster or fall back to the
+   default backend and log it.
 
 ### 7.3 Coordination
 
 - Interfaces stay frozen in `.goal/interfaces.md`.
-- Workers MAY SendMessage to negotiate details mid-wave.
+- Workers MAY negotiate mid-wave: native SendMessage, or portable
+  `MSG: to=<name> text=...` return lines the controller posts via
+  `goal_team.sh send`.
 - A negotiated interface change is binding only after it lands as a file
   write to interfaces.md (R3 spirit). Talk is cheap; the file is the
   contract.

@@ -101,39 +101,34 @@ forge 退出 = 地板全过 ∧ dry_streak≥dry_limit ∧ critic 空答案；�
 In-session bookkeeping is one Bash call: `scripts/goal_ctl.sh close-iteration ...`
 (forge contracts require `--dry yes|no`). 会话内记账一条命令。
 
-## Agent Teams backend / Teams 后端（opt-in，默认不启用）
+## Teams backend / Teams 后端（opt-in，任意 harness 可跑）
 
-Default = one-shot subagents. `--teams` (or asking for Agent Teams) swaps
-**only the execution surface** for a TeamCreate crew: named persistent
-teammates, a shared task list, and the desktop team panel. Costs one extra
-roster approval in the panel.
+**Zero Agent Teams dependency.** `--teams` ships a **portable team layer**
+(`scripts/goal_team.sh`) implementing the cc-haha file protocol — roster,
+per-agent inboxes, `TeammateMessage` — so multi-role crews work on any
+Claude Code harness. Native TeamCreate/SendMessage (cc-haha etc.) is an
+optional upgrade for true persistent teammates and the desktop panel.
 
-默认后端是一波即散的 subagent。`--teams` 只换**执行面**（持久队友 + 任务表 +
-面板，多一次名单审批）；**判命面不变**。
+**不依赖 Agent Teams。** `--teams` 自带便携 team 层（`goal_team.sh`），
+按 cc-haha 文件协议（角色表 + 消息箱 + TeammateMessage）实现——裸 harness
+也能跑多角色协作。有原生 TeamCreate 才升级成长驻队友+面板。
+
+Default = one-shot subagents. `--teams` swaps **only the execution surface**.
 
 | | Work tracking / 工作追踪 | Court / 法庭 |
 |---|---|---|
-| where | `.goal/work-plan.md` + Team task list (mirror) | contract + gate + verdicts |
-| says a work item is done | controller ticks work-plan; TaskUpdate=completed | — |
+| where | `.goal/work-plan.md` + team roster/inbox | contract + gate + verdicts |
+| says a work item is done | controller ticks work-plan | — |
 | says the GOAL is done | — | `goal_gate.sh` rc=0 only |
 
 **`TaskUpdate = completed` is NEVER a GO signal.** 任务表/工作计划标完成永远
-不是 GO 信号。Team task list is a projection of `work-plan.md` — on conflict
-the ledger wins. Hard rules:
+不是 GO 信号。Hard rules:
 
-- **No `isolation: worktree`** — teammates edit the shared workspace. A worktree
-  would hide their diffs from the digest and void R7. 禁 worktree 隔离。
-- Workers MAY SendMessage to negotiate; an interface change is binding only
-  after it lands as a file write to `interfaces.md`. 可聊天，落文件才算数。
+- **No `isolation: worktree`** — digest must see every teammate edit. 禁 worktree。
+- Negotiation via inbox/`MSG:` lines; interface changes bind only as file
+  writes to `interfaces.md`. 可协商，落文件才算数。
 - Judged cold seat is never a team member. 冷席永不进 team。
-- Teams unavailable → fall back to the default backend and note
-  `(fallback:teams-unavailable)` in the task field; never invent new
-  loop-log keys.
-
-Prefer the default. Choose `--teams` for long unattended multi-role runs
-where named continuity, a shared backlog, and the panel justify the roster
-glance. If you only want the panel and not the gate, use Agent Teams alone —
-do not wrap it in goal-loop. 只要面板不要门控 → 裸用 Agent Teams。
+- Protocol: `references/teams.md`. CLI: `scripts/goal_team.sh --help`.
 
 ## Unattended mode / 无人值守模式（可选）
 
@@ -223,6 +218,7 @@ its discretionary evaluator. rc=0/3/4 pass, fail-open.
 
 - `references/gate.md` — rules R1–R8, check order, schemas（门控规格与规则）
 - `references/crew.md` — crew protocol, Teams backend, judged-seat brief（派工与 Teams 协议）
+- `references/teams.md` — portable Agent-Teams layer（便携 team 协议，零 harness 依赖）
 - `references/patterns.md` — failable check shapes per artifact type（可失败检查形状库）
 - `assets/goal.contract.md` — contract template（契约模板）
 
