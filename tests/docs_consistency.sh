@@ -74,6 +74,9 @@ references/crew.md|work-plan.md
 references/crew.md|No `isolation: worktree`
 references/crew.md|fallback:teams-unavailable
 references/crew.md|Do not invent new loop-log keys
+references/gate.md|never WRITE `.goal/`
+references/crew.md|INLINED
+references/teams.md|own inbox file
 references/gate.md|task=T2[teams:3]
 references/teams.md|TeammateMessage
 references/teams.md|goal_team.sh

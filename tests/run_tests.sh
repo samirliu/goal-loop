@@ -559,6 +559,38 @@ bash "$CTL" close-iteration --project "$T/t60" --task T1 --files a.txt \
 out=$(bash "$CTL" status --project "$T/t60" 2>&1)
 assert_has "60 status best_score" 'best_score=5' "$out"
 
+# 61 score is MEASURED, not self-reported: a wrong claim is overridden
+mkproj t61
+{
+  printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
+  printf 'objective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `echo 42` | expected: maximize\n'
+  printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t61/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t61" --auto >/dev/null
+out=$(bash "$CTL" close-iteration --project "$T/t61" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --score 7 --no-gate 2>&1)
+assert_has "61 mismatch noted" 'score-measured-override' "$out"
+grep -q '^score=42$' "$T/t61/.goal/loop-log.md" && ok "61 measured score recorded" || no "61 recorded claimed score"
+grep -q '^best_score=42$' "$T/t61/.goal/state.rec" && ok "61 best_score from measurement" || no "61 best_score wrong"
+
+# 62 unmeasurable objective records none (gate will refuse the claim later)
+mkproj t62
+{
+  printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
+  printf 'objective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `cat missing_file_xyz` | expected: maximize\n'
+  printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t62/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t62" --auto >/dev/null
+out=$(bash "$CTL" close-iteration --project "$T/t62" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --score 9 --no-gate 2>&1)
+assert_rc "62 unmeasurable records ok rc0" 0 $?
+assert_has "62 warns unmeasurable" 'objective-unmeasurable' "$out"
+grep -q '^score=none$' "$T/t62/.goal/loop-log.md" && ok "62 score=none recorded" || no "62 score not none"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

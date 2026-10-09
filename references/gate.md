@@ -85,7 +85,9 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
 - **R4** judged UNVERIFIABLE <= 1/3, always PROBE/REASON.
 - **R5** judged briefs carry verbatim AC text + evidence paths only; no
   producer reasoning; verdicts without observation are void.
-- **R6** workers never touch `.goal/`; only goal_ctl.sh writes state.
+- **R6** workers never WRITE `.goal/`; only goal_ctl.sh writes state. Reads
+  are limited to the worker's own inbox file and files its brief explicitly
+  names - nothing else under `.goal/` (ledger, verdicts, other inboxes).
 - **R7** judged verdicts bind (iter, digest); digest move voids all judged
   verdicts, no sharding. Deterministic exempt (gate recomputes).
 - **R8** findings bind evidence - manufactured discoveries as forbidden as

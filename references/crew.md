@@ -29,8 +29,10 @@ Output paths: <exact>
 Scope: touch ONLY these files/dirs: <list>
 Pass condition: <named check or observable>
 Evidence: return the command you ran and its decisive output.
-Rules: never touch .goal/ (R6); no subagents; no scope drift.
-Interface contract: <relevant excerpt of interfaces.md>
+Rules: never write .goal/; read only your own inbox (if the brief says so);
+no subagents; no scope drift. (R6)
+Interface contract: <excerpt INLINED here by the controller - workers must
+not open .goal/interfaces.md themselves>
 ```
 
 Dispatch up to 3 workers in ONE message (they run concurrently). Their
@@ -128,8 +130,9 @@ and the team queue is repaired to match.
 - A negotiated interface change is binding only after it lands as a file
   write to interfaces.md (R3 spirit). Talk is cheap; the file is the
   contract.
-- Briefs unchanged (paths, scope, pass condition, evidence, no `.goal/`,
-  no spawn).
+- Briefs unchanged (paths, scope, pass condition, evidence, no `.goal/`
+  writes, no spawn). The interface excerpt is INLINED in the brief; a
+  worker reading `.goal/interfaces.md` itself is a scope violation (R6).
 - The judged cold seat is NEVER a team member - dispatch one fresh
   independent Agent. Production context voids a judge.
 

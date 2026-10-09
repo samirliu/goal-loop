@@ -33,6 +33,9 @@ Unchanged from crew.md §7:
 - GO only when `goal_gate.sh` returns rc=0.
 - No worktree isolation (digest must see every teammate edit).
 - Interface changes bind only as file writes to `interfaces.md`.
+- R6 in portable mode: a worker READS its own inbox file (only that one
+  under `.goal/`) and never writes anything there. The interface excerpt
+  is inlined in the brief - workers do not open `.goal/interfaces.md`.
 
 ## 3 Portable wave protocol
 

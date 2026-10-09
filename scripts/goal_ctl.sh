@@ -137,6 +137,23 @@ case "$cmd" in
       printf '%s' "$score" | grep -qE '^-?[0-9]+(\.[0-9]+)?$' \
         || { echo "CTL: ERROR bad-score:$score" >&2; exit 4; }
     fi
+    # The score is MEASURED, never self-reported: ctl reruns the objective AC
+    # (gate --verify, stateless) and records the observed value. A mismatch
+    # from the controller is noted; an unmeasurable instrument records none
+    # and the gate refuses any claim lacking a score.
+    obj_ac=$(r < "$sd/goal.md" | sed -nE 's/^objective: *maximize +(AC-[0-9]+).*/\1/p' | tail -1)
+    if [ -n "$obj_ac" ] && [ -n "$score" ]; then
+      vline=$(bash "$here/goal_gate.sh" --verify "$obj_ac" --project "$project" 2>/dev/null \
+              | grep -E "^GATE: VERIFY $obj_ac\|" | tail -1)
+      mobs=$(printf '%s' "$vline" | sed -nE 's/.*observed=([0-9.\-]+).*/\1/p')
+      if [ -n "$mobs" ]; then
+        [ "$mobs" = "$score" ] || echo "CTL: NOTE score-measured-override (claimed=$score measured=$mobs)" >&2
+        score="$mobs"
+      else
+        echo "CTL: WARN objective-unmeasurable:$obj_ac (recording score=none)" >&2
+        score=""
+      fi
+    fi
     # R10 value must be single-line or it shreds the key=value block
     sdelta_show=$(printf '%s' "${strategy_delta:-none}" | tr '\n\r\t' '   ')
     case "$sdelta_show" in ''|*[![:print:]]*) sdelta_show=none ;; esac
