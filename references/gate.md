@@ -39,7 +39,8 @@ needs `PROBE=.. REASON=..`; empty evidence voids a PASS.
   that AC's observed value against `best_score` and refuses a claim that
   regresses. Stamp still covers only the AC body + `exit:` lines.
 - Stamp `^approved: [0-9a-f]{8} [0-9]{4}-` = sha1-8 over the AC section body
-  PLUS every `^exit:` line (exit policy is frozen too).
+  PLUS every `^exit:` and `^objective:` line (exit policy and maximize
+  target are frozen too - R11 is unpatchable after stamping).
 
 ## 2 Digest + mutation guard
 

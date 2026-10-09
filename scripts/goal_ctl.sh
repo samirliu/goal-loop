@@ -53,6 +53,8 @@ done
 
 sd="$project/.goal"
 r(){ tr -d '\r'; }
+# MUST match goal_gate.sh hash_std - stamp and verify share one digest rule
+hash_std(){ if command -v sha1sum >/dev/null 2>&1; then sha1sum | cut -c1-40; else cksum | awk '{print $1}'; fi }
 state_get(){ [ -f "$sd/state.rec" ] && grep -E "^$1=" "$sd/state.rec" | r | tail -1 | cut -d= -f2-; echo; }
 
 case "$cmd" in
@@ -78,8 +80,8 @@ case "$cmd" in
       fi
     fi
     h=$( { r < "$sd/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
-           r < "$sd/goal.md" | grep -E '^exit:' || true
-         } | sha1sum | cut -c1-8)
+           r < "$sd/goal.md" | grep -E '^(exit|objective):' || true
+         } | hash_std | cut -c1-8)
     case "${time_budget:-}" in                            # optional wall-clock fuse, stamped at approval
       ''|0) : ;;
       *[!0-9]*) echo "CTL: ERROR bad-time-budget:$time_budget" >&2; exit 4 ;;
@@ -131,11 +133,14 @@ case "$cmd" in
     fi
     # score bookkeeping (objective: maximize)
     if [ -n "$score" ]; then
-      case "$score" in
-        ''|*[!0-9.\-]*) echo "CTL: ERROR bad-score:$score" >&2; exit 4 ;;
-      esac
+      # one optional leading '-', digits, optional decimal - not "..." or "--"
+      printf '%s' "$score" | grep -qE '^-?[0-9]+(\.[0-9]+)?$' \
+        || { echo "CTL: ERROR bad-score:$score" >&2; exit 4; }
     fi
-    sdelta_show=${strategy_delta:-none}
+    # R10 value must be single-line or it shreds the key=value block
+    sdelta_show=$(printf '%s' "${strategy_delta:-none}" | tr '\n\r\t' '   ')
+    case "$sdelta_show" in ''|*[![:print:]]*) sdelta_show=none ;; esac
+    [ -n "$sdelta_show" ] || sdelta_show=none
     printf '%s\n' "## iteration $new" "task=$task" "files_modified=$files" \
       "checks_pass=$cp" "checks_fail=$cf" "checks_unverifiable=$cu" \
       "error_signature=$errsig" "progress=$progress" "exit_signal=$exit_signal" \
@@ -179,8 +184,8 @@ case "$cmd" in
     g(){ state_get "$1"; }
     left="off"
     d=$(g deadline); if [ -n "$d" ] && [ "$d" != 0 ]; then left=$(( d - $(date +%s) ))s; [ "$left" = "" ] && left=0s; fi
-    printf 'CTL: STATUS iter=%s/%s breaker=%s dry_streak=%s/%s time_left=%s\n' \
-      "$(g iteration)" "$(g max_iterations)" "$(g breaker)" "$(g dry_streak)" "$(g dry_limit)" "$left"
+    printf 'CTL: STATUS iter=%s/%s breaker=%s dry_streak=%s/%s best_score=%s time_left=%s\n' \
+      "$(g iteration)" "$(g max_iterations)" "$(g breaker)" "$(g dry_streak)" "$(g dry_limit)" "$(g best_score)" "$left"
     lb=$(awk '
       /^## iteration/ { delete l; next }
       { line=$0; sub(/\r$/,"",line)

@@ -55,10 +55,10 @@ tree_digest(){                                         # 12 hex, deterministic
     fi )
 }
 
-ac_body_hash(){                                        # 8 hex over AC body + every ^exit: line
+ac_body_hash(){                                        # 8 hex over AC body + ^exit: + ^objective: lines
   { r < "$sd/goal.md" |
     awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
-    r < "$sd/goal.md" | grep -E '^exit:' || true
+    r < "$sd/goal.md" | grep -E '^(exit|objective):' || true
   } | hash_std | cut -c1-8
 }
 

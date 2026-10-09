@@ -513,6 +513,52 @@ bash "$CTL" close-iteration --project "$T/t56" --task T1 --files a.txt \
   --exit-signal no --strategy-delta 'switch camera to side view' --no-gate >/dev/null 2>&1
 grep -q 'strategy_delta=switch camera' "$T/t56/.goal/loop-log.md" && ok "56 strategy_delta recorded" || no "56 strategy_delta missing"
 
+# 57 objective: line is frozen by the stamp (R11 cannot be patched away)
+mkproj t57
+{
+  printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
+  printf 'objective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `echo 3` | expected: maximize\n'
+  printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t57/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t57" --auto >/dev/null
+sed -i 's/^objective: maximize AC-1/objective: maximize AC-2/' "$T/t57/.goal/goal.md"
+bash "$CTL" close-iteration --project "$T/t57" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --score 3 --no-gate >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t57" 2>&1); assert_rc "57 tampered objective -> rc2" 2 $?
+assert_has "57 reason contract-tampered" 'contract-tampered' "$out"
+
+# 58 strategy_delta newline is flattened (must not shred loop-log block)
+mkproj t58
+bash "$CTL" close-iteration --project "$T/t58" --task T1 --files a.txt \
+  --checks-pass 0 --checks-fail 0 --checks-unverifiable 0 --progress no \
+  --exit-signal no --strategy-delta $'line1\nline2' --no-gate >/dev/null 2>&1
+grep -q 'strategy_delta=line1 line2' "$T/t58/.goal/loop-log.md" && ok "58 strategy_delta single line" || no "58 strategy_delta multi-line leaked"
+grep -c '^## iteration' "$T/t58/.goal/loop-log.md" | grep -qx '1' && ok "58 loop-log block intact" || no "58 loop-log block shredded"
+
+# 59 bad score rejected
+mkproj t59
+bash "$CTL" close-iteration --project "$T/t59" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --score '1.2.3' --no-gate >/dev/null 2>&1
+assert_rc "59 bad-score refused" 4 $?
+
+# 60 status shows best_score
+mkproj t60
+{
+  printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
+  printf 'objective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `echo 5` | expected: maximize\n'
+  printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t60/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t60" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t60" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --score 5 --no-gate >/dev/null 2>&1
+out=$(bash "$CTL" status --project "$T/t60" 2>&1)
+assert_has "60 status best_score" 'best_score=5' "$out"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

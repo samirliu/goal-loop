@@ -90,6 +90,9 @@ scripts/goal_gate.sh|probe-failed
 scripts/goal_gate.sh|score-regressed
 scripts/goal_gate.sh|missing-strategy-delta
 scripts/goal_ctl.sh|strategy-delta
+scripts/goal_ctl.sh|(exit|objective):
+scripts/goal_gate.sh|(exit|objective):
+scripts/goal_ctl.sh|hash_std
 EOF
 
 echo "== docs consistency: $([ $fail -eq 0 ] && echo CONSISTENT || echo DRIFT) =="
