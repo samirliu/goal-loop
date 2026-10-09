@@ -102,6 +102,12 @@ ac_line_for(){ r < "$sd/goal.md" | awk -v id="$1" '$0 ~ "^- "id"[ |]"'; }
 ac_check_cmd(){ ac_line_for "$1" | sed -nE 's/^.*check: *`([^`]*)`.*/\1/p' | tail -1; }
 ac_expected(){ ac_line_for "$1" | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1; }
 ac_baseline_marker(){ ac_line_for "$1" | sed -nE 's/^.*baseline: *(delta|abs).*/\1/p' | tail -1; }
+# Verifier-of-the-verifier (R9): any metric/maximize AC may carry a probe:
+# check that must PASS before its number is trusted. The probe asserts the
+# measurement itself (instrument alive, fixture loaded, seed fixed).
+ac_probe_cmd(){ ac_line_for "$1" | sed -nE 's/^.*probe: *`([^`]*)`.*/\1/p' | tail -1; }
+# Optional contract-level objective: maximize AC-N  (score-regressed guard).
+objective_ac(){ r < "$sd/goal.md" | sed -nE 's/^objective: *maximize +(AC-[0-9]+).*/\1/p' | tail -1; }
 # Baseline validation (forge only): every delta metric AC needs a
 # .goal/baseline.md line `AC-N | ... | repeats=<N>=2 | cmd=<check verbatim>`.
 # The cmd match is the "same yardstick" rule made mechanical; repeats>=2
@@ -128,11 +134,12 @@ baseline_validate(){                                   # fail-fast via fail(); f
     { [ -n "$rep" ] && [ "$rep" -ge 2 ]; } || fail "baseline-weak:$id (repeats>=2 required - single runs game the metric)"
   done
 }
-classify_expected(){                                   # $1 raw -> exit0 | judged | "metric <op> <num>"
+classify_expected(){                                   # $1 raw -> exit0 | judged | maximize | "metric <op> <num>"
   v=$(printf '%s' "$1" | tr -d '[:space:]')
   case "$v" in
     ''|exit=0) echo "exit0" ;;
     judged)    echo "judged" ;;
+    maximize)  echo "maximize" ;;
     exit=[0-9]*) echo "rc ${v#exit=}" ;;
     *)
       op=$(printf '%s' "$v" | sed -nE 's/^([<>=!]+)[0-9].*/\1/p')
@@ -150,6 +157,23 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   id="$1"; cls="$2"; m_op="${3:-}"; m_num="${4:-}"
   cmd=$(ac_check_cmd "$id")
   if [ -z "$cmd" ]; then printf '%s|BROKEN|no check command in AC line\n' "$id"; return; fi
+  # R9 verifier-of-the-verifier: metric/maximize numbers are untrustworthy
+  # unless their probe (instrument alive) passes first.
+  case "$cls" in metric*|maximize)
+    pcmd=$(ac_probe_cmd "$id")
+    if [ -n "$pcmd" ]; then
+      if command -v timeout >/dev/null 2>&1; then
+        ( cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$pcmd" >/dev/null 2>&1 )
+      else
+        ( cd "$project" 2>/dev/null && bash -c "$pcmd" >/dev/null 2>&1 )
+      fi
+      prc=$?
+      if [ "$prc" -ne 0 ]; then
+        printf '%s|BROKEN|probe-failed:rc=%s (measurement untrusted - fix the instrument before the number)\n' "$id" "$prc"
+        return
+      fi
+    fi ;;
+  esac
   if command -v timeout >/dev/null 2>&1; then
     out=$(cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$cmd" 2>/dev/null); rc=$?
   else
@@ -176,6 +200,15 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
       v=$(awk -v a="$last" -v b="$m_num" -v o="$m_op" \
           'BEGIN{ok=(o==">=")?(a>=b):(o=="<=")?(a<=b):(o==">")?(a>b):(o=="<")?(a<b):(o=="==")?(a==b):(a!=b); print ok?"PASS":"FAIL"}')
       printf '%s|%s|observed=%s expect=%s%s\n' "$id" "$v" "$last" "$m_op" "$m_num" ;;
+    maximize)
+      last=$(printf '%s\n' "$out" | grep -vE '^[[:space:]]*$' | tail -1)
+      case "$last" in
+        ''|*[!0-9.\-]*)
+          printf '%s|BROKEN|last stdout line is not a number: %s\n' "$id" "${last:-<empty>}"; return ;;
+      esac
+      # maximize is the objective, not a floor: numeric = PASS. The score
+      # itself is compared to best_score by the caller (score-regressed).
+      printf '%s|PASS|observed=%s expect=maximize\n' "$id" "$last" ;;
     *)
       printf '%s|BROKEN|unroutable expectation class\n' "$id" ;;
   esac
@@ -281,7 +314,7 @@ lb=$(last_block) || fail "empty-loop-log"
 # last_block() consumes key=value lines generically, so the set is declared
 # here: it keeps parser and schema doc mutually named and advisory-checks
 # presence (exit codes unchanged; exit_signal and digest stay hard-checked).
-loop_keys="task files_modified checks_pass checks_fail checks_unverifiable error_signature progress exit_signal false_complete digest"
+loop_keys="task files_modified checks_pass checks_fail checks_unverifiable error_signature progress exit_signal false_complete digest score strategy_delta"
 missing_lk=""
 for k in $loop_keys; do
   printf '%s\n' "$lb" | grep -qE "^$k=" || missing_lk="$missing_lk $k"
@@ -296,6 +329,8 @@ ac_ids=$(all_ac_ids)
 [ -n "$ac_ids" ] || fail "contract-empty:no AC ids"
 lv=$(latest_verdicts)
 total=0; passn=0; unv=0
+observed_score=""
+primary=$(objective_ac)
 for id in $ac_ids; do
   cls=$(classify_expected "$(ac_expected "$id")")
   if [ "$cls" != judged ]; then
@@ -305,7 +340,10 @@ for id in $ac_ids; do
     v=$(printf '%s' "$line" | cut -d'|' -f2)
     detail=$(printf '%s' "$line" | cut -d'|' -f3-)
     case "$v" in
-      PASS)   total=$((total+1)); passn=$((passn+1)) ;;
+      PASS)   total=$((total+1)); passn=$((passn+1))
+              if [ "$id" = "$primary" ]; then
+                observed_score=$(printf '%s' "$detail" | sed -nE 's/.*observed=([0-9.\-]+).*/\1/p' | tail -1)
+              fi ;;
       FAIL)   fail "open-FAIL:$id (gate rerun: $detail)" ;;
       BROKEN) fail "check-broken:$id ($detail)" ;;
       *)      fail "check-unknown:$id ($line)" ;;
@@ -342,6 +380,27 @@ digest2=$(tree_digest)
 if [ "$exit_mode" = forge ]; then
   dry=$(state_get dry_streak); dl=$(state_get dry_limit)
   [ "${dry:-0}" -ge "${dl:-3}" ] || fail "not-dry:dry_streak=${dry:-0} limit=$dl (forge exits on verification exhaustion, not on floors alone)"
+fi
+
+# -12. strategy-delta duty (R10): landing on HALF_OPEN without a recorded
+# strategy change is make-work; refuse the claim until one is written.
+if [ "$breaker" = HALF_OPEN ]; then
+  sdelt=$(printf '%s\n' "$lb" | grep -E '^strategy_delta=' | tail -1 | cut -d= -f2-)
+  case "$sdelt" in
+    ''|none) fail "missing-strategy-delta (breaker=HALF_OPEN requires strategy_delta= <what you are changing>)" ;;
+  esac
+fi
+
+# -13. optimize objective: never deliver a score below the best seen (R11).
+if [ -n "$primary" ]; then
+  [ -n "$observed_score" ] || fail "score-missing:$primary (objective: maximize needs a numeric observed score)"
+  best=$(state_get best_score)
+  if [ -n "$best" ] && [ "$best" != "none" ]; then
+    awk -v c="$observed_score" -v b="$best" 'BEGIN{exit !(c+0 >= b+0)}' \
+      || fail "score-regressed:current=$observed_score best=$best (restore the best-scoring state or do not claim)"
+  fi
+  echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}"
+  exit 0
 fi
 
 echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode"

@@ -9,14 +9,17 @@ bookkeeps via goal_ctl.sh. Scripts: `scripts/goal_gate.sh` (`--check`,
 `.goal/state.rec` keys: iteration breaker(CLOSED|HALF_OPEN|OPEN)
 false_completes replans no_progress_streak last_progress_iteration
 max_iterations no_progress_limit max_replans per_check_fail_cap panel_max
-dry_streak dry_limit check_timeout time_budget deadline.
+dry_streak dry_limit check_timeout time_budget deadline best_score.
 `dry_streak/dry_limit` required only for `exit: forge`.
+`best_score` is the high-water mark for `objective: maximize AC-N` (R11).
 
 `.goal/loop-log.md` append-only blocks, exact keys:
 `## iteration N` + task files_modified checks_pass checks_fail
 checks_unverifiable error_signature progress exit_signal false_complete
-digest. `task=T2[crew:3]` marks a one-shot crew wave, `task=T2[teams:3]`
-a Teams-backend wave (same gate authority either way).
+digest score strategy_delta. `task=T2[crew:3]` marks a one-shot crew wave,
+`task=T2[teams:3]` a Teams-backend wave (same gate authority either way).
+`score=` holds the objective:maximize value or `none`; `strategy_delta=`
+is mandatory whenever `progress=no` (R10).
 
 `.goal/verdicts.rec` 6 fields: `id|verdict|iter|digest|command|evidence`.
 Deterministic ACs: records are bookkeeping; the gate's rerun is the
@@ -24,11 +27,17 @@ evidence. Judged ACs: PASS needs the quoted decisive output; UNVERIFIABLE
 needs `PROBE=.. REASON=..`; empty evidence voids a PASS.
 
 `.goal/goal.md` AC grammar:
-`- AC-N | <statement> | check: \`<command>\` | [baseline: delta|abs] | expected: <spec>`
+`- AC-N | <statement> | check: \`<command>\` | [probe: \`<cmd>\`] | [baseline: delta|abs] | expected: <spec>`
 - `exit=0`/omitted -> deterministic rc check; `<op><number>` (>= <= > < == !=)
-  -> metric, LAST non-empty stdout line must be the number; `judged` -> seat
+  -> metric, LAST non-empty stdout line must be the number; `maximize` ->
+  objective score (numeric, not a floor); `judged` -> seat
   verdict digest-bound; prose (v1.1) -> judged. Spec value must not contain
   `|`; exact-text compare goes INSIDE the command.
+- `probe: \`cmd\`` (R9) must PASS before a metric/maximize number is
+  trusted - it asserts the measurement instrument, not the artifact.
+- Optional contract line `objective: maximize AC-N` (R11): the gate tracks
+  that AC's observed value against `best_score` and refuses a claim that
+  regresses. Stamp still covers only the AC body + `exit:` lines.
 - Stamp `^approved: [0-9a-f]{8} [0-9]{4}-` = sha1-8 over the AC section body
   PLUS every `^exit:` line (exit policy is frozen too).
 
@@ -52,13 +61,15 @@ mutated the tree -> NO-GO.
 4b last two blocks same error_signature       else 3 repeated-error
 5  last block exit_signal=yes                 else 2 not-claimed
 6  block digest == current digest             else 2 verdicts-stale [R7]
-7  per AC: deterministic -> gate reruns NOW   FAIL 2 open-FAIL / BROKEN 2
+7  per AC: probe (R9) then deterministic      FAIL 2 open-FAIL / BROKEN 2
      judged -> stored verdict fresh+non-FAIL  else 2 not-covered/open-FAIL [R7]
 8  judged PASS has quoted evidence            else 2 evidence-missing [R5]
 9  judged UNVERIFIABLE *3 <= total            else 2 unverifiable-excessive [R4]
 10 digest unchanged after rerun batch         else 2 check-mutated-tree
 11 forge: dry_streak >= dry_limit             else 2 not-dry
-GO -> "GATE: GO digest=<d> iter=<n> ac=<t> pass=<p> unverified=<u> mode=<m>"
+12 breaker=HALF_OPEN: strategy_delta set      else 2 missing-strategy-delta [R10]
+13 objective:maximize score >= best_score     else 2 score-regressed [R11]
+GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
 ```
 
 ## 4 Rules
@@ -78,8 +89,15 @@ GO -> "GATE: GO digest=<d> iter=<n> ac=<t> pass=<p> unverified=<u> mode=<m>"
   verdicts, no sharding. Deterministic exempt (gate recomputes).
 - **R8** findings bind evidence - manufactured discoveries as forbidden as
   manufactured passes.
+- **R9** verify the verifier: metric/maximize numbers require a passing
+  `probe:` (instrument alive). An unprobed metric is a Goodhart magnet.
+- **R10** no-progress must be paired with `strategy_delta=` (what changes
+  next). Grinding without revising is make-work.
+- **R11** objective:maximize never delivers below `best_score` - restore
+  the best-scoring state or do not claim.
 
 ## 5 Breaker
 
-CLOSED -> HALF_OPEN (streak==limit: change strategy) -> OPEN (beyond, or
-false_completes>=2) -> BLOCKED. progress=yes resets.
+CLOSED -> HALF_OPEN (any progress=no: change strategy) -> OPEN (beyond, or
+false_completes>=2) -> BLOCKED. progress=yes resets. Every HALF_OPEN
+landing owes a `strategy_delta` (R10).

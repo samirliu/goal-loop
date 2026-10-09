@@ -168,6 +168,9 @@ iterations grind on the same error signature.
 - **R6** workers never touch `.goal/` / worker 禁触状态目录
 - **R7** stale judged verdicts are void after any digest move / 过期裁决作废
 - **R8** findings must bind evidence — manufactured discoveries are as forbidden as manufactured passes / 发现项必须绑证据：制造发现与制造通过同罪
+- **R9** verify the verifier: metric/maximize numbers need a passing `probe:` (instrument alive) / 数字必须先过仪器自检
+- **R10** `progress=no` must carry `strategy_delta=` (what changes next) / 无进展必须写策略修订
+- **R11** `objective: maximize` never delivers below `best_score` / 主指标不许倒退交付
 
 ## State / 状态文件（`.goal/`，纯文本，grep 即查询）
 

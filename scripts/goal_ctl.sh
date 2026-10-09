@@ -11,14 +11,18 @@
 #        --checks-pass N --checks-fail N --checks-unverifiable N
 #        [--progress yes|no] [--exit-signal yes|no] [--error-signature none]
 #        [--false-complete no] [--dry yes|no] [--no-gate]
+#        [--score N] [--strategy-delta TEXT]
 #        (--dry is REQUIRED on exit: forge contracts: yes = this round's
 #         panel+critic produced no new evidence-backed finding)
+#        (--score: objective:maximize value; --strategy-delta REQUIRED when
+#         the new breaker is HALF_OPEN/OPEN — R10)
 set -u
 export LC_ALL=C.UTF-8
 
 here=$(cd "$(dirname "$0")" && pwd)
 cmd="" project="." auto=0 no_gate=0 max_iterations=12 time_budget=""
 task="" files="" cp="" cf="" cu="" progress=yes exit_signal=no errsig=none fcomplete=no dry=""
+score="" strategy_delta=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -38,7 +42,9 @@ while [ $# -gt 0 ]; do
     --error-signature) [ $# -ge 2 ] || { echo "CTL: ERROR missing-error-signature" >&2; exit 4; }; errsig="$2"; shift ;;
     --false-complete) [ $# -ge 2 ] || { echo "CTL: ERROR missing-false-complete" >&2; exit 4; }; fcomplete="$2"; shift ;;
     --dry) [ $# -ge 2 ] || { echo "CTL: ERROR missing-dry" >&2; exit 4; }; dry="$2"; shift ;;
-    --help|-h) sed -n '2,13p' "$0"; exit 0 ;;
+    --score) [ $# -ge 2 ] || { echo "CTL: ERROR missing-score" >&2; exit 4; }; score="$2"; shift ;;
+    --strategy-delta) [ $# -ge 2 ] || { echo "CTL: ERROR missing-strategy-delta" >&2; exit 4; }; strategy_delta="$2"; shift ;;
+    --help|-h) sed -n '2,20p' "$0"; exit 0 ;;
     *) echo "CTL: ERROR unknown-flag:$1" >&2; exit 4 ;;
   esac
   shift
@@ -116,10 +122,25 @@ case "$cmd" in
     digest=$(bash "$here/goal_gate.sh" --digest --project "$project") || { echo "CTL: ERROR digest-unavailable" >&2; exit 4; }
     it=$(state_get iteration); [ -n "$it" ] || it=0
     new=$((it+1))
+    # R10: any no-progress landing sets HALF_OPEN/OPEN and must carry a
+    # strategy change - otherwise the loop is grinding without revising.
+    if [ "$progress" != yes ]; then
+      case "$strategy_delta" in
+        ''|none) echo "CTL: ERROR missing-strategy-delta (progress=no needs --strategy-delta 'what you are changing')" >&2; exit 4 ;;
+      esac
+    fi
+    # score bookkeeping (objective: maximize)
+    if [ -n "$score" ]; then
+      case "$score" in
+        ''|*[!0-9.\-]*) echo "CTL: ERROR bad-score:$score" >&2; exit 4 ;;
+      esac
+    fi
+    sdelta_show=${strategy_delta:-none}
     printf '%s\n' "## iteration $new" "task=$task" "files_modified=$files" \
       "checks_pass=$cp" "checks_fail=$cf" "checks_unverifiable=$cu" \
       "error_signature=$errsig" "progress=$progress" "exit_signal=$exit_signal" \
-      "false_complete=$fcomplete" "digest=$digest" >> "$sd/loop-log.md"
+      "false_complete=$fcomplete" "digest=$digest" \
+      "score=${score:-none}" "strategy_delta=$sdelta_show" >> "$sd/loop-log.md"
     if [ "$progress" = yes ]; then
       streak=0; breaker=CLOSED; lpi=$new
     else
@@ -132,13 +153,23 @@ case "$cmd" in
     [ "$fcomplete" = yes ] && fc=$((fc+1))
     mi=$(state_get max_iterations); [ -n "$mi" ] || mi=$max_iterations
     drys=$(state_get dry_streak); [ -n "$drys" ] || drys=0
+    # best_score: high-water mark for objective:maximize (R11)
+    best=$(state_get best_score); [ -n "$best" ] || best=none
+    if [ -n "$score" ]; then
+      if [ "$best" = none ]; then
+        best=$score
+      else
+        better=$(awk -v c="$score" -v b="$best" 'BEGIN{print (c+0>b+0)?1:0}')
+        [ "$better" = 1 ] && best=$score
+      fi
+    fi
     if [ "$dry" = yes ]; then drys=$((drys+1)); else drys=0; fi
     dlimit=$(state_get dry_limit); [ -n "$dlimit" ] || dlimit=3
     ctmo=$(state_get check_timeout); [ -n "$ctmo" ] || ctmo=120
     tb=$(state_get time_budget); [ -n "$tb" ] || tb=0
     dl=$(state_get deadline); [ -n "$dl" ] || dl=0
-    printf 'iteration=%s\nbreaker=%s\nfalse_completes=%s\nreplans=%s\nno_progress_streak=%s\nlast_progress_iteration=%s\nmax_iterations=%s\nno_progress_limit=%s\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=%s\ndry_limit=%s\ncheck_timeout=%s\ntime_budget=%s\ndeadline=%s\n' \
-      "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" > "$sd/state.rec"
+    printf 'iteration=%s\nbreaker=%s\nfalse_completes=%s\nreplans=%s\nno_progress_streak=%s\nlast_progress_iteration=%s\nmax_iterations=%s\nno_progress_limit=%s\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=%s\ndry_limit=%s\ncheck_timeout=%s\ntime_budget=%s\ndeadline=%s\nbest_score=%s\n' \
+      "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" "$best" > "$sd/state.rec"
     echo "CTL: CLOSE ok iter=$new digest=$digest"
     [ "$no_gate" -eq 1 ] && exit 0
     bash "$here/goal_gate.sh" --check --project "$project"; exit $? ;;

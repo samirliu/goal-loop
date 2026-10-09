@@ -82,6 +82,14 @@ scripts/goal_team.sh|TeammateMessage
 SKILL.md|task=T2[teams:3]
 SKILL.md|禁止
 SKILL.md|worktree
+references/gate.md|R9
+references/gate.md|R10
+references/gate.md|R11
+references/gate.md|probe:
+scripts/goal_gate.sh|probe-failed
+scripts/goal_gate.sh|score-regressed
+scripts/goal_gate.sh|missing-strategy-delta
+scripts/goal_ctl.sh|strategy-delta
 EOF
 
 echo "== docs consistency: $([ $fail -eq 0 ] && echo CONSISTENT || echo DRIFT) =="

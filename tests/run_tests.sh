@@ -447,6 +447,72 @@ out=$(bash "$TEAM" status --project "$T/t52c" 2>&1)
 assert_has "52c status shows unread=0" 'unread=0' "$out"
 printf '%s' "$out" | grep -qE 'w1\.jsonl: total=1 unread=0$' && ok "52c unread is single integer" || no "52c unread polluted: [$out]"
 
+# 53 maximize objective + score-regressed (R11)
+mkproj t53
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf 'objective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | score | check: `echo 7` | expected: maximize\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t53/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t53" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t53" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --score 7 --no-gate >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t53" 2>&1); assert_rc "53 maximize GO at score 7" 0 $?
+assert_has "53 GO line carries score" 'score=7' "$out"
+grep -q 'best_score=7' "$T/t53/.goal/state.rec" && ok "53 best_score stored" || no "53 best_score missing"
+
+# 54 score-regressed claim refused
+sed -i 's/^iteration=.*/iteration=1/' "$T/t53/.goal/state.rec"
+# rewrite last block score and claim again with a lower gate rerun: lower echo
+# simulate by bumping best_score above the check's 7
+sed -i 's/^best_score=.*/best_score=9/' "$T/t53/.goal/state.rec"
+out=$(bash "$GATE" --check --project "$T/t53" 2>&1); assert_rc "54 score-regressed -> rc2" 2 $?
+assert_has "54 reason score-regressed" 'score-regressed' "$out"
+
+# 55 probe-failed untrusts the metric (R9)
+mkproj t55
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | metric | check: `echo 9` | probe: `false` | expected: >=1\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t55/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t55" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t55" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t55" 2>&1); assert_rc "55 probe-failed -> rc2" 2 $?
+assert_has "55 reason check-broken probe" 'probe-failed' "$out"
+
+# 55b probe passes -> metric trusted
+mkproj t55b
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | metric | check: `echo 9` | probe: `true` | expected: >=1\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t55b/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t55b" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t55b" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t55b" 2>&1); assert_rc "55b probe-ok GO" 0 $?
+
+# 56 HALF_OPEN requires strategy_delta (R10)
+mkproj t56
+out=$(bash "$CTL" close-iteration --project "$T/t56" --task T1 --files a.txt \
+  --checks-pass 0 --checks-fail 0 --checks-unverifiable 0 --progress no \
+  --exit-signal no --no-gate 2>&1)
+assert_rc "56 progress=no without strategy_delta refused" 4 $?
+assert_has "56 error names strategy-delta" 'missing-strategy-delta' "$out"
+
+bash "$CTL" close-iteration --project "$T/t56" --task T1 --files a.txt \
+  --checks-pass 0 --checks-fail 0 --checks-unverifiable 0 --progress no \
+  --exit-signal no --strategy-delta 'switch camera to side view' --no-gate >/dev/null 2>&1
+grep -q 'strategy_delta=switch camera' "$T/t56/.goal/loop-log.md" && ok "56 strategy_delta recorded" || no "56 strategy_delta missing"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1
