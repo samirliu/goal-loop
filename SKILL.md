@@ -73,16 +73,16 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   `.goal/interfaces.md`（crew 启动时冻结，改走提案）——默认后端 worker
   间只靠文件与简报协作；Teams 后端可互发消息协商，但接口变更落文件才算数。
 - 同一消息并发 ≤3 个 worker（general-purpose + 角色注入；未注册
-  goal-* 类型属正常；Teams 后端 = 同等任务域进任务表派给队友，**禁止
+  goal-* 类型属正常；Teams 后端 = 同等任务域按 roster 角色卡派工，**禁止
   worktree 隔离**——否则指纹测不到改动，R7 作废）。每个简报：任务、
   确切输出路径、文件域（"只碰这些"）、通过条件、"返回证据（命令+输出）"、
   禁触 `.goal/`、禁 spawn。
 - 拆解不出 ≥2 个说得清接口的模块 → 退串行单任务（记录原因）。
 - Worker 的执行工艺（怎么调试、怎么组织代码）是它自己的事——不把
   goal-loop 的规则塞进简报。
-- Teams 后端铁律：**任务表/工作计划标完成永远不是 GO 信号**（任务队列
-  以 `.goal/work-plan.md` 为准，team 任务表只是它的镜像）；完成判定只
-  认门控。细节见 references/crew.md §7。
+- Teams 后端铁律：**work-plan 标完成 / 任务表 completed 永远不是 GO 信号**
+  （队列正本是 `.goal/work-plan.md`，team roster/inbox 只是执行面）；完成
+  判定只认门控。细节见 references/crew.md §7。
 
 ## Step 3 Join + gate
 
@@ -115,7 +115,8 @@ references/patterns.md。
 
 ## 脚本与自检
 
-`scripts/{goal_gate.sh,goal_ctl.sh}`（门控只读仲裁 / 控制器记账手）·
-`scripts/goal_hook.sh`（Stop hook）· `assets/goal.contract.md`。
+`scripts/{goal_gate.sh,goal_ctl.sh,goal_team.sh}`（门控只读仲裁 / 控制器
+记账手 / 便携 team 层）· `scripts/goal_hook.sh`（Stop hook）·
+`assets/goal.contract.md`。
 自检：`bash tests/run_tests.sh`（全套）+ `bash tests/docs_consistency.sh`。
 卸载 = 删 skill 目录 + `~/.claude/agents/goal-*.md`。

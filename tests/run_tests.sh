@@ -437,6 +437,16 @@ assert_has "52 status shows roster" 'w1' "$out"
 bash "$TEAM" delete --project "$T/t48" >/dev/null
 [ ! -d "$T/t48/.goal/team" ] && ok "52b delete removes team dir" || no "52b team dir remains"
 
+# 52c status unread count must be a single integer (grep -c zero-match trap)
+mkproj t52c
+bash "$TEAM" init --project "$T/t52c" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t52c" --add --name w1 --role r --prompt p >/dev/null
+bash "$TEAM" send --project "$T/t52c" --from c --to w1 --text 'hello' >/dev/null
+bash "$TEAM" inbox --project "$T/t52c" --name w1 --mark-read >/dev/null
+out=$(bash "$TEAM" status --project "$T/t52c" 2>&1)
+assert_has "52c status shows unread=0" 'unread=0' "$out"
+printf '%s' "$out" | grep -qE 'w1\.jsonl: total=1 unread=0$' && ok "52c unread is single integer" || no "52c unread polluted: [$out]"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

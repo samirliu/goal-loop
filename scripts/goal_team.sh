@@ -7,7 +7,7 @@
 # stays the only completion arbiter. Workers still never touch .goal/ (R6).
 #
 # Layout (project-local, under .goal/team/):
-#   .goal/team/config.json          roster (cc-haha-shaped members[])
+#   .goal/team/config.json          team meta (canonical roster = roster.jsonl)
 #   .goal/team/inboxes/<name>.jsonl one TeammateMessage JSON per line
 #   .goal/team/board.md             optional human-readable message mirror
 #
@@ -178,8 +178,11 @@ EOF
     echo "TEAM: INBOXES"
     for f in "$inbox_dir"/*.jsonl; do
       [ -f "$f" ] || continue
-      u=$(grep -c '"read":false\|"read": false' "$f" 2>/dev/null || echo 0)
-      t=$(grep -c . "$f" 2>/dev/null || echo 0)
+      # grep -c prints 0 but exits 1 on zero matches — never `|| echo 0`
+      # (that would append a second line and yield unread=0\n0).
+      u=$(grep -c '"read":false\|"read": false' "$f" 2>/dev/null || true)
+      t=$(grep -c . "$f" 2>/dev/null || true)
+      u=${u:-0}; t=${t:-0}
       echo "  $(basename "$f"): total=$t unread=$u"
     done ;;
 
