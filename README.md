@@ -2,15 +2,17 @@
 
 **EN** — goal-loop combines the DRIVE of the harness /goal (never stop until done) with the CREW of /team (parallel teammates on one deliverable) plus the layer both lack: an external acceptance gate with a frozen contract. **/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
-**EN (v1 lineage)** — A Claude Code skill that fuses two open-source disciplines into one loop: *ralph-claude-code*'s dual-condition exit gate with *fable-mode*'s adversarial checker panel. The core promise (v1.2): **the model can never self-declare completion** — only an external shell gate (`goal_gate.sh`) can certify GO, and since v1.2 the gate **re-runs every deterministic check itself** (zero model in the trust chain); judged quality claims go to cold checker seats. For open-ended "make it as good as possible" objectives, the `forge` exit ends the loop on **verification exhaustion** (K consecutive dry adversarial rounds), not on floors alone.
+**v2.1.0** — two execution backends (default one-shot subagents; opt-in Agent Teams), one judge (the gate). 执行面两档、判命面一档。
 
-**中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺（v1.2）：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且 v1.2 起门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明才交冷检查席。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。
+**中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明交冷席终验。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。
 
 ```
 objective → contract (AC-1..N, each with a NAMED failable check) → user approval stamp
-  → loop: worker produces artifact → gate re-runs deterministic checks · cold seats judge quality claims
-    → fix, re-check only FAILs → claim exit → goal_gate.sh --check decides
-  → GO only when every AC holds at THIS digest (forge: floors + K-round dry streak + empty completeness critic)
+  → loop: crew wave (≤3 workers) → join → gate re-runs deterministic checks
+    → GO  → deliver
+    → NO-GO → next wave (never stop) · BLOCKED → stop & report
+  → GO only when every AC holds at THIS digest
+    (forge: floors + K-round dry streak + empty completeness critic)
 ```
 
 ---
@@ -20,13 +22,14 @@ objective → contract (AC-1..N, each with a NAMED failable check) → user appr
 Two pieces, both required / 两件套，缺一不可：
 
 ```bash
-# 1) skill本体 → Claude Code 的 skills 目录
+# 1) skill 本体 → Claude Code 的 skills 目录
 git clone https://github.com/samirliu/goal-loop.git
-mkdir -p ~/.claude/skills
-cp -r goal-loop/SKILL.md goal-loop/INTEGRATION.md goal-loop/assets \
-      goal-loop/references goal-loop/scripts goal-loop/tests ~/.claude/skills/goal-loop/
+mkdir -p ~/.claude/skills/goal-loop
+cp -r goal-loop/SKILL.md goal-loop/VERSION goal-loop/assets \
+      goal-loop/references goal-loop/scripts goal-loop/tests \
+      ~/.claude/skills/goal-loop/
 
-# 2) 5个agent定义 → agents 目录
+# 2) 5 个 agent 定义 → agents 目录
 mkdir -p ~/.claude/agents
 cp goal-loop/agents/*.md ~/.claude/agents/
 ```
@@ -39,43 +42,98 @@ cp goal-loop/agents/*.md ~/.claude/agents/
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check
 # 无 .goal/ 的目录里应返回 rc=4, reason=no-goal-dir —— 说明门控在岗
 bash ~/.claude/skills/goal-loop/tests/run_tests.sh
-# 场景套件应 41/41 全绿 —— 门控语义的完整回归
+# 场景套件应 86/86 全绿 —— 门控语义的完整回归
+bash ~/.claude/skills/goal-loop/tests/docs_consistency.sh
+# 文档一致性（含 Teams 后端铁律字面量）应 CONSISTENT
 ```
 
 ## Quick start — in-session / 快速开始 — 会话内
 
 ```
 /goal-loop <objective>
+/goal-loop --teams <objective>          # optional Agent Teams backend
 ```
 
-1. The controller decomposes your objective into a contract: `AC-1..N`, each a yes/no
-   statement **plus the exact command that settles it** (a check must be able to FAIL).
-   控制器把目标分解为契约：每条 AC = 可判定的 yes/no 陈述 + 能让它失败的指名检测命令。
-2. You approve → the AC section is frozen by a sha1 stamp. After that, criteria changes
-   go through proposals, never silent edits (R3).
-   你批准后 AC 正文按哈希冻结；之后改标准只能走提案，不能偷改（R3）。
-3. One task per iteration: a worker agent produces the artifact. Deterministic ACs are
-   re-run BY THE GATE (`goal_gate.sh --verify` / inline at exit) — no model involved; a
-   cold requirements seat judges the `judged` quality claims and nominates missed claims.
-   Ternary verdicts — PASS / FAIL / UNVERIFIABLE — each with quoted command output.
-   每迭代一个任务：worker 产工件；确定性 AC 由**门控亲自重跑**（零模型参与），判断类
-   质量声明交冷检查席裁决（并提名遗漏声明）；三元裁决且必须引证输出。
-4. Every iteration ends with a `---GOAL_STATUS---` block — which the gate deliberately
-   does **not** trust. The authority is `bash scripts/goal_gate.sh --check`
-   (0=GO, 2=NO-GO, 3=BLOCKED, 4=state error).
-   每轮末尾的状态块门控**故意不读**；唯一权威是门控退出码。
+Four steps, no fifth / 四步循环，没有第五步：
 
-## Modes & flags / 模式与参数（v1.5.0）
+1. **Contract / 契约** — decompose into `AC-1..N`, each a yes/no statement
+   **plus the exact command that settles it** (a check must be able to FAIL).
+   You approve with one word → AC section frozen by a sha1 stamp (R3).
+   每条 AC = 可判定陈述 + 能让它失败的指名检测命令；你回一个字即盖章冻结。
+2. **Dispatch / 派工** — ≤3 concurrent workers on disjoint file scopes;
+   interfaces frozen in `.goal/interfaces.md` first.
+   默认一波 subagent；`--teams` 换 Agent Teams 队友（见下）。
+3. **Join + gate** — merge review, then `bash scripts/goal_gate.sh --check`
+   re-runs every deterministic check. This is the **only** completion authority.
+   合并审阅后门控重跑全部确定性检查——唯一的完成判定。
+4. **Branch / 分岔** — GO → deliver. NO-GO → fix and take the next wave
+   (the loop does not stop). BLOCKED → stop under the four parking rules.
+   GO 交付；NO-GO 继续派工；BLOCKED 停车上报。
+
+Judged quality claims are reviewed **once** by a fresh cold seat before you
+claim exit — never by the producers. 判断类 AC 在 claim 前由全新冷席终验一次，
+生产者不自裁。
+
+## Flags / 参数
 
 ```
-/goal-loop --mode=quick|standard|deep [--max-iterations=N] [--min-acs=N] [--auto] [--forge] [--time-budget=N] <objective>
+/goal-loop [--auto] [--time-budget=N] [--teams] <objective>
 ```
 
-**`--time-budget=N`** / 时间预算（v1.3）：whole-loop wall-clock fuse / 整循环墙钟保险丝——超时 rc=3 `time-budget-exhausted`，优雅交付 best-so-far；延期 = 用户改 `deadline=` / extension = user-approved `deadline=` rewrite. Efficiency assets: `assets/evidence_cache.sh` (measurement-once) / 效率资产（一次测量多项检查）与 `tests/docs_consistency.sh`（文档一致性回归）。
+| flag | meaning / 含义 |
+|---|---|
+| `--auto` | still show the full contract summary, stamp immediately, ledger records `approval=auto` / 仍展示摘要，随即盖章记 `auto` |
+| `--time-budget=N` | whole-loop wall-clock fuse; on expiry deliver best-so-far / 墙钟保险丝，到期优雅交付 |
+| `--teams` | swap dispatch for an Agent Teams crew (see below) / 换 Agent Teams 后端 |
 
-**EN** — `quick` = 3 iterations / 2-4 ACs · `standard` = 6 / 4-6 · `deep` = 12 / 6-10 with a **mandatory adversarial seat** (one checker is assigned to legitimately break a check each iteration, exercising the fix→recheck path). `--auto` skips the approval wait: the contract is still shown in full, stamped immediately, and the ledger records `approval=auto` for after-the-fact audit. **`--forge`** (or `exit: forge` in the contract) switches the exit policy for maximization objectives: GO requires floors **plus** a K-round dry streak (`dry_limit`, default 3 — panel + adversarial seat + completeness critic find no new evidence-backed finding) **plus** an empty completeness-critic answer; `max_iterations` becomes a pure fuse (rc=3 `budget-fuse` → extend or deliver best-so-far). In-session bookkeeping is one Bash call: `scripts/goal_ctl.sh close-iteration ...` (`--dry` is mandatory on forge contracts).
+Exit policy is a **contract field**, not a mode: `exit: threshold` (default,
+delivery/build) or `exit: forge` (maximization). No modes matrix. 退出策略写在
+契约里（`exit: threshold|forge`），不再有 quick/standard/deep 模式矩阵——
+exit 策略/预算/基线由控制器在摘要中推断声明，旗标只是覆写。
 
-**中文** — `quick` = 3 轮 / 2-4 条 AC · `standard` = 6 / 4-6 · `deep` = 12 / 6-10 且带**强制对抗席**（每轮一个检查席专职合法搞挂一项检查，逼出修复路径）。`--auto` 跳过审批等待：契约仍完整呈现、立即盖章，账本记 `approval=auto` 供事后审计。**`--forge`**（或契约写 `exit: forge`）为最大化目标切换退出策略：GO = 地板全过 **且** 连续 `dry_limit`（默认 3）轮"面板+对抗席+completeness critic 挖不出任何有证据的新发现、fix-now 发现项清零" **且** critic 冷答案为空；`max_iterations` 退化为纯保险丝（rc=3 `budget-fuse` → 续期或交付 best-so-far）。v1.5：forge 契约的 metric AC 默认 `baseline: delta`——盖章前须有 `.goal/baseline.md`（冒烟跑即基线测量，repeats≥2，cmd 与 AC 检查逐字一致），不合规拒签；`/goal-loop` 无参 = 打印进度摘要并接续；用户的全部参与 = 一条命令 + 一眼审批 + 一份交付报告（exit 策略/预算/mode/基线标记由控制器推断，旗标只是覆写）。会话内记账一条命令：`scripts/goal_ctl.sh close-iteration ...`（forge 契约必带 `--dry`）。
+**forge** (optimization objectives / 优化类目标): GO requires floors **plus** a
+K-round dry streak (`dry_limit`, default 3 — critic finds no new evidence-backed
+finding) **plus** an empty completeness-critic answer; `max_iterations` is a pure
+fuse (rc=3 `budget-fuse`). Metric ACs default to `baseline: delta` — stamping
+requires `.goal/baseline.md` (smoke run = baseline measurement, repeats≥2).
+forge 退出 = 地板全过 ∧ dry_streak≥dry_limit ∧ critic 空答案；盖章前必须有基线。
+
+In-session bookkeeping is one Bash call: `scripts/goal_ctl.sh close-iteration ...`
+(forge contracts require `--dry yes|no`). 会话内记账一条命令。
+
+## Agent Teams backend / Teams 后端（opt-in，默认不启用）
+
+Default = one-shot subagents. `--teams` (or asking for Agent Teams) swaps
+**only the execution surface** for a TeamCreate crew: named persistent
+teammates, a shared task list, and the desktop team panel. Costs one extra
+roster approval in the panel.
+
+默认后端是一波即散的 subagent。`--teams` 只换**执行面**（持久队友 + 任务表 +
+面板，多一次名单审批）；**判命面不变**。
+
+| | Work tracking / 工作追踪 | Court / 法庭 |
+|---|---|---|
+| where | `.goal/work-plan.md` + Team task list (mirror) | contract + gate + verdicts |
+| says a work item is done | controller ticks work-plan; TaskUpdate=completed | — |
+| says the GOAL is done | — | `goal_gate.sh` rc=0 only |
+
+**`TaskUpdate = completed` is NEVER a GO signal.** 任务表/工作计划标完成永远
+不是 GO 信号。Team task list is a projection of `work-plan.md` — on conflict
+the ledger wins. Hard rules:
+
+- **No `isolation: worktree`** — teammates edit the shared workspace. A worktree
+  would hide their diffs from the digest and void R7. 禁 worktree 隔离。
+- Workers MAY SendMessage to negotiate; an interface change is binding only
+  after it lands as a file write to `interfaces.md`. 可聊天，落文件才算数。
+- Judged cold seat is never a team member. 冷席永不进 team。
+- Teams unavailable → fall back to the default backend and note
+  `(fallback:teams-unavailable)` in the task field; never invent new
+  loop-log keys.
+
+Prefer the default. Choose `--teams` for long unattended multi-role runs
+where named continuity, a shared backlog, and the panel justify the roster
+glance. If you only want the panel and not the gate, use Agent Teams alone —
+do not wrap it in goal-loop. 只要面板不要门控 → 裸用 Agent Teams。
 
 ## Unattended mode / 无人值守模式（可选）
 
@@ -94,8 +152,8 @@ the API. 外层循环只信退出码；`--dry-run` 可不调 API 演练。
 | rc | meaning / 含义 | typical reasons / 常见原因 |
 |---|---|---|
 | 0 | GO, deliverable / 可交付 | — |
-| 2 | NO-GO, keep iterating / 继续迭代 | no-approval, contract-tampered, not-claimed, verdicts-stale, open-FAIL, **check-broken, check-mutated-tree**, evidence-missing, unverifiable-excessive, **not-dry (forge)**, budget-exhausted |
-| 3 | BLOCKED, stop & report / 停止上报 | breaker-open, false-completes≥2, stagnation, repeated-error, **budget-fuse (forge)** |
+| 2 | NO-GO, keep iterating / 继续迭代 | contract-tampered, not-claimed, verdicts-stale, open-FAIL, **check-broken, check-mutated-tree**, evidence-missing, unverifiable-excessive, **not-dry (forge)** |
+| 3 | BLOCKED, stop & report / 停止上报 | breaker-open, false-completes≥2, stagnation, repeated-error, **budget-fuse (forge)**, time-budget-exhausted |
 | 4 | state error / 状态错误 | no-goal-dir, missing-key, unknown-flag |
 
 Every judged verdict is bound to `(iteration, tree-digest)`. Touch one file under audit and
@@ -119,7 +177,8 @@ iterations grind on the same error signature.
 ## State / 状态文件（`.goal/`，纯文本，grep 即查询）
 
 `goal.md`（契约+批准戳）· `state.rec`（计数器）· `loop-log.md`（迭代账本）·
-`verdicts.rec`（裁决记录，6 字段管道分隔）· `logs/`（无人值守日志）
+`verdicts.rec`（裁决记录，6 字段管道分隔）· `work-plan.md`（任务队列正本）·
+`interfaces.md`（crew 接口契约）· `baseline.md`（forge 基线）· `evidence/`（席与检查证据）
 
 ## goal-loop vs the built-in /goal / 与内置 /goal 的对位
 
@@ -137,7 +196,7 @@ agent（结构化输出、评估器出错 fail-closed、reason 消毒回注、tr
 | regression protection / 回归保护 | none structurally / 结构性缺失 | every deterministic check re-runs at every exit / 出口全量重跑 |
 | "done" definition / 完成定义 | one sentence, interpreted post-hoc / 一句话事后解释 | AC-1..N frozen at stamping, user-owned / 盖章冻结，定义权在用户 |
 | failure semantics / 失败语义 | continue until the user kills it / 只有不结束 | BLOCKED · breakers · budget-fuse · time-budget · best-so-far |
-| cost shape / 成本形态 | pays every stop (evaluator tax), even with nothing claimed / 每次停顿都付 | pays per panel; gate reruns are bash; gate-only rounds ~free / 按面板付费，门控重跑≈0 |
+| cost shape / 成本形态 | pays every stop (evaluator tax), even with nothing claimed / 每次停顿都付 | pays per wave; gate reruns are bash; gate-only rounds ~free / 按波次付费，门控重跑≈0 |
 | audit / 审计 | transcript grep only | verdicts.rec + digest binding + evidence/ |
 | setup / 门槛 | zero ceremony / 零仪式 | contract + approval, one-time / 契约+审批，一次性 |
 
@@ -152,18 +211,20 @@ that only goal-loop has; for optimization specifically, /goal cannot pin a
 baseline or a noise floor, so "better" is judged on vibes while goal-loop
 spends its tokens on deltas against a measured baseline. 一句话模糊目标、有人
 盯着 → /goal 更省；要交付物、要指标 delta、要可审计完成 → goal-loop。
+感知型高迭代目标（逼真/手感/文采）也是 /goal 主场——契约只能写代理指标时
+Goodhart 必然发生。
 
-**Physical tooth, deterministic arbiter / 物理的牙，确定性的仲裁**：register
-`scripts/goal_hook.sh` as a Stop hook (INTEGRATION.md §5.7) and the harness
-blocks stopping only when a claimed exit is denied by the gate (rc=2) — /goal's
-tooth, without its discretionary evaluator. rc=0/3/4 pass, fail-open.
+**Physical tooth / 物理的牙**：register `scripts/goal_hook.sh` as a Stop hook
+(see the install snippet in the script header) and the harness blocks stopping
+only when a claimed exit is denied by the gate (rc=2) — /goal's tooth, without
+its discretionary evaluator. rc=0/3/4 pass, fail-open.
 
 ## More docs / 更多文档
 
-- **[INTEGRATION.md](INTEGRATION.md)** — 详细接入指南（中文）：安装、权限建议、故障排查、harness 行为差异披露
-- `references/exit-gate.md` — gate checks in order, digest algorithm, scenarios（门控规格）
-- `references/checker-panel.md` — panel assembly & brief template（面板规程）
-- `references/domain-patterns.md` — failable checks per artifact type（按工件类型的可失败检查库）
+- `references/gate.md` — rules R1–R8, check order, schemas（门控规格与规则）
+- `references/crew.md` — crew protocol, Teams backend, judged-seat brief（派工与 Teams 协议）
+- `references/patterns.md` — failable check shapes per artifact type（可失败检查形状库）
+- `assets/goal.contract.md` — contract template（契约模板）
 
 ## Provenance / 出处
 
@@ -176,7 +237,5 @@ Self-audited with its own protocol (v1.2): 5 acceptance criteria (4 deterministi
 gate-re-run; 1 judged, cold seat), a real bug caught by the seat
 (close-iteration refusals left an orphan loop-log block — fixed + regression-tested),
 final line `GATE: GO ... ac=5 pass=5 unverified=0 mode=threshold` — the skill certified
-itself by the same gate it ships. 本 skill 用它自己的协议审计了它自己（v1.2）：5 条
-验收标准（4 条确定性由门控重跑、1 条判断类交冷席），冷席抓出并修复了一个真实 bug
-（close-iteration 拒绝后遗留孤儿账本块——已修 + 回归测试），最终 `GATE: GO` ——
+itself by the same gate it ships. 本 skill 用它自己的协议审计了它自己（v1.2）：
 卖的门，先过自己。
