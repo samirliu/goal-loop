@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.3.1)
+# Goal Loop (v2.3.2)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -92,6 +92,14 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 - Teams 后端铁律：**work-plan 标完成 / 任务表 completed 永远不是 GO 信号**
   （队列正本是 `.goal/work-plan.md`，team roster/inbox 只是执行面）；完成
   判定只认门控。细节见 references/crew.md §7。
+- Teams 生命周期（native）：TeamPlan submit 后**必须停轮等用户面板批准**
+  （`review_pending` 时 `stopped` 是正常态不是故障）；process 后端队友随
+  lead 轮次/暂停回收，持久的是 sessionId——恢复=逐个 SendMessage 从存档
+  会话续跑，不是重建 team。**禁止静默降级**：只有复活连续 2 次失败或
+  roster/TeamCreate 真没了才回落，账本 task= 后缀标明失败模式
+  （`(fallback:teams-process-reaped)`/`(fallback:teams-unavailable)`）；
+  **禁止用 TeamDelete 清理濒死 team**（销毁证据，只许交付/熔断时删）。
+  细节见 references/teams.md §5。
 
 ## Step 3 Join + gate
 

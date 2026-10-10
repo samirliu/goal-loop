@@ -79,7 +79,7 @@ floating defect; call detached only with a 3D gap across views.
 Default = the one-shot subagents above. `--teams` swaps Step 2's dispatch
 for a multi-role team, selected by **native first** detection: if the
 controller's own tool list contains native TeamCreate/TeamPlan/SendMessage
-this run, use NATIVE (true persistent teammates + panel). Only when native
+this run, use NATIVE (session-resumed teammates + panel). Only when native
 is absent fall back to the portable layer (`scripts/goal_team.sh`, cc-haha
 file protocol - roster + inboxes + TeammateMessage), which runs on ANY
 harness. The flag `--teams` never selects the layer; detection does, and
@@ -88,6 +88,13 @@ dual-layer rules either way; contract, loop, gate, and every rule stay
 identical - only the execution surface changes. Prefer the default;
 `--teams` is for long unattended multi-role runs. Protocol details:
 references/teams.md.
+
+Native process lifetime (truth): process-backed teammates are NOT
+independent persistent OS processes. They stop when the lead turn ends /
+pauses / compacts; the persistent object is the teammate sessionId /
+transcript. Resume via SendMessage per roster member. `stopped` /
+`terminated` is recoverable, not backend death. Never silent-fallback;
+never TeamDelete mid-run to "clean up". Full protocol: teams.md §5.
 
 ### 7.1 Dual layer (non-negotiable)
 
@@ -111,9 +118,12 @@ and the team queue is repaired to match.
 1. Contract stamped (unchanged).
 2. Team up (native first - probe the tool list, do not ask the user):
    - Native (TeamCreate/TeamPlan in the tool list): TeamCreate + TeamPlan
-     submit — user reviews the roster in the panel. Approval starts the
-     run. This is the PRIMARY path whenever native exists; do not quietly
-     use the portable layer just because it is available.
+     submit returns `review_pending` + `reviewRequired:true` — then END
+     THE PLANNING TURN. Tell the user to approve the roster in the panel.
+     Approval starts the run; nothing dispatches before it. Pre-approval
+     `stopped` workers are NORMAL (review gate not yet opened) — not a
+     failure. This is the PRIMARY path whenever native exists; do not
+     quietly use the portable layer just because it is available.
    - Portable (native absent/unusable): `goal_team.sh init` + `roster
      --add` per role (≤3).
    Summary line declares `派工: teams native` or `teams portable`.
@@ -124,9 +134,18 @@ and the team queue is repaired to match.
    workers -> they implement (native: teammates SendMessage each other
    directly; portable: notes home via `MSG: to=...` the controller
    `send`s) -> controller join (§4) -> `gate --check` exactly as usual.
-4. Delivery/fuse: native -> TeamDelete the roster; portable ->
-   `goal_team.sh delete`. Resume: team dir/roster still there -> continue;
-   gone -> rebuild roster or fall back to the default backend and log it.
+   Native process workers stop when the lead turn ends / pauses /
+   compacts — that is lifetime, not failure. On resume or a dead roster:
+   SendMessage each member to continue its task (session resume);
+   work-plan.md stays the queue of record.
+4. Delivery/fuse: native -> TeamDelete the roster ONLY here, after the
+   run; portable -> `goal_team.sh delete`. NEVER TeamDelete mid-run to
+   clean up a dying team — it destroys sessionId evidence and hides the
+   bug. Resume: roster present -> SendMessage revive (teams.md §5.2);
+   revive fails 2x or roster/TeamCreate truly gone -> fall back to
+   portable or default backend and name the mode in the ledger, e.g.
+   `(fallback:teams-process-reaped)` or `(fallback:teams-unavailable)`.
+   No silent fallback.
 
 ### 7.3 Coordination
 
@@ -149,8 +168,17 @@ No Agent tool on the surface -> work inline, self-verify cold from the
 claims list and artifact alone (not from production memory), label the
 report `WEAKER VERIFICATION: cold self-check`.
 
-Teams backend requested but native AND portable both unavailable or
-refused -> fall back to the default backend, close the wave with
-`task=T2[crew:3]` and a task-suffix note `(fallback:teams-unavailable)`,
-continue. Do not invent new loop-log keys (schema is exact). The gate
-does not care which backend produced the artifacts.
+Teams backend: never silent-fallback. Process workers stopping when the
+lead turn ends / pauses / compacts is NORMAL lifetime (§7) — revive via
+SendMessage, not fallback. Fall back only when revive fails twice or the
+roster / TeamCreate is truly gone.
+
+- revive failed 2x / process reaped and unresumable -> portable (or
+  default if portable also dead); close the wave with `task=T2[crew:3]`
+  and suffix `(fallback:teams-process-reaped)`.
+- native AND portable both unavailable or refused -> default backend,
+  close the wave with `task=T2[crew:3]` and suffix
+  `(fallback:teams-unavailable)`.
+- Ledger and report MUST carry the suffix.
+  Do not invent new loop-log keys (schema is exact); only task= suffixes.
+  The gate does not care which backend produced the artifacts.

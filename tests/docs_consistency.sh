@@ -92,6 +92,11 @@ references/crew.md|native first
 references/teams.md|detection, not by flag
 references/teams.md|native wins
 references/gate.md|probe:
+references/teams.md|process-backed
+references/teams.md|SendMessage
+references/crew.md|never TeamDelete
+references/crew.md|review_pending
+SKILL.md|面板批准
 scripts/goal_gate.sh|probe-failed
 scripts/goal_gate.sh|score-regressed
 scripts/goal_gate.sh|missing-strategy-delta
