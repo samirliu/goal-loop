@@ -115,7 +115,22 @@ scripts/goal_ctl.sh|hash_std
 references/teams.md|5.1b After approval lands
 SKILL.md|唤醒+完整简报
 SKILL.md|不要口语化成 crew
+SKILL.md|minimize
+references/gate.md|low-water for minimize
+scripts/goal_gate.sh|minimize)  echo "minimize"
+scripts/goal_gate.sh|dir=minimize
+scripts/goal_ctl.sh|obj_dir
 EOF
+
+# C6 generality: case knowledge stays in examples/. Generic skill surfaces
+# must not name any validation case or its domain recipe.
+leak=$(grep -nE 'tsp-minimize|logcli|svg-dash|goal-loop-case-|波音|b747|threejs|THREEJS|goal-loop-747' \
+        SKILL.md references/*.md scripts/*.sh tests/*.sh assets/* 2>/dev/null | grep -v '^tests/docs_consistency.sh:' || true)
+if [ -z "$leak" ]; then
+  ok "C6 no case knowledge leaked into generic skill files"
+else
+  bad "C6 case knowledge leaked: $leak"
+fi
 
 echo "== docs consistency: $([ $fail -eq 0 ] && echo CONSISTENT || echo DRIFT) =="
 exit $fail

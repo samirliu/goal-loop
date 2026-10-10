@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.4.2)
+# Goal Loop (v2.4.3)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -55,16 +55,16 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 ## Step 1 契约
 
 - 每条 AC：`- AC-N | <yes/no 陈述> | check: \`<命令>\` | [baseline: delta|abs] | expected: <spec>`
-- spec：`exit=0`（默认）/ 数值比较（`>=60`）/ `maximize`（主指标）/ `judged`
+- spec：`exit=0`（默认）/ 数值比较（`>=60`）/ `maximize`|`minimize`（主指标）/ `judged`
 - **Goodhart 哨兵**：写每条 AC 自问"不推进目标能满足它吗"——能则是代理
   指标，重写或删。尺寸/比例类 AC 必须引用真实规格来源。judged AC 的 brief 必须带**校准锚**
 （已知好/已知坏样例或命名参考件）：冷席先对锚写死 rubric 分档，再看证据。
-- **R9 验证验证者**：每条 metric/maximize AC 带 `probe: \`仪器自检\``（先跑
+- **R9 验证验证者**：每条 metric/maximize/minimize AC 带 `probe: \`仪器自检\``（先跑
   probe，过了才信数字）。**指标批评席**（forge 候选 dry 轮必问）：
   此分数与真实进度单调吗？存在哪条刷分路径？说不清单调性 = 刷分洞，
   重写 AC。**R10**：`progress=no` 必须写 `--strategy-delta`
   （下一步改什么）。**R13**：每轮冷席分记 `--judge-score`；分数与冷席
-  反向=背离，门控 `DIVERGENCE` 拒 claim（零人工）。**R11**：`objective: maximize AC-N` 声明主指标，
+  反向=背离，门控 `DIVERGENCE` 拒 claim（零人工）。**R11**：`objective: maximize|minimize AC-N` 声明主指标（maximize=高水位，minimize=低水位），
   每轮 `--score` 入账，`best_score` 为水位，低于水位不许 claim。
 - 盖章前冒烟每条检查（跑不了的当场改写）；优化类目标冒烟跑即基线测量，
   写入 `.goal/baseline.md`（forge 契约必须，stamp 校验）。
@@ -132,7 +132,7 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   生产期间你自己每轮看截图（快节奏自视），门控只测确定性面。
 - 熔断：`time_budget` 墙钟、`no_progress_limit` 停滞、迭代预算——到期走
   graceful best-so-far 交付。优化类目标（forge）以 `dry_limit` 轮"确定性
-  全绿且无新发现"为穷尽退出；`objective: maximize` 还须 score≥best_score。
+  全绿且无新发现"为穷尽退出；`objective: maximize|minimize` 还须 score 不劣于 best_score（方向按 objective）。
 - 记账：`close-iteration --score N`（主指标）/ `--strategy-delta "..."`（R10）。
 
 ## 账本

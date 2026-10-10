@@ -20,29 +20,31 @@ exit: threshold
 
 ## Objective (optional, for optimization)
 
-<!-- objective: maximize AC-N
+<!-- objective: maximize AC-N  |  objective: minimize AC-N
      Declares the PRIMARY score AC. Every iteration records its observed
-     value (ctl --score); best_score is the high-water mark. The gate
-     refuses a claim below best_score (R11). Floors stay as ordinary ACs.
-     Use with exit: forge. Example:
-       objective: maximize AC-2 -->
+     value (ctl --score); best_score is the water mark (high-water for
+     maximize, low-water for minimize). The gate refuses a claim that is
+     worse than best_score in the objective's direction (R11). Floors stay
+     as ordinary ACs. Use with exit: forge. Examples:
+       objective: maximize AC-2
+       objective: minimize AC-1 -->
 
 ## Acceptance criteria
 
 <!-- verbatim, frozen by the stamp. Grammar per line:
      - AC-N | <yes/no statement> | check: `<command>` | [probe: `<cmd>`] | [baseline: delta|abs] | expected: <spec>
-     spec: exit=0 (default) | metric comparison (>=60, <=1.8, ...) | maximize | judged
+     spec: exit=0 (default) | metric comparison (>=60, <=1.8, ...) | maximize | minimize | judged
      - a metric command aggregates internally (N repeats / percentile) and
        prints ONE number on its last stdout line; set thresholds beyond the
        measured noise floor (patterns.md section 4)
      - probe (R9): MUST pass before the number is trusted - asserts the
        instrument (fixture loaded, seed fixed, tool alive), not the artifact.
-       Every metric/maximize AC should carry one.
+       Every metric/maximize/minimize AC should carry one.
      - baseline: delta (default for metric ACs) requires a .goal/baseline.md
        row `AC-N | observed=<v> | repeats=<N>=2 | cmd=<check verbatim>` -
        the pre-stamp smoke run IS the measurement; abs = new capability,
        no baseline owed. Controller infers delta/abs, never asks the user.
-     - `maximize`: objective score (see above), numeric last line, not a floor
+     - `maximize`/`minimize`: objective score (see above), numeric last line, not a floor
      - `judged` needs a written rubric anchor or a pairwise A/B protocol
        (crew.md section 6)
      - the command runs at project root and must not modify the tree;

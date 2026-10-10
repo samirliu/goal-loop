@@ -14,7 +14,7 @@
 #        [--score N] [--judge-score N] [--strategy-delta TEXT]
 #        (--dry is REQUIRED on exit: forge contracts: yes = this round's
 #         panel+critic produced no new evidence-backed finding)
-#        (--score: objective:maximize value; --strategy-delta REQUIRED when
+#        (--score: objective:maximize|minimize value; --strategy-delta REQUIRED when
 #         the new breaker is HALF_OPEN/OPEN — R10)
 set -u
 export LC_ALL=C.UTF-8
@@ -132,7 +132,7 @@ case "$cmd" in
         ''|none) echo "CTL: ERROR missing-strategy-delta (progress=no needs --strategy-delta 'what you are changing')" >&2; exit 4 ;;
       esac
     fi
-    # score bookkeeping (objective: maximize)
+    # score bookkeeping (objective: maximize|minimize)
     if [ -n "$score" ]; then
       # one optional leading '-', digits, optional decimal - not "..." or "--"
       printf '%s' "$score" | grep -qE '^-?[0-9]+(\.[0-9]+)?$' \
@@ -146,7 +146,9 @@ case "$cmd" in
     # (gate --verify, stateless) and records the observed value. A mismatch
     # from the controller is noted; an unmeasurable instrument records none
     # and the gate refuses any claim lacking a score.
-    obj_ac=$(r < "$sd/goal.md" | sed -nE 's/^objective: *maximize +(AC-[0-9]+).*/\1/p' | tail -1)
+    obj_ac=$(r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1)
+    obj_dir=$(r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\1/p' | tail -1)
+    [ -n "$obj_dir" ] || obj_dir=maximize
     if [ -n "$obj_ac" ] && [ -n "$score" ]; then
       vline=$(bash "$here/goal_gate.sh" --verify "$obj_ac" --project "$project" 2>/dev/null \
               | grep -E "^GATE: VERIFY $obj_ac\|" | tail -1)
@@ -183,13 +185,18 @@ case "$cmd" in
     [ "$fcomplete" = yes ] && fc=$((fc+1))
     mi=$(state_get max_iterations); [ -n "$mi" ] || mi=$max_iterations
     drys=$(state_get dry_streak); [ -n "$drys" ] || drys=0
-    # best_score: high-water mark for objective:maximize (R11)
+    # best_score: water mark for the objective (R11). maximize -> high-water
+    # (keep the larger); minimize -> low-water (keep the smaller).
     best=$(state_get best_score); [ -n "$best" ] || best=none
     if [ -n "$score" ]; then
       if [ "$best" = none ]; then
         best=$score
       else
-        better=$(awk -v c="$score" -v b="$best" 'BEGIN{print (c+0>b+0)?1:0}')
+        if [ "$obj_dir" = minimize ]; then
+          better=$(awk -v c="$score" -v b="$best" 'BEGIN{print (c+0<b+0)?1:0}')
+        else
+          better=$(awk -v c="$score" -v b="$best" 'BEGIN{print (c+0>b+0)?1:0}')
+        fi
         [ "$better" = 1 ] && best=$score
       fi
     fi

@@ -11,14 +11,15 @@ false_completes replans no_progress_streak last_progress_iteration
 max_iterations no_progress_limit max_replans per_check_fail_cap panel_max
 dry_streak dry_limit check_timeout time_budget deadline best_score.
 `dry_streak/dry_limit` required only for `exit: forge`.
-`best_score` is the high-water mark for `objective: maximize AC-N` (R11).
+`best_score` is the water mark for `objective: maximize|minimize AC-N` (R11) -
+high-water for maximize, low-water for minimize.
 
 `.goal/loop-log.md` append-only blocks, exact keys:
 `## iteration N` + task files_modified checks_pass checks_fail
 checks_unverifiable error_signature progress exit_signal false_complete
 digest score strategy_delta. `task=T2[crew:3]` marks a one-shot crew wave,
 `task=T2[teams:3]` a Teams-backend wave (same gate authority either way).
-`score=` holds the objective:maximize value or `none`; `strategy_delta=`
+`score=` holds the objective value or `none`; `strategy_delta=`
 is mandatory whenever `progress=no` (R10).
 
 `.goal/verdicts.rec` 6 fields: `id|verdict|iter|digest|command|evidence`.
@@ -29,18 +30,19 @@ needs `PROBE=.. REASON=..`; empty evidence voids a PASS.
 `.goal/goal.md` AC grammar:
 `- AC-N | <statement> | check: \`<command>\` | [probe: \`<cmd>\`] | [baseline: delta|abs] | expected: <spec>`
 - `exit=0`/omitted -> deterministic rc check; `<op><number>` (>= <= > < == !=)
-  -> metric, LAST non-empty stdout line must be the number; `maximize` ->
-  objective score (numeric, not a floor); `judged` -> seat
+  -> metric, LAST non-empty stdout line must be the number; `maximize`/`minimize` ->
+  objective score (numeric, not a floor; direction taken from the objective line); `judged` -> seat
   verdict digest-bound; prose (v1.1) -> judged. Spec value must not contain
   `|`; exact-text compare goes INSIDE the command.
-- `probe: \`cmd\`` (R9) must PASS before a metric/maximize number is
+- `probe: \`cmd\`` (R9) must PASS before a metric/maximize/minimize number is
   trusted - it asserts the measurement instrument, not the artifact.
-- Optional contract line `objective: maximize AC-N` (R11): the gate tracks
+- Optional contract line `objective: maximize|minimize AC-N` (R11): the gate tracks
   that AC's observed value against `best_score` and refuses a claim that
   regresses. Stamp still covers only the AC body + `exit:` lines.
 - Stamp `^approved: [0-9a-f]{8} [0-9]{4}-` = sha1-8 over the AC section body
   PLUS every `^exit:` and `^objective:` line (exit policy and maximize
   target are frozen too - R11 is unpatchable after stamping).
+  Direction comes from the objective line; changing it is contract-tampered.
 
 ## 2 Digest + mutation guard
 
@@ -69,7 +71,7 @@ mutated the tree -> NO-GO.
 10 digest unchanged after rerun batch         else 2 check-mutated-tree
 11 forge: dry_streak >= dry_limit             else 2 not-dry
 12 breaker=HALF_OPEN: strategy_delta set      else 2 missing-strategy-delta [R10]
-13 objective:maximize score >= best_score     else 2 score-regressed [R11]
+13 objective score vs best_score by direction else 2 score-regressed [R11]
 14 score<->judge direction on last 2 points  else 2 DIVERGENCE:score-vs-judge [R13]
 GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
 ```
@@ -93,11 +95,12 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
   verdicts, no sharding. Deterministic exempt (gate recomputes).
 - **R8** findings bind evidence - manufactured discoveries as forbidden as
   manufactured passes.
-- **R9** verify the verifier: metric/maximize numbers require a passing
+- **R9** verify the verifier: metric/maximize/minimize numbers require a passing
   `probe:` (instrument alive). An unprobed metric is a Goodhart magnet.
 - **R10** no-progress must be paired with `strategy_delta=` (what changes
   next). Grinding without revising is make-work.
-- **R11** objective:maximize never delivers below `best_score` - restore
+- **R11** objective score never delivers worse than `best_score`
+  (maximize: current >= best; minimize: current <= best) - restore
   the best-scoring state or do not claim.
 - **R13** score/judge divergence: when .goal/scores.rec holds two comparable
   points (iter|score|judge both numeric) and their directions oppose, the

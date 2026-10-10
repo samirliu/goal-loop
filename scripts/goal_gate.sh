@@ -102,12 +102,14 @@ ac_line_for(){ r < "$sd/goal.md" | awk -v id="$1" '$0 ~ "^- "id"[ |]"'; }
 ac_check_cmd(){ ac_line_for "$1" | sed -nE 's/^.*check: *`([^`]*)`.*/\1/p' | tail -1; }
 ac_expected(){ ac_line_for "$1" | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1; }
 ac_baseline_marker(){ ac_line_for "$1" | sed -nE 's/^.*baseline: *(delta|abs).*/\1/p' | tail -1; }
-# Verifier-of-the-verifier (R9): any metric/maximize AC may carry a probe:
+# Verifier-of-the-verifier (R9): any metric/maximize/minimize AC may carry a probe:
 # check that must PASS before its number is trusted. The probe asserts the
 # measurement itself (instrument alive, fixture loaded, seed fixed).
 ac_probe_cmd(){ ac_line_for "$1" | sed -nE 's/^.*probe: *`([^`]*)`.*/\1/p' | tail -1; }
-# Optional contract-level objective: maximize AC-N  (score-regressed guard).
-objective_ac(){ r < "$sd/goal.md" | sed -nE 's/^objective: *maximize +(AC-[0-9]+).*/\1/p' | tail -1; }
+# Optional contract-level objective: maximize|minimize AC-N  (score-regressed guard).
+# objective_dir: "maximize" (higher is better) or "minimize" (lower is better).
+objective_ac(){ r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1; }
+objective_dir(){ r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\1/p' | tail -1; }
 # Baseline validation (forge only): every delta metric AC needs a
 # .goal/baseline.md line `AC-N | ... | repeats=<N>=2 | cmd=<check verbatim>`.
 # The cmd match is the "same yardstick" rule made mechanical; repeats>=2
@@ -134,12 +136,13 @@ baseline_validate(){                                   # fail-fast via fail(); f
     { [ -n "$rep" ] && [ "$rep" -ge 2 ]; } || fail "baseline-weak:$id (repeats>=2 required - single runs game the metric)"
   done
 }
-classify_expected(){                                   # $1 raw -> exit0 | judged | maximize | "metric <op> <num>"
+classify_expected(){                                   # $1 raw -> exit0 | judged | maximize | minimize | "metric <op> <num>"
   v=$(printf '%s' "$1" | tr -d '[:space:]')
   case "$v" in
     ''|exit=0) echo "exit0" ;;
     judged)    echo "judged" ;;
     maximize)  echo "maximize" ;;
+    minimize)  echo "minimize" ;;
     exit=[0-9]*) echo "rc ${v#exit=}" ;;
     *)
       op=$(printf '%s' "$v" | sed -nE 's/^([<>=!]+)[0-9].*/\1/p')
@@ -159,7 +162,7 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   if [ -z "$cmd" ]; then printf '%s|BROKEN|no check command in AC line\n' "$id"; return; fi
   # R9 verifier-of-the-verifier: metric/maximize numbers are untrustworthy
   # unless their probe (instrument alive) passes first.
-  case "$cls" in metric*|maximize)
+  case "$cls" in metric*|maximize|minimize)
     pcmd=$(ac_probe_cmd "$id")
     if [ -n "$pcmd" ]; then
       if command -v timeout >/dev/null 2>&1; then
@@ -209,6 +212,15 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
       # maximize is the objective, not a floor: numeric = PASS. The score
       # itself is compared to best_score by the caller (score-regressed).
       printf '%s|PASS|observed=%s expect=maximize\n' "$id" "$last" ;;
+    minimize)
+      last=$(printf '%s\n' "$out" | grep -vE '^[[:space:]]*$' | tail -1)
+      case "$last" in
+        ''|*[!0-9.\-]*)
+          printf '%s|BROKEN|last stdout line is not a number: %s\n' "$id" "${last:-<empty>}"; return ;;
+      esac
+      # minimize: the objective is to push the number DOWN. Numeric = PASS;
+      # the low-water mark is enforced by the caller (score-regressed).
+      printf '%s|PASS|observed=%s expect=minimize\n' "$id" "$last" ;;
     *)
       printf '%s|BROKEN|unroutable expectation class\n' "$id" ;;
   esac
@@ -391,22 +403,33 @@ if [ "$breaker" = HALF_OPEN ]; then
   esac
 fi
 
-# -13. optimize objective: never deliver a score below the best seen (R11).
+# -13. optimize objective: never deliver a score worse than the best seen (R11).
+# direction: maximize = high-water mark (current >= best);
+#            minimize = low-water mark  (current <= best).
 if [ -n "$primary" ]; then
-  [ -n "$observed_score" ] || fail "score-missing:$primary (objective: maximize needs a numeric observed score)"
+  [ -n "$observed_score" ] || fail "score-missing:$primary (objective score needs a numeric observed score)"
   best=$(state_get best_score)
+  pdir=$(objective_dir); [ -n "$pdir" ] || pdir=maximize
   if [ -n "$best" ] && [ "$best" != "none" ]; then
-    awk -v c="$observed_score" -v b="$best" 'BEGIN{exit !(c+0 >= b+0)}' \
-      || fail "score-regressed:current=$observed_score best=$best (restore the best-scoring state or do not claim)"
+    if [ "$pdir" = minimize ]; then
+      awk -v c="$observed_score" -v b="$best" 'BEGIN{exit !(c+0 <= b+0)}' \
+        || fail "score-regressed:current=$observed_score best=$best dir=minimize (restore the best-scoring state or do not claim)"
+    else
+      awk -v c="$observed_score" -v b="$best" 'BEGIN{exit !(c+0 >= b+0)}' \
+        || fail "score-regressed:current=$observed_score best=$best dir=maximize (restore the best-scoring state or do not claim)"
+    fi
   fi
 fi
 
-# -14. score<->judge divergence (R13): the objective may climb while the
+# -14. score<->judge divergence (R13): the objective may improve while the
 # cold seat falls - that is optimizing the wrong thing. Compare the last two
 # comparable points in .goal/scores.rec (iter|score|judge, both numeric).
-# Opposite directions -> refuse the claim. Flat is "unverified movement", not
+# Quality direction: maximize -> higher score is better; minimize -> lower
+# score is better. Judge score is always higher-is-better. Opposite quality
+# directions -> refuse the claim. Flat is "unverified movement", not
 # divergence; <2 comparable points -> skip (no pair to compare).
 if [ -f "$sd/scores.rec" ]; then
+  rdir=$(objective_dir); [ -n "$rdir" ] || rdir=maximize
   pair=$(r < "$sd/scores.rec" | awk -F'|' '
     $2 ~ /^-?[0-9]+(\.[0-9]+)?$/ && $3 ~ /^-?[0-9]+(\.[0-9]+)?$/ {
       s1=s2; j1=j2; s2=$2+0; j2=$3+0; n++
@@ -414,9 +437,13 @@ if [ -f "$sd/scores.rec" ]; then
     END { if (n >= 2) printf "%s %s %s %s\n", s1, j1, s2, j2 }')
   if [ -n "$pair" ]; then
     set -- $pair
-    awk -v s1="$1" -v j1="$2" -v s2="$3" -v j2="$4" \
-      'BEGIN{exit !((s2-s1)*(j2-j1) < 0)}' \
-      && fail "DIVERGENCE:score-vs-judge score:$1->$3 judge:$2->$4 (objective and cold-seat moving apart - the metric is pulling away from perceived quality; redesign the AC or the direction)"
+    awk -v s1="$1" -v j1="$2" -v s2="$3" -v j2="$4" -v d="$rdir" \
+      'BEGIN{
+        sd = (d=="minimize") ? (s1-s2) : (s2-s1);   # quality delta of score
+        jd = j2-j1;                                  # quality delta of judge
+        exit !(sd*jd < 0)
+      }' \
+      && fail "DIVERGENCE:score-vs-judge score:$1->$3 judge:$2->$4 dir=$rdir (objective and cold-seat moving apart - the metric is pulling away from perceived quality; redesign the AC or the direction)"
   fi
 fi
 

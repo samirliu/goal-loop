@@ -673,6 +673,87 @@ out=$(bash "$AUDIT" --project "$T/t68" 2>&1); rc=$?
 assert_rc "68 A8 warn does not block rc0" 0 $rc
 assert_has "68 A8 warns judge-score-unrecorded" 'A8 judge-score-unrecorded' "$out"
 
+# 69 minimize: classify as deterministic objective, not judged
+mkproj t69
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf 'objective: minimize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | score | check: `echo 7` | expected: minimize\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t69/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t69" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t69" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --score 7 --no-gate >/dev/null 2>&1
+out=$(bash "$GATE" --verify AC-1 --project "$T/t69" 2>&1)
+assert_has "69 minimize classified deterministic" 'AC-1|PASS|observed=7' "$out"
+printf '%s' "$out" | grep -q '|SKIP|judged' && no "69 minimize misrouted to judged" || ok "69 not judged"
+out=$(bash "$GATE" --check --project "$T/t69" 2>&1); assert_rc "69 minimize GO at score 7" 0 $?
+grep -q 'best_score=7' "$T/t69/.goal/state.rec" && ok "69 best_score stored" || no "69 best_score missing"
+
+# 70 minimize low-water mark: higher score is regression
+sed -i 's/^best_score=.*/best_score=5/' "$T/t69/.goal/state.rec"
+out=$(bash "$GATE" --check --project "$T/t69" 2>&1); assert_rc "70 score-regressed (minimize 7>5) -> rc2" 2 $?
+assert_has "70 reason score-regressed" 'score-regressed' "$out"
+assert_has "70 direction named" 'dir=minimize' "$out"
+
+# 70b minimize accepts an improved (lower) score
+mkproj t70b
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf 'objective: minimize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | score | check: `echo 3` | expected: minimize\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t70b/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t70b" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t70b" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --score 3 --no-gate >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t70b" 2>&1); assert_rc "70b minimize GO at improved score 3" 0 $?
+
+# 71 R13 divergence direction-aware for minimize
+# NOTE: ctl re-measures --score via gate --verify (self-report is a hint), so
+# fabricate the scores.rec pair the way t66/t67 do - the point under test is
+# the direction math, not the measurement path.
+mkproj t71
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf 'objective: minimize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | score | check: `echo 10` | expected: minimize\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t71/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t71" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t71" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate --judge-score 8 >/dev/null 2>&1
+bash "$CTL" close-iteration --project "$T/t71" --task T2 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate --judge-score 3 >/dev/null 2>&1
+# score improved (20->10, lower=better) but judge fell (8->3) -> DIVERGENCE
+printf '1|20|8\n2|10|3\n' >> "$T/t71/.goal/scores.rec"
+out=$(bash "$GATE" --check --project "$T/t71" 2>&1); assert_rc "71 minimize divergence -> rc2" 2 $?
+assert_has "71 DIVERGENCE token" 'DIVERGENCE:score-vs-judge' "$out"
+assert_has "71 dir named" 'dir=minimize' "$out"
+
+# 72 minimize score+judge both improve -> GO
+mkproj t72
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf 'objective: minimize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | score | check: `echo 10` | expected: minimize\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t72/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t72" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t72" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate --judge-score 3 >/dev/null 2>&1
+bash "$CTL" close-iteration --project "$T/t72" --task T2 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate --judge-score 8 >/dev/null 2>&1
+printf '1|20|3\n2|10|8\n' >> "$T/t72/.goal/scores.rec"
+out=$(bash "$GATE" --check --project "$T/t72" 2>&1); assert_rc "72 minimize agree -> GO" 0 $?
+printf '%s' "$out" | grep -q 'DIVERGENCE' && no "72 unexpected DIVERGENCE" || ok "72 no DIVERGENCE"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1
