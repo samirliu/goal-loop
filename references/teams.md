@@ -105,6 +105,24 @@ approval gate has not opened the run yet.
 Do not dispatch work, claim tasks, TaskUpdate=completed, or bypass
 review before the user approves. Approval starts the roster.
 
+### 5.1b After approval lands — wake-with-brief is action #1
+
+The "Approved … is running" notice is NOT a worker heartbeat. Process
+workers are reaped at every lead turn boundary; the gap between panel
+approval and the first SendMessage is a zero-output death window
+(live case 2026-10-10: both members reaped before touching a file).
+
+On the approval turn, in this order and nothing before it:
+
+1. Liveness check (config `isActive` / `terminated`).
+2. SendMessage **each** member its full task brief (wake-with-brief) —
+   even if the roster claims to be running.
+3. Only then write the ledger (work-plan.md etc.).
+
+A session resume / user Stop that stopped the team is the same playbook:
+open with liveness + wake-with-brief for every member with open work.
+Never respawn, never TeamDelete, never fall back before the §5.3 rule.
+
 ### 5.2 Revive protocol
 
 On resume, or whenever the roster looks dead mid-run:

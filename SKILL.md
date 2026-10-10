@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.4.1)
+# Goal Loop (v2.4.2)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -73,7 +73,7 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   （交付/构建→threshold；优化/尽可能好→forge）、预算、基线标记。
 - `--auto`：仍展示摘要，随即盖章记 `auto`。`--time-budget=N`：墙钟保险丝。
 
-## Step 2 crew 派工
+## Step 2 派工（默认 crew subagent；--teams 则 Teams 队友）
 
 - 后端：默认一波 subagent。仅当用户写了 `--teams` 时换 Teams 后端，
   且按 **native first** 选择：开工时探测当前工具列表——有原生
@@ -81,7 +81,9 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   roster 面板审批），没有才走便携层（goal_team.sh 角色卡+消息箱，
   任意 harness）。探测只看工具面，不由用户决定。选了就在摘要里
   声明 `派工: teams native` 或 `teams portable`。细节见
-  references/teams.md。
+  references/teams.md。用户可见文案里 teams 后端就叫"Teams 队友/
+  roster"，**不要口语化成 crew**（crew 指默认 subagent 波次，混称会让
+  用户以为没走 --teams）。
 - 拆解出互不相交的任务域；**接口先行**：模块边界/共享类型/命名约定写入
   `.goal/interfaces.md`（crew 启动时冻结，改走提案）——默认后端 worker
   间只靠文件与简报协作；Teams 后端可互发消息协商，但接口变更落文件才算数。
@@ -97,8 +99,12 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   （队列正本是 `.goal/work-plan.md`，team roster/inbox 只是执行面）；完成
   判定只认门控。细节见 references/crew.md §7。
 - Teams 生命周期（native）：TeamPlan submit 后**必须停轮等用户面板批准**
-  （`review_pending` 时 `stopped` 是正常态不是故障）；process 后端队友随
-  lead 轮次/暂停回收，持久的是 sessionId——恢复=逐个 SendMessage 从存档
+  （`review_pending` 时 `stopped` 是正常态不是故障）。**批准落地的那一轮，
+  动作序列必须是：活性探测 → 逐个 SendMessage 唤醒+完整简报 → 才写账本**——
+  "Approved is running" 不是心跳；批准到首个唤醒之间的空窗会让 process
+  队友零产出被回收（活案例 2026-10-10）。session 恢复/用户 Stop 停全队
+  = 正常态，同一 playbook：先活性再唤醒，不重建不降级。process 后端队友
+  随 lead 轮次/暂停回收，持久的是 sessionId——恢复=逐个 SendMessage 从存档
   会话续跑，不是重建 team。**禁止静默降级**：只有复活连续 2 次失败或
   roster/TeamCreate 真没了才回落，账本 task= 后缀标明失败模式
   （`(fallback:teams-process-reaped)`/`(fallback:teams-unavailable)`）；

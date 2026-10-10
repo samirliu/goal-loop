@@ -112,6 +112,9 @@ scripts/goal_ctl.sh|strategy-delta
 scripts/goal_ctl.sh|(exit|objective):
 scripts/goal_gate.sh|(exit|objective):
 scripts/goal_ctl.sh|hash_std
+references/teams.md|5.1b After approval lands
+SKILL.md|唤醒+完整简报
+SKILL.md|不要口语化成 crew
 EOF
 
 echo "== docs consistency: $([ $fail -eq 0 ] && echo CONSISTENT || echo DRIFT) =="
