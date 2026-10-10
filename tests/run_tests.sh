@@ -754,6 +754,23 @@ printf '1|20|3\n2|10|8\n' >> "$T/t72/.goal/scores.rec"
 out=$(bash "$GATE" --check --project "$T/t72" 2>&1); assert_rc "72 minimize agree -> GO" 0 $?
 printf '%s' "$out" | grep -q 'DIVERGENCE' && no "72 unexpected DIVERGENCE" || ok "72 no DIVERGENCE"
 
+# 73 budget knobs in goal.md bind at stamp (were decorative)
+mkproj t73
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `true` | expected: exit=0\n'
+  printf '\n## Out of scope\n\n- none\n\n'
+  printf '## Budget knobs\n\nmax_iterations=10  no_progress_limit=2  max_replans=2\n'
+  printf 'per_check_fail_cap=3  panel_max=4  dry_limit=3  check_timeout=60\n'
+  printf 'wallclock=99\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t73/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t73" --auto >/dev/null
+grep -q '^max_iterations=10$' "$T/t73/.goal/state.rec" && ok "73 max_iterations bound" || no "73 max_iterations not bound"
+grep -q '^check_timeout=60$' "$T/t73/.goal/state.rec" && ok "73 check_timeout bound" || no "73 check_timeout not bound"
+grep -q '^time_budget=99$' "$T/t73/.goal/state.rec" && ok "73 wallclock bound" || no "73 wallclock not bound"
+grep -q '^deadline=' "$T/t73/.goal/state.rec" && ok "73 deadline seeded" || no "73 deadline missing"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

@@ -120,6 +120,8 @@ references/gate.md|low-water for minimize
 scripts/goal_gate.sh|minimize)  echo "minimize"
 scripts/goal_gate.sh|dir=minimize
 scripts/goal_ctl.sh|obj_dir
+SKILL.md|盖戳时绑定
+scripts/goal_ctl.sh|BIND at stamp
 EOF
 
 # C6 generality: case knowledge stays in examples/. Generic skill surfaces

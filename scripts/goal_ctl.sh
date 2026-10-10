@@ -83,6 +83,23 @@ case "$cmd" in
     h=$( { r < "$sd/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
            r < "$sd/goal.md" | grep -E '^(exit|objective):' || true
          } | hash_std | cut -c1-8)
+    # Budget knobs written in goal.md BIND at stamp. They used to be
+    # decorative (contract said max_iterations=10, state.rec kept 12) -
+    # that is a silent contract lie. Parse key=value tokens; CLI --time-budget
+    # still wins over a wallclock= token.
+    for key in max_iterations no_progress_limit max_replans per_check_fail_cap panel_max dry_limit check_timeout wallclock; do
+      val=$(r < "$sd/goal.md" | sed -nE "s/.*(^|[[:space:]])${key}=([0-9]+).*/\2/p" | tail -1)
+      [ -n "$val" ] || continue
+      case "$key" in
+        wallclock)
+          [ -n "${time_budget:-}" ] || time_budget=$val
+          ;;
+        *)
+          { grep -vE "^${key}=" "$sd/state.rec"; printf '%s=%s\n' "$key" "$val"; } > "$sd/state.rec.new" \
+            && mv "$sd/state.rec.new" "$sd/state.rec"
+          ;;
+      esac
+    done
     case "${time_budget:-}" in                            # optional wall-clock fuse, stamped at approval
       ''|0) : ;;
       *[!0-9]*) echo "CTL: ERROR bad-time-budget:$time_budget" >&2; exit 4 ;;

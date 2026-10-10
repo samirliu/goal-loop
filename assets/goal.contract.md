@@ -66,7 +66,7 @@ patterns: <relative path to this project's check-recipes file>
 <!-- authoring-time input only; its commands are written INTO the AC lines
      above and smoke-run like any other; the gate never reads it -->
 
-## Budget knobs (override before approval if needed)
+## Budget knobs (override before approval if needed; BIND AT STAMP)
 
 max_iterations=12  no_progress_limit=2  max_replans=2
 per_check_fail_cap=3  panel_max=4  dry_limit=3  check_timeout=120

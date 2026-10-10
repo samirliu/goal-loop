@@ -31,3 +31,10 @@ Fixed 48-city Euclidean TSP instance. Find a tour and keep improving it
   objective_dir, directional best_score + score-regressed + R13, docs, tests
   69-72. (Also: ctl re-measures --score via gate --verify - a self-reported
   score is only a hint. Test 71 initially failed for the right reason.)
+
+- 2026-10-10 F2 (found when the contract's max_iterations=10 never took effect):
+  Budget knobs in goal.md were DECORATIVE - goal_ctl.sh init wrote defaults
+  (max_iterations=12, check_timeout=120) and never read the contract. Silent
+  contract lie. Fixed in v2.4.3: stamp parses key=value tokens from goal.md
+  into state.rec; wallclock= seeds time_budget unless --time-budget wins.
+  Test 73.

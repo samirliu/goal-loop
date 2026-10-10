@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.4.3)
+# Goal Loop (v2.4.4)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -72,6 +72,8 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   基线值）→ 用户回一个字即显式批准。摘要里声明你的推断：exit 策略
   （交付/构建→threshold；优化/尽可能好→forge）、预算、基线标记。
 - `--auto`：仍展示摘要，随即盖章记 `auto`。`--time-budget=N`：墙钟保险丝。
+  契约里的 Budget knobs（max_iterations/dry_limit/check_timeout/wallclock 等）
+  在**盖戳时绑定**进 state.rec——写了不生效等于契约撒谎。
 
 ## Step 2 派工（默认 crew subagent；--teams 则 Teams 队友）
 

@@ -11,6 +11,8 @@ false_completes replans no_progress_streak last_progress_iteration
 max_iterations no_progress_limit max_replans per_check_fail_cap panel_max
 dry_streak dry_limit check_timeout time_budget deadline best_score.
 `dry_streak/dry_limit` required only for `exit: forge`.
+Budget knobs written in goal.md (max_iterations, dry_limit, check_timeout,
+wallclock, ...) BIND at stamp - goal_ctl.sh stamp copies them into state.rec.
 `best_score` is the water mark for `objective: maximize|minimize AC-N` (R11) -
 high-water for maximize, low-water for minimize.
 
