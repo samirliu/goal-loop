@@ -771,6 +771,34 @@ grep -q '^check_timeout=60$' "$T/t73/.goal/state.rec" && ok "73 check_timeout bo
 grep -q '^time_budget=99$' "$T/t73/.goal/state.rec" && ok "73 wallclock bound" || no "73 wallclock not bound"
 grep -q '^deadline=' "$T/t73/.goal/state.rec" && ok "73 deadline seeded" || no "73 deadline missing"
 
+# 74 gate NO-GO carries a mechanical routing hint
+mkproj t74
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `true` | expected: exit=0\n'
+  printf -- '- AC-2 | j | check: - | expected: judged\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t74/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t74" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t74" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 1 --progress yes \
+  --exit-signal yes --no-gate >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t74" 2>&1); assert_rc "74 not-covered -> rc2" 2 $?
+assert_has "74 reason not-covered" 'not-covered:AC-2' "$out"
+assert_has "74 hint bind-seat" 'hint=bind-seat' "$out"
+
+# 75 status lists ALL open work-plan items
+printf -- '- [ ] T1 | w1 | first | files: a\n- [ ] T2 | w2 | second | files: b\n' > "$T/t74/.goal/work-plan.md"
+out=$(bash "$CTL" status --project "$T/t74" 2>&1)
+assert_has "75 status shows T1" 'T1' "$out"
+assert_has "75 status shows T2" 'T2' "$out"
+assert_has "75 status counts 2 open" 'OPEN \(2 items\)' "$out"
+printf -- '- [x] T1 | w1 | first | files: a\n- [ ] T2 | w2 | second | files: b\n' > "$T/t74/.goal/work-plan.md"
+out=$(bash "$CTL" status --project "$T/t74" 2>&1)
+assert_has "75 status drops ticked T1" 'OPEN \(1 items\)' "$out"
+printf '%s' "$out" | grep -q 'T1 |' && no "75 ticked item still listed" || ok "75 ticked item hidden"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

@@ -26,4 +26,16 @@ query / CLI).
 
 ## Findings log
 
-- (pending run)
+- 2026-10-10 F3 (found when claiming without the judged seat): after
+  `GATE: NO-GO reason=not-covered:AC-5`, `ctl status` still printed
+  `NEXT T1 | w-mod | split src/cli.js...` - the FIRST unchecked work-plan
+  line, which was already finished. Next-batch selection was a stub: no
+  mapping from gate reason to action, no tick discipline, status hid the
+  rest of the queue. Fixed in v2.4.5: gate NO-GO line carries `hint=`
+  (bind-seat / fix-AC / fix-instrument / ...); status lists ALL open items;
+  SKILL.md Step 4 has a mechanical routing table; Step 3 requires ticking
+  work-plan rows on join. Tests 74-75.
+
+- 2026-10-10 (instrument, not skill): golden compare must CR-scrub
+  (`tr -d '\r'`) and number-format must match the CLI's stringification
+  (JS `14` vs Python `14.0`) - regenerate goldens via the CLI itself.

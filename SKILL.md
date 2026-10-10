@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.4.4)
+# Goal Loop (v2.4.5)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -123,11 +123,20 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   控制器自己——task= 后缀、静默降级、strategy_delta 诚实度。rc!=0 不许
   claim。
 - loop-log 记 `task=T2[crew:3]`（Teams 后端 `task=T2[teams:3]`）+ 各 worker 文件清单。
+- **勾账**：任务证据并入后立刻把 work-plan 对应行 `[ ]`→`[x]`。
+  不勾 = status 的 OPEN 列表永远指回干完的活。
 
 ## Step 4 分岔
 
-- GO（rc=0）→ 交付。NO-GO（rc=2）→ 修 FAIL（确定性：门控复跑即判定；
-  按域隔离）→ 下一波。BLOCKED（rc=3）→ 停车四类之一种，报告。
+- GO（rc=0）→ 交付。BLOCKED（rc=3）→ 停车四类之一种，报告。
+- **NO-GO（rc=2）的下一批 = 按门控 `hint=` 机械路由**（不要凭感觉）：
+  - `hint=fix-AC` → 对 `open-FAIL:AC-N` 的 AC 派修复工（按文件域隔离）；
+  - `hint=bind-seat` → `not-covered:AC-N` 是冷席缺席，派**判读席**不是改码工；
+  - `hint=fix-instrument` → 修 verify 仪器/probe，数字不可信；
+  - `hint=restore-best` / `continue-forge` / `write-strategy-delta` / `rebind-judged` /
+    `set-exit-signal` / `redesign-AC` / `proposal-to-user` / `graceful-deliver` →
+    按字面做，不派工。
+  下一批成员 = 未勾 work-plan 项 ∪ 路由目标；路由目标覆盖过期队列项。
 - **冷席终验（judged AC）**：只在第一次准备 claim EXIT_SIGNAL 前，派一个
   全新视觉/判读席（简报只带 AC 原文 + 证据路径 + rubric 锚点，无你的推
   理）。PASS → 绑定裁决交付；FAIL → 修复再来。procedural 3D/视觉任务：

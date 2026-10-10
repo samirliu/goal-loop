@@ -122,6 +122,9 @@ scripts/goal_gate.sh|dir=minimize
 scripts/goal_ctl.sh|obj_dir
 SKILL.md|盖戳时绑定
 scripts/goal_ctl.sh|BIND at stamp
+scripts/goal_gate.sh|hint=fix-AC
+SKILL.md|hint=
+SKILL.md|bind-seat
 EOF
 
 # C6 generality: case knowledge stays in examples/. Generic skill surfaces

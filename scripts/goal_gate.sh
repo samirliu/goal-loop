@@ -87,7 +87,30 @@ latest_verdicts(){                                     # id|verdict|iter|digest|
     END{ for (id in best) printf "%s|%s|%s|%s|%s\n", id, ver[id], best[id], dig[id], ev[id] }' "$sd/verdicts.rec"
 }
 
-fail(){ echo "GATE: NO-GO reason=$1" >&2; exit 2; }
+fail(){
+  # reason=$1 ; optional hint token routes the controller's next batch
+  # (open-FAIL -> fix that AC's domain; not-covered -> dispatch the seat).
+  # The hint is mechanical routing, not case knowledge.
+  reason="$1"
+  case "$reason" in
+    open-FAIL:*)             hint=fix-AC ;;
+    not-covered:*)           hint=bind-seat ;;
+    check-broken:*)          hint=fix-instrument ;;
+    probe-failed:*)          hint=fix-instrument ;;
+    score-regressed:*)       hint=restore-best ;;
+    not-dry:*)               hint=continue-forge ;;
+    missing-strategy-delta*) hint=write-strategy-delta ;;
+    verdicts-stale:*)        hint=rebind-judged ;;
+    not-claimed:*)           hint=set-exit-signal ;;
+    DIVERGENCE:*)            hint=redesign-AC ;;
+    contract-tampered:*)     hint=proposal-to-user ;;
+    time-budget-exhausted*)  hint=graceful-deliver ;;
+    stagnation*|repeated-error*) hint=replan-or-stop ;;
+    *)                       hint=see-reason ;;
+  esac
+  echo "GATE: NO-GO reason=$reason hint=$hint" >&2
+  exit 2
+}
 blocked(){ echo "GATE: BLOCKED reason=$1" >&2; exit 3; }
 state_err(){ echo "GATE: ERROR reason=$1" >&2; exit 4; }
 

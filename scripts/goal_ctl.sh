@@ -243,7 +243,14 @@ case "$cmd" in
       l["task"], l["checks_pass"], l["checks_fail"], l["checks_unverifiable"], l["progress"], l["digest"] }
     ' "$sd/loop-log.md" 2>/dev/null)
     echo "CTL: LAST $lb"
-    next=$(grep -m1 -E '^- \[ \]' "$sd/work-plan.md" 2>/dev/null | sed 's/^- \[ \] //' | cut -c1-120)
-    echo "CTL: NEXT ${next:-none (all tasks closed)}"
+    # All open queue items (controller must tick [x] on join). A single
+    # "NEXT" line hid the rest and after a NO-GO kept pointing at finished work.
+    open=$(grep -E '^- \[ \]' "$sd/work-plan.md" 2>/dev/null | sed 's/^- \[ \] //' | cut -c1-120)
+    if [ -n "$open" ]; then
+      echo "CTL: OPEN ($(printf '%s\n' "$open" | wc -l | tr -d ' ') items)"
+      printf '%s\n' "$open" | sed 's/^/CTL:   - /'
+    else
+      echo "CTL: OPEN none (all tasks closed)"
+    fi
     exit 0 ;;
 esac
