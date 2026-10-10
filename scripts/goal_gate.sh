@@ -91,6 +91,9 @@ fail(){
   # reason=$1 ; optional hint token routes the controller's next batch
   # (open-FAIL -> fix that AC's domain; not-covered -> dispatch the seat).
   # The hint is mechanical routing, not case knowledge.
+  if [ "${deadline_expired:-0}" = 1 ]; then
+    blocked "time-budget-exhausted (claim did not pass - stop burning time; extend = user-approved rewrite of deadline= in state.rec)"
+  fi
   reason="$1"
   case "$reason" in
     open-FAIL:*)             hint=fix-AC ;;
@@ -112,6 +115,10 @@ fail(){
   exit 2
 }
 blocked(){ echo "GATE: BLOCKED reason=$1" >&2; exit 3; }
+# time-budget fuse: a wall-clock overrun must not confiscate completed work.
+# 1) green claim still delivers (GO + NOTE); 2) any failure after the fuse
+# escalates to BLOCKED so the loop stops instead of grinding another wave.
+deadline_expired=0
 state_err(){ echo "GATE: ERROR reason=$1" >&2; exit 4; }
 
 # ---- contract parsing (v1.2) ----------------------------------------------
@@ -319,7 +326,9 @@ case "$dl" in
   ''|0) : ;;
   *[!0-9]*) state_err "bad-deadline:$dl" ;;
   *) now=$(date +%s)
-     [ "$now" -gt "$dl" ] && blocked "time-budget-exhausted:deadline=$dl now=$now (graceful: finish the current task, deliver best-so-far; extend = user-approved rewrite of deadline= in state.rec)" ;;
+     # Overrun is a CONTINUATION fuse, not a delivery veto: flag it here;
+     # fail() escalates to BLOCKED, a green claim still GO (see fail/GO).
+     [ "$now" -gt "$dl" ] && deadline_expired=1 ;;
 esac
 if [ "$exit_mode" = forge ]; then
   [ "${iter:-0}" -le "${maxit:-12}" ] || blocked "budget-fuse:iter=$iter max=$maxit (forge: budget is a fuse - extend it or deliver best-so-far)"
@@ -470,6 +479,9 @@ if [ -f "$sd/scores.rec" ]; then
   fi
 fi
 
+if [ "${deadline_expired:-0}" = 1 ]; then
+  echo "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)"
+fi
 if [ -n "$primary" ]; then
   echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}"
   exit 0

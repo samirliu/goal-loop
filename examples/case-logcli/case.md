@@ -39,3 +39,11 @@ query / CLI).
 - 2026-10-10 (instrument, not skill): golden compare must CR-scrub
   (`tr -d '\r'`) and number-format must match the CLI's stringification
   (JS `14` vs Python `14.0`) - regenerate goldens via the CLI itself.
+
+- 2026-10-10 F4 (found when wallclock=1200 expired while we were fixing F1-F3):
+  `GATE: BLOCKED reason=time-budget-exhausted` fired BEFORE AC checks, so a
+  fully green, ready-to-deliver claim was vetoed. The message even said
+  "graceful: deliver best-so-far" while rc=3 confiscated the work. Fuse should
+  stop grinding, not confiscate passing delivery. Fixed in v2.4.6: deadline
+  overrun flags only; green claim GO + NOTE; any fail() after the fuse
+  escalates to BLOCKED. Tests 76-77.

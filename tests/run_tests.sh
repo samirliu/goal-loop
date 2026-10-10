@@ -238,15 +238,16 @@ printf 'AC-1|PASS|3|%s|cmd|"ok carried=yes"\n' "$dOld" | bash "$CTL" bind --proj
 out=$(bash "$GATE" --check --project "$T/t27" 2>&1); assert_rc "27 stale re-bind -> rc2" 2 $?
 assert_has "27 reason not-covered" 'not-covered:AC-1' "$out"
 
-# 28 time-budget fuse fires when expired (rc=3, graceful class)
+# 28 expired wallclock + GREEN claim still delivers (fuse is not a delivery veto)
 mkproj t28 >/dev/null; TB=1 contract t28 "- AC-1 | f | check: \`true\` | expected: exit=0"
 # deterministically expired: deadline=1 (epoch 1) is always in the past - no
 # reliance on machine speed (a fast runner used to hit the same-second
 # boundary and wrongly answer GO)
 sed -i 's/^deadline=.*/deadline=1/' "$T/t28/.goal/state.rec"
 close_iter t28
-out=$(bash "$GATE" --check --project "$T/t28" 2>&1); assert_rc "28 expired time-budget -> rc3" 3 $?
-assert_has "28 reason time-budget-exhausted" 'time-budget-exhausted' "$out"
+out=$(bash "$GATE" --check --project "$T/t28" 2>&1); assert_rc "28 expired green claim -> GO" 0 $?
+assert_has "28 NOTE fuse" 'time-budget-exhausted' "$out"
+assert_has "28 still GO" 'GATE: GO' "$out"
 
 # 29 time-budget in the future: loop runs normally -> GO
 mkproj t29 >/dev/null; TB=3600 contract t29 "- AC-1 | f | check: \`true\` | expected: exit=0"
@@ -798,6 +799,42 @@ printf -- '- [x] T1 | w1 | first | files: a\n- [ ] T2 | w2 | second | files: b\n
 out=$(bash "$CTL" status --project "$T/t74" 2>&1)
 assert_has "75 status drops ticked T1" 'OPEN \(1 items\)' "$out"
 printf '%s' "$out" | grep -q 'T1 |' && no "75 ticked item still listed" || ok "75 ticked item hidden"
+
+# 76 expired wallclock still delivers a green claim (fuse != delivery veto)
+mkproj t76
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `true` | expected: exit=0\n'
+  printf '\n## Out of scope\n\n- none\n\n'
+  printf '## Budget knobs\n\nmax_iterations=12  wallclock=1\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t76/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t76" --auto >/dev/null
+# force deadline into the past
+sed -i 's/^deadline=.*/deadline=1/' "$T/t76/.goal/state.rec"
+bash "$CTL" close-iteration --project "$T/t76" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t76" 2>&1); assert_rc "76 expired wallclock green claim -> GO" 0 $?
+assert_has "76 NOTE fuse" 'time-budget-exhausted' "$out"
+assert_has "76 still GO" 'GATE: GO' "$out"
+
+# 77 expired wallclock + failing claim escalates to BLOCKED (stop grinding)
+mkproj t77
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `false` | expected: exit=0\n'
+  printf '\n## Out of scope\n\n- none\n\n'
+  printf '## Budget knobs\n\nmax_iterations=12  wallclock=1\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t77/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t77" --auto >/dev/null
+sed -i 's/^deadline=.*/deadline=1/' "$T/t77/.goal/state.rec"
+bash "$CTL" close-iteration --project "$T/t77" --task T1 --files a.txt \
+  --checks-pass 0 --checks-fail 1 --checks-unverifiable 0 --progress no \
+  --strategy-delta 'try next' --exit-signal yes --no-gate >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t77" 2>&1); assert_rc "77 expired+fail -> BLOCKED rc3" 3 $?
+assert_has "77 BLOCKED fuse" 'time-budget-exhausted' "$out"
 
 echo
 echo "== results: pass=$pass fail=$failn =="

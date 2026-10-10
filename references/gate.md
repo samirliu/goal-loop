@@ -60,7 +60,8 @@ mutated the tree -> NO-GO.
 0b forge: dry_streak/dry_limit present        else 4
 1  stamp matches recomputed hash              else 2 contract-tampered [R3]
 2  breaker OPEN / false_completes>=2          else 3
-2c deadline passed (time_budget>0)            else 3 time-budget-exhausted
+2c deadline passed (time_budget>0)            flag only: green claim still GO
+                                               (NOTE); any fail() -> 3 fuse
 3  iteration <= max_iterations                else 2 (forge: 3 budget-fuse)
 4  no_progress_streak <= limit                else 3 stagnation
 4b last two blocks same error_signature       else 3 repeated-error

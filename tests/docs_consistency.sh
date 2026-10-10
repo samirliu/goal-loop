@@ -125,6 +125,8 @@ scripts/goal_ctl.sh|BIND at stamp
 scripts/goal_gate.sh|hint=fix-AC
 SKILL.md|hint=
 SKILL.md|bind-seat
+scripts/goal_gate.sh|graceful delivery of passing work
+SKILL.md|不没收已通过的交付
 EOF
 
 # C6 generality: case knowledge stays in examples/. Generic skill surfaces

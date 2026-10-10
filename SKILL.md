@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.4.5)
+# Goal Loop (v2.4.6)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -141,8 +141,9 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   全新视觉/判读席（简报只带 AC 原文 + 证据路径 + rubric 锚点，无你的推
   理）。PASS → 绑定裁决交付；FAIL → 修复再来。procedural 3D/视觉任务：
   生产期间你自己每轮看截图（快节奏自视），门控只测确定性面。
-- 熔断：`time_budget` 墙钟、`no_progress_limit` 停滞、迭代预算——到期走
-  graceful best-so-far 交付。优化类目标（forge）以 `dry_limit` 轮"确定性
+- 熔断：`time_budget` 墙钟、`no_progress_limit` 停滞、迭代预算。墙钟到期
+  **不没收已通过的交付**（绿 claim 照 GO，仅 NOTE）；只把后续失败升级为
+  BLOCKED 停止烧时间。到期走 graceful best-so-far 交付。优化类目标（forge）以 `dry_limit` 轮"确定性
   全绿且无新发现"为穷尽退出；`objective: maximize|minimize` 还须 score 不劣于 best_score（方向按 objective）。
 - 记账：`close-iteration --score N`（主指标）/ `--strategy-delta "..."`（R10）。
 
