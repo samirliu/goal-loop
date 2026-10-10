@@ -61,7 +61,9 @@ Teams backend below is in use).
 ## 6 Final review (judged ACs - once, before claiming exit)
 
 Dispatch ONE fresh reviewer seat. Brief carries: verbatim AC text, evidence
-paths ONLY, rubric anchors. Never the producer's reasoning. Verdicts
+paths ONLY, rubric anchors, and calibration anchors (a known-good example
+and a known-bad example, or a named reference artifact - FIXED before the
+seat reads the new evidence). Never the producer's reasoning. Verdicts
 ternary with quoted observation; findings must bind evidence.
 
 Judging quality claims (what "逼真/好用/清晰" become) - in order:

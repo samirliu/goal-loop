@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.3.2)
+# Goal Loop (v2.4.0)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -57,9 +57,12 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 - 每条 AC：`- AC-N | <yes/no 陈述> | check: \`<命令>\` | [baseline: delta|abs] | expected: <spec>`
 - spec：`exit=0`（默认）/ 数值比较（`>=60`）/ `maximize`（主指标）/ `judged`
 - **Goodhart 哨兵**：写每条 AC 自问"不推进目标能满足它吗"——能则是代理
-  指标，重写或删。尺寸/比例类 AC 必须引用真实规格来源。
+  指标，重写或删。尺寸/比例类 AC 必须引用真实规格来源。judged AC 的 brief 必须带**校准锚**
+（已知好/已知坏样例或命名参考件）：冷席先对锚写死 rubric 分档，再看证据。
 - **R9 验证验证者**：每条 metric/maximize AC 带 `probe: \`仪器自检\``（先跑
-  probe，过了才信数字）。**R10**：`progress=no` 必须写 `--strategy-delta`
+  probe，过了才信数字）。**指标批评席**（forge 候选 dry 轮必问）：
+  此分数与真实进度单调吗？存在哪条刷分路径？说不清单调性 = 刷分洞，
+  重写 AC。**R10**：`progress=no` 必须写 `--strategy-delta`
   （下一步改什么）。**R11**：`objective: maximize AC-N` 声明主指标，
   每轮 `--score` 入账，`best_score` 为水位，低于水位不许 claim。
 - 盖章前冒烟每条检查（跑不了的当场改写）；优化类目标冒烟跑即基线测量，
@@ -107,6 +110,9 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   两轮未解 → 退回串行并记录。
 - `bash scripts/goal_gate.sh --check`：重跑全部确定性检查、校验指纹与
   账本——这是唯一的完成判定。`--verify [AC-ID]` 单独复跑。
+- **claim 前必跑 `bash scripts/goal_audit.sh --project .`**（R12）：审的是
+  控制器自己——task= 后缀、静默降级、strategy_delta 诚实度。rc!=0 不许
+  claim。
 - loop-log 记 `task=T2[crew:3]`（Teams 后端 `task=T2[teams:3]`）+ 各 worker 文件清单。
 
 ## Step 4 分岔

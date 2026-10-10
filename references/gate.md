@@ -98,6 +98,10 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
   next). Grinding without revising is make-work.
 - **R11** objective:maximize never delivers below `best_score` - restore
   the best-scoring state or do not claim.
+- **R12** controller self-audit: before claiming exit run
+  `scripts/goal_audit.sh` (task= schema, fallback suffixes, no silent
+  downgrade, strategy_delta honesty). rc!=0 blocks the claim. The gate
+  judges the artifact; the audit judges the controller.
 
 ## 5 Breaker
 

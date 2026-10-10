@@ -591,6 +591,28 @@ assert_rc "62 unmeasurable records ok rc0" 0 $?
 assert_has "62 warns unmeasurable" 'objective-unmeasurable' "$out"
 grep -q '^score=none$' "$T/t62/.goal/loop-log.md" && ok "62 score=none recorded" || no "62 score not none"
 
+# 63-65 goal_audit.sh (R12 controller self-audit)
+AUDIT="$here/scripts/goal_audit.sh"
+mkproj t63
+printf '## iteration 1\ntask=T1[teams:3]\nprogress=yes\nexit_signal=no\nscore=99.5\nstrategy_delta=none\n' > "$T/t63/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t63" 2>&1); rc=$?
+assert_rc "63 clean ledger rc0" 0 $rc
+assert_has "63 clean said" 'AUDIT: clean' "$out"
+
+mkproj t64
+printf '## iteration 1\ntask=T1[teams:3]\nprogress=yes\nexit_signal=no\nscore=1\nstrategy_delta=none\n## iteration 2\ntask=T2[crew:3]\nprogress=yes\nexit_signal=no\nscore=2\nstrategy_delta=none\n' > "$T/t64/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t64" 2>&1); rc=$?
+assert_rc "64 silent-downgrade rc1" 1 $rc
+assert_has "64 names silent-downgrade" 'silent-downgrade' "$out"
+
+mkproj t65
+printf '## iteration 1\ntask=T1[teams:3](fallback:evil-mode)\nprogress=no\nexit_signal=no\nscore=1.2.3\nstrategy_delta=none\n' > "$T/t65/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t65" 2>&1); rc=$?
+assert_rc "65 bad vocab+score+delta rc1" 1 $rc
+assert_has "65 vocab" 'fallback-vocabulary' "$out"
+assert_has "65 score-format" 'score-format' "$out"
+assert_has "65 missing strategy_delta" 'progress-no-without-strategy-delta' "$out"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

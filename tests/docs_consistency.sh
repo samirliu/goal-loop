@@ -97,6 +97,10 @@ references/teams.md|SendMessage
 references/crew.md|never TeamDelete
 references/crew.md|review_pending
 SKILL.md|面板批准
+references/gate.md|R12
+SKILL.md|goal_audit.sh
+references/crew.md|calibration anchors
+SKILL.md|指标批评席
 scripts/goal_gate.sh|probe-failed
 scripts/goal_gate.sh|score-regressed
 scripts/goal_gate.sh|missing-strategy-delta
