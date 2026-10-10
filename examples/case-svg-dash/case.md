@@ -24,4 +24,11 @@ must read as a real dashboard.
 
 ## Findings log
 
-- (pending run)
+- 2026-10-10: NO new skill defects. Deterministic floors + dual cold-seat
+  (AC-4 visual, AC-5 KPI) + calibration anchors in verify/anchors.md worked
+  as designed; GATE: GO on first claim. Negative result recorded on purpose -
+  the judged/cold-seat surface held under this case's pressure.
+
+- 2026-10-10 (instrument, not skill): golden/data checks that glue attribute
+  substrings (`data-region="X" data-value="Y"`) break when the generator
+  reorders attributes. Parse per-element attributes instead.
