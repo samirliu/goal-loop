@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.4.0)
+# Goal Loop (v2.4.1)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -63,7 +63,8 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   probe，过了才信数字）。**指标批评席**（forge 候选 dry 轮必问）：
   此分数与真实进度单调吗？存在哪条刷分路径？说不清单调性 = 刷分洞，
   重写 AC。**R10**：`progress=no` 必须写 `--strategy-delta`
-  （下一步改什么）。**R11**：`objective: maximize AC-N` 声明主指标，
+  （下一步改什么）。**R13**：每轮冷席分记 `--judge-score`；分数与冷席
+  反向=背离，门控 `DIVERGENCE` 拒 claim（零人工）。**R11**：`objective: maximize AC-N` 声明主指标，
   每轮 `--score` 入账，`best_score` 为水位，低于水位不许 claim。
 - 盖章前冒烟每条检查（跑不了的当场改写）；优化类目标冒烟跑即基线测量，
   写入 `.goal/baseline.md`（forge 契约必须，stamp 校验）。

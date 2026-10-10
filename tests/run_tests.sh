@@ -613,6 +613,66 @@ assert_has "65 vocab" 'fallback-vocabulary' "$out"
 assert_has "65 score-format" 'score-format' "$out"
 assert_has "65 missing strategy_delta" 'progress-no-without-strategy-delta' "$out"
 
+# 66-68 R13 score<->judge divergence guard
+mkproj t66
+{
+  printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `true` | expected: exit=0\n'
+  printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t66/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t66" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t66" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate --judge-score 4 >/dev/null 2>&1
+bash "$CTL" close-iteration --project "$T/t66" --task T2 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate --judge-score 2 >/dev/null 2>&1
+# last block claims; no objective AC so score=none both rows -> A8-free but
+# R13 needs numeric score side; fabricate comparable points then check
+printf '1|10|4\n2|20|2\n' >> "$T/t66/.goal/scores.rec"
+# close again so last block is the claim with exit_signal=yes (t66 last was yes)
+out=$(bash "$GATE" --check --project "$T/t66" 2>&1); rc=$?
+assert_rc "66 divergence refuses claim rc2" 2 $rc
+assert_has "66 names DIVERGENCE" 'DIVERGENCE:score-vs-judge' "$out"
+
+mkproj t67
+{
+  printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `true` | expected: exit=0\n'
+  printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t67/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t67" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t67" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate >/dev/null 2>&1
+printf '1|10|2\n2|20|4\n' >> "$T/t67/.goal/scores.rec"
+bash "$CTL" close-iteration --project "$T/t67" --task T2 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate --judge-score 4 >/dev/null 2>&1
+# last scores.rec row: 2|none|4 (no objective) - that's not comparable, so
+# pair is 1|10|2 vs earlier... append a clean agreeing pair as the tail
+printf '3|30|5\n4|40|5\n' >> "$T/t67/.goal/scores.rec"
+out=$(bash "$GATE" --check --project "$T/t67" 2>&1); rc=$?
+assert_has "67 no DIVERGENCE on same-direction" 'GATE: GO' "$out"
+printf '%s' "$out" | grep -q 'DIVERGENCE' && no "67 unexpected DIVERGENCE" || ok "67 no DIVERGENCE token"
+
+mkproj t68
+{
+  printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `true` | expected: judged\n'
+  printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t68/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t68" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t68" --task 'T1[crew:1]' --files a.txt \
+  --checks-pass 0 --checks-fail 0 --checks-unverifiable 1 --progress yes \
+  --exit-signal no --no-gate >/dev/null 2>&1
+out=$(bash "$AUDIT" --project "$T/t68" 2>&1); rc=$?
+assert_rc "68 A8 warn does not block rc0" 0 $rc
+assert_has "68 A8 warns judge-score-unrecorded" 'A8 judge-score-unrecorded' "$out"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

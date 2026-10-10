@@ -101,6 +101,10 @@ references/gate.md|R12
 SKILL.md|goal_audit.sh
 references/crew.md|calibration anchors
 SKILL.md|指标批评席
+references/gate.md|R13
+references/gate.md|DIVERGENCE
+scripts/goal_gate.sh|DIVERGENCE
+scripts/goal_ctl.sh|judge-score
 scripts/goal_gate.sh|probe-failed
 scripts/goal_gate.sh|score-regressed
 scripts/goal_gate.sh|missing-strategy-delta

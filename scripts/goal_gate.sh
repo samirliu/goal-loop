@@ -399,6 +399,28 @@ if [ -n "$primary" ]; then
     awk -v c="$observed_score" -v b="$best" 'BEGIN{exit !(c+0 >= b+0)}' \
       || fail "score-regressed:current=$observed_score best=$best (restore the best-scoring state or do not claim)"
   fi
+fi
+
+# -14. score<->judge divergence (R13): the objective may climb while the
+# cold seat falls - that is optimizing the wrong thing. Compare the last two
+# comparable points in .goal/scores.rec (iter|score|judge, both numeric).
+# Opposite directions -> refuse the claim. Flat is "unverified movement", not
+# divergence; <2 comparable points -> skip (no pair to compare).
+if [ -f "$sd/scores.rec" ]; then
+  pair=$(r < "$sd/scores.rec" | awk -F'|' '
+    $2 ~ /^-?[0-9]+(\.[0-9]+)?$/ && $3 ~ /^-?[0-9]+(\.[0-9]+)?$/ {
+      s1=s2; j1=j2; s2=$2+0; j2=$3+0; n++
+    }
+    END { if (n >= 2) printf "%s %s %s %s\n", s1, j1, s2, j2 }')
+  if [ -n "$pair" ]; then
+    set -- $pair
+    awk -v s1="$1" -v j1="$2" -v s2="$3" -v j2="$4" \
+      'BEGIN{exit !((s2-s1)*(j2-j1) < 0)}' \
+      && fail "DIVERGENCE:score-vs-judge score:$1->$3 judge:$2->$4 (objective and cold-seat moving apart - the metric is pulling away from perceived quality; redesign the AC or the direction)"
+  fi
+fi
+
+if [ -n "$primary" ]; then
   echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}"
   exit 0
 fi

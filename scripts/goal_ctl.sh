@@ -11,7 +11,7 @@
 #        --checks-pass N --checks-fail N --checks-unverifiable N
 #        [--progress yes|no] [--exit-signal yes|no] [--error-signature none]
 #        [--false-complete no] [--dry yes|no] [--no-gate]
-#        [--score N] [--strategy-delta TEXT]
+#        [--score N] [--judge-score N] [--strategy-delta TEXT]
 #        (--dry is REQUIRED on exit: forge contracts: yes = this round's
 #         panel+critic produced no new evidence-backed finding)
 #        (--score: objective:maximize value; --strategy-delta REQUIRED when
@@ -22,7 +22,7 @@ export LC_ALL=C.UTF-8
 here=$(cd "$(dirname "$0")" && pwd)
 cmd="" project="." auto=0 no_gate=0 max_iterations=12 time_budget=""
 task="" files="" cp="" cf="" cu="" progress=yes exit_signal=no errsig=none fcomplete=no dry=""
-score="" strategy_delta=""
+score="" judge_score="" strategy_delta=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -43,6 +43,7 @@ while [ $# -gt 0 ]; do
     --false-complete) [ $# -ge 2 ] || { echo "CTL: ERROR missing-false-complete" >&2; exit 4; }; fcomplete="$2"; shift ;;
     --dry) [ $# -ge 2 ] || { echo "CTL: ERROR missing-dry" >&2; exit 4; }; dry="$2"; shift ;;
     --score) [ $# -ge 2 ] || { echo "CTL: ERROR missing-score" >&2; exit 4; }; score="$2"; shift ;;
+    --judge-score) [ $# -ge 2 ] || { echo "CTL: ERROR missing-judge-score" >&2; exit 4; }; judge_score="$2"; shift ;;
     --strategy-delta) [ $# -ge 2 ] || { echo "CTL: ERROR missing-strategy-delta" >&2; exit 4; }; strategy_delta="$2"; shift ;;
     --help|-h) sed -n '2,20p' "$0"; exit 0 ;;
     *) echo "CTL: ERROR unknown-flag:$1" >&2; exit 4 ;;
@@ -137,6 +138,10 @@ case "$cmd" in
       printf '%s' "$score" | grep -qE '^-?[0-9]+(\.[0-9]+)?$' \
         || { echo "CTL: ERROR bad-score:$score" >&2; exit 4; }
     fi
+    if [ -n "$judge_score" ]; then
+      printf '%s' "$judge_score" | grep -qE '^-?[0-9]+(\.[0-9]+)?$' \
+        || { echo "CTL: ERROR bad-judge-score:$judge_score" >&2; exit 4; }
+    fi
     # The score is MEASURED, never self-reported: ctl reruns the objective AC
     # (gate --verify, stateless) and records the observed value. A mismatch
     # from the controller is noted; an unmeasurable instrument records none
@@ -158,6 +163,9 @@ case "$cmd" in
     sdelta_show=$(printf '%s' "${strategy_delta:-none}" | tr '\n\r\t' '   ')
     case "$sdelta_show" in ''|*[![:print:]]*) sdelta_show=none ;; esac
     [ -n "$sdelta_show" ] || sdelta_show=none
+    # R13 sidecar: iter|score|judge (either may be 'none'). Two comparable
+    # points later let the gate refuse DIVERGENCE:score-vs-judge claims.
+    printf '%s|%s|%s\n' "$new" "${score:-none}" "${judge_score:-none}" >> "$sd/scores.rec"
     printf '%s\n' "## iteration $new" "task=$task" "files_modified=$files" \
       "checks_pass=$cp" "checks_fail=$cf" "checks_unverifiable=$cu" \
       "error_signature=$errsig" "progress=$progress" "exit_signal=$exit_signal" \

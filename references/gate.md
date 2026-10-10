@@ -70,6 +70,7 @@ mutated the tree -> NO-GO.
 11 forge: dry_streak >= dry_limit             else 2 not-dry
 12 breaker=HALF_OPEN: strategy_delta set      else 2 missing-strategy-delta [R10]
 13 objective:maximize score >= best_score     else 2 score-regressed [R11]
+14 score<->judge direction on last 2 points  else 2 DIVERGENCE:score-vs-judge [R13]
 GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
 ```
 
@@ -98,6 +99,10 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
   next). Grinding without revising is make-work.
 - **R11** objective:maximize never delivers below `best_score` - restore
   the best-scoring state or do not claim.
+- **R13** score/judge divergence: when .goal/scores.rec holds two comparable
+  points (iter|score|judge both numeric) and their directions oppose, the
+  objective is optimizing away from perceived quality - refuse the claim.
+  Flat movement is unverified, not divergence. Fewer than two points = skip.
 - **R12** controller self-audit: before claiming exit run
   `scripts/goal_audit.sh` (task= schema, fallback suffixes, no silent
   downgrade, strategy_delta honesty). rc!=0 blocks the claim. The gate

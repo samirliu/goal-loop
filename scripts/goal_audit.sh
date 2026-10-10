@@ -83,6 +83,14 @@ while IFS= read -r line; do
 done <<< "$log"
 flush
 
+# ---- A8 (WARN only, never blocks): judged score not recorded ---------------
+# Divergence guard (R13) needs judge scores. Missing them degrades it to a
+# no-op; say so loudly instead of silently losing the tooth.
+if grep -qE 'expected: *judged' "$sd/goal.md" 2>/dev/null; then
+  has_j=$(r < "$sd/scores.rec" 2>/dev/null | awk -F'|' '$3 ~ /^-?[0-9]+(\.[0-9]+)?$/ {c++} END{print c+0}')
+  [ "${has_j:-0}" -gt 0 ] || echo "AUDIT: WARN A8 judge-score-unrecorded (judged ACs present but no numeric judge= in scores.rec; pass --judge-score to close-iteration - R13 divergence guard is inert)"
+fi
+
 if [ "$fail" -eq 0 ]; then
   echo "AUDIT: clean (controller ledger hygiene OK)"; exit 0
 fi
