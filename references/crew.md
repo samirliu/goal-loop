@@ -77,14 +77,17 @@ floating defect; call detached only with a 3D gap across views.
 ## 7 Teams backend (opt-in)
 
 Default = the one-shot subagents above. `--teams` swaps Step 2's dispatch
-for a multi-role team. **Portable by default**: `scripts/goal_team.sh`
-implements the cc-haha file protocol (roster + inboxes + TeammateMessage)
-so this works on ANY harness — no TeamCreate required. If the harness
-does have native TeamCreate/SendMessage, upgrade to it for true persistent
-teammates and the panel; same dual-layer rules either way. Contract, loop,
-gate, and every rule stay identical - only the execution surface changes.
-Prefer the default; `--teams` is for long unattended multi-role runs.
-Protocol details: references/teams.md.
+for a multi-role team, selected by **native first** detection: if the
+controller's own tool list contains native TeamCreate/TeamPlan/SendMessage
+this run, use NATIVE (true persistent teammates + panel). Only when native
+is absent fall back to the portable layer (`scripts/goal_team.sh`, cc-haha
+file protocol - roster + inboxes + TeammateMessage), which runs on ANY
+harness. The flag `--teams` never selects the layer; detection does, and
+the run declares `teams native` / `teams portable` in the summary. Same
+dual-layer rules either way; contract, loop, gate, and every rule stay
+identical - only the execution surface changes. Prefer the default;
+`--teams` is for long unattended multi-role runs. Protocol details:
+references/teams.md.
 
 ### 7.1 Dual layer (non-negotiable)
 
@@ -106,20 +109,24 @@ and the team queue is repaired to match.
 ### 7.2 Lifecycle
 
 1. Contract stamped (unchanged).
-2. Team up:
-   - Portable (always available): `goal_team.sh init` + `roster --add` per
-     role (≤3). Summary line already declared `派工: teams`.
-   - Native (if TeamCreate exists): TeamCreate + TeamPlan submit — user
-     reviews the roster in the panel. Approval starts the run.
+2. Team up (native first - probe the tool list, do not ask the user):
+   - Native (TeamCreate/TeamPlan in the tool list): TeamCreate + TeamPlan
+     submit — user reviews the roster in the panel. Approval starts the
+     run. This is the PRIMARY path whenever native exists; do not quietly
+     use the portable layer just because it is available.
+   - Portable (native absent/unusable): `goal_team.sh init` + `roster
+     --add` per role (≤3).
+   Summary line declares `派工: teams native` or `teams portable`.
    **No `isolation: worktree`** - teammates edit the shared workspace.
    A worktree would hide their diffs from the digest and poison R7
    verdict binding. This is a hard ban, not a preference.
 3. Waves: keep `work-plan.md` as plan of record; dispatch role-card
-   workers -> they implement (notes home via `MSG: to=...` the controller
+   workers -> they implement (native: teammates SendMessage each other
+   directly; portable: notes home via `MSG: to=...` the controller
    `send`s) -> controller join (§4) -> `gate --check` exactly as usual.
-4. Delivery/fuse: `goal_team.sh delete` (or TeamDelete). Resume: team dir
-   still there -> continue; gone -> rebuild roster or fall back to the
-   default backend and log it.
+4. Delivery/fuse: native -> TeamDelete the roster; portable ->
+   `goal_team.sh delete`. Resume: team dir/roster still there -> continue;
+   gone -> rebuild roster or fall back to the default backend and log it.
 
 ### 7.3 Coordination
 
@@ -142,8 +149,8 @@ No Agent tool on the surface -> work inline, self-verify cold from the
 claims list and artifact alone (not from production memory), label the
 report `WEAKER VERIFICATION: cold self-check`.
 
-Teams backend requested but TeamCreate/TeamPlan unavailable or refused ->
-fall back to the default backend, close the wave with
+Teams backend requested but native AND portable both unavailable or
+refused -> fall back to the default backend, close the wave with
 `task=T2[crew:3]` and a task-suffix note `(fallback:teams-unavailable)`,
 continue. Do not invent new loop-log keys (schema is exact). The gate
 does not care which backend produced the artifacts.

@@ -88,6 +88,9 @@ SKILL.md|worktree
 references/gate.md|R9
 references/gate.md|R10
 references/gate.md|R11
+references/crew.md|native first
+references/teams.md|detection, not by flag
+references/teams.md|native wins
 references/gate.md|probe:
 scripts/goal_gate.sh|probe-failed
 scripts/goal_gate.sh|score-regressed

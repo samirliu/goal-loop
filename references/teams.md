@@ -1,10 +1,13 @@
-# Teams — portable Agent-Teams layer
+# Teams — Agent-Teams backend (native first, portable fallback)
 
-`--teams` must work on ANY Claude Code harness. Most terminals have no
-TeamCreate/SendMessage. This layer implements the cc-haha file protocol
-over bash + files (`scripts/goal_team.sh`), so multi-role crews run
-everywhere. Native TeamCreate (cc-haha and friends) is an optional
-upgrade, not a dependency.
+`--teams` must work on ANY Claude Code harness. Selection is by
+**detection, not by flag**: if the controller's tool list this run has
+native TeamCreate/TeamPlan/SendMessage, use native (persistent
+teammates + panel) — that is the PRIMARY path, never a quiet downgrade
+to the file layer. Only when native is absent does the portable layer
+run: it implements the cc-haha file protocol over bash + files
+(`scripts/goal_team.sh`) so multi-role crews work everywhere. The flag
+asks for a team; the tool list decides which kind.
 
 ## 1 What we took from cc-haha
 
@@ -37,7 +40,7 @@ Unchanged from crew.md §7:
   under `.goal/`) and never writes anything there. The interface excerpt
   is inlined in the brief - workers do not open `.goal/interfaces.md`.
 
-## 3 Portable wave protocol
+## 3 Portable wave protocol (fallback layer)
 
 1. `goal_team.sh init --team goal` once per run (after contract stamp).
 2. `roster --add --name w1 --role backend --prompt '...' --scope 'src/api'`
@@ -55,17 +58,22 @@ Negotiation without SendMessage: worker returns
 `MSG: to=<name> text=...` in its final message; controller posts it with
 `goal_team.sh send`. Binding still requires an `interfaces.md` write.
 
-## 4 Native upgrade path
+## 4 Native wave protocol (primary layer)
 
-If the harness has TeamCreate + Agent(name, team_name) + SendMessage:
+When TeamCreate + TeamPlan + SendMessage are in the tool list, use them:
 
-- Prefer native spawn for long unattended runs (true persistence, panel).
-- Still keep `work-plan.md` as queue of record and the gate as sole judge.
-- Still ban `isolation: worktree`.
-- Inbox/board files remain the audit trail; post the same messages.
-
-Detection is trivial: if TeamCreate is in the tool list, use native;
-otherwise portable. The user-facing flag is always `--teams`.
+- Detection is trivial: if TeamCreate is in the tool list, native wins -
+  do not "prefer portable for safety", that silently loses persistence
+  and the panel. The user-facing flag is always `--teams`.
+- TeamCreate + TeamPlan submit (roster ≤3 role cards, tasks carry the
+  brief fields); the user's panel approval starts the run.
+- Teammates negotiate via SendMessage directly; an interface change is
+  binding only after a file write to interfaces.md (R3 spirit).
+- Keep `work-plan.md` as queue of record; the team task list mirrors it.
+  Still ban `isolation: worktree` (digest must see teammate edits).
+- Teammate idle notifications are normal, not failure.
+- Close: TeamDelete. If the native path dies mid-run (team unavailable /
+  roster lost), fall back to portable or default backend and log it.
 
 ## 5 CLI cheat sheet
 

@@ -101,17 +101,19 @@ forge 退出 = 地板全过 ∧ dry_streak≥dry_limit ∧ critic 空答案；�
 In-session bookkeeping is one Bash call: `scripts/goal_ctl.sh close-iteration ...`
 (forge contracts require `--dry yes|no`). 会话内记账一条命令。
 
-## Teams backend / Teams 后端（opt-in，任意 harness 可跑）
+## Teams backend / Teams 后端（opt-in，native first）
 
-**Zero Agent Teams dependency.** `--teams` ships a **portable team layer**
-(`scripts/goal_team.sh`) implementing the cc-haha file protocol — roster,
-per-agent inboxes, `TeammateMessage` — so multi-role crews work on any
-Claude Code harness. Native TeamCreate/SendMessage (cc-haha etc.) is an
-optional upgrade for true persistent teammates and the desktop panel.
+**Native first.** `--teams` 的选择靠**工具面探测**，不靠 flag 内容：当前
+harness 有原生 TeamCreate/TeamPlan/SendMessage 就直接用原生（持久队友 +
+面板，一次 roster 审批）；没有才跑便携层。flag 只决定「要不要 team」，
+工具列表决定「用哪种」。
 
-**不依赖 Agent Teams。** `--teams` 自带便携 team 层（`goal_team.sh`），
-按 cc-haha 文件协议（角色表 + 消息箱 + TeammateMessage）实现——裸 harness
-也能跑多角色协作。有原生 TeamCreate 才升级成长驻队友+面板。
+**Native first.** Selection is by detection: if TeamCreate/TeamPlan/
+SendMessage exist in the controller's tool list this run, native wins —
+persistent teammates + panel. The **portable team layer**
+(`scripts/goal_team.sh`, cc-haha file protocol: roster, per-agent inboxes,
+`TeammateMessage`) is the fallback, guaranteeing multi-role crews work on
+any bare harness.
 
 Default = one-shot subagents. `--teams` swaps **only the execution surface**.
 
