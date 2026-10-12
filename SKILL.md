@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.4.6)
+# Goal Loop (v2.5.0)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -54,8 +54,13 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 
 ## Step 1 契约
 
-- 每条 AC：`- AC-N | <yes/no 陈述> | check: \`<命令>\` | [baseline: delta|abs] | expected: <spec>`
-- spec：`exit=0`（默认）/ 数值比较（`>=60`）/ `maximize`|`minimize`（主指标）/ `judged`
+- 每条 AC：`- AC-N | <yes/no 陈述> | check: \`<命令>\` | [baseline: delta|abs] | [metric: \`提取正则\`] | [tolerance: <相对容差>] | expected: <spec>`
+- spec：`exit=0`/`exit=N`（N=期望错误码，错误路径是一等公民）/ 数值比较（`>=60`）/ `maximize`|`minimize`（主指标）/ `judged`
+- **测量鲁棒面**：`metric:` 带一个捕获组，门控用它从 stdout 取数（ANSI 染色
+  先剥离），数字散在日志里时不靠"最后一行"碰运气——取不到即 BROKEN 不蒙混。
+  `tolerance:` 给主指标水位比较留噪声带（基准类指标天然 ±5%），带内视为持平
+  不算回退，避免水位警报把你对指标失去信任。**AC 行 fail-closed**：缺 expected:
+  或缺 check: 的 AC 门控直接拒评该契约（静默丢 AC = 评估面开天窗，最坏缺陷类）。
 - **Goodhart 哨兵**：写每条 AC 自问"不推进目标能满足它吗"——能则是代理
   指标，重写或删。尺寸/比例类 AC 必须引用真实规格来源。judged AC 的 brief 必须带**校准锚**
 （已知好/已知坏样例或命名参考件）：冷席先对锚写死 rubric 分档，再看证据。
@@ -146,6 +151,9 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   BLOCKED 停止烧时间。到期走 graceful best-so-far 交付。优化类目标（forge）以 `dry_limit` 轮"确定性
   全绿且无新发现"为穷尽退出；`objective: maximize|minimize` 还须 score 不劣于 best_score（方向按 objective）。
 - 记账：`close-iteration --score N`（主指标）/ `--strategy-delta "..."`（R10）。
+- **假完成棘轮已机械**：你带 `--exit-signal yes` 交账而门控答 NO-GO，计数自动
+  +1（NOTE 里会告诉你）；两次被抓自动 BLOCKED。看到计数 NOTE 的对策是**修产物
+  而不是再 claim 一次**。
 
 ## 账本
 

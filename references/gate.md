@@ -26,18 +26,31 @@ is mandatory whenever `progress=no` (R10).
 
 `.goal/verdicts.rec` 6 fields: `id|verdict|iter|digest|command|evidence`.
 Deterministic ACs: records are bookkeeping; the gate's rerun is the
-evidence. Judged ACs: PASS needs the quoted decisive output; UNVERIFIABLE
-needs `PROBE=.. REASON=..`; empty evidence voids a PASS.
+evidence. Judged ACs: PASS needs the quoted decisive output PLUS an
+`artifact: <path> digest: <sha256>` binding - the gate recomputes the
+sha256 of that path and voids the verdict on mismatch (`verdict-unbound`);
+UNVERIFIABLE needs `PROBE=.. REASON=..`; empty evidence voids a PASS.
 
 `.goal/goal.md` AC grammar:
-`- AC-N | <statement> | check: \`<command>\` | [probe: \`<cmd>\`] | [baseline: delta|abs] | expected: <spec>`
-- `exit=0`/omitted -> deterministic rc check; `<op><number>` (>= <= > < == !=)
-  -> metric, LAST non-empty stdout line must be the number; `maximize`/`minimize` ->
-  objective score (numeric, not a floor; direction taken from the objective line); `judged` -> seat
+`- AC-N | <statement> | check: \`<command>\` | [probe: \`<cmd>\`] | [baseline: delta|abs] | [metric: \`regex one capture group\`] | [tolerance: <rel>] | expected: <spec>`
+- `exit=0`/omitted -> deterministic rc check; `exit=N` -> must end with that
+  exact code (error paths as first-class ACs); `<op><number>` (>= <= > < == !=)
+  -> metric, number from `metric:` regex or LAST non-empty stdout line;
+  `maximize`/`minimize` -> objective score (numeric, not a floor; direction
+  taken from the objective line); `judged` -> seat
   verdict digest-bound; prose (v1.1) -> judged. Spec value must not contain
   `|`; exact-text compare goes INSIDE the command.
+- AC lines missing `expected:` or `check:` make the gate refuse the contract
+  (`contract-malformed`, fail-closed) - no silent AC loss, no free PASS.
+- `metric:` pins WHERE the number comes from (one capture group; ANSI codes
+  stripped before matching) - use when output carries other numbers.
+  `tolerance:` gives the objective water-mark a relative noise band: within
+  it the score holds (no false regression); below/above it R11 fires.
 - `probe: \`cmd\`` (R9) must PASS before a metric/maximize/minimize number is
   trusted - it asserts the measurement instrument, not the artifact.
+- stderr is captured to the verdict detail (stdout stays the measurement
+  channel); a FAIL/BROKEN that says only "failed" is the eval system
+  violating fail-loud.
 - Optional contract line `objective: maximize|minimize AC-N` (R11): the gate tracks
   that AC's observed value against `best_score` and refuses a claim that
   regresses. Stamp still covers only the AC body + `exit:` lines.
@@ -67,15 +80,20 @@ mutated the tree -> NO-GO.
 4b last two blocks same error_signature       else 3 repeated-error
 5  last block exit_signal=yes                 else 2 not-claimed
 6  block digest == current digest             else 2 verdicts-stale [R7]
+   (ctl counts the false complete automatically - the ratchet is mechanical)
+6b every AC line has expected: and check:     else 4 contract-malformed
 7  per AC: probe (R9) then deterministic      FAIL 2 open-FAIL / BROKEN 2
      judged -> stored verdict fresh+non-FAIL  else 2 not-covered/open-FAIL [R7]
-8  judged PASS has quoted evidence            else 2 evidence-missing [R5]
+8  judged PASS evidence cited AND artifact    else 2 evidence-missing /
+   digest recomputes same                     verdict-unbound [R5]
 9  judged UNVERIFIABLE *3 <= total            else 2 unverifiable-excessive [R4]
 10 digest unchanged after rerun batch         else 2 check-mutated-tree
 11 forge: dry_streak >= dry_limit             else 2 not-dry
 12 breaker=HALF_OPEN: strategy_delta set      else 2 missing-strategy-delta [R10]
 13 objective score vs best_score by direction else 2 score-regressed [R11]
+   (tolerance: absorbs noise inside the band)
 14 score<->judge direction on last 2 points  else 2 DIVERGENCE:score-vs-judge [R13]
+   advisory NOTEs on GO: tautology-suspect / metric-flat (never block)
 GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
 ```
 
@@ -83,7 +101,10 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
 
 - **R1** false-complete: claimed exit honored only with all floors verified
   AND exit_signal=yes AND digest match (forge: also dry). Two gate-caught
-  false claims -> BLOCKED.
+  false claims -> BLOCKED. The counting is MECHANICAL: close-iteration with
+  exit-signal=yes that the gate answers rc=2 auto-increments
+  false_completes (NOTE `false-complete-counted=N`) - the controller no
+  longer has to append the count by hand.
 - **R2** seat re-judgment illegal while covered files unchanged; gate
   re-runs are measurement, always legal.
 - **R3** stamped contract frozen (AC body + `exit:` lines); amendments are
@@ -104,7 +125,12 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
   next). Grinding without revising is make-work.
 - **R11** objective score never delivers worse than `best_score`
   (maximize: current >= best; minimize: current <= best) - restore
-  the best-scoring state or do not claim.
+  the best-scoring state or do not claim. `tolerance:` widens the comparison
+  by a relative band so benchmark noise is "holds", not "regressed".
+- **R14** measurement honesty (v2.5): metric regex pins the number, ANSI is
+  stripped before matching, stderr rides along in verdicts (fail-loud),
+  judged PASS must bind its artifact hash, and deterministic checks that
+  cannot fail across rounds get flagged `tautology-suspect` (advisory).
 - **R13** score/judge divergence: when .goal/scores.rec holds two comparable
   points (iter|score|judge both numeric) and their directions oppose, the
   objective is optimizing away from perceived quality - refuse the claim.

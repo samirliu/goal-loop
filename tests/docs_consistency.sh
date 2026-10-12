@@ -123,6 +123,15 @@ scripts/goal_ctl.sh|obj_dir
 SKILL.md|盖戳时绑定
 scripts/goal_ctl.sh|BIND at stamp
 scripts/goal_gate.sh|hint=fix-AC
+scripts/goal_gate.sh|verdict-unbound
+scripts/goal_gate.sh|contract-malformed
+scripts/goal_ctl.sh|false-complete-counted
+scripts/goal_gate.sh|tautology-suspect
+scripts/goal_gate.sh|metric-flat
+scripts/goal_gate.sh|extract_metric
+scripts/goal_gate.sh|strip_ansi
+scripts/goal_gate.sh|tolerance
+references/gate.md|R14
 SKILL.md|hint=
 SKILL.md|bind-seat
 scripts/goal_gate.sh|graceful delivery of passing work

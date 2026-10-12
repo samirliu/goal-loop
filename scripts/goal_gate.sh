@@ -136,6 +136,30 @@ ac_baseline_marker(){ ac_line_for "$1" | sed -nE 's/^.*baseline: *(delta|abs).*/
 # check that must PASS before its number is trusted. The probe asserts the
 # measurement itself (instrument alive, fixture loaded, seed fixed).
 ac_probe_cmd(){ ac_line_for "$1" | sed -nE 's/^.*probe: *`([^`]*)`.*/\1/p' | tail -1; }
+# Optional measurement tokens (v2.5): `metric: ` <ERE with exactly one capture
+# group> pins WHERE the number comes from (immune to log noise / multi-number
+# output); tolerance: <rel> absorbs measurement noise in water-mark compares.
+ac_metric_re(){ ac_line_for "$1" | sed -nE 's/^.*metric: *`([^`]*)`.*/\1/p' | tail -1; }
+ac_tolerance(){ ac_line_for "$1" | sed -nE 's/^.*tolerance: *([0-9.]+).*/\1/p' | tail -1; }
+sha256_std(){                                           # one file -> 64 hex
+  if command -v sha256sum >/dev/null 2>&1; then sha256sum < "$1" | cut -c1-64
+  elif command -v openssl >/dev/null 2>&1; then openssl dgst -sha256 "$1" | awk '{print $NF}'
+  else echo ""; fi
+}
+strip_ansi(){                                           # colored CLIs must not cut the metric regex
+  gawk '{ gsub(/\033\[[0-9;?]*[A-Za-z]/, "", $0); print }'
+}
+extract_metric(){                                       # $1 text $2 regex-or-empty -> number or empty
+  # regex via ENVIRON: -v would eat backslashes in the user's ERE. The pipeline
+  # needs an EXPORT (assignment on the first command covers only printf).
+  [ -n "$2" ] || return 0
+  export MRE="$2"
+  printf '%s\n' "$1" | gawk '{
+    if (match($0, ENVIRON["MRE"], m)) {
+      for (i = 1; i <= length(m); i++) if (m[i] != "") { print m[i]; exit }
+    }
+  }' | sed -nE 's/^[^0-9]*(-?[0-9]+(\.[0-9]+)?).*/\1/p' | head -1
+}
 # Optional contract-level objective: maximize|minimize AC-N  (score-regressed guard).
 # objective_dir: "maximize" (higher is better) or "minimize" (lower is better).
 objective_ac(){ r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1; }
@@ -195,58 +219,94 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   case "$cls" in metric*|maximize|minimize)
     pcmd=$(ac_probe_cmd "$id")
     if [ -n "$pcmd" ]; then
+      perr=$(mktemp "${TMPDIR:-/tmp}/goal-probe-err.XXXXXX" 2>/dev/null) || perr=/tmp/probe-err.$$
       if command -v timeout >/dev/null 2>&1; then
-        ( cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$pcmd" >/dev/null 2>&1 )
+        ( cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$pcmd" >/dev/null 2>"$perr" )
       else
-        ( cd "$project" 2>/dev/null && bash -c "$pcmd" >/dev/null 2>&1 )
+        ( cd "$project" 2>/dev/null && bash -c "$pcmd" >/dev/null 2>"$perr" )
       fi
       prc=$?
+      perr_tail=$(r < "$perr" | tail -2 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-120)
+      rm -f "$perr"
       if [ "$prc" -ne 0 ]; then
-        printf '%s|BROKEN|probe-failed:rc=%s (measurement untrusted - fix the instrument before the number)\n' "$id" "$prc"
+        printf '%s|BROKEN|probe-failed:rc=%s (measurement untrusted - fix the instrument before the number) %s\n' "$id" "$prc" "$perr_tail"
         return
       fi
     fi ;;
   esac
+  # stdout stays the MEASUREMENT channel; stderr is captured to a side file so
+  # a failure is never diagnosed by guessing (an eval system that says "failed"
+  # with no reason violates fail-loud). Streams stay separated on purpose.
+  gate_err=$(mktemp "${TMPDIR:-/tmp}/goal-gate-err.XXXXXX" 2>/dev/null) || gate_err=/tmp/gate-err.$$
   if command -v timeout >/dev/null 2>&1; then
-    out=$(cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$cmd" 2>/dev/null); rc=$?
+    out=$(cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$cmd" 2>"$gate_err"); rc=$?
   else
-    out=$(cd "$project" 2>/dev/null && bash -c "$cmd" 2>/dev/null); rc=$?   # without coreutils timeout a hang hangs; documented
+    out=$(cd "$project" 2>/dev/null && bash -c "$cmd" 2>"$gate_err"); rc=$?   # without coreutils timeout a hang hangs; documented
   fi
+  err_tail=$(r < "$gate_err" | tail -3 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-160)
+  rm -f "$gate_err"
+  [ -n "$err_tail" ] || err_tail=""
   out=$(printf '%s\n' "$out" | r)                    # CR scrub: Windows-native checks print CRLF
+  metric=$(ac_metric_re "$id")
+  if [ -n "$metric" ]; then
+    clean=$(printf '%s\n' "$out" | strip_ansi)
+    mval=$(extract_metric "$clean" "$metric")
+  else
+    mval=""
+  fi
   case "$cls" in
     exit0)
       if [ "$rc" -eq 0 ]; then printf '%s|PASS|exit=0\n' "$id"
-      elif [ "$rc" -eq 127 ] || [ "$rc" -eq 124 ]; then printf '%s|BROKEN|check not executable (rc=%d)\n' "$id" "$rc"
-      else printf '%s|FAIL|exit=%d\n' "$id" "$rc"; fi ;;
+      elif [ "$rc" -eq 127 ] || [ "$rc" -eq 124 ]; then printf '%s|BROKEN|check not executable (rc=%d) %s\n' "$id" "$rc" "$err_tail"
+      elif [ "$rc" -gt 128 ]; then printf '%s|BROKEN|check killed (rc=%d, signal) %s\n' "$id" "$rc" "$err_tail"
+      else printf '%s|FAIL|exit=%d %s\n' "$id" "$rc" "$err_tail"; fi ;;
     rc\ *)                                            # negative assertion: rc==N passes
       want=${cls#rc }
       if [ "$rc" -eq "$want" ]; then printf '%s|PASS|exit=%d\n' "$id" "$rc"
-      elif [ "$rc" -eq 124 ] && [ "$want" != 124 ]; then printf '%s|BROKEN|timed out (rc=124)\n' "$id"
-      elif [ "$rc" -eq 127 ] && [ "$want" != 127 ]; then printf '%s|BROKEN|check not executable (rc=127)\n' "$id"
-      else printf '%s|FAIL|exit=%d expect=exit=%s\n' "$id" "$rc" "$want"; fi ;;
+      elif [ "$rc" -eq 124 ] && [ "$want" != 124 ]; then printf '%s|BROKEN|timed out (rc=124) %s\n' "$id" "$err_tail"
+      elif [ "$rc" -eq 127 ] && [ "$want" != 127 ]; then printf '%s|BROKEN|check not executable (rc=127) %s\n' "$id" "$err_tail"
+      else printf '%s|FAIL|exit=%d expect=exit=%s %s\n' "$id" "$rc" "$want" "$err_tail"; fi ;;
     metric\ *)
-      last=$(printf '%s\n' "$out" | grep -vE '^[[:space:]]*$' | tail -1)
+      last="$mval"
+      if [ -z "$last" ] && [ -n "$metric" ]; then
+        printf '%s|BROKEN|metric regex matched nothing: %s %s\n' "$id" "$metric" "$err_tail"; return
+      fi
+      if [ -z "$last" ]; then
+        last=$(printf '%s\n' "$out" | strip_ansi | grep -vE '^[[:space:]]*$' | tail -1)
+      fi
       case "$last" in
         ''|*[!0-9.\-]*)
-          printf '%s|BROKEN|last stdout line is not a number: %s\n' "$id" "${last:-<empty>}"; return ;;
+          printf '%s|BROKEN|no number in output (metric or last line): %s\n' "$id" "${last:-<empty>}"; return ;;
       esac
       v=$(awk -v a="$last" -v b="$m_num" -v o="$m_op" \
           'BEGIN{ok=(o==">=")?(a>=b):(o=="<=")?(a<=b):(o==">")?(a>b):(o=="<")?(a<b):(o=="==")?(a==b):(a!=b); print ok?"PASS":"FAIL"}')
       printf '%s|%s|observed=%s expect=%s%s\n' "$id" "$v" "$last" "$m_op" "$m_num" ;;
     maximize)
-      last=$(printf '%s\n' "$out" | grep -vE '^[[:space:]]*$' | tail -1)
+      last="$mval"
+      if [ -z "$last" ] && [ -n "$metric" ]; then
+        printf '%s|BROKEN|metric regex matched nothing: %s %s\n' "$id" "$metric" "$err_tail"; return
+      fi
+      if [ -z "$last" ]; then
+        last=$(printf '%s\n' "$out" | strip_ansi | grep -vE '^[[:space:]]*$' | tail -1)
+      fi
       case "$last" in
         ''|*[!0-9.\-]*)
-          printf '%s|BROKEN|last stdout line is not a number: %s\n' "$id" "${last:-<empty>}"; return ;;
+          printf '%s|BROKEN|no number in output: %s %s\n' "$id" "${last:-<empty>}" "$err_tail"; return ;;
       esac
       # maximize is the objective, not a floor: numeric = PASS. The score
       # itself is compared to best_score by the caller (score-regressed).
       printf '%s|PASS|observed=%s expect=maximize\n' "$id" "$last" ;;
     minimize)
-      last=$(printf '%s\n' "$out" | grep -vE '^[[:space:]]*$' | tail -1)
+      last="$mval"
+      if [ -z "$last" ] && [ -n "$metric" ]; then
+        printf '%s|BROKEN|metric regex matched nothing: %s %s\n' "$id" "$metric" "$err_tail"; return
+      fi
+      if [ -z "$last" ]; then
+        last=$(printf '%s\n' "$out" | strip_ansi | grep -vE '^[[:space:]]*$' | tail -1)
+      fi
       case "$last" in
         ''|*[!0-9.\-]*)
-          printf '%s|BROKEN|last stdout line is not a number: %s\n' "$id" "${last:-<empty>}"; return ;;
+          printf '%s|BROKEN|no number in output: %s %s\n' "$id" "${last:-<empty>}" "$err_tail"; return ;;
       esac
       # minimize: the objective is to push the number DOWN. Numeric = PASS;
       # the low-water mark is enforced by the caller (score-regressed).
@@ -367,10 +427,19 @@ done
 claim=$(printf '%s\n' "$lb" | grep -E '^exit_signal=' | tail -1 | cut -d= -f2-)
 [ "$claim" = yes ] || fail "not-claimed"
 lbdigest=$(printf '%s\n' "$lb" | grep -E '^digest=' | tail -1 | cut -d= -f2-)
-[ "$lbdigest" = "$digest" ] || { echo "GATE: NOTE false-complete suspected; controller: append false_complete=yes and increment false_completes in state.rec" >&2; fail "verdicts-stale:block=$lbdigest current=$digest"; }
+# A stale claim IS a false complete; the ratchet (ctl close-iteration) counts
+# it automatically - no manual bookkeeping asked of the controller anymore.
+[ "$lbdigest" = "$digest" ] || { echo "GATE: NOTE false-complete suspected; already counted by the ratchet - fix the artifact and let the claim pass, do not re-claim unchanged" >&2; fail "verdicts-stale:block=$lbdigest current=$digest"; }
 
 ac_ids=$(all_ac_ids)
 [ -n "$ac_ids" ] || fail "contract-empty:no AC ids"
+# fail-closed contract sanity: an AC line whose expected:/check: tokens are
+# missing (typo'd or half-written) must never silently default to exit=0 and
+# get a free PASS - a silent hole in the eval surface is the worst defect class.
+for id in $ac_ids; do
+  [ -n "$(ac_expected "$id")" ] || fail "contract-malformed:$id (no expected: token - write expected: exit=0|<op><num>|maximize|minimize|judged)"
+  [ -n "$(ac_check_cmd "$id")" ] || fail "contract-malformed:$id (no check: \`command\` - every AC needs a failable named check)"
+done
 lv=$(latest_verdicts)
 total=0; passn=0; unv=0
 observed_score=""
@@ -406,6 +475,19 @@ for id in $ac_ids; do
   total=$((total+1))
   if [ "$v" = PASS ]; then
     [ -n "$ev" ] || fail "evidence-missing:$id"
+    # Mechanical binding (v2.5): the evidence must cite the exact artifact it
+    # saw - `artifact: <path>` and `digest: <sha256-hex>`. The gate recomputes
+    # and compares. A verdict that does not name what it examined, or names a
+    # file whose bytes changed since, is worthless: verdict-unbound.
+    art=$(printf '%s' "$ev" | grep -oE 'artifact:[[:space:]]*[^[:space:]]+' | head -1 | sed -E 's/^artifact:[[:space:]]*//')
+    dig=$(printf '%s' "$ev" | grep -oE 'digest:[[:space:]]*(sha256:)?[a-f0-9]{8,64}' | head -1 | sed -E 's/^digest:[[:space:]]*(sha256:)?//')
+    [ -n "$art" ] && [ -n "$dig" ] || fail "verdict-unbound:$id (PASS evidence must cite artifact: <path> and digest: <sha256> - the seat must say WHAT it judged)"
+    if [ -f "$project/$art" ]; then
+      now=$(sha256_std "$project/$art")
+      case "$now" in "$dig"*) : ;; *) fail "verdict-unbound:$id (artifact $art changed since the verdict - digest mismatch)" ;; esac
+    else
+      fail "verdict-unbound:$id (artifact file $art not found)"
+    fi
     passn=$((passn+1))
   elif [ "$v" = UNVERIFIABLE ]; then
     case "$ev" in *PROBE=*REASON=*) ;; *) fail "evidence-missing:$id (PROBE/REASON required)" ;; esac
@@ -442,13 +524,18 @@ if [ -n "$primary" ]; then
   [ -n "$observed_score" ] || fail "score-missing:$primary (objective score needs a numeric observed score)"
   best=$(state_get best_score)
   pdir=$(objective_dir); [ -n "$pdir" ] || pdir=maximize
+  # Relative tolerance absorbs benchmark noise (same code varies +-5% across
+  # runs; an exact water-mark would false-alarm "regressed" every round and
+  # teach the controller to distrust the metric). Inside the noise band the
+  # score is treated as holding, not moving.
+  tol=$(ac_tolerance "$primary"); case "$tol" in ''|*[!0-9.]*) tol=0 ;; esac
   if [ -n "$best" ] && [ "$best" != "none" ]; then
     if [ "$pdir" = minimize ]; then
-      awk -v c="$observed_score" -v b="$best" 'BEGIN{exit !(c+0 <= b+0)}' \
-        || fail "score-regressed:current=$observed_score best=$best dir=minimize (restore the best-scoring state or do not claim)"
+      awk -v c="$observed_score" -v b="$best" -v t="$tol" 'BEGIN{exit !(c+0 <= (b+0)*(1+t))}' \
+        || fail "score-regressed:current=$observed_score best=$best dir=minimize tol=$tol (restore the best-scoring state or do not claim)"
     else
-      awk -v c="$observed_score" -v b="$best" 'BEGIN{exit !(c+0 >= b+0)}' \
-        || fail "score-regressed:current=$observed_score best=$best dir=maximize (restore the best-scoring state or do not claim)"
+      awk -v c="$observed_score" -v b="$best" -v t="$tol" 'BEGIN{exit !(c+0 >= (b+0)*(1-t))}' \
+        || fail "score-regressed:current=$observed_score best=$best dir=maximize tol=$tol (restore the best-scoring state or do not claim)"
     fi
   fi
 fi
@@ -481,6 +568,33 @@ fi
 
 if [ "${deadline_expired:-0}" = 1 ]; then
   echo "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)"
+fi
+# Eval self-hardening notes (v2.5, advisory only - never block a GO).
+# 1) Static tautology suspects: deterministic checks whose command cannot fail
+#    (bare true/echo/cat) would pass every round and make the gate decorative.
+#    judged ACs are exempt (their check generates evidence, the seats judge).
+taut=""
+for id in $ac_ids; do
+  cls=$(classify_expected "$(ac_expected "$id")")
+  [ "$cls" = judged ] && continue
+  cmd=$(ac_check_cmd "$id")
+  # cannot-fail shapes only: bare true/:/echo with no pipes, no test, no
+  # redirects (cat/echo file can fail - missing artifact is a real outcome).
+  if printf '%s' "$cmd" | grep -qE '^(true|:|:)[[:space:]]*$' ||
+     printf '%s' "$cmd" | grep -qE '^echo [^|<>]*$'; then
+    taut="$taut $id"
+  fi
+done
+[ -z "$taut" ] || echo "GATE: NOTE tautology-suspect:${taut# } (check cannot fail across rounds - strengthen it or the gate is decorative)" >&2
+# 2) Metric-flat: the objective score has sat at the water-mark for >=3
+#    rounds - a ceiling metric with delta-style ambitions is unreachable and
+#    the loop grinds. (Same code, same number: flat is not regressed.)
+if [ -n "$primary" ] && [ -f "$sd/scores.rec" ] && [ -n "$observed_score" ]; then
+  # count trailing rows pinned to the current score
+  flat=$(r < "$sd/scores.rec" | awk -F'|' -v s="$observed_score" '
+    { if ($2 ~ /^-?[0-9]+(\.[0-9]+)?$/ && $2+0 == s+0) c++; else if ($2 ~ /^-?[0-9]+(\.[0-9]+)?$/) c=0 }
+    END { print c+0 }')
+  [ "${flat:-0}" -ge 3 ] && echo "GATE: NOTE metric-flat ($primary pinned at $observed_score for $flat rounds - if the objective demands strict improvement, the metric may be saturated (ceiling); raise its headroom or accept floor+forge)" >&2
 fi
 if [ -n "$primary" ]; then
   echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}"

@@ -33,20 +33,30 @@ exit: threshold
 
 <!-- verbatim, frozen by the stamp. Grammar per line:
      - AC-N | <yes/no statement> | check: `<command>` | [probe: `<cmd>`] | [baseline: delta|abs] | expected: <spec>
-     spec: exit=0 (default) | metric comparison (>=60, <=1.8, ...) | maximize | minimize | judged
+     spec: exit=0 (default) | exit=N (expect this exact failure code) |
+           metric comparison (>=60, <=1.8, ...) | maximize | minimize | judged
      - a metric command aggregates internally (N repeats / percentile) and
-       prints ONE number on its last stdout line; set thresholds beyond the
-       measured noise floor (patterns.md section 4)
+       prints ONE number; set thresholds beyond the measured noise floor
+       (patterns.md section 4)
      - probe (R9): MUST pass before the number is trusted - asserts the
        instrument (fixture loaded, seed fixed, tool alive), not the artifact.
        Every metric/maximize/minimize AC should carry one.
+     - `metric:` (optional): one capture group; the gate takes the number from
+       it (ANSI-stripped first) instead of guessing the last line - use it
+       when output carries other numbers. `tolerance:` (optional): relative
+       noise band for the water-mark comparison of an objective score.
      - baseline: delta (default for metric ACs) requires a .goal/baseline.md
        row `AC-N | observed=<v> | repeats=<N>=2 | cmd=<check verbatim>` -
        the pre-stamp smoke run IS the measurement; abs = new capability,
        no baseline owed. Controller infers delta/abs, never asks the user.
-     - `maximize`/`minimize`: objective score (see above), numeric last line, not a floor
+     - `maximize`/`minimize`: objective score (see above), numeric, not a floor
      - `judged` needs a written rubric anchor or a pairwise A/B protocol
-       (crew.md section 6)
+       (crew.md section 6); its check must be a REAL command that produces
+       the evidence the seats read (rendering/screenshots/extraction) -
+       an empty or placeholder check voids the whole contract (fail-closed).
+       A judged PASS must cite `artifact: <path>` + `digest: <sha256>` in its
+       evidence; the gate recomputes the hash, so an unbound or stale
+       verdict fails `verdict-unbound` (the seat must say what it judged).
      - the command runs at project root and must not modify the tree;
        generated evidence goes to .goal/evidence/
      - the spec value must not contain "|"
@@ -54,7 +64,7 @@ exit: threshold
 
 - AC-1 | <yes/no decision statement> | check: `<exact command>` | expected: exit=0
 - AC-2 | <...metric...> | check: `<command printing one number>` | probe: `<instrument check>` | baseline: delta | expected: >=<value>
-- AC-3 | <...quality claim...> | check: - | expected: judged
+- AC-3 | <...quality claim...> | check: `<command producing the reviewed artifact>` | expected: judged
 
 ## Out of scope
 

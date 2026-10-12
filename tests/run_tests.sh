@@ -95,8 +95,10 @@ mkproj t08; contract t08 \
   "- AC-1 | j1 | check: \`true\` | expected: judged" \
   "- AC-2 | j2 | check: \`true\` | expected: judged" \
   "- AC-3 | j3 | check: \`true\` | expected: judged"
+echo ok > "$T/t08/jart.txt"          # the artifact the judged seat reviewed
 close_iter t08
-bind_v t08 'AC-1|PASS|1|DIGEST|cmd|"ok line"'
+S=$(sha256sum "$T/t08/jart.txt" | cut -c1-64)
+bind_v t08 "AC-1|PASS|1|DIGEST|cmd|\"ok line\" artifact: jart.txt digest: $S"
 bind_v t08 'AC-2|UNVERIFIABLE|1|DIGEST|-|PROBE=x REASON=y'
 bind_v t08 'AC-3|UNVERIFIABLE|1|DIGEST|-|PROBE=x REASON=y'
 bash "$GATE" --check --project "$T/t08" >/dev/null 2>&1; assert_rc "08 unverifiable-excessive -> rc2" 2 $?
@@ -153,7 +155,8 @@ assert_has "15 reason budget-fuse" 'budget-fuse' "$out"
 # 16 v1.1 prose expectation routes to judged (backward compat)
 mkproj t16; contract t16 "- AC-1 | v11 | check: \`test -f a.txt\` | expected: the diff is empty"
 echo x > "$T/t16/a.txt"; close_iter t16
-bind_v t16 'AC-1|PASS|1|DIGEST|cmd|"the diff is empty"'
+S16=$(sha256sum "$T/t16/a.txt" | cut -c1-64)
+bind_v t16 "AC-1|PASS|1|DIGEST|cmd|\"the diff is empty\" artifact: a.txt digest: $S16"
 bash "$GATE" --check --project "$T/t16" >/dev/null 2>&1; assert_rc "16 prose->judged GO -> rc0" 0 $?
 
 # 17a forge close without --dry refused, and WITHOUT leaving an orphan block
@@ -227,8 +230,10 @@ assert_has "25 reason open-FAIL w/ expect" 'open-FAIL:AC-1' "$out"
 
 # 26 carry-forward: same digest, later iteration -> GO without re-seat
 mkproj t27; contract t27 "- AC-1 | j | check: \`true\` | expected: judged"
-close_iter t27; bind_v t27 'AC-1|PASS|1|DIGEST|cmd|"ok"'
-close_iter t27; bind_v t27 'AC-1|PASS|2|DIGEST|cmd|"ok carried=yes"'
+echo ok > "$T/t27/jart.txt"
+S27=$(sha256sum "$T/t27/jart.txt" | cut -c1-64)
+close_iter t27; bind_v t27 "AC-1|PASS|1|DIGEST|cmd|\"ok\" artifact: jart.txt digest: $S27"
+close_iter t27; bind_v t27 "AC-1|PASS|2|DIGEST|cmd|\"ok carried=yes\" artifact: jart.txt digest: $S27"
 out=$(bash "$GATE" --check --project "$T/t27" 2>&1); assert_rc "26 carry-forward GO -> rc0" 0 $?
 
 # 27 no sharding: after digest moved, re-bind at stale digest -> not-covered
@@ -778,7 +783,7 @@ mkproj t74
   printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
   printf '## Acceptance criteria\n\n'
   printf -- '- AC-1 | s | check: `true` | expected: exit=0\n'
-  printf -- '- AC-2 | j | check: - | expected: judged\n'
+  printf -- '- AC-2 | j | check: `true` | expected: judged\n'
   printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t74/.goal/goal.md"
 bash "$CTL" stamp --project "$T/t74" --auto >/dev/null
@@ -835,6 +840,122 @@ bash "$CTL" close-iteration --project "$T/t77" --task T1 --files a.txt \
   --strategy-delta 'try next' --exit-signal yes --no-gate >/dev/null 2>&1
 out=$(bash "$GATE" --check --project "$T/t77" 2>&1); assert_rc "77 expired+fail -> BLOCKED rc3" 3 $?
 assert_has "77 BLOCKED fuse" 'time-budget-exhausted' "$out"
+
+# ============================================================================
+# v2.5 - eval hardening mechanisms ported from the DSH-plugin analysis
+# ============================================================================
+
+# 78 metric: regex with one capture group beats last-line, immune to noise+ANSI
+mkproj t78
+{
+  printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | m | check: `bash noisy.sh` | metric: `score: ([0-9.]+)` | expected: >=40\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t78/.goal/goal.md"
+printf '#!/usr/bin/env bash\nprintf "\\033[32mnoise 9\\033[0m score: 42.5 done\\n"\n' > "$T/t78/noisy.sh"
+chmod +x "$T/t78/noisy.sh" 2>/dev/null
+bash "$CTL" stamp --project "$T/t78" --auto >/dev/null
+out=$(bash "$GATE" --verify --project "$T/t78" 2>&1)
+assert_has "78 metric regex extracts through ANSI" 'AC-1|PASS|observed=42.5' "$out"
+# regex mismatch -> BROKEN (fail-loud, not a silent last-line fallback lie)
+sed -i 's/metric: [^|]*| expected/metric: `nosuch=([0-9]+)` | expected/' "$T/t78/.goal/goal.md"
+out=$(bash "$GATE" --verify --project "$T/t78" 2>&1)
+assert_has "78b regex miss -> BROKEN named" 'regex matched nothing' "$out"
+
+# 79 tolerance: inside noise band the water-mark holds (no false regression)
+mkproj t79
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | perf | check: `cat n.txt` | tolerance: 0.1 | expected: maximize\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t79/.goal/goal.md"
+printf '100\n' > "$T/t79/n.txt"
+bash "$CTL" stamp --project "$T/t79" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t79" --task T1 --files n.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate --score 100 >/dev/null 2>&1
+printf '96\n' > "$T/t79/n.txt"   # 4% noise, inside 10% band
+bash "$CTL" close-iteration --project "$T/t79" --task T2 --files n.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate --score 96 >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t79" 2>&1); assert_rc "79 noise-band holds -> GO" 0 $?
+# 80 below band -> score-regressed names the tolerance
+printf '80\n' > "$T/t79/n.txt"
+bash "$CTL" close-iteration --project "$T/t79" --task T3 --files n.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate --score 80 >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t79" 2>&1); assert_rc "80 below band -> rc2" 2 $?
+assert_has "80 regressed names tol" 'tol=0.1' "$out"
+
+# 81 judged PASS without artifact/digest binding -> verdict-unbound
+mkproj t81
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | j | check: `true` | expected: judged\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t81/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t81" --auto >/dev/null
+close_iter t81
+bind_v t81 'AC-1|PASS|1|DIGEST|cmd|"looks good to me"'
+out=$(bash "$GATE" --check --project "$T/t81" 2>&1); assert_rc "81 unbound PASS -> rc2" 2 $?
+assert_has "81 verdict-unbound named" 'verdict-unbound:AC-1' "$out"
+# 82 properly bound artifact -> GO
+echo judged > "$T/t81/jart.txt"
+close_iter t81                      # iter 2 (iter 1 from 81)
+S=$(sha256sum "$T/t81/jart.txt" | cut -c1-64)
+bind_v t81 "AC-1|PASS|2|DIGEST|cmd|\"ok\" artifact: jart.txt digest: $S"
+out=$(bash "$GATE" --check --project "$T/t81" 2>&1); assert_rc "82 bound artifact GO -> rc0" 0 $?
+# 82b stale evidence: tree moved (file edited) and the REBIND copies the old
+# sha256 line - tree digest matches, artifact hash does not -> unbound
+echo changed > "$T/t81/jart.txt"
+close_iter t81                      # iter 3, digest follows the edit
+bind_v t81 "AC-1|PASS|3|DIGEST|cmd|\"ok\" artifact: jart.txt digest: $S"
+out=$(bash "$GATE" --check --project "$T/t81" 2>&1); assert_rc "82b stale artifact hash -> rc2" 2 $?
+assert_has "82b mismatch named" 'verdict-unbound' "$out"
+# 83 false-complete ratchet: two caught claims, gate auto-counts, third BLOCKS
+mkproj t83
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | f | check: `false` | expected: exit=0\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t83/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t83" --auto >/dev/null
+out=$(bash "$CTL" close-iteration --project "$T/t83" --task T1 --files a.txt \
+  --checks-pass 0 --checks-fail 1 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes 2>&1); rc1=$?
+assert_has "83 catch1 auto-counted" 'false-complete-counted=1' "$out"
+out=$(bash "$CTL" close-iteration --project "$T/t83" --task T2 --files a.txt \
+  --checks-pass 0 --checks-fail 1 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes 2>&1); rc2=$?
+assert_has "83 catch2 auto-counted" 'false-complete-counted=2' "$out"
+out=$(bash "$CTL" close-iteration --project "$T/t83" --task T3 --files a.txt \
+  --checks-pass 0 --checks-fail 1 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes 2>&1); rc3=$?
+assert_rc "83 third claim frozen -> rc3" 3 $rc3
+# progress=no landings must NOT count as false completes (no claim): recheck
+grep -q 'false_completes=2' "$T/t83/.goal/state.rec" && ok "83 state holds count" || no "83 counter not in state"
+
+# 84 advisory notes: tautology suspect + metric-flat (never block)
+mkproj t84
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | m | check: `cat n.txt` | expected: maximize\n'
+  printf -- '- AC-2 | t | check: `true` | expected: exit=0\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t84/.goal/goal.md"
+printf '10\n' > "$T/t84/n.txt"
+bash "$CTL" stamp --project "$T/t84" --auto >/dev/null
+close_iter t84 --score 10
+printf '10\n' > "$T/t84/n2.txt"; # same digest not needed; just append score rows
+printf '2|10|none\n3|10|none\n' >> "$T/t84/.goal/scores.rec"
+close_iter t84 --score 10
+out=$(bash "$GATE" --check --project "$T/t84" 2>&1); assert_rc "84 notes never block -> GO" 0 $?
+assert_has "84 tautology suspect named" 'tautology-suspect:AC-2' "$out"
 
 echo
 echo "== results: pass=$pass fail=$failn =="

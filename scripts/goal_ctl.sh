@@ -226,7 +226,19 @@ case "$cmd" in
       "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" "$best" > "$sd/state.rec"
     echo "CTL: CLOSE ok iter=$new digest=$digest"
     [ "$no_gate" -eq 1 ] && exit 0
-    bash "$here/goal_gate.sh" --check --project "$project"; exit $? ;;
+    # False-complete ratchet, mechanized: a claim that the gate catches failing
+    # IS a false complete - counting it used to depend on the controller
+    # obeying the NOTE and appending false_complete=yes by hand. Two catches
+    # now BLOCK the loop automatically (gate rule fc>=2). Only NO-GO (rc=2)
+    # claims count; BLOCKED/rc=4 mean other failures.
+    bash "$here/goal_gate.sh" --check --project "$project"; grc=$?
+    if [ "$grc" -eq 2 ] && [ "$exit_signal" = yes ]; then
+      fc=$(( $(state_get false_completes) + 1 ))
+      { grep -vE '^false_completes=' "$sd/state.rec"; printf 'false_completes=%s\n' "$fc"; } > "$sd/state.rec.new" \
+        && mv "$sd/state.rec.new" "$sd/state.rec"
+      echo "CTL: NOTE false-complete-counted=$fc (gate caught a failing claim; two catches BLOCK the loop - fix the artifact, do not re-claim)" >&2
+    fi
+    exit "$grc" ;;
 
   status)
     [ -f "$sd/state.rec" ] || { echo "CTL: STATUS no active goal-loop ledger ($sd/state.rec missing)" >&2; exit 4; }
