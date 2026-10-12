@@ -126,6 +126,16 @@ scripts/goal_gate.sh|hint=fix-AC
 scripts/goal_gate.sh|verdict-unbound
 scripts/goal_gate.sh|contract-malformed
 scripts/goal_ctl.sh|false-complete-counted
+scripts/goal_gate.sh|calibration-missing
+scripts/goal_gate.sh|calibration-broken
+references/gate.md|R15
+references/gate.md|calibration-missing
+references/crew.md|calibration is MANDATORY
+assets/goal.contract.md|calib:
+SKILL.md|calib:
+SKILL.md|小任务快车道
+scripts/goal_ctl.sh|CTL: NEXT
+scripts/goal_ctl.sh|last_hint=
 scripts/goal_gate.sh|check-mutated-ledger
 scripts/goal_gate.sh|ledger_digest
 scripts/goal_gate.sh|unknown-ac-id

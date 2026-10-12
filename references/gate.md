@@ -30,9 +30,13 @@ evidence. Judged ACs: PASS needs the quoted decisive output PLUS an
 `artifact: <path> digest: <sha256>` binding - the gate recomputes the
 sha256 of that path and voids the verdict on mismatch (`verdict-unbound`);
 UNVERIFIABLE needs `PROBE=.. REASON=..`; empty evidence voids a PASS.
+Calibration rows share the same 6-field schema under derived ids: `AC-1#good`
+and `AC-1#bad` - the seat's grades on the declared fixtures (see `calib:`
+below). Derived ids count as ordinary rows for bind/stale rules: a digest
+move or iteration bump voids them exactly like the parent verdict.
 
 `.goal/goal.md` AC grammar:
-`- AC-N | <statement> | check: \`<command>\` | [probe: \`<cmd>\`] | [baseline: delta|abs] | [metric: \`regex one capture group\`] | [tolerance: <rel>] | expected: <spec>`
+`- AC-N | <statement> | check: \`<command>\` | [probe: \`<cmd>\`] | [baseline: delta|abs] | [metric: \`regex one capture group\`] | [tolerance: <rel>] | [calib: good=<f> bad=<f>] | expected: <spec>`
 - `exit=0`/omitted -> deterministic rc check; `exit=N` -> must end with that
   exact code (error paths as first-class ACs); `<op><number>` (>= <= > < == !=)
   -> metric, number from `metric:` regex or LAST non-empty stdout line;
@@ -48,6 +52,15 @@ UNVERIFIABLE needs `PROBE=.. REASON=..`; empty evidence voids a PASS.
   it the score holds (no false regression); below/above it R11 fires.
 - `probe: \`cmd\`` (R9) must PASS before a metric/maximize/minimize number is
   trusted - it asserts the measurement instrument, not the artifact.
+- `calib: good=<f> bad=<f>` (R15, judged ACs only) names a known-good and a
+  known-bad fixture of the AC's subject. The claim is refused until
+  `AC-N#good` = PASS and `AC-N#bad` = FAIL are bound at the current
+  iteration+digest (derived-id rows in verdicts.rec), and the row's evidence
+  must QUOTE the fixture file it read (an unbound grade is an invented grade).
+  R9 extended from the numeric plane to the judgment plane: a seat that cannot
+  reject the known-bad case cannot be trusted on the real one. Fixtures exist
+  in the tree (stamp validates), fixture decay mid-loop = `calibration-broken`
+  (fail-closed, never a silent exemption).
 - stderr is captured to the verdict detail (stdout stays the measurement
   channel); a FAIL/BROKEN that says only "failed" is the eval system
   violating fail-loud.
@@ -91,6 +104,8 @@ the contract or a state file mid-rerun trips `check-mutated-ledger`; only
      judged -> stored verdict fresh+non-FAIL  else 2 not-covered/open-FAIL [R7]
 8  judged PASS evidence cited AND artifact    else 2 evidence-missing /
    digest recomputes same                     verdict-unbound [R5]
+8b calib: fixtures graded both ways fresh     else 2 calibration-missing /
+                                               calibration-broken [R15]
 9  judged UNVERIFIABLE *3 <= total            else 2 unverifiable-excessive [R4]
 10 digest unchanged after rerun batch         else 2 check-mutated-tree
 11 forge: dry_streak >= dry_limit             else 2 not-dry
@@ -138,6 +153,14 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
   stripped before matching, stderr rides along in verdicts (fail-loud),
   judged PASS must bind its artifact hash, and deterministic checks that
   cannot fail across rounds get flagged `tautology-suspect` (advisory).
+- **R15** judge calibration (v2.6, `calib:` fixtures on judged ACs): the
+  verifier-of-the-verifier rule (R9) extended to the judgment plane. A judged
+  AC that names `good=`/`bad=` fixtures owes correct grades on both in the
+  current iteration - mechanically checked from derived-id rows in
+  `verdicts.rec`. A too-lenient seat passes `#good` and FAILS `#bad`, and the
+  claim is refused `calibration-missing:*/*`; declared-but-missing fixtures
+  are `calibration-broken` (fail-closed). Stamp refuses calib on non-judged
+  ACs, one-sided declarations, and missing fixture files (t=0 exposure).
 - **R13** score/judge divergence: when .goal/scores.rec holds two comparable
   points (iter|score|judge both numeric) and their directions oppose, the
   objective is optimizing away from perceived quality - refuse the claim.

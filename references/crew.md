@@ -66,6 +66,14 @@ and a known-bad example, or a named reference artifact - FIXED before the
 seat reads the new evidence). Never the producer's reasoning. Verdicts
 ternary with quoted observation; findings must bind evidence.
 
+When the AC declares `calib: good=<f> bad=<f>`, calibration is MANDATORY and
+mechanically gated (R15): the brief orders both fixtures FIRST (before the
+real subject), and the controller binds their grades as derived-id rows
+`AC-N#good|PASS|<iter>|<digest>|-|<quoted>` and `AC-N#bad|FAIL|...` before any
+claim on the parent AC. A seat that grades the bad fixture PASS is being
+lenient - expect `calibration-missing:AC-N/bad` and re-dispatch with the rubric,
+not a re-claim.
+
 Judging quality claims (what "逼真/好用/清晰" become) - in order:
 - Rubric decomposition: observable dimensions, written 1-5 anchors, threshold.
 - Pairwise A/B at a FIXED observation point (same camera/input/viewport)

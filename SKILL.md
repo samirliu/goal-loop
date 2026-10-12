@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.5.2)
+# Goal Loop (v2.6.0)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -56,21 +56,23 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 
 - 每条 AC：`- AC-N | <yes/no 陈述> | check: \`<命令>\` | [baseline: delta|abs] | [metric: \`提取正则\`] | [tolerance: <相对容差>] | expected: <spec>`
 - spec：`exit=0`/`exit=N`（N=期望错误码，错误路径是一等公民）/ 数值比较（`>=60`）/ `maximize`|`minimize`（主指标）/ `judged`
-- **测量鲁棒面**：`metric:` 带一个捕获组，门控用它从 stdout 取数（ANSI 染色
-  先剥离），数字散在日志里时不靠"最后一行"碰运气——取不到即 BROKEN 不蒙混。
-  `tolerance:` 给主指标水位比较留噪声带（基准类指标天然 ±5%），带内视为持平
-  不算回退，避免水位警报把你对指标失去信任。**AC 行 fail-closed**：缺 expected:
-  或缺 check: 的 AC 门控直接拒评该契约（静默丢 AC = 评估面开天窗，最坏缺陷类）。
+- **测量鲁棒面**：`metric:` 用捕获组从 stdout 取数（ANSI 先剥离，取不到即
+  BROKEN 不蒙混）；`tolerance:` 给主指标水位留噪声带，带内视为持平不算回退。
+  **AC 行 fail-closed**：缺 expected: 或缺 check: 的 AC 门控直接拒评该契约
+  （静默丢 AC = 评估面开天窗，最坏缺陷类）。语法细则见 references/gate.md §1。
 - **Goodhart 哨兵**：写每条 AC 自问"不推进目标能满足它吗"——能则是代理
   指标，重写或删。尺寸/比例类 AC 必须引用真实规格来源。judged AC 的 brief 必须带**校准锚**
 （已知好/已知坏样例或命名参考件）：冷席先对锚写死 rubric 分档，再看证据。
-- **R9 验证验证者**：每条 metric/maximize/minimize AC 带 `probe: \`仪器自检\``（先跑
-  probe，过了才信数字）。**指标批评席**（forge 候选 dry 轮必问）：
-  此分数与真实进度单调吗？存在哪条刷分路径？说不清单调性 = 刷分洞，
-  重写 AC。**R10**：`progress=no` 必须写 `--strategy-delta`
-  （下一步改什么）。**R13**：每轮冷席分记 `--judge-score`；分数与冷席
-  反向=背离，门控 `DIVERGENCE` 拒 claim（零人工）。**R11**：`objective: maximize|minimize AC-N` 声明主指标（maximize=高水位，minimize=低水位），
-  每轮 `--score` 入账，`best_score` 为水位，低于水位不许 claim。
+  **R15 校准夹具**：写得出好/坏样例的 judged AC 声明
+  `calib: good=<f> bad=<f>`——门控机械要求判读席对夹具 `#good`=PASS ∧
+  `#bad`=FAIL（本迭代内），否则拒 claim。R9「验证验证者」从数字面
+  延伸到判断面：认不出坏样本的席，好样本上也不算数。
+- **R9 验证验证者**：metric/maximize/minimize AC 带 `probe: \`仪器自检\``，过了才信
+  数字。**指标批评席**（forge dry 轮必问）：分数与真实进度单调吗？刷分路径在哪？
+  说不清 = 重写 AC。**R10**：`progress=no` 必须写 `--strategy-delta`。
+  **R13**：每轮记 `--judge-score`，分数与冷席反向 → 门控 `DIVERGENCE` 拒 claim。
+  **R11**：`objective: maximize|minimize AC-N` 声明主指标，`best_score` 为水位
+  （maximize 高水位 / minimize 低水位），劣于水位不许 claim。
 - 盖章前冒烟每条检查（跑不了的当场改写）；优化类目标冒烟跑即基线测量，
   写入 `.goal/baseline.md`（forge 契约必须，stamp 校验）。
 - 压缩摘要（一屏：目标行 + exit 策略/预算声明 + AC 表含检查命令逐字 +
@@ -79,6 +81,23 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 - `--auto`：仍展示摘要，随即盖章记 `auto`。`--time-budget=N`：墙钟保险丝。
   契约里的 Budget knobs（max_iterations/dry_limit/check_timeout/wallclock 等）
   在**盖戳时绑定**进 state.rec——写了不生效等于契约撒谎。
+
+## 小任务快车道
+
+单 AC、单产物、无接口的任务就是这份契约的全部合法形态：一条能失败的
+check + 一次盖章 + 一波派工 + 一次门控——没有 interfaces.md、没有基线、
+没有 crew。别为不存在的接口写协议；契约变简单不等于过程变松。最小合规
+路径的全部四条命令：
+
+```
+bash scripts/goal_ctl.sh init  --project .                 # 再填 .goal/goal.md
+bash scripts/goal_ctl.sh stamp --project . --auto          # 冒烟过 check 之后
+bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes
+# 退出码即门控裁决；非 0 看 status 的 NEXT 一行
+```
+
+完整可跑证明（仓库内，不随 skill 分发）：`bash examples/quickstart-one-shot/run.sh`。
 
 ## Step 2 派工（默认 crew subagent；--teams 则 Teams 队友）
 
@@ -103,20 +122,13 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 - Worker 的执行工艺（怎么调试、怎么组织代码）是它自己的事——不把
   goal-loop 的规则塞进简报。
 - Teams 后端铁律：**work-plan 标完成 / 任务表 completed 永远不是 GO 信号**
-  （队列正本是 `.goal/work-plan.md`，team roster/inbox 只是执行面）；完成
-  判定只认门控。细节见 references/crew.md §7。
-- Teams 生命周期（native）：TeamPlan submit 后**必须停轮等用户面板批准**
-  （`review_pending` 时 `stopped` 是正常态不是故障）。**批准落地的那一轮，
-  动作序列必须是：活性探测 → 逐个 SendMessage 唤醒+完整简报 → 才写账本**——
-  "Approved is running" 不是心跳；批准到首个唤醒之间的空窗会让 process
-  队友零产出被回收（活案例 2026-10-10）。session 恢复/用户 Stop 停全队
-  = 正常态，同一 playbook：先活性再唤醒，不重建不降级。process 后端队友
-  随 lead 轮次/暂停回收，持久的是 sessionId——恢复=逐个 SendMessage 从存档
-  会话续跑，不是重建 team。**禁止静默降级**：只有复活连续 2 次失败或
-  roster/TeamCreate 真没了才回落，账本 task= 后缀标明失败模式
-  （`(fallback:teams-process-reaped)`/`(fallback:teams-unavailable)`）；
-  **禁止用 TeamDelete 清理濒死 team**（销毁证据，只许交付/熔断时删）。
-  细节见 references/teams.md §5。
+  （队列正本是 `.goal/work-plan.md`，roster/inbox 只是执行面）；完成判定只认
+  门控。**禁止** worktree 隔离。细节 references/crew.md §7（§7.2 生命周期）。
+- Teams 生命周期（native）：submit 后停轮等用户**面板批准**；批准落地那一轮
+  先活性探测再逐个 SendMessage **唤醒+完整简报**（"Approved is running" 不是
+  心跳）。session 恢复/回收 = 正常态，同一 playbook，**禁止**静默降级，账本
+  后缀标明失败模式；濒死 team 禁 TeamDelete。活案例与恢复 playbook 全文在
+  references/teams.md §5——照该节走，这里不重复。
 
 ## Step 3 Join + gate
 
@@ -134,13 +146,11 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 ## Step 4 分岔
 
 - GO（rc=0）→ 交付。BLOCKED（rc=3）→ 停车四类之一种，报告。
-- **NO-GO（rc=2）的下一批 = 按门控 `hint=` 机械路由**（不要凭感觉）：
-  - `hint=fix-AC` → 对 `open-FAIL:AC-N` 的 AC 派修复工（按文件域隔离）；
-  - `hint=bind-seat` → `not-covered:AC-N` 是冷席缺席，派**判读席**不是改码工；
-  - `hint=fix-instrument` → 修 verify 仪器/probe，数字不可信；
-  - `hint=restore-best` / `continue-forge` / `write-strategy-delta` / `rebind-judged` /
-    `set-exit-signal` / `redesign-AC` / `proposal-to-user` / `graceful-deliver` →
-    按字面做，不派工。
+- **NO-GO（rc=2）的下一批 = 机械路由，不要凭感觉**：跑 `goal_ctl.sh status`——
+  它把上一轮门控 `hint=` 翻译成一句话 `NEXT ->`，照它执行即可。
+  派工类 hint 才拆工人：`fix-AC`→按文件域修 open-FAIL 的 AC、
+  `bind-seat`→派判读席不是改码工、`fix-instrument`→修 probe、
+  `bind-calib-grades`→补夹具裁决；其余按 NEXT 字面做不派工。
   下一批成员 = 未勾 work-plan 项 ∪ 路由目标；路由目标覆盖过期队列项。
 - **冷席终验（judged AC）**：只在第一次准备 claim EXIT_SIGNAL 前，派一个
   全新视觉/判读席（简报只带 AC 原文 + 证据路径 + rubric 锚点，无你的推

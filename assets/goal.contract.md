@@ -57,6 +57,13 @@ exit: threshold
        A judged PASS must cite `artifact: <path>` + `digest: <sha256>` in its
        evidence; the gate recomputes the hash, so an unbound or stale
        verdict fails `verdict-unbound` (the seat must say what it judged).
+     - `calib: good=<file> bad=<file>` (optional, judged only; R15) names the
+       two calibration fixtures - one known-good, one known-bad artifact of
+       this AC's subject. The gate refuses the claim until the seat's grades
+       `AC-N#good = PASS` and `AC-N#bad = FAIL` are bound at the current
+       iteration (see gate.md section 1). A seat that cannot reject the known-
+       bad case is not trustworthy on the real subject. Stamp checks: judged
+       expected, both fixtures named, both files present.
      - the command runs at project root and must not modify the tree;
        generated evidence goes to .goal/evidence/
      - the spec value must not contain "|"

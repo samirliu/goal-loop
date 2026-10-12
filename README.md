@@ -2,7 +2,7 @@
 
 **EN** — goal-loop combines the DRIVE of the harness /goal (never stop until done) with the CREW of /team (parallel teammates on one deliverable) plus the layer both lack: an external acceptance gate with a frozen contract. **/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
-**v2.1.0** — two execution backends (default one-shot subagents; opt-in Agent Teams), one judge (the gate). 执行面两档、判命面一档。
+**v2.6.0** — two execution backends (default one-shot subagents; opt-in Agent Teams), one judge (the gate). 执行面两档、判命面一档。 v2.6 新增：判断面校准夹具（R15）、非 git 树指纹重型目录剪枝、status 机械路由 NEXT=、单 AC 小任务快车道。
 
 **中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明交冷席终验。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。
 
@@ -42,9 +42,11 @@ cp goal-loop/agents/*.md ~/.claude/agents/
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check
 # 无 .goal/ 的目录里应返回 rc=4, reason=no-goal-dir —— 说明门控在岗
 bash ~/.claude/skills/goal-loop/tests/run_tests.sh
-# 场景套件应 86/86 全绿 —— 门控语义的完整回归
+# 场景套件应 fail=0 全绿 —— 门控语义的完整回归（当前 ~265 项）
 bash ~/.claude/skills/goal-loop/tests/docs_consistency.sh
 # 文档一致性（含 Teams 后端铁律字面量）应 CONSISTENT
+bash ~/.claude/skills/goal-loop/examples/quickstart-one-shot/run.sh
+# 小任务快车道：单 AC 最小契约应 GO（rc=0）—— 证明仪式的下限
 ```
 
 ## Quick start — in-session / 快速开始 — 会话内
@@ -173,6 +175,11 @@ iterations grind on the same error signature.
 - **R9** verify the verifier: metric/maximize numbers need a passing `probe:` (instrument alive) / 数字必须先过仪器自检
 - **R10** `progress=no` must carry `strategy_delta=` (what changes next) / 无进展必须写策略修订
 - **R11** `objective: maximize` never delivers below `best_score` / 主指标不许倒退交付
+- **R12** controller self-audit before claiming / claim 前自审控制器（goal_audit.sh）
+- **R13** score↔judge divergence refuses the claim / 分数与冷席背离拒 claim
+- **R14** measurement honesty: metric regex, ANSI strip, artifact-bound judged PASS / 测量诚实面
+- **R15** judge calibration (v2.6): judged ACs with `calib: good= bad=` need `#good`=PASS ∧ `#bad`=FAIL on the fixtures before any claim / 认不出坏样本的席，好样本上不算数——判断面的"验证验证者"
+- **digest 剪枝 (v2.6)**: 非 git 仓的树指纹默认跳过 node_modules/.venv/build 等重型目录（`.goalignore`/`GOAL_PRUNE` 可调）；真实源码的任何改动仍会被指纹抓住
 
 ## State / 状态文件（`.goal/`，纯文本，grep 即查询）
 

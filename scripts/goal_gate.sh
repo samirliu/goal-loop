@@ -41,17 +41,35 @@ hash_std(){                                            # one stable content hash
   else cksum | awk '{print $1}'; fi
 }
 
+# Heavy third-party dirs skipped by the non-git tree walk (v2.6). Their bytes
+# are not what an AC measures; including them made the digest O(whole-repo)
+# per gate call. Override with GOAL_PRUNE="name name ...". .goalignore at the
+# project root adds more prune names (one basename/dir per line). Semantics:
+# skipped trees are invisible to the digest - that is the explicit trade, same
+# spirit as .gitignore for a git digest.
+prune_names(){ printf '%s\n' node_modules venv .venv __pycache__ dist build target out vendor .mypy_cache .pytest_cache; }
 tree_digest(){                                         # 12 hex, deterministic
   ( cd "$project" 2>/dev/null || exit 4
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
       { git rev-parse HEAD 2>/dev/null || echo none; git status --porcelain 2>/dev/null | r | sort; } | hash_std | cut -c1-12
     else
-      find . -type f ! -path './.goal*' ! -path './.git*' | sort |
-      while IFS= read -r f; do
-        [ -f "$f" ] || continue
-        h=$(hash_std < "$f")
-        printf '%s %s\n' "$f" "$h"
-      done | sort | hash_std | cut -c1-12
+      prune=${GOAL_PRUNE:-}
+      [ -z "$prune" ] && prune=$(prune_names | tr '\n' ' ')
+      [ -f .goalignore ] && prune="$prune $(r < .goalignore | grep -vE '^[[:space:]]*(#|$)' | tr '\n' ' ')"
+      args=(); i=0
+      for p in $prune; do
+        [ "$i" -gt 0 ] && args+=( -o )
+        args+=( -name "$p" ); i=$((i+1))
+      done
+      # one xargs-fed sha1sum replaces a per-file bash spawn (the real cost);
+      # paths stay in the hash so any content/rename change moves the digest.
+      [ "$i" -gt 0 ] && set -- \( "${args[@]}" \) -prune -o
+      # sort -z then one xargs-fed sha1sum replaces the per-file bash spawn
+      # that used to dominate the digest (O(files) subshells -> O(batches)).
+      find . \( "$@" -type f ! -path './.goal*' ! -path './.git*' -print0 \) 2>/dev/null |
+      sort -z |
+      xargs -0 -r sha1sum 2>/dev/null |
+      sed -E 's/^([0-9a-f]{40})  (.*)$/\2 \1/' | sort | hash_std | cut -c1-12
     fi )
 }
 
@@ -117,8 +135,12 @@ fail(){
     verdicts-stale:*)        hint=rebind-judged ;;
     score-missing:*)         hint=objective-not-metric ;;
     not-claimed:*)           hint=set-exit-signal ;;
+    not-claimed)             hint=set-exit-signal ;;   # bare reason, no AC suffix
+    empty-loop-log)          hint=write-ledger-block ;;
     DIVERGENCE:*)            hint=redesign-AC ;;
     contract-tampered:*)     hint=proposal-to-user ;;
+    calibration-missing:*)   hint=bind-calib-grades ;;
+    calibration-*)           hint=fix-calib-fixture ;;
     time-budget-exhausted*)  hint=graceful-deliver ;;
     stagnation*|repeated-error*) hint=replan-or-stop ;;
     *)                       hint=see-reason ;;
@@ -153,6 +175,14 @@ ac_probe_cmd(){ ac_line_for "$1" | sed -nE 's/^.*probe: *`([^`]*)`.*/\1/p' | tai
 # output); tolerance: <rel> absorbs measurement noise in water-mark compares.
 ac_metric_re(){ ac_line_for "$1" | sed -nE 's/^.*metric: *`([^`]*)`.*/\1/p' | tail -1; }
 ac_tolerance(){ ac_line_for "$1" | sed -nE 's/^.*tolerance: *([0-9.]+).*/\1/p' | tail -1; }
+# Calibration fixtures (v2.6, judged ACs): `calib: good=<f1> bad=<f2>` names a
+# known-good and a known-bad artifact of the AC's subject. A seat may claim
+# PASS only after grading both correctly (#good=PASS, #bad=FAIL, same
+# iteration+digest). A too-lenient seat passes the good fixture but fails the
+# bad one, and the claim is refused mechanically.
+ac_calib_good(){ ac_line_for "$1" | sed -nE 's/^.*calib:[^|]*good *= *([^ |]+).*/\1/p' | tail -1; }
+ac_calib_bad(){ ac_line_for "$1"  | sed -nE 's/^.*calib:[^|]*bad *= *([^ |]+).*/\1/p' | tail -1; }
+ac_calib_declared(){ ac_line_for "$1" | grep -qE 'calib:[^|]*(good|bad) *=' && echo yes || echo no; }
 sha256_std(){                                           # one file -> 64 hex
   if command -v sha256sum >/dev/null 2>&1; then sha256sum < "$1" | cut -c1-64
   elif command -v openssl >/dev/null 2>&1; then openssl dgst -sha256 "$1" | awk '{print $NF}'
@@ -529,6 +559,30 @@ for id in $ac_ids; do
       case "$now" in "$dig"*) : ;; *) fail "verdict-unbound:$id (artifact $art changed since the verdict - digest mismatch)" ;; esac
     else
       fail "verdict-unbound:$id (artifact file $art not found)"
+    fi
+    # Calibration gate (v2.6, R9 applied to the judgment plane): if the AC
+    # declared fixtures, the seat owed correct grades on both. A declared
+    # fixture that never exists is a BROKEN instrument (fail-loud), never a
+    # silent exemption - same fail-closed rule as metric probes.
+    cg=$(ac_calib_good "$id"); cb=$(ac_calib_bad "$id")
+    if [ -n "$cg" ] || [ -n "$cb" ]; then
+      [ -n "$cg" ] && [ -n "$cb" ] || fail "calibration-malformed:$id (calib: needs BOTH good= and bad= fixtures)"
+      [ -f "$project/$cg" ] || fail "calibration-broken:$id (good fixture $cg not found - instrument, not artifact)"
+      [ -f "$project/$cb" ] || fail "calibration-broken:$id (bad fixture $cb not found - instrument, not artifact)"
+      # fixtures are TREE state: their bytes must match the binding - reuse
+      # the same verdict-unbound machinery per fixture via the ledger rule.
+      g_rec=$(printf '%s\n' "$lv" | gawk -F'|' -v want="$id#good" '$1==want{print}')
+      b_rec=$(printf '%s\n' "$lv" | gawk -F'|' -v want="$id#bad"  '$1==want{print}')
+      gv=$(printf '%s' "$g_rec" | cut -d'|' -f2); gvi=$(printf '%s' "$g_rec" | cut -d'|' -f3); gvd=$(printf '%s' "$g_rec" | cut -d'|' -f4)
+      bv=$(printf '%s' "$b_rec" | cut -d'|' -f2); bvi=$(printf '%s' "$b_rec" | cut -d'|' -f3); bvd=$(printf '%s' "$b_rec" | cut -d'|' -f4)
+      # Evidence must name the fixture the grade was read from (R5 spirit):
+      # an unbound grade is an invented grade, same as an unbound PASS.
+      gve=$(printf '%s' "$g_rec" | cut -d'|' -f5-)
+      bve=$(printf '%s' "$b_rec" | cut -d'|' -f5-)
+      { [ "$gv" = PASS ] && [ "$gvi" = "$iter" ] && [ "$gvd" = "$digest" ] && printf '%s' "$gve" | grep -qF "$cg"; } \
+        || fail "calibration-missing:$id/good (needs a fresh PASS verdict this iteration whose evidence quotes the good fixture $cg)"
+      { [ "$bv" = FAIL ] && [ "$bvi" = "$iter" ] && [ "$bvd" = "$digest" ] && printf '%s' "$bve" | grep -qF "$cb"; } \
+        || fail "calibration-missing:$id/bad (known-bad fixture $cb needs a fresh FAIL verdict in the current iteration - a seat that cannot reject the bad case cannot be trusted on the real one)"
     fi
     passn=$((passn+1))
   elif [ "$v" = UNVERIFIABLE ]; then

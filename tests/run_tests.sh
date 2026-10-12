@@ -1179,6 +1179,162 @@ assert_has "97 A8 warns (stdout)" 'A8 judge-score-unrecorded' "$out"
 err=$(bash "$AUDIT" --project "$T/t97" 2>&1 >/dev/null)
 printf '%s' "$err" | grep -qE 'No such file|not found' && no "97 stderr leaks reader error" || ok "97 no stderr noise for missing scores.rec"
 
+# 98 heavy-dir prune (v2.6 perf): node_modules/build are invisible to the
+# non-git tree digest (same spirit as .gitignore on git), while real sources
+# stay visible. Pruning must never let a REAL change slip past the guard.
+mkproj t98; contract t98 "- AC-1 | f | check: \`test -f src/a.txt\` | expected: exit=0"
+mkdir -p "$T/t98/src" "$T/t98/node_modules" "$T/t98/build"
+echo hi > "$T/t98/src/a.txt"; echo lib > "$T/t98/node_modules/p.js"; echo o > "$T/t98/build/out.js"
+d1=$(bash "$GATE" --digest --project "$T/t98")
+printf lib2 > "$T/t98/node_modules/p.js"; printf o2 > "$T/t98/build/out.js"
+d2=$(bash "$GATE" --digest --project "$T/t98")
+[ "$d1" = "$d2" ] && ok "98a pruned dir change invisible" || no "98a prune leak (d1=$d1 d2=$d2)"
+echo hi2 > "$T/t98/src/a.txt"
+d3=$(bash "$GATE" --digest --project "$T/t98")
+[ "$d3" != "$d2" ] && ok "98b real source change still detected" || no "98b prune swallowed a real change"
+d4=$(bash "$GATE" --digest --project "$T/t98"); [ "$d4" = "$d3" ] && ok "98c digest deterministic" || no "98c nondeterministic"
+# 99 .goalignore adds prune names; GOAL_PRUNE overrides the whole set.
+mkdir -p "$T/t98/data"; echo dat > "$T/t98/data.csv"; echo x > "$T/t98/data/big.dat"
+printf 'data\n' > "$T/t98/.goalignore"
+e1=$(bash "$GATE" --digest --project "$T/t98"); echo y > "$T/t98/data/big.dat"
+e2=$(bash "$GATE" --digest --project "$T/t98")
+[ "$e1" = "$e2" ] && ok "99a .goalignore prunes named dir" || no "99a .goalignore ignored"
+rm -f "$T/t98/.goalignore"
+f1=$(GOAL_PRUNE="node_modules src build data" bash "$GATE" --digest --project "$T/t98")
+f2=$(GOAL_PRUNE="node_modules src build data" bash "$GATE" --digest --project "$T/t98")
+[ "$f1" = "$f2" ] && ok "99b GOAL_PRUNE override deterministic" || no "99b override unstable"
+printf z > "$T/t98/src/a.txt"
+f3=$(GOAL_PRUNE="node_modules src build data" bash "$GATE" --digest --project "$T/t98")
+[ "$f3" = "$f2" ] && ok "99c GOAL_PRUNE drops src from watch" || no "99c override not honored"
+# 103 status NEXT= mechanical routing (v2.6): close-iteration stores the gate's
+# last reason/hint; status turns it into one routing sentence - the controller
+# no longer re-parses reason strings from memory.
+mkproj t103; contract t103 "- AC-1 | m | check: \`echo 3\` | expected: >=5"
+# real close-iteration (runs the gate, --no-gate NOT implied) - gate will NO-GO
+bash "$CTL" close-iteration --project "$T/t103" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no >/dev/null 2>&1
+out=$(bash "$CTL" status --project "$T/t103" 2>&1)
+assert_has "103a status prints NEXT" '^CTL: NEXT ' "$out"
+assert_has "103a NEXT names the hint" 'hint=' "$out"
+assert_has "103a NEXT is one actionable sentence" '\-> ' "$out"
+# after a clean pass the NEXT line reports nothing pending
+mkproj t104; contract t104 "- AC-1 | f | check: \`test -f ok.txt\` | expected: exit=0"
+echo ok > "$T/t104/ok.txt"
+bash "$CTL" close-iteration --project "$T/t104" --task T1 --files ok.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes >/dev/null 2>&1
+out=$(bash "$CTL" status --project "$T/t104" 2>&1)
+assert_has "103b clean claim => nothing pending" 'NEXT \(nothing pending' "$out"
+
+# 100 calibration fixtures (v2.6): a judged AC that declares calib: needs
+# correct grades on BOTH fixtures (good=PASS bad=FAIL, same iter+digest)
+# before its verdict can carry a claim. A seat that cannot reject the known-
+# bad case cannot be trusted on the real one.
+mkproj t100
+echo good > "$T/t100/g.txt"; echo bad > "$T/t100/b.txt"; echo real > "$T/t100/subject.png"
+contract t100 "- AC-1 | art quality | check: \`true\` | calib: good=g.txt bad=b.txt | expected: judged"
+close_iter t100
+S=$(sha256sum "$T/t100/subject.png" | cut -c1-64)
+# 100a claim with the real verdict only -> calibration-missing
+bind_v t100 "AC-1|PASS|1|DIGEST|cmd|\"looks great\" artifact: subject.png digest: $S"
+out=$(bash "$GATE" --check --project "$T/t100" 2>&1); assert_rc "100a calib declared, no grades -> rc2" 2 $?
+assert_has "100a reason calibration-missing" 'calibration-missing:AC-1/good' "$out"
+assert_has "100a hint routes the controller" 'hint=bind-calib-grades' "$out"
+# 100b bad fixture graded PASS (too-lenient seat) -> refused
+bind_v t100 "AC-1#good|PASS|1|DIGEST|-|\"clean render\" g.txt"
+bind_v t100 "AC-1#bad|PASS|1|DIGEST|-|\"looks fine\" b.txt"
+out=$(bash "$GATE" --check --project "$T/t100" 2>&1); assert_rc "100b lenient seat -> rc2" 2 $?
+assert_has "100b names the bad fixture" 'calibration-missing:AC-1/bad' "$out"
+# 100c correct grades (evidence quotes the fixture it read) -> GO
+bind_v t100 "AC-1#bad|FAIL|1|DIGEST|-|\"broken as shipped\" b.txt"
+bash "$GATE" --check --project "$T/t100" >/dev/null 2>&1; assert_rc "100c calibrated claim -> GO" 0 $?
+# 100e an UNBOUND grade (evidence never names the fixture) is invented -> refused
+bind_v t100 "AC-1#good|PASS|1|DIGEST|-|\"it is good\" unrelated.txt"
+out=$(bash "$GATE" --check --project "$T/t100" 2>&1); assert_rc "100e unbound grade -> rc2" 2 $?
+assert_has "100e reason good side" 'calibration-missing:AC-1/good' "$out"
+bind_v t100 "AC-1#good|PASS|1|DIGEST|-|\"clean render\" g.txt"   # rebind correctly for 100d
+# 100d stale grades (next iteration, digest move) void them too: the real
+# verdict is freshly rebound (iter 2), the calib lines stay bound to iter 1.
+echo v2 > "$T/t100/subject.png"; close_iter t100
+bind_v t100 "AC-1|PASS|2|DIGEST|cmd|\"v2 still great\" artifact: subject.png digest: $(sha256sum "$T/t100/subject.png" | cut -c1-64)"
+out=$(bash "$GATE" --check --project "$T/t100" 2>&1); assert_rc "100d stale grades voided -> rc2" 2 $?
+assert_has "100d stale calibration flagged" 'calibration-missing' "$out"
+
+# 101 stamp-time calibration validation (t=0 exposure, no mid-loop surprises)
+mkproj t101
+echo g > "$T/t101/g.txt"; echo b > "$T/t101/b.txt"
+# non-judged + calib -> stamp refused
+printf '# Goal contract
+
+## Acceptance criteria
+
+- AC-1 | j | check: `true` | calib: good=g.txt bad=b.txt | expected: >=5
+
+## Approval
+
+approved: PENDING
+' > "$T/t101/.goal/goal.md"
+out=$(bash "$CTL" stamp --project "$T/t101" --auto 2>&1); assert_rc "101a calib on non-judged AC -> stamp refused" 2 $?
+assert_has "101a reason named" 'not judged' "$out"
+# missing fixture file -> stamp refused
+printf '# Goal contract
+
+## Acceptance criteria
+
+- AC-1 | j | check: `true` | calib: good=g.txt bad=MISSING.txt | expected: judged
+
+## Approval
+
+approved: PENDING
+' > "$T/t101/.goal/goal.md"
+out=$(bash "$CTL" stamp --project "$T/t101" --auto 2>&1); assert_rc "101b missing bad fixture -> stamp refused" 2 $?
+assert_has "101b names the fixture" 'bad fixture' "$out"
+# one-sided calib -> stamp refused
+printf '# Goal contract
+
+## Acceptance criteria
+
+- AC-1 | j | check: `true` | calib: good=g.txt | expected: judged
+
+## Approval
+
+approved: PENDING
+' > "$T/t101/.goal/goal.md"
+out=$(bash "$CTL" stamp --project "$T/t101" --auto 2>&1); assert_rc "101c one-sided calib -> stamp refused" 2 $?
+assert_has "101c needs both" 'BOTH' "$out"
+# same file named twice -> one ruler claiming both directions, refused at stamp
+printf '# Goal contract\n\n## Acceptance criteria\n\n- AC-1 | j | check: `true` | calib: good=g.txt bad=g.txt | expected: judged\n\n## Approval\n\napproved: PENDING\n' > "$T/t101/.goal/goal.md"
+out=$(bash "$CTL" stamp --project "$T/t101" --auto 2>&1); assert_rc "101d one ruler both ends -> stamp refused" 2 $?
+assert_has "101d names the single-ruler problem" 'SAME file' "$out"
+
+# 102 gate-side fixture decay: stamp with both fixtures, then the bad one
+# disappears mid-loop -> fail-closed BROKEN instrument, never silent exemption
+mkproj t102
+printf '# Goal contract
+
+## Acceptance criteria
+
+- AC-1 | j | check: `true` | calib: good=g.txt bad=b.txt | expected: judged
+
+## Approval
+
+approved: PENDING
+' > "$T/t102/.goal/goal.md"
+echo g > "$T/t102/g.txt"; echo b > "$T/t102/b.txt"; echo subj > "$T/t102/subject.png"
+bash "$CTL" stamp --project "$T/t102" --auto >/dev/null
+rm -f "$T/t102/b.txt"           # fixture decay before the iteration block lands,
+close_iter t102                 # so the block digest is current and the check
+bind_v t102 "AC-1|PASS|1|DIGEST|cmd|\"ok\" artifact: subject.png digest: $(sha256sum "$T/t102/subject.png" | cut -c1-64)"   # reaches the calibration rule
+out=$(bash "$GATE" --check --project "$T/t102" 2>&1); assert_rc "102 dead fixture -> rc2" 2 $?
+assert_has "102 reason calibration-broken" 'calibration-broken' "$out"
+assert_has "102 hint routes" 'hint=fix-calib-fixture' "$out"
+
+# 99d empty project still digests (rc=0, well-formed) - the xargs-empty path
+mkdir -p "$T/t98e"; g1=$(bash "$GATE" --digest --project "$T/t98e"); rc=$?
+assert_rc "99d empty project digest rc0" 0 $rc
+assert_has "99d empty digest well-formed" '^[0-9a-f]{12}$' "$g1"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

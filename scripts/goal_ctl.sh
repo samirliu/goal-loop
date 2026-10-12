@@ -91,6 +91,23 @@ case "$cmd" in
         *) echo "CTL: ERROR stamp-refused: objective points at $oac whose expected= is not maximize|minimize (it would never produce a score)" >&2; exit 2 ;;
       esac
     fi
+    # Calibration fixtures (v2.6): calib: belongs to JUDGED ACs only, needs
+    # both fixtures, and the fixture files must exist in the tree NOW - t=0
+    # exposure so the loop never discovers mid-run that the yardstick is gone.
+    while IFS= read -r ac_line; do
+      printf '%s' "$ac_line" | grep -qE 'calib:' || continue
+      ac_id=$(printf '%s' "$ac_line" | sed -nE 's/^- (AC-[0-9]+).*/\1/p')
+      exp=$(printf '%s' "$ac_line" | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1 | tr -d '[:space:]')
+      [ "$exp" = judged ] || { echo "CTL: ERROR stamp-refused: $ac_id declares calib: but expected= is not judged (calibration measures a seat, not a command)" >&2; exit 2; }
+      cg=$(printf '%s' "$ac_line" | sed -nE 's/^.*calib:[^|]*good *= *([^ |]+).*/\1/p' | tail -1)
+      cb=$(printf '%s' "$ac_line" | sed -nE 's/^.*calib:[^|]*bad *= *([^ |]+).*/\1/p' | tail -1)
+      { [ -n "$cg" ] && [ -n "$cb" ]; } || { echo "CTL: ERROR stamp-refused: $ac_id calib: needs BOTH good= and bad= fixtures" >&2; exit 2; }
+      [ -f "$project/$cg" ] || { echo "CTL: ERROR stamp-refused: $ac_id good fixture $cg not found in the tree" >&2; exit 2; }
+      [ -f "$project/$cb" ] || { echo "CTL: ERROR stamp-refused: $ac_id bad fixture $cb not found in the tree" >&2; exit 2; }
+      # same file on both ends = one ruler claiming to measure both directions:
+      # the pair's PASS+FAIL requirement is then a permanent block. Catch at t=0.
+      [ "$cg" != "$cb" ] || { echo "CTL: ERROR stamp-refused: $ac_id calib: good= and bad= name the SAME file $cg (one ruler cannot calibrate both ways)" >&2; exit 2; }
+    done < <(r < "$sd/goal.md" | grep -E '^- AC-[0-9]+' || true)
     h=$( { r < "$sd/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
            r < "$sd/goal.md" | grep -E '^(exit|objective):' || true
          } | hash_std | cut -c1-8)
@@ -258,7 +275,21 @@ case "$cmd" in
     # obeying the NOTE and appending false_complete=yes by hand. Two catches
     # now BLOCK the loop automatically (gate rule fc>=2). Only NO-GO (rc=2)
     # claims count; BLOCKED/rc=4 mean other failures.
-    bash "$here/goal_gate.sh" --check --project "$project"; grc=$?
+    # Capture the gate's verdict: the reason/hint pair lands in state.rec so
+    # `status` can print a mechanical NEXT= later. Streams are split-captured
+    # and replayed (stdout->stdout, stderr->stderr) so the pass-through stays
+    # byte-identical to the old direct call; the real gate rc survives.
+    g_out=$(mktemp "${TMPDIR:-/tmp}/ctl-gate-out.XXXXXX") || g_out=/tmp/ctl-gate-out.$$
+    g_err=$(mktemp "${TMPDIR:-/tmp}/ctl-gate-err.XXXXXX") || g_err=/tmp/ctl-gate-err.$$
+    bash "$here/goal_gate.sh" --check --project "$project" >"$g_out" 2>"$g_err"; grc=$?
+    cat "$g_out"; cat "$g_err" >&2
+    gate_out=$(cat "$g_out" "$g_err")
+    rm -f "$g_out" "$g_err"
+    last_reason=$(printf '%s\n' "$gate_out" | grep -E '^GATE: (NO-GO|BLOCKED|ERROR)' | tail -1 | sed -nE 's/.*reason=([^ ]*).*/\1/p')
+    last_hint=$(printf '%s\n' "$gate_out" | grep -E '^GATE: NO-GO' | tail -1 | sed -nE 's/.*hint=([^ ]*).*/\1/p')
+    { grep -vE '^last_(reason|hint)=' "$sd/state.rec" 2>/dev/null
+      printf 'last_reason=%s\nlast_hint=%s\n' "${last_reason:-ok}" "${last_hint:-}"; } > "$sd/state.rec.new" \
+      && mv "$sd/state.rec.new" "$sd/state.rec"
     if [ "$grc" -eq 2 ] && [ "$exit_signal" = yes ]; then
       fc=$(( $(state_get false_completes) + 1 ))
       { grep -vE '^false_completes=' "$sd/state.rec"; printf 'false_completes=%s\n' "$fc"; } > "$sd/state.rec.new" \
@@ -290,6 +321,34 @@ case "$cmd" in
       printf '%s\n' "$open" | sed 's/^/CTL:   - /'
     else
       echo "CTL: OPEN none (all tasks closed)"
+    fi
+    # NEXT= is the mechanical routing the controller must otherwise remember
+    # from the gate's hint token: state.rec carries the pair recorded by the
+    # last close-iteration, and this maps it to one sentence. No judgment:
+    # the mapping lives in one place and matches references/gate.md section 3.
+    lr=$(g last_reason); lh=$(g last_hint)
+    if [ -z "$lr" ] || [ "$lr" = ok ]; then
+      echo "CTL: NEXT (nothing pending at last gate check - claim when ready)"
+    else
+      case "$lh" in
+        fix-AC)              next="dispatch a fixer scoped to the open-FAIL AC's files" ;;
+        bind-seat)           next="dispatch a cold judging seat - do NOT send a coder" ;;
+        fix-instrument)      next="repair the probe/verify instrument; the number is untrusted" ;;
+        bind-calib-grades)   next="grade the calib fixtures and bind AC-N#good=PASS / AC-N#bad=FAIL this iteration" ;;
+        fix-calib-fixture)   next="restore the named calibration fixture (or restamp with valid paths)" ;;
+        restore-best)        next="return the tree to best_score state before claiming" ;;
+        continue-forge)      next="keep forging: dry_streak < dry_limit, run another exhaustion round" ;;
+        write-strategy-delta) next="record what genuinely changes next, then close-iteration" ;;
+        rebind-judged)       next="re-run the judging seat at the current digest and bind fresh" ;;
+        set-exit-signal)     next="the block never claimed exit - close-iteration --exit-signal yes" ;;
+        redesign-AC)         next="the metric and the cold seat disagree: rewrite the AC or its direction" ;;
+        proposal-to-user)    next="the contract changed: propose an amendment, do not apply it" ;;
+        graceful-deliver)    next="time fuse expired: deliver the passing work as best-so-far and stop" ;;
+        replan-or-stop)      next="same error signature twice: change strategy (HALF_OPEN) or stop and report" ;;
+        *)                   next="read reason=$lr (hint=$lh) and route literally" ;;
+      esac
+      echo "CTL: NEXT reason=$lr hint=${lh:-none}"
+      echo "CTL:   -> $next"
     fi
     exit 0 ;;
 esac
