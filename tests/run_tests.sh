@@ -1344,6 +1344,31 @@ mkdir -p "$T/t98e"; g1=$(bash "$GATE" --digest --project "$T/t98e"); rc=$?
 assert_rc "99d empty project digest rc0" 0 $rc
 assert_has "99d empty digest well-formed" '^[0-9a-f]{12}$' "$g1"
 
+# 104 goal_loop.sh unattended outer loop: README promises --dry-run rehearses
+# without API and the loop trusts ONLY gate rc. Pin the three exits here.
+LOOPT="$here/scripts/goal_loop.sh"
+# init seeds the template; second init refuses (contract editing = re-approval)
+mkproj t104i
+out=$(bash "$LOOPT" --init --project "$T/t104i" 2>&1); assert_rc "104a init seeds contract" 0 $?
+[ -f "$T/t104i/.goal/goal.md" ] && ok "104a goal.md seeded from template" || no "104a goal.md seeded from template"
+out=$(bash "$LOOPT" --init --project "$T/t104i" 2>&1); assert_rc "104a re-init -> rc2" 2 $?
+assert_has "104a re-init points at R3" 'R3' "$out"
+# dry-run, nothing claimed: gate says NO-GO every round -> fuse trips, rc3
+mkproj t104b; contract t104b "- AC-1 | t | check: \`true\` | expected: exit=0"
+out=$(bash "$LOOPT" --continue --dry-run --max-iterations=2 --project "$T/t104b" 2>&1)
+assert_rc "104b unclaimed -> iterations-exhausted" 3 $?
+assert_has "104b loops without API (dry-run plan line)" 'DRY-RUN iter=' "$out"
+assert_has "104b fuse reason" 'iterations-exhausted' "$out"
+# dry-run with a valid claim on disk: first round's gate check is GO -> deliver
+mkproj t104c; contract t104c "- AC-1 | t | check: \`true\` | expected: exit=0"
+close_iter t104c
+out=$(bash "$LOOPT" --continue --dry-run --max-iterations=5 --project "$T/t104c" 2>&1)
+assert_rc "104c claim verified -> DELIVERED" 0 $?
+assert_has "104c delivery line" 'DELIVERED iter=1' "$out"
+# no-contract continue refuses (rc4) - state error, not an iteration
+mkdir -p "$T/t104d"
+bash "$LOOPT" --continue --dry-run --project "$T/t104d" >/dev/null 2>&1; assert_rc "104d continue without contract -> rc4" 4 $?
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1
