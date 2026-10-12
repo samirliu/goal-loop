@@ -221,6 +221,15 @@ case "$cmd" in
     # R13 sidecar: iter|score|judge (either may be 'none'). Two comparable
     # points later let the gate refuse DIVERGENCE:score-vs-judge claims.
     printf '%s|%s|%s\n' "$new" "${score:-none}" "${judge_score:-none}" >> "$sd/scores.rec"
+    # task= is ledger law (R12/A1): wave ids must carry their backend. A bare
+    # T<n> means an ordinary one-shot subagent wave - normalize it (crew:1)
+    # instead of letting the self-audit refuse the claim after the fact.
+    case "$task" in
+      '') echo "CTL: ERROR missing-task (ledger needs --task T<n> or T<n>[backend:N])" >&2; exit 4 ;;
+      T[0-9]*) printf '%s' "$task" | grep -qE '^T[0-9]+$' && task="$task[crew:1]" ;;
+    esac
+    printf '%s' "$task" | grep -qE '^T[0-9]+\[(teams|crew):[0-9]+\]( *\(fallback:[a-z0-9-]+\))?$' \
+      || { echo "CTL: ERROR bad-task:$task (schema: T<n>[crew:N] / T<n>[teams:N], bare T<n> normalizes to crew:1)" >&2; exit 4; }
     printf '%s\n' "## iteration $new" "task=$task" "files_modified=$files" \
       "checks_pass=$cp" "checks_fail=$cf" "checks_unverifiable=$cu" \
       "error_signature=$errsig" "progress=$progress" "exit_signal=$exit_signal" \

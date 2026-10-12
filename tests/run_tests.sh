@@ -389,10 +389,10 @@ printf -- '- [ ] T1 | do the thing\n' > "$T/h46/.goal/work-plan.md"
 close_iter h46
 out=$(bash "$CTL" status --project "$T/h46" 2>&1)
 assert_has "46 status prints iteration line" 'CTL: STATUS iter=1/' "$out"
-assert_has "46 status prints last block" 'CTL: LAST task=T1' "$out"
+assert_has "46 status prints last block" 'CTL: LAST task=T1\[crew:1\]' "$out"
 assert_has "46 status prints next task" 'CTL: NEXT T1 | do the thing' "$out"
 
-# 47 teams-backend wave marker is free-form in the log (task= is not gated)
+# 47 teams-backend wave marker survives normalization (teams wave passes through)
 mkproj t47; contract t47 "- AC-1 | f | check: \`true\` | expected: exit=0"
 bash "$CTL" close-iteration --project "$T/t47" --task 'T2[teams:3]' --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
@@ -1343,6 +1343,20 @@ assert_has "102 hint routes" 'hint=fix-calib-fixture' "$out"
 mkdir -p "$T/t98e"; g1=$(bash "$GATE" --digest --project "$T/t98e"); rc=$?
 assert_rc "99d empty project digest rc0" 0 $rc
 assert_has "99d empty digest well-formed" '^[0-9a-f]{12}$' "$g1"
+
+# 103b? no - 103 done. 105: ledger task= is normalized/validated at WRITE time
+# so R12 never surprises the controller after the fact (caught by self-audit)
+mkproj t105; contract t105 "- AC-1 | t | check: \`true\` | expected: exit=0"
+bash "$CTL" close-iteration --project "$T/t105" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate >/dev/null 2>&1
+grep -q 'task=T1\[crew:1\]' "$T/t105/.goal/loop-log.md" && ok "105a bare T1 normalizes to crew:1" || no "105a bare T1 normalizes to crew:1"
+# free-form junk is refused at write (not silently ledgered for the audit to catch)
+out=$(bash "$CTL" close-iteration --project "$T/t105" --task SELF-AUDIT --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate 2>&1); assert_rc "105b free-form task -> write refused" 4 $?
+assert_has "105b names the task schema" 'schema' "$out"
+grep -q 'task=SELF-AUDIT' "$T/t105/.goal/loop-log.md" && no "105c junk task must not be ledgered" || ok "105c junk task kept out of ledger"
 
 # 104 goal_loop.sh unattended outer loop: README promises --dry-run rehearses
 # without API and the loop trusts ONLY gate rc. Pin the three exits here.
