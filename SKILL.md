@@ -92,6 +92,7 @@ check + 一次盖章 + 一波派工 + 一次门控——没有 interfaces.md、�
 ```
 bash scripts/goal_ctl.sh init  --project .                 # 再填 .goal/goal.md
 bash scripts/goal_ctl.sh stamp --project . --auto          # 冒烟过 check 之后
+# --task T1 合法（自动规范为 T1[crew:1]）；自由格式 id 会在写入时被拒
 bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes
 # 退出码即门控裁决；非 0 看 status 的 NEXT 一行

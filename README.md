@@ -42,7 +42,7 @@ cp goal-loop/agents/*.md ~/.claude/agents/
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check
 # 无 .goal/ 的目录里应返回 rc=4, reason=no-goal-dir —— 说明门控在岗
 bash ~/.claude/skills/goal-loop/tests/run_tests.sh
-# 场景套件应 fail=0 全绿 —— 门控语义的完整回归（当前 ~281 项）
+# 场景套件应 fail=0 全绿 —— 门控语义的完整回归（当前 ~285 项）
 bash ~/.claude/skills/goal-loop/tests/docs_consistency.sh
 # 文档一致性（含 Teams 后端铁律字面量）应 CONSISTENT
 bash ~/.claude/skills/goal-loop/examples/quickstart-one-shot/run.sh

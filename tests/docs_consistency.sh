@@ -136,6 +136,8 @@ SKILL.md|calib:
 SKILL.md|小任务快车道
 scripts/goal_ctl.sh|CTL: NEXT
 scripts/goal_ctl.sh|last_hint=
+references/gate.md|crew:1]
+scripts/goal_ctl.sh|bad-task:
 scripts/goal_gate.sh|check-mutated-ledger
 scripts/goal_gate.sh|ledger_digest
 scripts/goal_gate.sh|unknown-ac-id

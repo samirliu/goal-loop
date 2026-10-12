@@ -21,6 +21,8 @@ high-water for maximize, low-water for minimize.
 checks_unverifiable error_signature progress exit_signal false_complete
 digest score strategy_delta. `task=T2[crew:3]` marks a one-shot crew wave,
 `task=T2[teams:3]` a Teams-backend wave (same gate authority either way).
+Bare `T<n>` normalizes to `T<n>[crew:1]` at write; free-form task ids are
+refused by ctl (R12/A1 is enforced by the writer, not only by the audit).
 `score=` holds the objective value or `none`; `strategy_delta=`
 is mandatory whenever `progress=no` (R10).
 
