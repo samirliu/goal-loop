@@ -957,6 +957,20 @@ close_iter t84 --score 10
 out=$(bash "$GATE" --check --project "$T/t84" 2>&1); assert_rc "84 notes never block -> GO" 0 $?
 assert_has "84 tautology suspect named" 'tautology-suspect:AC-2' "$out"
 
+# 84b judged artifact path containing spaces must bind whole
+mkproj t84b
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | j | check: `cat "out/my artifact.svg"` | expected: judged\n'
+  printf '\n## Approval\n\napproved: PENDING\n'
+} > "$T/t84b/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t84b" --auto >/dev/null
+mkdir -p "$T/t84b/out" && printf '<svg/>' > "$T/t84b/out/my artifact.svg"
+close_iter t84b
+bind_v t84b "AC-1|PASS|1|DIGEST|cmd|artifact: out/my artifact.svg digest: $(sha256sum "$T/t84b/out/my artifact.svg" | cut -c1-64)"
+out=$(bash "$GATE" --check --project "$T/t84b" 2>&1); assert_rc "84b artifact with spaces -> GO" 0 $?
+
 # 85 probe campaign (2026-10-12): duplicate AC id must never silently resolve
 mkproj t85
 {
