@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# evidence_cache.sh - measurement-once helper (domain-patterns.md section 11).
+# evidence_cache.sh - measurement-once helper (references/patterns.md section 11).
 # Runs a check command only when the hash of its INPUT FILES changed; on a
 # cache hit it replays the previously captured stdout, so metric contracts
 # (last stdout line = the number) keep working. Output is archived under

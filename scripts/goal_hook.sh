@@ -11,7 +11,7 @@
 # The injected reason is sanitized the way the built-in /goal sanitizes its
 # "Goal continuing" channel: strip <>&, collapse whitespace, cap 240 chars,
 # GOAL_LOOP_GATE: prefix (grep-able). The user can always override with Esc.
-# Install (settings.json -> hooks.Stop), see INTEGRATION.md section 5.7:
+# Install (settings.json -> hooks.Stop):
 #   {"hooks":{"Stop":[{"hooks":[{"type":"command",
 #     "command":"bash ~/.claude/skills/goal-loop/scripts/goal_hook.sh"}]}]}}
 # The hook reads .goal/ relative to its cwd (Claude Code runs hooks in the

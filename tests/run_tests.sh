@@ -266,7 +266,7 @@ grep -q '^time_budget=60$' "$T/t30/.goal/state.rec" && ok "30 close preserves ti
 d=$(grep '^deadline=' "$T/t30/.goal/state.rec" | cut -d= -f2)
 [ -n "$d" ] && [ "$d" -gt 0 ] && ok "30 close preserves deadline" || no "30 deadline lost on close"
 
-# 31 evidence_cache: measurement-once semantics (domain-patterns.md section 11)
+# 31 evidence_cache: measurement-once semantics (references/patterns.md section 11)
 mkproj t31 >/dev/null
 printf 'v1\n' > "$T/t31/in.txt"
 cd "$T/t31"

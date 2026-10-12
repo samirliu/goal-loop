@@ -20,3 +20,5 @@ Rules for this folder:
 | case-tsp-minimize | algorithmic optimization | forge + minimize | minimize objective, R11 direction, R9 probe, forge exhaust |
 | case-logcli | multi-module CLI | threshold | NO-GO next-batch, interface freeze, multi-worker domains, R12 |
 | case-svg-dash | 2D data viz | threshold + judged | calibration anchors, cold-seat, judged×deterministic mix |
+| case-probe-campaign | hostile contracts ×10 | mixed | rule seams: duplicate ids, verify filters, state garbage, ledger self-mutation |
+| case-probe-campaign2 | state-machine loops ×10 | mixed | sequences: breaker arcs, ratchet arcs, fuse escalation, check-order walk, audit lifecycle |

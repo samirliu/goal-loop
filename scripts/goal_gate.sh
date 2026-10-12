@@ -449,7 +449,7 @@ fi
 
 # -5..-9. dual condition on the last loop block + verdicts (R1,R5,R7) ----
 lb=$(last_block) || fail "empty-loop-log"
-# Canonical loop-log key set (schema doc: references/exit-gate.md section 1).
+# Canonical loop-log key set (schema doc: references/gate.md section 1).
 # last_block() consumes key=value lines generically, so the set is declared
 # here: it keeps parser and schema doc mutually named and advisory-checks
 # presence (exit codes unchanged; exit_signal and digest stay hard-checked).
