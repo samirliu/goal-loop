@@ -87,7 +87,10 @@ flush
 # Divergence guard (R13) needs judge scores. Missing them degrades it to a
 # no-op; say so loudly instead of silently losing the tooth.
 if grep -qE 'expected: *judged' "$sd/goal.md" 2>/dev/null; then
-  has_j=$(r < "$sd/scores.rec" 2>/dev/null | awk -F'|' '$3 ~ /^-?[0-9]+(\.[0-9]+)?$/ {c++} END{print c+0}')
+  # scores.rec may legitimately not exist yet (first rounds) - a missing file
+  # means zero judge scores, not a reader error leaking to stderr.
+  has_j=0
+  [ -f "$sd/scores.rec" ] && has_j=$(r < "$sd/scores.rec" | awk -F'|' '$3 ~ /^-?[0-9]+(\.[0-9]+)?$/ {c++} END{print c+0}')
   [ "${has_j:-0}" -gt 0 ] || echo "AUDIT: WARN A8 judge-score-unrecorded (judged ACs present but no numeric judge= in scores.rec; pass --judge-score to close-iteration - R13 divergence guard is inert)"
 fi
 

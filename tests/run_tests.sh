@@ -1063,6 +1063,122 @@ printf '# c\n## Acceptance criteria\n\n- AC-1 | x | check: `true` | expected: ex
 out=$(bash "$CTL" stamp --project "$T/t92" --auto 2>&1); assert_rc "92 stamp without placeholder rc4" 4 $?
 assert_has "92 placeholder refusal named" 'stamp-refused' "$out"
 
+# 93 breaker state-machine arc (probe campaign 2 / S2): CLOSED -> HALF_OPEN ->
+# claim at HALF_OPEN without strategy owes R10 -> progress resets -> claim at
+# OPEN blocked. Drives ctl+gate as a sequence, not one rule.
+mkproj t93
+contract t93 "- AC-1 | ok | check: \`test -f a.txt\` | expected: exit=0"
+printf 'x' > "$T/t93/a.txt"
+close_iter t93 --progress yes --exit-signal no
+out=$(bash "$CTL" close-iteration --project "$T/t93" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress no --no-gate 2>&1)
+assert_rc "93a no-progress alone refused (R10)" 4 $?
+out=$(bash "$CTL" close-iteration --project "$T/t93" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress no \
+  --strategy-delta "change tack" --no-gate 2>&1); rc93=$?
+[ "$rc93" = 0 ] && grep -q '^breaker=HALF_OPEN$' "$T/t93/.goal/state.rec" \
+  && ok "93b no-progress+delta -> HALF_OPEN" || no "93b breaker arc"
+# manual block: claim at HALF_OPEN whose strategy_delta is none owes R10
+{ printf '## iteration 4\ntask=T1[crew:1]\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=no\nexit_signal=yes\nfalse_complete=no\ndigest=%s\nscore=none\nstrategy_delta=none\n' \
+    "$(bash "$GATE" --digest --project "$T/t93")"; } >> "$T/t93/.goal/loop-log.md"
+out=$(bash "$GATE" --check --project "$T/t93" 2>&1); assert_rc "93c HALF_OPEN claim w/o strategy -> rc2" 2 $?
+assert_has "93c R10 duty named" 'missing-strategy-delta' "$out"
+close_iter t93 --progress yes
+out=$(bash "$CTL" close-iteration --project "$T/t93" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes 2>&1)
+assert_rc "93d progress reset + claim GO" 0 $?
+grep -q '^breaker=CLOSED$' "$T/t93/.goal/state.rec" && ok "93d breaker back CLOSED" || no "93d breaker stuck"
+# OPEN: three consecutive no-progress (limit 2)
+for i in 1 2 3; do close_iter t93 --progress no --strategy-delta "try $i"; done
+grep -q '^no_progress_streak=3$' "$T/t93/.goal/state.rec" && grep -q '^breaker=OPEN$' "$T/t93/.goal/state.rec" \
+  && ok "93e streak 3>2 -> OPEN" || no "93e OPEN arc"
+out=$(bash "$CTL" close-iteration --project "$T/t93" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress no \
+  --strategy-delta "x" --exit-signal yes 2>&1); rc93=$?
+assert_rc "93f claim at OPEN -> rc3" 3 $rc93
+assert_has "93f breaker-open named" 'breaker-open' "$out"
+
+# 94 repeated-error grind: two blocks with the same non-none error_signature
+# -> BLOCKED (grind detector); none-signatures never trip it.
+mkproj t94
+contract t94 "- AC-1 | ok | check: \`test -f a.txt\` | expected: exit=0"
+printf 'x' > "$T/t94/a.txt"
+close_iter t94 --progress yes --error-signature "boom"
+out=$(bash "$CTL" close-iteration --project "$T/t94" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --error-signature "boom" --exit-signal yes 2>&1); rc94=$?
+assert_rc "94 two same error_signature -> rc3" 3 $rc94
+assert_has "94 grind detector named" 'repeated-error' "$out"
+close_iter t94 --progress yes --error-signature none
+close_iter t94 --progress yes --error-signature none
+out=$(bash "$CTL" close-iteration --project "$T/t94" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --error-signature none --exit-signal yes 2>&1)
+assert_rc "94b none signatures never trip" 0 $?
+
+# 95 hint routing beyond bind-seat (probe campaign 2 / S6): score-regressed ->
+# restore-best, contract-tampered -> proposal-to-user. NO-GO lines must carry
+# actionable routing or the controller stalls on dead pointers.
+mkproj t95
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | v | check: `cat v.txt` | metric: `v=(-?[0-9]+)` | expected: maximize\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t95/.goal/goal.md"
+printf 'v=10\n' > "$T/t95/v.txt"
+bash "$CTL" stamp --project "$T/t95" --auto >/dev/null
+close_iter t95 --score 10
+sed -i 's/^best_score=.*/best_score=99/' "$T/t95/.goal/state.rec"
+printf 'v=50\n' > "$T/t95/v.txt"
+out=$(bash "$CTL" close-iteration --project "$T/t95" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --score 50 --exit-signal yes 2>&1); rc95=$?
+assert_rc "95a regression -> rc2" 2 $rc95
+assert_has "95a hint restore-best" 'hint=restore-best' "$out"
+sed -i 's/- AC-1 | v |/- AC-1 | tampered |/' "$T/t95/.goal/goal.md"
+out=$(bash "$GATE" --check --project "$T/t95" 2>&1); assert_rc "95b tampered -> rc2" 2 $?
+assert_has "95b hint proposal-to-user" 'hint=proposal-to-user' "$out"
+
+# 96 forge dry-streak round sequence (probe campaign 2 / S1): dry rounds
+# accumulate, a premature claim is refused AND counted by the ratchet, an
+# exhausted dry streak allows GO.
+mkproj t96; FORGE=1 contract t96 "- AC-1 | ok | check: \`test -f a.txt\` | expected: exit=0"
+printf 'x' > "$T/t96/a.txt"
+# dry_limit defaults to 3; dry_streak increments when --dry yes lands.
+close_iter t96 --dry yes          # dry_streak 1
+close_iter t96 --dry yes          # dry_streak 2
+out=$(bash "$CTL" close-iteration --project "$T/t96" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --dry yes --exit-signal yes 2>&1); rc96=$?
+# lands at dry_streak=3 >= dry_limit=3 -> dry exhausted -> claim allowed
+assert_rc "96a claim at dry=limit (3>=3) GO" 0 $rc96
+assert_has "96a forge GO line" 'GATE: GO' "$out"
+grep -q '^dry_streak=3$' "$T/t96/.goal/state.rec" && ok "96a dry_streak reached limit" || no "96a dry_streak: $(grep dry_streak "$T/t96/.goal/state.rec")"
+# reset with a fix round, then claim too early (dry=1 < 3)
+close_iter t96 --dry no           # dry_streak 0
+close_iter t96 --dry yes          # dry_streak 1
+out=$(bash "$CTL" close-iteration --project "$T/t96" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --dry yes --exit-signal yes 2>&1); rc96=$?
+assert_rc "96b premature forge claim (dry 2<3) rc2" 2 $rc96
+assert_has "96b not-dry named" 'not-dry' "$out"
+assert_has "96b counted by ratchet" 'false-complete-counted=1' "$out"
+
+# 97 A8 warn is quiet about a missing scores.rec (probe campaign 2 / D10):
+# judged AC present, scores.rec never created -> WARN on stdout, no reader
+# error leaking to stderr. (close-iteration always creates the sidecar, so
+# the ledger is hand-written without it.)
+mkproj t97
+contract t97 "- AC-1 | s | check: \`true\` | expected: judged"
+printf '## iteration 1\ntask=T1[crew:1]\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t97/.goal/loop-log.md"
+rm -f "$T/t97/.goal/scores.rec"
+out=$(bash "$AUDIT" --project "$T/t97" 2>/dev/null)
+assert_has "97 A8 warns (stdout)" 'A8 judge-score-unrecorded' "$out"
+err=$(bash "$AUDIT" --project "$T/t97" 2>&1 >/dev/null)
+printf '%s' "$err" | grep -qE 'No such file|not found' && no "97 stderr leaks reader error" || ok "97 no stderr noise for missing scores.rec"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1
