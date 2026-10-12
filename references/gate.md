@@ -36,6 +36,9 @@ Calibration rows share the same 6-field schema under derived ids: `AC-1#good`
 and `AC-1#bad` - the seat's grades on the declared fixtures (see `calib:`
 below). Derived ids count as ordinary rows for bind/stale rules: a digest
 move or iteration bump voids them exactly like the parent verdict.
+Orphan rows (ids absent from the contract) are ignored by `--check` and
+caught by `--verify` as `unknown-ac-id` (by design: the gate measures the
+contract, not the ledger).
 
 `.goal/goal.md` AC grammar:
 `- AC-N | <statement> | check: \`<command>\` | [probe: \`<cmd>\`] | [baseline: delta|abs] | [metric: \`regex one capture group\`] | [tolerance: <rel>] | [calib: good=<f> bad=<f>] | expected: <spec>`
