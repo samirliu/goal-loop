@@ -67,6 +67,17 @@ state_get(){                                           # $1 key -> value or empt
   grep -E "^$1=" "$sd/state.rec" | r | tail -1 | cut -d= -f2-
 }
 
+ledger_digest(){                                       # 8 hex over the LEDGER state files
+  # Checks may write evidence (.goal/evidence/) but nothing else under
+  # .goal/ (R6). The tree digest is blind to .goal, so the ledger gets its
+  # own before/after guard - a check editing goal.md/state/verdicts mid-run
+  # would otherwise measure one state and report another.
+  { for f in goal.md state.rec loop-log.md verdicts.rec scores.rec work-plan.md baseline.md interfaces.md; do
+      [ -f "$sd/$f" ] && { printf '%s\n' "$f"; r < "$sd/$f"; }
+    done
+  } | hash_std | cut -c1-8
+}
+
 last_block(){                                          # last loop-log block as key=value lines
   [ -f "$sd/loop-log.md" ] || return 1
   gawk '
@@ -104,6 +115,7 @@ fail(){
     not-dry:*)               hint=continue-forge ;;
     missing-strategy-delta*) hint=write-strategy-delta ;;
     verdicts-stale:*)        hint=rebind-judged ;;
+    score-missing:*)         hint=objective-not-metric ;;
     not-claimed:*)           hint=set-exit-signal ;;
     DIVERGENCE:*)            hint=redesign-AC ;;
     contract-tampered:*)     hint=proposal-to-user ;;
@@ -158,7 +170,8 @@ extract_metric(){                                       # $1 text $2 regex-or-em
     if (match($0, ENVIRON["MRE"], m)) {
       for (i = 1; i <= length(m); i++) if (m[i] != "") { print m[i]; exit }
     }
-  }' | sed -nE 's/^[^0-9]*(-?[0-9]+(\.[0-9]+)?).*/\1/p' | head -1
+  }' | sed -nE 's/^[^-0-9]*(-?[0-9]+(\.[0-9]+)?).*/\1/p' | head -1
+  # the leading-chars class must keep '-', or a captured "-10" is rewritten to 10
 }
 # Optional contract-level objective: maximize|minimize AC-N  (score-regressed guard).
 # objective_dir: "maximize" (higher is better) or "minimize" (lower is better).
@@ -317,6 +330,8 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
 }
 
 digest=$(tree_digest) || state_err "unreadable-project"
+# ledger state before the rerun batch (the tree guard is blind to .goal/)
+[ -d "$sd" ] && ld_check0=$(ledger_digest) || ld_check0=none
 if [ "$mode" = digest ]; then echo "$digest"; exit 0; fi
 
 # -0. state present and complete -----------------------------------------
@@ -326,8 +341,15 @@ tmo=$(state_get check_timeout); [ -n "$tmo" ] || tmo=120
 case "$tmo" in ''|*[!0-9]*) state_err "bad-check-timeout:$tmo" ;; esac
 
 if [ "$mode" = verify ]; then
+  # an AC id that is not in the contract is a usage error, not a verdict -
+  # silently "skipping" a typo'd id would let --verify AC-9 report all-clear
+  # while the real ACs were never measured.
+  for rid in $positional; do
+    printf '%s\n' "$(all_ac_ids)" | grep -qx "$rid" \
+      || { echo "GATE: NO-GO reason=unknown-ac-id:$rid (no such AC in the contract)" >&2; exit 4; }
+  done
   want="$positional "
-  d0="$digest"; nfail=0; nbroken=0; nchecked=0
+  d0="$digest"; ld0=$(ledger_digest); nfail=0; nbroken=0; nchecked=0
   for id in $(all_ac_ids); do
     if [ -n "${want// /}" ]; then case "$want" in *" $id "*) ;; *) continue ;; esac; fi
     cls=$(classify_expected "$(ac_expected "$id")")
@@ -342,6 +364,11 @@ if [ "$mode" = verify ]; then
   done
   d1=$(tree_digest)
   [ "$d0" = "$d1" ] || { echo "GATE: NO-GO reason=check-mutated-tree:before=$d0 after=$d1" >&2; exit 2; }
+  # the ledger is digest-excluded from the tree, so a check editing goal.md /
+  # state.rec / verdicts.rec mid-rerun is invisible to the tree guard: same
+  # before/after rule, over the LEDGER state files (evidence/ stays free).
+  ld1=$(ledger_digest)
+  [ "$ld0" = "$ld1" ] || { echo "GATE: NO-GO reason=check-mutated-ledger:before=$ld0 after=$ld1 (a check wrote the ledger mid-run - only .goal/evidence/ is fair game)" >&2; exit 2; }
   [ "$nchecked" -gt 0 ] || { echo "GATE: VERIFY-OK nothing-deterministic"; exit 0; }
   if [ $((nfail+nbroken)) -eq 0 ]; then echo "GATE: VERIFY-OK checked=$nchecked"; exit 0; fi
   echo "GATE: NO-GO reason=verify-failures:fail=$nfail broken=$nbroken" >&2
@@ -370,7 +397,15 @@ fi
 iter=$(state_get iteration); breaker=$(state_get breaker)
 fc=$(state_get false_completes); streak=$(state_get no_progress_streak)
 maxit=$(state_get max_iterations); npl=$(state_get no_progress_limit)
-case "$iter$breaker$fc$streak$maxit$npl" in *[!0-9A-Z_a-z_]*) state_err "unparseable-state" ;; esac
+# the numeric counters must actually be numbers (a corrupted or hand-edited
+# state.rec with iteration=banana must never reach an arithmetic comparison);
+# breaker is the only word-valued key in this set.
+for k in iteration false_completes no_progress_streak max_iterations no_progress_limit replans; do
+  case "$(state_get "$k")" in
+    ''|*[!0-9]*) state_err "unparseable-state:$k=$(state_get "$k") (numeric key not numeric)" ;;
+  esac
+done
+case "$breaker" in CLOSED|HALF_OPEN|OPEN) : ;; *) state_err "unparseable-state:breaker=$breaker" ;; esac
 
 # -1. contract frozen by a matching stamp (R3) ----------------------------
 stamp=$(r < "$sd/goal.md" | grep -E '^approved: [0-9a-f]{6,}' | tail -1 | awk '{print $2}')
@@ -433,6 +468,10 @@ lbdigest=$(printf '%s\n' "$lb" | grep -E '^digest=' | tail -1 | cut -d= -f2-)
 
 ac_ids=$(all_ac_ids)
 [ -n "$ac_ids" ] || fail "contract-empty:no AC ids"
+# a duplicated AC id is never silently resolved (the parser would pick one of
+# the two lines by luck): same id twice = malformed contract.
+dups=$(r < "$sd/goal.md" | grep -oE '^- AC-[0-9]+' | sort | uniq -d)
+[ -z "$dups" ] || fail "contract-malformed:duplicate AC id(s): ${dups#- } (one line per AC id)"
 # fail-closed contract sanity: an AC line whose expected:/check: tokens are
 # missing (typo'd or half-written) must never silently default to exit=0 and
 # get a free PASS - a silent hole in the eval surface is the worst defect class.
@@ -479,7 +518,10 @@ for id in $ac_ids; do
     # saw - `artifact: <path>` and `digest: <sha256-hex>`. The gate recomputes
     # and compares. A verdict that does not name what it examined, or names a
     # file whose bytes changed since, is worthless: verdict-unbound.
-    art=$(printf '%s' "$ev" | grep -oE 'artifact:[[:space:]]*[^[:space:]]+' | head -1 | sed -E 's/^artifact:[[:space:]]*//')
+    # greedy match to the digest: token - artifact paths with spaces are
+    # legal file names; stopping at whitespace silently loses the path.
+    art=$(printf '%s' "$ev" | sed -nE 's/^.*artifact:[[:space:]]*(.*[^[:space:]])[[:space:]]+digest:.*/\1/p' | head -1)
+    [ -n "$art" ] || art=$(printf '%s' "$ev" | grep -oE 'artifact:[[:space:]]*[^[:space:]]+' | head -1 | sed -E 's/^artifact:[[:space:]]*//')
     dig=$(printf '%s' "$ev" | grep -oE 'digest:[[:space:]]*(sha256:)?[a-f0-9]{8,64}' | head -1 | sed -E 's/^digest:[[:space:]]*(sha256:)?//')
     [ -n "$art" ] && [ -n "$dig" ] || fail "verdict-unbound:$id (PASS evidence must cite artifact: <path> and digest: <sha256> - the seat must say WHAT it judged)"
     if [ -f "$project/$art" ]; then
@@ -501,6 +543,13 @@ done
 # -10. guard against checks that mutated the tree mid-verification --------
 digest2=$(tree_digest)
 [ "$digest" = "$digest2" ] || fail "check-mutated-tree:before=$digest after=$digest2"
+# .goal is digest-excluded from the tree, so the tree guard is blind there:
+# a check editing goal.md/state.rec/verdicts.rec mid-run would measure one
+# state and report another while leaving the tree pristine. The ledger gets
+# its own before/after digest; evidence/ is the only directory checks may
+# write (R6), so it stays out of the hash.
+ld2=$(ledger_digest)
+[ "$ld_check0" = "$ld2" ] || fail "check-mutated-ledger:before=$ld_check0 after=$ld2 (a check wrote the ledger mid-run - only .goal/evidence/ is fair game)"
 
 # -11. forge: floors alone are not an exit; exhaustion is -----------------
 if [ "$exit_mode" = forge ]; then
@@ -530,11 +579,14 @@ if [ -n "$primary" ]; then
   # score is treated as holding, not moving.
   tol=$(ac_tolerance "$primary"); case "$tol" in ''|*[!0-9.]*) tol=0 ;; esac
   if [ -n "$best" ] && [ "$best" != "none" ]; then
+    # Noise band = b +/- |b|*t. Multiplying (1-t)*b flips the band on
+    # NEGATIVE water marks (b=-10,t=.1 -> band -9, so -10 reads "regressed");
+    # absolute value keeps the band on the correct side in every sign.
     if [ "$pdir" = minimize ]; then
-      awk -v c="$observed_score" -v b="$best" -v t="$tol" 'BEGIN{exit !(c+0 <= (b+0)*(1+t))}' \
+      awk -v c="$observed_score" -v b="$best" -v t="$tol" 'BEGIN{a=(b<0)?-b:b; exit !(c+0 <= b+0 + a*t)}' \
         || fail "score-regressed:current=$observed_score best=$best dir=minimize tol=$tol (restore the best-scoring state or do not claim)"
     else
-      awk -v c="$observed_score" -v b="$best" -v t="$tol" 'BEGIN{exit !(c+0 >= (b+0)*(1-t))}' \
+      awk -v c="$observed_score" -v b="$best" -v t="$tol" 'BEGIN{a=(b<0)?-b:b; exit !(c+0 >= b+0 - a*t)}' \
         || fail "score-regressed:current=$observed_score best=$best dir=maximize tol=$tol (restore the best-scoring state or do not claim)"
     fi
   fi

@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.5.0)
+# Goal Loop (v2.5.1)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 

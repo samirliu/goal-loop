@@ -80,6 +80,17 @@ case "$cmd" in
         exit 2
       fi
     fi
+    # the objective must point at a score-producing AC (expected: maximize|
+    # minimize); pointing it at a judged/exit AC can never yield a score and
+    # only surfaces mid-loop as score-missing - catch the mismatch at t=0.
+    oac=$(r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1)
+    if [ -n "$oac" ]; then
+      oexp=$(r < "$sd/goal.md" | awk -v id="$oac" '$0 ~ "^- "id"[ |]"' | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1 | tr -d '[:space:]')
+      case "$oexp" in
+        maximize|minimize) : ;;
+        *) echo "CTL: ERROR stamp-refused: objective points at $oac whose expected= is not maximize|minimize (it would never produce a score)" >&2; exit 2 ;;
+      esac
+    fi
     h=$( { r < "$sd/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
            r < "$sd/goal.md" | grep -E '^(exit|objective):' || true
          } | hash_std | cut -c1-8)
@@ -109,6 +120,11 @@ case "$cmd" in
     esac
     marker=""; [ "$auto" -eq 1 ] && marker=" auto"
     sed -i "s/^approved: .*/approved: $h $(date +%F)$marker/" "$sd/goal.md"
+    # sed silently no-ops when the goal.md has no approved: placeholder line -
+    # the whole stamp then pretends success while the contract stays
+    # unstamped. Fail loud instead (the contract template always ships one).
+    grep -E '^approved:' "$sd/goal.md" | head -1 | grep -qE '[0-9a-f]{6,}' \
+      || { echo "CTL: ERROR stamp-refused: goal.md has no 'approved: <placeholder>' line to write the hash onto" >&2; exit 4; }
     grep -E '^approved:' "$sd/goal.md" | head -1 ;;
 
   bind)
@@ -199,7 +215,18 @@ case "$cmd" in
     fi
     # forge bookkeeping: --dry is mandatory there and must be consistent
     fc=$(state_get false_completes); [ -n "$fc" ] || fc=0
-    [ "$fcomplete" = yes ] && fc=$((fc+1))
+    # The MECHANICAL ratchet below owns the false-complete count when the
+    # gate runs. A manual --false-complete yes next to it used to DOUBLE-COUNT
+    # (the first caught claim instantly BLOCKed the loop - defeating R1's
+    # "two catches" rule). The flag only still means something with --no-gate,
+    # where nothing else counts; with the gate running, note and defer.
+    if [ "$fcomplete" = yes ]; then
+      if [ "$no_gate" -eq 1 ]; then
+        fc=$((fc+1))
+      else
+        echo "CTL: NOTE false-complete-flag-ignored (the gate ratchet counts catches mechanically)" >&2
+      fi
+    fi
     mi=$(state_get max_iterations); [ -n "$mi" ] || mi=$max_iterations
     drys=$(state_get dry_streak); [ -n "$drys" ] || drys=0
     # best_score: water mark for the objective (R11). maximize -> high-water

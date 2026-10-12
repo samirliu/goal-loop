@@ -126,7 +126,16 @@ scripts/goal_gate.sh|hint=fix-AC
 scripts/goal_gate.sh|verdict-unbound
 scripts/goal_gate.sh|contract-malformed
 scripts/goal_ctl.sh|false-complete-counted
-scripts/goal_gate.sh|tautology-suspect
+scripts/goal_gate.sh|check-mutated-ledger
+scripts/goal_gate.sh|ledger_digest
+scripts/goal_gate.sh|unknown-ac-id
+scripts/goal_gate.sh|duplicate AC id
+scripts/goal_gate.sh|unparseable-state:
+scripts/goal_ctl.sh|never produce a score
+scripts/goal_ctl.sh|stamp-refused: goal.md has no
+scripts/goal_ctl.sh|false-complete-flag-ignored
+references/gate.md|check-mutated-ledger
+references/gate.md|NEGATIVE water marks
 scripts/goal_gate.sh|metric-flat
 scripts/goal_gate.sh|extract_metric
 scripts/goal_gate.sh|strip_ansi

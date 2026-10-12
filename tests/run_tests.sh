@@ -957,6 +957,98 @@ close_iter t84 --score 10
 out=$(bash "$GATE" --check --project "$T/t84" 2>&1); assert_rc "84 notes never block -> GO" 0 $?
 assert_has "84 tautology suspect named" 'tautology-suspect:AC-2' "$out"
 
+# 85 probe campaign (2026-10-12): duplicate AC id must never silently resolve
+mkproj t85
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\n## Exit policy\n\nexit: threshold\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | foo | check: `false` | expected: exit=0\n'
+  printf -- '- AC-1 | foo | check: `true` | expected: exit=0\n'
+  printf '\n## Approval\n\napproved: PENDING\n'
+} > "$T/t85/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t85" --auto >/dev/null
+close_iter t85
+out=$(bash "$GATE" --check --project "$T/t85" 2>&1); assert_rc "85 duplicate AC id -> rc2" 2 $?
+assert_has "85 duplicate named" 'duplicate AC id' "$out"
+
+# 86 --verify with an unknown AC id is a usage error, not an all-clear
+mkproj t86
+contract t86 '- AC-1 | x | check: `true` | expected: exit=0'
+out=$(bash "$GATE" --verify AC-99 --project "$T/t86" 2>&1); assert_rc "86 verify unknown id -> rc4" 4 $?
+assert_has "86 unknown id named" 'unknown-ac-id:AC-99' "$out"
+
+# 87 letters in numeric state keys never reach arithmetic
+mkproj t87
+contract t87 '- AC-1 | x | check: `true` | expected: exit=0'
+close_iter t87
+sed -i 's/^iteration=.*/iteration=banana/' "$T/t87/.goal/state.rec"
+out=$(bash "$GATE" --check --project "$T/t87" 2>&1); assert_rc "87 alpha numeric-key -> rc4" 4 $?
+assert_has "87 offending key named" 'unparseable-state:iteration' "$out"
+
+# 88 negative scores: metric capture AND the tolerance band must survive '-'
+mkproj t88
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | m | check: `printf "score=-10\\n"` | metric: `score=(-?[0-9.]+)` | tolerance: 0.1 | expected: maximize\n'
+  printf '\n## Approval\n\napproved: PENDING\n'
+} > "$T/t88/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t88" --auto >/dev/null
+out=$(bash "$GATE" --verify --project "$T/t88" 2>&1)
+assert_has "88 negative score extracted with sign" 'observed=-10' "$out"
+close_iter t88 --score -10
+out=$(bash "$GATE" --check --project "$T/t88" 2>&1); assert_rc "88 negative band holds -> GO" 0 $?
+
+# 89 ledger guard: a check that rewrites goal.md mid-run is caught in-run
+mkproj t89
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\n## Exit policy\n\nexit: threshold\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | mutates | check: `echo x >> .goal/verdicts.rec; true` | expected: exit=0\n'
+  printf '\n## Approval\n\napproved: PENDING\n'
+} > "$T/t89/.goal/goal.md"
+# (verdicts.rec is ledger, digest-excluded - the tree guard is blind there;
+#  the --check batch ends with the same stamp check --verify got for free)
+bash "$CTL" stamp --project "$T/t89" --auto >/dev/null
+close_iter t89
+out=$(bash "$GATE" --check --project "$T/t89" 2>&1); rc89=$?
+[ "$rc89" -ne 0 ] && ok "89 ledger-mutating check never ends GO (rc=$rc89)" || no "89 ledger-mutating check ended GO"
+# --verify mode must also refuse a self-rewriting check in-run
+printf '# Goal contract - test\n\n## Objective\n\nt\n\n## Exit policy\n\nexit: threshold\n\n## Acceptance criteria\n\n- AC-1 | mutates | check: `sed -i "s/PENDING/PENX/" .goal/goal.md && true` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n' > "$T/t89/.goal/goal.md"
+out=$(bash "$GATE" --verify --project "$T/t89" 2>&1); assert_rc "89b verify self-rewrite caught" 2 $?
+assert_has "89b ledger mutation named" 'check-mutated-ledger' "$out"
+
+# 90 manual false-complete flag + mechanical ratchet must not double-count
+mkproj t90
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | f | check: `false` | expected: exit=0\n'
+  printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
+} > "$T/t90/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t90" --auto >/dev/null
+out=$(bash "$CTL" close-iteration --project "$T/t90" --task T1 --files a.txt \
+  --checks-pass 0 --checks-fail 1 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --false-complete yes 2>&1); rc90=$?
+assert_has "90 manual flag noted not double-counted" 'false-complete-flag-ignored' "$out"
+grep -q '^false_completes=1$' "$T/t90/.goal/state.rec" && ok "90 fc counted exactly 1" || no "90 fc double-counted"
+
+# 91 stamp: objective pointing at a non-metric AC is refused at t=0
+mkproj t91
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | judged obj | check: `true` | expected: judged\n'
+  printf '\n## Approval\n\napproved: PENDING\n'
+} > "$T/t91/.goal/goal.md"
+out=$(bash "$CTL" stamp --project "$T/t91" --auto 2>&1); assert_rc "91 objective-on-judged refused" 2 $?
+assert_has "91 stamp refusal names the AC" 'never produce a score' "$out"
+# and stamp with NO approved: placeholder line fails loud, not silent
+mkproj t92
+printf '# c\n## Acceptance criteria\n\n- AC-1 | x | check: `true` | expected: exit=0\n' > "$T/t92/.goal/goal.md"
+out=$(bash "$CTL" stamp --project "$T/t92" --auto 2>&1); assert_rc "92 stamp without placeholder rc4" 4 $?
+assert_has "92 placeholder refusal named" 'stamp-refused' "$out"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

@@ -65,6 +65,11 @@ UNVERIFIABLE needs `PROBE=.. REASON=..`; empty evidence voids a PASS.
 `.goal/ .git/`. Evidence dir `.goal/evidence/` is digest-excluded. The gate
 fingerprints before/after every rerun batch: a moved digest = a check
 mutated the tree -> NO-GO.
+The tree digest is blind to `.goal/`, so the ledger gets its own before/after
+digest (`ledger_digest`, over goal.md/state.rec/loop-log.md/verdicts.rec/
+scores.rec/work-plan.md/baseline.md/interfaces.md) - a check that rewrites
+the contract or a state file mid-rerun trips `check-mutated-ledger`; only
+`.goal/evidence/` is fair game for checks (R6).
 
 ## 3 Check order (first failure decides)
 
@@ -126,7 +131,9 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
 - **R11** objective score never delivers worse than `best_score`
   (maximize: current >= best; minimize: current <= best) - restore
   the best-scoring state or do not claim. `tolerance:` widens the comparison
-  by a relative band so benchmark noise is "holds", not "regressed".
+  by a relative band so benchmark noise is "holds", not "regressed". The band
+  is computed from `|best|*tol` so it survives NEGATIVE water marks (a
+  multiply-by-(1-tol) flips the band when best<0).
 - **R14** measurement honesty (v2.5): metric regex pins the number, ANSI is
   stripped before matching, stderr rides along in verdicts (fail-loud),
   judged PASS must bind its artifact hash, and deterministic checks that
