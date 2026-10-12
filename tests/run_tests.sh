@@ -1307,6 +1307,15 @@ assert_has "101c needs both" 'BOTH' "$out"
 printf '# Goal contract\n\n## Acceptance criteria\n\n- AC-1 | j | check: `true` | calib: good=g.txt bad=g.txt | expected: judged\n\n## Approval\n\napproved: PENDING\n' > "$T/t101/.goal/goal.md"
 out=$(bash "$CTL" stamp --project "$T/t101" --auto 2>&1); assert_rc "101d one ruler both ends -> stamp refused" 2 $?
 assert_has "101d names the single-ruler problem" 'SAME file' "$out"
+# 101e the literal "calib:" inside a backtick check command is command text,
+# not a calibration declaration - a deterministic AC that GREPS for it must
+# stamp clean, never trip the not-judged refusal (found by self-audit)
+mkproj t101e
+printf '# Goal contract\n\n## Acceptance criteria\n\n- AC-1 | docs | check: `grep -q "calib:" refs.md` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n' > "$T/t101e/.goal/goal.md"
+printf 'calib: good=x bad=y\n' > "$T/t101e/refs.md"
+out=$(bash "$CTL" stamp --project "$T/t101e" --auto 2>&1); assert_rc "101e calib literal inside check -> stamps clean" 0 $?
+out=$(bash "$GATE" --check --project "$T/t101e" 2>&1)
+printf '%s' "$out" | grep -qE 'calibration' && no "101e gate must not invent calibration" || ok "101e gate must not invent calibration"
 
 # 102 gate-side fixture decay: stamp with both fixtures, then the bad one
 # disappears mid-loop -> fail-closed BROKEN instrument, never silent exemption

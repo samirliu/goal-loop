@@ -95,12 +95,15 @@ case "$cmd" in
     # both fixtures, and the fixture files must exist in the tree NOW - t=0
     # exposure so the loop never discovers mid-run that the yardstick is gone.
     while IFS= read -r ac_line; do
-      printf '%s' "$ac_line" | grep -qE 'calib:' || continue
+      # backtick spans are command text; strip before spotting calib: so a check
+      # that greps the literal "calib:" cannot masquerade as a calibration claim
+      ac_cline=$(printf '%s' "$ac_line" | sed -E 's/`[^`]*`//g')
+      printf '%s' "$ac_cline" | grep -qE 'calib:' || continue
       ac_id=$(printf '%s' "$ac_line" | sed -nE 's/^- (AC-[0-9]+).*/\1/p')
       exp=$(printf '%s' "$ac_line" | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1 | tr -d '[:space:]')
       [ "$exp" = judged ] || { echo "CTL: ERROR stamp-refused: $ac_id declares calib: but expected= is not judged (calibration measures a seat, not a command)" >&2; exit 2; }
-      cg=$(printf '%s' "$ac_line" | sed -nE 's/^.*calib:[^|]*good *= *([^ |]+).*/\1/p' | tail -1)
-      cb=$(printf '%s' "$ac_line" | sed -nE 's/^.*calib:[^|]*bad *= *([^ |]+).*/\1/p' | tail -1)
+      cg=$(printf '%s' "$ac_cline" | sed -nE 's/^.*calib:[^|]*good *= *([^ |]+).*/\1/p' | tail -1)
+      cb=$(printf '%s' "$ac_cline" | sed -nE 's/^.*calib:[^|]*bad *= *([^ |]+).*/\1/p' | tail -1)
       { [ -n "$cg" ] && [ -n "$cb" ]; } || { echo "CTL: ERROR stamp-refused: $ac_id calib: needs BOTH good= and bad= fixtures" >&2; exit 2; }
       [ -f "$project/$cg" ] || { echo "CTL: ERROR stamp-refused: $ac_id good fixture $cg not found in the tree" >&2; exit 2; }
       [ -f "$project/$cb" ] || { echo "CTL: ERROR stamp-refused: $ac_id bad fixture $cb not found in the tree" >&2; exit 2; }

@@ -180,9 +180,12 @@ ac_tolerance(){ ac_line_for "$1" | sed -nE 's/^.*tolerance: *([0-9.]+).*/\1/p' |
 # PASS only after grading both correctly (#good=PASS, #bad=FAIL, same
 # iteration+digest). A too-lenient seat passes the good fixture but fails the
 # bad one, and the claim is refused mechanically.
-ac_calib_good(){ ac_line_for "$1" | sed -nE 's/^.*calib:[^|]*good *= *([^ |]+).*/\1/p' | tail -1; }
-ac_calib_bad(){ ac_line_for "$1"  | sed -nE 's/^.*calib:[^|]*bad *= *([^ |]+).*/\1/p' | tail -1; }
-ac_calib_declared(){ ac_line_for "$1" | grep -qE 'calib:[^|]*(good|bad) *=' && echo yes || echo no; }
+# Backtick spans are command text, not calib declarations: strip them first
+# so an AC whose check greps the literal "calib:" is not mistaken for calibrated.
+ac_calib_line(){ ac_line_for "$1" | sed -E 's/`[^`]*`//g'; }
+ac_calib_good(){ ac_calib_line "$1" | sed -nE 's/^.*calib:[^|]*good *= *([^ |]+).*/\1/p' | tail -1; }
+ac_calib_bad(){ ac_calib_line "$1"  | sed -nE 's/^.*calib:[^|]*bad *= *([^ |]+).*/\1/p' | tail -1; }
+ac_calib_declared(){ ac_calib_line "$1" | grep -qE 'calib:[^|]*(good|bad) *=' && echo yes || echo no; }
 sha256_std(){                                           # one file -> 64 hex
   if command -v sha256sum >/dev/null 2>&1; then sha256sum < "$1" | cut -c1-64
   elif command -v openssl >/dev/null 2>&1; then openssl dgst -sha256 "$1" | awk '{print $NF}'
