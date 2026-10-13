@@ -24,7 +24,12 @@ digest score strategy_delta. `task=T2[crew:3]` marks a one-shot crew wave,
 Bare `T<n>` normalizes to `T<n>[crew:1]` at write; free-form task ids are
 refused by ctl (R12/A1 is enforced by the writer, not only by the audit).
 `score=` holds the objective value or `none`; `strategy_delta=`
-is mandatory whenever `progress=no` (R10).
+is mandatory whenever `progress=no` (R10). Optional v2.8 key `strategy=<label>`
+(the wave's attack direction, one word; folded single-line exactly like
+`strategy_delta`, default `none` when `close-iteration --strategy` was not
+given). It is deliberately NOT in the gate's advisory key list - legacy
+ledgers must read silent. `status` uses it for per-strategy score attribution
+(efficiency windows over `scores.rec`; see SKILL.md Step 4).
 
 `.goal/verdicts.rec` 6 fields: `id|verdict|iter|digest|command|evidence`.
 Deterministic ACs: records are bookkeeping; the gate's rerun is the
@@ -93,7 +98,9 @@ The tree digest is blind to `.goal/`, so the ledger gets its own before/after
 digest (`ledger_digest`, over goal.md/state.rec/loop-log.md/verdicts.rec/
 scores.rec/work-plan.md/baseline.md/interfaces.md) - a check that rewrites
 the contract or a state file mid-rerun trips `check-mutated-ledger`; only
-`.goal/evidence/` is fair game for checks (R6).
+`.goal/evidence/` is fair game for checks (R6). Peer-notes (v2.8 protocol,
+see crew.md §4) live under `.goal/evidence/peer-notes/` - invisible to both
+digests by construction.
 
 ## 3 Check order (first failure decides)
 
@@ -154,6 +161,11 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
 - **R6** workers never WRITE `.goal/`; only goal_ctl.sh writes state. Reads
   are limited to the worker's own inbox file and files its brief explicitly
   names - nothing else under `.goal/` (ledger, verdicts, other inboxes).
+  Exception (v2.8): each worker may APPEND at most one line per iteration to
+  `.goal/evidence/peer-notes/<task>.md` - the shared-findings pool. The
+  evidence directory is digest-excluded and note-free, so this cannot move
+  any fingerprint; the exception covers that single path and nothing else
+  (protocol law in crew.md §4: claims not instructions).
 - **R7** judged verdicts bind (iter, digest); digest move voids all judged
   verdicts, no sharding. Deterministic exempt (gate recomputes).
 - **R8** findings bind evidence - manufactured discoveries as forbidden as

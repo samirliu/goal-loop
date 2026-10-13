@@ -3,7 +3,7 @@
 Contents: [1 how to read] [2 executable-correctness] [3 behavioral]
 [4 quantitative] [5 perceptual/quality] [6 data] [7 documents]
 [8 long-running] [9 metric robustness] [10 project patterns slot]
-[11 measurement-once / evidence cache].
+[11 measurement-once / evidence cache] [12 complex-goal contract shapes].
 This file is deliberately DOMAIN-FREE: it names claim families and the
 shape a failable check must have - never tools or industries. Concrete
 recipes belong to each project (section 10).
@@ -138,3 +138,28 @@ must produce it ONCE per input state, not once per check:
   environment invocations across a multi-hour loop because two sibling
   checks re-measured the same artifacts every gate exit - the
   measurement-once shape cuts that to one pass per input state.
+
+## 12 complex-goal contract shapes
+
+For open-ended goals ("as good as it can get"), one AC family rarely
+carries the whole objective. The shape that keeps eval honest is three
+layers, at least one AC from each when the goal is genuinely complex:
+
+- **floor** - correctness that must never regress. `exit=0` checks from
+  families 2/3/6 (tests, golden, invariants). Cheap to re-run every gate;
+  the only thing they prove is "nothing broke".
+- **objective** - the single primary number. Family 4 with
+  `objective: maximize|minimize AC-N`, a `probe:` instrument self-check
+  (R9) and a `tolerance:` noise band. This is the loop's gradient; if you
+  cannot name one number, the goal is not yet optimizable - say so in the
+  contract and let the objective line stay empty (threshold exit).
+- **horizon** - what the number does NOT see. Family 5 judged ACs with
+  `calib:` good/bad fixtures (R15) on the qualities the metric can chase
+  away from (perceptual quality, realism, readability). A complex goal
+  with only floors + objective is a Goodhart machine waiting to happen.
+
+If a complex goal will not yield all three layers, that is contract
+information too: name the missing layer in the summary so the user knows
+which failure mode is unprotected. Attribution (v2.8) needs the objective
+layer to record `--strategy` labels; without it, the efficiency block has
+nothing to attribute.

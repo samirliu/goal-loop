@@ -18,7 +18,7 @@ pass=0; failn=0
 ok(){ pass=$((pass+1)); echo "  ok   - $1"; }
 no(){ failn=$((failn+1)); echo "  FAIL - $1"; }
 assert_rc(){ [ "$3" = "$2" ] && ok "$1 (rc=$3)" || no "$1 (want rc=$2 got rc=$3)"; }
-assert_has(){ printf '%s' "$3" | grep -qE "$2" && ok "$1" || no "$1"; }
+assert_has(){ printf '%s' "$3" | grep -qE -- "$2" && ok "$1" || no "$1"; }
 
 mkproj(){ p="$T/$1"; mkdir -p "$p"; bash "$CTL" init --project "$p" >/dev/null; }
 
@@ -1454,6 +1454,240 @@ d=$(bash "$GATE" --digest --project "$T/t108b")
 sed -i "s/^digest=X$/digest=$d/" "$T/t108b/.goal/loop-log.md"
 out=$(bash "$GATE" --check --project "$T/t108b" 2>&1); assert_rc "108b bare legacy id still claims" 0 $?
 assert_has "108b legacy NOTE emitted" 'task-id-legacy' "$out"
+
+# ---------------------------------------------------------------------------
+# v2.8 eval-drive: --strategy attribution + EFFICIENCY (advisory, rc-neutral)
+# ---------------------------------------------------------------------------
+
+# helper: stall the ledger without touching gate semantics
+stall(){ printf 'no_progress_streak=1\n' >> "$1/.goal/state.rec"; }
+# handwritten ledger blocks: $1 proj, $2.. alternating STRAT/TASK per block
+hblocks(){ local p="$T/$1/.goal/loop-log.md" n=1; : > "$p"
+  shift
+  while [ $# -ge 2 ]; do
+    printf '## iteration %d\ntask=%s\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=deadbeefcafe\nscore=none\nstrategy_delta=none\nstrategy=%s\n' "$n" "$1" "$2" >> "$p"; n=$((n+1)); shift 2 || break
+  done; }
+scorefile(){ local f="$T/$1/.goal/scores.rec"; : > "$f"; shift; local n=1 kv
+  for kv in "$@"; do printf '%s|%s|none\n' "$n" "$kv" >> "$f"; n=$((n+1)); done; }
+
+# 109a --strategy writes a strategy= line
+mkproj t109a; contract t109a "- AC-1 | t | check: \`true\` | expected: exit=0"
+bash "$CTL" close-iteration --project "$T/t109a" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy cache-rework --no-gate >/dev/null 2>&1
+assert_has "109a strategy written" 'strategy=cache-rework' "$(cat "$T/t109a/.goal/loop-log.md")"
+# 109b omitted => strategy=none
+mkproj t109b; contract t109b "- AC-1 | t | check: \`true\` | expected: exit=0"
+bash "$CTL" close-iteration --project "$T/t109b" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --no-gate >/dev/null 2>&1
+assert_has "109b default strategy none" 'strategy=none' "$(cat "$T/t109b/.goal/loop-log.md")"
+# 109c newline+tab fold to single line; gate rc unchanged on a claiming run
+mkproj t109c; contract t109c "- AC-1 | t | check: \`true\` | expected: exit=0"
+bash "$CTL" close-iteration --project "$T/t109c" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --exit-signal yes \
+  --strategy "$(printf 'x\ny\tz')" --no-gate >/dev/null 2>&1
+assert_has "109c folded to one line" '^strategy=x y z$' "$(cat "$T/t109c/.goal/loop-log.md")"
+[ "$(grep -cE '^## iteration' "$T/t109c/.goal/loop-log.md")" = 1 ] \
+  && ok "109c no block shred" || no "109c label shredded the block"
+out=$(bash "$GATE" --check --project "$T/t109c" 2>&1); assert_rc "109c gate still GO with folded label" 0 $?
+# 109d edge whitespace trimmed
+mkproj t109d; contract t109d "- AC-1 | t | check: \`true\` | expected: exit=0"
+bash "$CTL" close-iteration --project "$T/t109d" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy "  pad  " --no-gate >/dev/null 2>&1
+assert_has "109d label trimmed" '^strategy=pad$' "$(cat "$T/t109d/.goal/loop-log.md")"
+# 109e legacy block without strategy reads fine + attribution-unused (objective)
+mkproj t109e; contract t109e "- AC-1 | t | check: \`true\` | expected: maximize"
+printf 'objective: maximize AC-1\n' >> "$T/t109e/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t109e" --auto >/dev/null 2>&1
+printf '## iteration 1\ntask=T1[crew:1]\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=deadbeefcafe\nscore=none\nstrategy_delta=none\n' > "$T/t109e/.goal/loop-log.md"
+out=$(bash "$CTL" status --project "$T/t109e" 2>&1); assert_rc "109e legacy block status rc0" 0 $?
+assert_has "109e attribution-unused fires" 'attribution-unused:' "$out"
+# 109f audit stays clean with strategy present
+mkproj t109f; contract t109f "- AC-1 | t | check: \`true\` | expected: exit=0"
+bash "$CTL" close-iteration --project "$T/t109f" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy probe-first --no-gate >/dev/null 2>&1
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t109f" 2>&1); assert_rc "109f audit clean w/ strategy" 0 $?
+assert_has "109f audit says clean" 'AUDIT: clean' "$out"
+# 109g R10 unchanged: progress=no still demands --strategy-delta
+mkproj t109g; contract t109g "- AC-1 | t | check: \`true\` | expected: exit=0"
+bash "$CTL" close-iteration --project "$T/t109g" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress no --strategy label-only --no-gate >/dev/null 2>&1
+assert_rc "109g strategy label does not excuse R10" 4 $?
+
+# 110 slope math - deterministic ledgers via handwritten blocks + scores.rec
+obj110(){ # $1 proj NAME under $T, optional $2 = tolerance token (inserted BEFORE expected)
+  local p="$T/$1" tol=""
+  [ -n "${2:-}" ] && tol=" $2 |"
+  contract "$1" "- AC-1 | t | check: \`true\` |${tol} expected: maximize"
+  printf 'objective: maximize AC-1\n' >> "$p/.goal/goal.md"
+  bash "$CTL" stamp --project "$p" --auto >/dev/null 2>&1; }
+# 110a anchors over none rows: scores 10,none,11 => +0.5 /2 exploit
+mkproj t110a; obj110 t110a ""; hblocks t110a T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110a 10 none 11
+out=$(bash "$CTL" status --project "$T/t110a" 2>&1); assert_rc "110a rc0" 0 $?
+assert_has "110a slope +0.5 over span 2" 'strategy=A \+0.5 /2 iters -> exploit' "$out"
+# 110b window of none scores => unmeasured (needs other numeric data)
+mkproj t110b; obj110 t110b ""; hblocks t110b T1[crew:1] A T1[crew:1] A T1[crew:1] B T1[crew:1] B; scorefile t110b none none 5 6
+out=$(bash "$CTL" status --project "$T/t110b" 2>&1)
+assert_has "110b unmeasured window" 'strategy=A n=0 unmeasured' "$out"
+assert_has "110b numeric window still slopes" 'strategy=B \+1.0 /1 iters -> exploit' "$out"
+# 110c single numeric point => no divide
+mkproj t110c; obj110 t110c ""; hblocks t110c T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110c none 12 none
+out=$(bash "$CTL" status --project "$T/t110c" 2>&1)
+assert_has "110c n=1 unmeasured" 'strategy=A n=1 unmeasured' "$out"
+# 110d negative scores format (maximize, negative slope => no advisory)
+mkproj t110d; obj110 t110d ""; hblocks t110d T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110d -5 -7 -11 -12.5
+out=$(bash "$CTL" status --project "$T/t110d" 2>&1)
+assert_has "110d negative slope format" 'strategy=A \-2.5 /3 iters$' "$out"
+printf '%s' "$out" | grep -qE '-> exploit|-> prune' && no "110d no advisory on negative maximize" || ok "110d no advisory on negative maximize"
+# 110e minimize objective flips exploit
+mkproj t110e; contract t110e "- AC-1 | t | check: \`true\` | expected: maximize"; printf 'objective: minimize AC-1\n' >> "$T/t110e/.goal/goal.md"; bash "$CTL" stamp --project "$T/t110e" --auto >/dev/null 2>&1
+hblocks t110e T1[crew:1] A T1[crew:1] A; scorefile t110e 100 90
+out=$(bash "$CTL" status --project "$T/t110e" 2>&1)
+assert_has "110e minimize direction exploit" 'strategy=A \-10.0 /1 iters -> exploit' "$out"
+# 110f label returns later => two windows (window order = file order)
+mkproj t110f; obj110 t110f ""; hblocks t110f T1[crew:1] A T1[crew:1] A T1[crew:1] B T1[crew:1] A T1[crew:1] A; scorefile t110f 1 2 3 4 5
+out=$(bash "$CTL" status --project "$T/t110f" 2>&1)
+nA=$(printf '%s\n' "$out" | grep -c '^CTL: EFFICIENCY strategy=A')
+nB=$(printf '%s\n' "$out" | grep -c '^CTL: EFFICIENCY strategy=B')
+[ "$nA" = 2 ] && [ "$nB" = 1 ] && ok "110f two A windows + one B window" || no "110f two A windows + one B window (A=$nA B=$nB)"
+i1=$(printf '%s' "$out" | grep -n 'strategy=A' | head -1 | cut -d: -f1)
+i2=$(printf '%s' "$out" | grep -n 'strategy=B' | head -1 | cut -d: -f1)
+i3=$(printf '%s' "$out" | grep -n 'strategy=A' | tail -1 | cut -d: -f1)
+[ -n "$i1" ] && [ -n "$i2" ] && [ -n "$i3" ] && [ "$i1" -lt "$i2" ] && [ "$i2" -lt "$i3" ] \
+  && ok "110f window order follows file order" || no "110f window order follows file order"
+# 110g flat D>=3 => prune
+mkproj t110g; obj110 t110g ""; hblocks t110g T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110g 12 12 12 12
+assert_has "110g flat prune" 'strategy=A \+0.0 /3 iters -> prune \(flat 3 iters\)' "$(bash "$CTL" status --project "$T/t110g" 2>&1)"
+# 110h tolerance band: tiny drift within tol => flat prune
+mkproj t110h; obj110 t110h "| tolerance: .1"; hblocks t110h T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110h 12.0 12.05 12.1 12.15
+assert_has "110h tol-band flat prune" '-> prune \(flat 3 iters\)' "$(bash "$CTL" status --project "$T/t110h" 2>&1)"
+# 110i negative water mark with tight tol => NOT flat (abs band regression)
+mkproj t110i; obj110 t110i "| tolerance: .01"; hblocks t110i T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110i -10.0 -10.1 -10.3 -10.4
+out=$(bash "$CTL" status --project "$T/t110i" 2>&1)
+assert_has "110i negative slope shown" 'strategy=A \-0.1 /3 iters' "$out"
+printf '%s' "$out" | grep -qE '-> prune' && no "110i abs-band keeps tight tol honest" || ok "110i abs-band keeps tight tol honest"
+# 111a threshold + unstalled => no EFFICIENCY section at all
+mkproj t111a; contract t111a "- AC-1 | t | check: \`true\` | expected: exit=0"
+hblocks t111a T1[crew:1] x T1[crew:1] y; scorefile t111a 1 2
+printf '%s\n' "$(bash "$CTL" status --project "$T/t111a" 2>&1)" | grep -qE 'EFFICIENCY|eval-gap|promote:|attribution-unused' \
+  && no "111a healthy loop prints no efficiency block" || ok "111a healthy loop prints no efficiency block"
+# 111b forge dry_streak=1 fires the block
+mkproj t111b; FORGE=1 contract t111b "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf 'dry_streak=1\n' >> "$T/t111b/.goal/state.rec"
+out=$(bash "$CTL" status --project "$T/t111b" 2>&1)
+assert_has "111b forge stall fires" 'CTL: EFFICIENCY score-data: none recorded' "$out"
+# 111c orphan score row (iter without block) skipped, rc0
+mkproj t111c; obj110 t111c ""; hblocks t111c T1[crew:1] A T1[crew:1] A; scorefile t111c 10 none
+printf '99|7|none\n' >> "$T/t111c/.goal/scores.rec"
+out=$(bash "$CTL" status --project "$T/t111c" 2>&1); assert_rc "111c orphan row rc0" 0 $?
+assert_has "111c slope from real blocks only" 'strategy=A n=1 unmeasured' "$out"
+
+# 112 eval-gap: flat objective scores while stalled
+mkproj t112a; obj110 t112a ""; hblocks t112a T1[crew:1] f T1[crew:1] f T1[crew:1] f; scorefile t112a 50 50 50; stall "$T/t112a"
+out=$(bash "$CTL" status --project "$T/t112a" 2>&1)
+assert_has "112a eval-gap fires" 'eval-gap:' "$out"
+assert_has "112a names goal-critic" 'goal-critic' "$out"
+mkproj t112b; obj110 t112b ""; hblocks t112b T1[crew:1] f T1[crew:1] f; scorefile t112b 50 50; stall "$T/t112b"
+printf '%s\n' "$(bash "$CTL" status --project "$T/t112b" 2>&1)" | grep -qE 'eval-gap' && no "112b two points stay silent" || ok "112b two points stay silent"
+mkproj t112c; obj110 t112c ""; hblocks t112c T1[crew:1] f T1[crew:1] f T1[crew:1] f; scorefile t112c 50 50 50
+printf '%s\n' "$(bash "$CTL" status --project "$T/t112c" 2>&1)" | grep -qE 'eval-gap' && no "112c unstalled stays silent" || ok "112c unstalled stays silent"
+mkproj t112d; contract t112d "- AC-1 | t | check: \`true\` | expected: exit=0"
+hblocks t112d T1[crew:1] f T1[crew:1] f T1[crew:1] f; scorefile t112d 50 50 50; stall "$T/t112d"
+printf '%s\n' "$(bash "$CTL" status --project "$T/t112d" 2>&1)" | grep -qE 'eval-gap' && no "112d no objective stays silent" || ok "112d no objective stays silent"
+mkproj t112e; obj110 t112e "| tolerance: .1"; hblocks t112e T1[crew:1] f T1[crew:1] f T1[crew:1] f; scorefile t112e 12.0 12.05 12.1; stall "$T/t112e"
+assert_has "112e tol-band flat fires" 'eval-gap:' "$(bash "$CTL" status --project "$T/t112e" 2>&1)"
+
+# 113 promote: same task domain 3 consecutive waves while stalled
+mkproj t113a; contract t113a "- AC-1 | t | check: \`true\` | expected: exit=0"
+hblocks t113a T1[crew:1] s T1[crew:1] s T1[crew:1] s; stall "$T/t113a"
+assert_has "113a promote after 3 waves" 'promote: T1 \(3 consecutive waves\) - consider' "$(bash "$CTL" status --project "$T/t113a" 2>&1)"
+# 113b backend/fallback suffixes are transport not identity
+mkproj t113b; contract t113b "- AC-1 | t | check: \`true\` | expected: exit=0"
+hblocks t113b T1[crew:1] s 'T1[teams:2](fallback:teams-unavailable)' s T1 s; stall "$T/t113b"
+assert_has "113b normalized ids count as one domain" 'promote: T1 \(3 consecutive waves\)' "$(bash "$CTL" status --project "$T/t113b" 2>&1)"
+mkproj t113c; contract t113c "- AC-1 | t | check: \`true\` | expected: exit=0"
+hblocks t113c T1[crew:1] s T2[crew:1] s T1[crew:1] s; stall "$T/t113c"
+printf '%s\n' "$(bash "$CTL" status --project "$T/t113c" 2>&1)" | grep -qE 'promote:' && no "113c interleaved stays silent" || ok "113c interleaved stays silent"
+mkproj t113d; contract t113d "- AC-1 | t | check: \`true\` | expected: exit=0"
+hblocks t113d T1[crew:1] s T1[crew:1] s; stall "$T/t113d"
+printf '%s\n' "$(bash "$CTL" status --project "$T/t113d" 2>&1)" | grep -qE 'promote:' && no "113d run of two stays silent" || ok "113d run of two stays silent"
+printf '%s\n' "$(bash "$CTL" status --project "$T/t113a" 2>&1 | grep promote)" | grep -qE 'consider' && ok "113e promote wording is consider" || no "113e promote wording is consider"
+# (unstalled silence covered by 111a pattern; 113a's sibling t113c is stalled-interleaved)
+mkproj t113f; contract t113f "- AC-1 | t | check: \`true\` | expected: exit=0"
+hblocks t113f T1[crew:1] s T1[crew:1] s T1[crew:1] s
+printf '%s\n' "$(bash "$CTL" status --project "$T/t113f" 2>&1)" | grep -qE 'promote:' && no "113f unstalled promote silent" || ok "113f unstalled promote silent"
+
+# 114 peer-notes: digest-blind evidence (protocol is doc-side; teeth here)
+mkproj t114a; contract t114a "- AC-1 | t | check: \`true\` | expected: exit=0"
+close_iter t114a
+d1=$(bash "$GATE" --digest --project "$T/t114a")
+out1=$(bash "$GATE" --check --project "$T/t114a" 2>&1); rc1=$?
+mkdir -p "$T/t114a/.goal/evidence/peer-notes"
+printf 'iter 1: API boundary shifted vs brief\n' >> "$T/t114a/.goal/evidence/peer-notes/T1.md"
+d2=$(bash "$GATE" --digest --project "$T/t114a")
+out2=$(bash "$GATE" --check --project "$T/t114a" 2>&1); rc2=$?
+assert_rc "114a gate still GO with peer-note present" 0 $?
+[ "$d1" = "$d2" ] && ok "114a tree digest blind to peer-notes" || no "114a digest moved by peer-note"
+[ "$rc1" = "$rc2" ] && ok "114a rc stable across peer-note" || no "114a rc shifted by peer-note"
+# docs teeth
+grep -qE 'peer-notes' "$here/references/gate.md" && ok "114c gate.md documents peer-notes" || no "114c gate.md documents peer-notes"
+grep -qE 'peer-notes' "$here/references/crew.md" && ok "114c crew.md documents peer-notes" || no "114c crew.md documents peer-notes"
+grep -qE 'never WRITE' "$here/references/gate.md" && ok "114c R6 never-WRITE clause intact" || no "114c R6 never-WRITE clause intact"
+out=$(bash "$here/tests/docs_consistency.sh" 2>&1); assert_rc "114d docs consistency green" 0 $?
+assert_has "114e patterns C3 for section 12" 'CONSISTENT' "$out"
+
+# 115 regressions
+# 115a T46 literals survive with the efficiency block compiled in
+mkproj h115a >/dev/null; contract h115a "- AC-1 | f | check: \`true\` | expected: exit=0"
+printf -- '- [ ] T1 | do the thing\n' > "$T/h115a/.goal/work-plan.md"
+close_iter h115a
+out=$(bash "$CTL" status --project "$T/h115a" 2>&1); assert_rc "115a status rc0" 0 $?
+assert_has "115a iteration line intact" 'CTL: STATUS iter=1/' "$out"
+assert_has "115a last block intact" 'CTL: LAST task=T1\[crew:1\]' "$out"
+assert_has "115a work-plan NEXT intact" 'CTL: NEXT T1 | do the thing' "$out"
+# 115b STEP derivation unchanged
+mkproj h115b >/dev/null; contract h115b "- AC-1 | f | check: \`true\` | expected: exit=0"
+close_iter h115b
+assert_has "115b step line intact" 'STEP 4-branch' "$(bash "$CTL" status --project "$T/h115b" 2>&1)"
+# 115c NEXT routing line unchanged under a NO-GO hint
+mkproj h115c >/dev/null; contract h115c "- AC-1 | f | check: \`true\` | expected: exit=0"
+printf 'last_reason=open-FAIL:AC-1\nlast_hint=fix-AC\n' >> "$T/h115c/.goal/state.rec"
+out=$(bash "$CTL" status --project "$T/h115c" 2>&1)
+assert_has "115c NEXT routes fix-AC" 'hint=fix-AC' "$out"
+assert_has "115c NEXT sentence present" 'dispatch a fixer' "$out"
+# 115d fresh stamped objective project with no scores yet
+mkproj h115d; obj110 h115d ""
+out=$(bash "$CTL" status --project "$T/h115d" 2>&1); assert_rc "115d empty-score status rc0" 0 $?
+assert_has "115d score-data none" 'CTL: EFFICIENCY score-data: none recorded' "$out"
+# 115e garbage scores.rec rows skipped
+mkproj h115e; obj110 h115e ""; hblocks h115e T1[crew:1] A T1[crew:1] A
+printf 'x|y|z\n' >> "$T/h115e/.goal/scores.rec"
+printf '1|5|none\n2|6|none\n' >> "$T/h115e/.goal/scores.rec"
+out=$(bash "$CTL" status --project "$T/h115e" 2>&1); assert_rc "115e garbage row skipped rc0" 0 $?
+assert_has "115e slope still computed" 'strategy=A \+1.0 /1 iters -> exploit' "$out"
+# 115f legacy v2.7-shaped ledger: zero new lines (golden guard)
+mkdir -p "$T/g115f"; bash "$CTL" init --project "$T/g115f" >/dev/null
+{ printf '# Goal contract - test\n\n## Objective\n\ntest objective\n\n## Acceptance criteria\n\n- AC-1 | f | check: `true` | expected: exit=0\n\n\n## Out of scope\n\n- nothing\n\n## Approval\n\napproved: PENDING\n'; } > "$T/g115f/.goal/goal.md"
+bash "$CTL" stamp --project "$T/g115f" --auto >/dev/null
+d=$(bash "$GATE" --digest --project "$T/g115f")
+printf '%s\n' "## iteration 1" "task=T1[crew:1]" "files_modified=a.txt" "checks_pass=1" "checks_fail=0" "checks_unverifiable=0" "error_signature=none" "progress=yes" "exit_signal=no" "false_complete=no" "digest=$d" "score=none" "strategy_delta=none" >> "$T/g115f/.goal/loop-log.md"
+printf -- '- [ ] T1 | golden task\n' > "$T/g115f/.goal/work-plan.md"
+out=$(bash "$CTL" status --project "$T/g115f" 2>&1)
+assert_has "115f golden STEP present" 'CTL: STEP 3-join' "$out"
+assert_has "115f golden NEXT present" 'NEXT \(nothing pending' "$out"
+printf '%s\n' "$out" | grep -qE 'EFFICIENCY|eval-gap|promote:|attribution-unused' \
+  && no "115f no v2.8 lines on legacy ledger" || ok "115f no v2.8 lines on legacy ledger"
+# 115g all three advisories together, deterministic order (slope lines sorted by window start)
+# A window (2 blocks, climbing -> exploit) then B window (4 flat blocks -> prune);
+# last 3 numeric scores flat -> eval-gap; same task 6 waves -> promote.
+mkproj h115g; obj110 h115g ""; hblocks h115g T1[crew:1] A T1[crew:1] A T1[crew:1] B T1[crew:1] B T1[crew:1] B T1[crew:1] B; scorefile h115g 10 16 10 10 10 10; stall "$T/h115g"
+out=$(bash "$CTL" status --project "$T/h115g" 2>&1)
+i1=$(printf '%s' "$out" | grep -n 'strategy=A .*> exploit' | head -1 | cut -d: -f1)
+i2=$(printf '%s' "$out" | grep -n 'strategy=B .*prune' | head -1 | cut -d: -f1)
+i3=$(printf '%s' "$out" | grep -n 'eval-gap' | head -1 | cut -d: -f1)
+i4=$(printf '%s' "$out" | grep -n 'promote:' | head -1 | cut -d: -f1)
+[ -n "$i1" ] && [ -n "$i2" ] && [ -n "$i3" ] && [ -n "$i4" ] && [ "$i1" -lt "$i2" ] && [ "$i2" -lt "$i3" ] && [ "$i3" -lt "$i4" ] \
+  && ok "115g advisory order deterministic" || no "115g advisory order deterministic"
+assert_has "115g promote present too" 'promote: T1' "$out"
 
 echo
 echo "== results: pass=$pass fail=$failn =="

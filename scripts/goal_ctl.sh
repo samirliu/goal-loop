@@ -11,18 +11,20 @@
 #        --checks-pass N --checks-fail N --checks-unverifiable N
 #        [--progress yes|no] [--exit-signal yes|no] [--error-signature none]
 #        [--false-complete no] [--dry yes|no] [--no-gate]
-#        [--score N] [--judge-score N] [--strategy-delta TEXT]
+#        [--score N] [--judge-score N] [--strategy-delta TEXT] [--strategy TEXT]
 #        (--dry is REQUIRED on exit: forge contracts: yes = this round's
 #         panel+critic produced no new evidence-backed finding)
 #        (--score: objective:maximize|minimize value; --strategy-delta REQUIRED when
-#         the new breaker is HALF_OPEN/OPEN — R10)
+#         the new breaker is HALF_OPEN/OPEN — R10; --strategy is an optional
+#         one-word label for the attack direction this wave tried - eval-drive
+#         v2.8: status derives per-strategy score slopes from it)
 set -u
 export LC_ALL=C.UTF-8
 
 here=$(cd "$(dirname "$0")" && pwd)
 cmd="" project="." auto=0 no_gate=0 max_iterations=12 time_budget=""
 task="" files="" cp="" cf="" cu="" progress=yes exit_signal=no errsig=none fcomplete=no dry=""
-score="" judge_score="" strategy_delta=""
+score="" judge_score="" strategy_delta="" strategy=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -45,7 +47,8 @@ while [ $# -gt 0 ]; do
     --score) [ $# -ge 2 ] || { echo "CTL: ERROR missing-score" >&2; exit 4; }; score="$2"; shift ;;
     --judge-score) [ $# -ge 2 ] || { echo "CTL: ERROR missing-judge-score" >&2; exit 4; }; judge_score="$2"; shift ;;
     --strategy-delta) [ $# -ge 2 ] || { echo "CTL: ERROR missing-strategy-delta" >&2; exit 4; }; strategy_delta="$2"; shift ;;
-    --help|-h) sed -n '2,20p' "$0"; exit 0 ;;
+    --strategy) [ $# -ge 2 ] || { echo "CTL: ERROR missing-strategy" >&2; exit 4; }; strategy="$2"; shift ;;
+    --help|-h) sed -n '2,22p' "$0"; exit 0 ;;
     *) echo "CTL: ERROR unknown-flag:$1" >&2; exit 4 ;;
   esac
   shift
@@ -212,9 +215,13 @@ case "$cmd" in
     sdelta_show=$(printf '%s' "${strategy_delta:-none}" | tr '\n\r\t' '   ')
     case "$sdelta_show" in ''|*[![:print:]]*) sdelta_show=none ;; esac
     [ -n "$sdelta_show" ] || sdelta_show=none
-    # R13 sidecar: iter|score|judge (either may be 'none'). Two comparable
-    # points later let the gate refuse DIVERGENCE:score-vs-judge claims.
-    printf '%s|%s|%s\n' "$new" "${score:-none}" "${judge_score:-none}" >> "$sd/scores.rec"
+    # v2.8 eval-drive: optional strategy label (attack direction of this wave).
+    # Same fold law as strategy_delta; a label never splits on '=' so block
+    # readers stay correct. Not in the gate's advisory key list - optional key.
+    strat_show=$(printf '%s' "${strategy:-none}" | tr '\n\r\t' '   ')
+    case "$strat_show" in ''|*[![:print:]]*) strat_show=none ;; esac
+    strat_show=$(printf '%s' "$strat_show" | sed 's/^ \+//; s/ \+$//')
+    [ -n "$strat_show" ] || strat_show=none
     # task= is ledger law (R12/A1): wave ids must carry their backend. A bare
     # T<n> means an ordinary one-shot subagent wave - normalize it (crew:1)
     # instead of letting the self-audit refuse the claim after the fact.
@@ -224,11 +231,16 @@ case "$cmd" in
     esac
     gp_task_ok "$task" \
       || { echo "CTL: ERROR bad-task:$task (schema: T<n>[crew:N] / T<n>[teams:N], bare T<n> normalizes to crew:1)" >&2; exit 4; }
+    # R13 sidecar: iter|score|judge (either may be 'none'). Two comparable
+    # points later let the gate refuse DIVERGENCE:score-vs-judge claims.
+    # v2.8: written AFTER task validation - a refused close must not orphan a
+    # score row with no iteration block behind it.
+    printf '%s|%s|%s\n' "$new" "${score:-none}" "${judge_score:-none}" >> "$sd/scores.rec"
     printf '%s\n' "## iteration $new" "task=$task" "files_modified=$files" \
       "checks_pass=$cp" "checks_fail=$cf" "checks_unverifiable=$cu" \
       "error_signature=$errsig" "progress=$progress" "exit_signal=$exit_signal" \
       "false_complete=$fcomplete" "digest=$digest" \
-      "score=${score:-none}" "strategy_delta=$sdelta_show" >> "$sd/loop-log.md"
+      "score=${score:-none}" "strategy_delta=$sdelta_show" "strategy=$strat_show" >> "$sd/loop-log.md"
     if [ "$progress" = yes ]; then
       streak=0; breaker=CLOSED; lpi=$new
     else
@@ -374,6 +386,93 @@ case "$cmd" in
       esac
       echo "CTL: NEXT reason=$lr hint=${lh:-none}"
       echo "CTL:   -> $next"
+    fi
+    # ---- v2.8 eval-drive: EFFICIENCY attribution (advisory lines only - it
+    # never changes rc, last_reason/last_hint or the NEXT route). Ledger-is-
+    # truth: reads only loop-log.md + scores.rec. Fires when an objective line
+    # exists (optimization loops always report attribution) or when the loop
+    # is stalled (no_progress_streak>=1, or forge with a live dry_streak).
+    obj_ac=$(gp_objective_ac "$project")
+    obj_dir=$(gp_objective_dir "$project")
+    tol=$( [ -n "$obj_ac" ] && gp_ac_tolerance "$project" "$obj_ac" )
+    tol=${tol:-0}
+    nps=$(g no_progress_streak); drys=$(g dry_streak)
+    case "${nps:-0}" in ''|*[!0-9]*) nps=0;; esac
+    case "${drys:-0}" in ''|*[!0-9]*) drys=0;; esac
+    stalled=0
+    [ "$nps" -ge 1 ] && stalled=1
+    [ "$(gp_contract_mode "$project")" = forge ] && [ "$drys" -ge 1 ] && stalled=1
+    if [ -n "$obj_ac" ] || [ "$stalled" = 1 ]; then
+      sf=/dev/null; [ -s "$sd/scores.rec" ] && sf="$sd/scores.rec"
+      lf=/dev/null; [ -s "$sd/loop-log.md" ] && lf="$sd/loop-log.md"
+      if [ "$sf" = /dev/null ] && [ "$lf" = /dev/null ]; then
+        echo "CTL: EFFICIENCY score-data: none recorded"
+      else
+        gawk -v obj="${obj_dir:-none}" -v tol="$tol" -v stalled="$stalled" '
+          function absv(x){ return x<0 ? -x : x }
+          FILENAME==ARGV[1] {
+            line=$0; sub(/\r$/,"",line)
+            split(line,a,"|")
+            if (a[1] ~ /^[0-9]+$/ && a[2] ~ /^-?[0-9]+(\.[0-9]+)?$/) { SC[a[1]+0]=a[2]; sn++ }
+            next }
+          { line=$0; sub(/\r$/,"",line)
+            if (line ~ /^## iteration/) {
+              num=line; sub(/^[^0-9]+/,"",num); num+=0
+              if (cur>0 && ORD[cur]==num) { STRAT[cur]="none"; TASK[cur]="" }
+              else { cur++; STRAT[cur]="none"; TASK[cur]="" }
+              ORD[cur]=num; blk=cur; next }
+            p=index(line,"=")
+            if (p>1 && cur>0) { k=substr(line,1,p-1); v=substr(line,p+1)
+              sub(/^ +/,"",v); sub(/ +$/,"",v)
+              if (k=="strategy") STRAT[cur]=(v==""?"none":v)
+              else if (k=="task") TASK[cur]=v } }
+          END {
+            if (blk==0) { if (sn==0) print "CTL: EFFICIENCY score-data: none recorded" }
+            else if (sn==0) print "CTL: EFFICIENCY score-data: none recorded"
+            else {
+              i=1
+              while (i<=blk) { j=i
+                while (j<blk && STRAT[j+1]==STRAT[i]) j++
+                lab=STRAT[i]
+                if (lab!="none") {
+                  p1=0; p2=0; nk=0
+                  for (q=i;q<=j;q++) { it=ORD[q]
+                    if ((it in SC) && SC[it] ~ /^-?[0-9]+(\.[0-9]+)?$/) {
+                      v=SC[it]+0; nk++
+                      if (p1==0) { p1=q-i+1; v1=v }
+                      p2=q-i+1; v2=v } }
+                  if (nk<2) printf "CTL: EFFICIENCY strategy=%s n=%d unmeasured\n", lab, nk
+                  else {
+                    D=p2-p1; slope=(v2-v1)/D
+                    band=tol*(absv(v1)>absv(v2)?absv(v1):absv(v2))
+                    adv=""
+                    if (D>=3 && absv(v2-v1)<=band) adv=sprintf(" -> prune (flat %d iters)", D)
+                    else if (obj=="minimize" ? slope < -(band/D) : slope > band/D) adv=" -> exploit"
+                    printf "CTL: EFFICIENCY strategy=%s %+.1f /%d iters%s\n", lab, slope, D, adv } }
+                i=j+1 } }
+            if (stalled+0) {
+              if (obj!="none") {
+                n2=0; for (k in SC) { n2++; kk[n2]=k+0; kv[n2]=SC[k]+0 }
+                for (x=2;x<=n2;x++){ kx=kk[x]; vx=kv[x]; y=x-1
+                  while (y>=1 && kk[y]>kx) { kk[y+1]=kk[y]; kv[y+1]=kv[y]; y-- }
+                  kk[y+1]=kx; kv[y+1]=vx }
+                if (n2>=3) { v1=kv[n2-2]; v2=kv[n2-1]; v3=kv[n2]
+                  mn=v1; mx=v1; if (v2<mn) mn=v2; if (v2>mx) mx=v2
+                  if (v3<mn) mn=v3; if (v3>mx) mx=v3
+                  b3=absv(mx)>absv(mn)?absv(mx):absv(mn)
+                  if (mx-mn <= tol*b3)
+                    print "CTL: eval-gap: objective scores flat while stalled - the eval plane may miss the progress dimension: dispatch goal-critic to draft candidate AC proposals into .goal/proposals/ (user-approved, not applied)" } }
+              prev=""; run=0
+              for (q=1;q<=blk;q++) { id=TASK[q]; sub(/\[.*/,"",id)
+                if (id ~ /^T[0-9]+$/) { if (id==prev) run++; else { prev=id; run=1 }
+                  if (run==3) print "CTL: promote: " id " (3 consecutive waves) - consider a role-card/Teams promotion for this task domain" }
+                else { prev=""; run=0 } } }
+            allnone=1; if (blk<1) allnone=0
+            for (q=1;q<=blk;q++) if (STRAT[q]!="none") { allnone=0; break }
+            if (obj!="none" && allnone)
+              print "CTL: attribution-unused: no --strategy labels recorded - per-strategy attribution is empty (optional: label each wave with its attack direction)"
+          }' "$sf" "$lf" 2>/dev/null || true
+      fi
     fi
     exit 0 ;;
 esac

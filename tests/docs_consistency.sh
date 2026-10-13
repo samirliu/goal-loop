@@ -61,7 +61,7 @@ done
 # load-bearing - silent drift here re-opens the dual-truth hole it closed.
 while IFS='|' read -r f needle; do
   [ -n "$f" ] || continue
-  if grep -qF "$needle" "$f" 2>/dev/null; then
+  if grep -qF -- "$needle" "$f" 2>/dev/null; then
     ok "C5 $f has: $needle"
   else
     bad "C5 $f missing: $needle"
@@ -158,6 +158,19 @@ SKILL.md|hint=
 SKILL.md|bind-seat
 scripts/goal_gate.sh|graceful delivery of passing work
 SKILL.md|不没收已通过的交付
+references/gate.md|strategy=<label>
+references/gate.md|peer-notes
+references/crew.md|peer-notes
+references/patterns.md|complex-goal contract shapes
+SKILL.md|--strategy
+SKILL.md|peer-notes
+SKILL.md|EFFICIENCY
+scripts/goal_ctl.sh|--strategy
+scripts/goal_ctl.sh|strat_show
+scripts/goal_ctl.sh|CTL: EFFICIENCY
+scripts/goal_ctl.sh|eval-gap:
+scripts/goal_ctl.sh|promote:
+scripts/goal_ctl.sh|attribution-unused:
 EOF
 
 # C6 generality: case knowledge stays in examples/. Generic skill surfaces
