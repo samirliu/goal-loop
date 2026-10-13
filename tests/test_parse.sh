@@ -13,6 +13,8 @@ here=$(cd "$(dirname "$0")/.." && pwd)
 . "$here/scripts/goal_parse.sh"
 
 P=$(mktemp -d); trap 'rm -rf "$P"' EXIT
+# BSD/GNU portability (v2.9): in-place sed = shared parser's transform+mv.
+sed_in(){ gp_sed_inplace "$1" "$2"; }
 pass=0; failn=0
 ok(){ pass=$((pass+1)); echo "  ok   - $1"; }
 no(){ failn=$((failn+1)); echo "  FAIL - $1"; }
@@ -61,7 +63,7 @@ p2="$P/obj"; mkdir -p "$p2/.goal"
 printf '# G\n\nobjective: maximize AC-1\n\n## Acceptance criteria\n\n- AC-1 | m | check: `true` | expected: maximize\n\n## Approval\n\napproved: PENDING\n' > "$p2/.goal/goal.md"
 t "objective ac"  "AC-1" "$(gp_objective_ac "$p2")"
 t "objective dir" "maximize" "$(gp_objective_dir "$p2")"
-sed -i 's/^objective: maximize/objective: minimize/' "$p2/.goal/goal.md"
+sed_in 's/^objective: maximize/objective: minimize/' "$p2/.goal/goal.md"
 t "objective dir minimize" "minimize" "$(gp_objective_dir "$p2")"
 # body hash must change when objective changes (R3: frozen surface)
 h1=$(gp_ac_body_hash "$p2")

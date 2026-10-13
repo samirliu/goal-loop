@@ -139,7 +139,8 @@ case "$cmd" in
          } > "$sd/state.rec.new" && mv "$sd/state.rec.new" "$sd/state.rec" ;;
     esac
     marker=""; [ "$auto" -eq 1 ] && marker=" auto"
-    sed -i "s/^approved: .*/approved: $h $(date +%F)$marker/" "$sd/goal.md"
+    gp_sed_inplace "s/^approved: .*/approved: $h $(date +%F)$marker/" "$sd/goal.md" \
+      || { echo "CTL: ERROR stamp-failed: could not write the approved: line" >&2; exit 4; }
     # sed silently no-ops when the goal.md has no approved: placeholder line -
     # the whole stamp then pretends success while the contract stays
     # unstamped. Fail loud instead (the contract template always ships one).
@@ -220,7 +221,7 @@ case "$cmd" in
     # readers stay correct. Not in the gate's advisory key list - optional key.
     strat_show=$(printf '%s' "${strategy:-none}" | tr '\n\r\t' '   ')
     case "$strat_show" in ''|*[![:print:]]*) strat_show=none ;; esac
-    strat_show=$(printf '%s' "$strat_show" | sed 's/^ \+//; s/ \+$//')
+    strat_show=$(printf '%s' "$strat_show" | sed -E 's/^ +//; s/ +$//')
     [ -n "$strat_show" ] || strat_show=none
     # task= is ledger law (R12/A1): wave ids must carry their backend. A bare
     # T<n> means an ordinary one-shot subagent wave - normalize it (crew:1)

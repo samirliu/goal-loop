@@ -20,6 +20,11 @@ no(){ failn=$((failn+1)); echo "  FAIL - $1"; }
 assert_rc(){ [ "$3" = "$2" ] && ok "$1 (rc=$3)" || no "$1 (want rc=$2 got rc=$3)"; }
 assert_has(){ printf '%s' "$3" | grep -qE -- "$2" && ok "$1" || no "$1"; }
 
+# BSD/GNU portability (v2.9): `sed -i` with no extension is GNU-only (on
+# macOS/BSD it swallows the expression as a backup suffix). One in-place
+# substitution = transform to a sibling tmp + atomic mv.
+sed_in(){ local s="$1" f="$2"; sed "$s" "$f" > "$f.tsedtmp" || { rm -f "$f.tsedtmp"; return 1; }; mv -f "$f.tsedtmp" "$f"; }
+
 mkproj(){ p="$T/$1"; mkdir -p "$p"; bash "$CTL" init --project "$p" >/dev/null; }
 
 contract(){ # $1 proj NAME under $T; $2.. = AC lines; optional FORGE=1 / TB=seconds / NOSTAMP=1 env
@@ -105,7 +110,7 @@ bash "$GATE" --check --project "$T/t08" >/dev/null 2>&1; assert_rc "08 unverifia
 
 # 09 contract tamper after stamp
 mkproj t09; contract t09 "- AC-1 | f | check: \`true\` | expected: exit=0"
-sed -i 's/^approved:/&\n- AC-2 | smuggled | check: `true` | expected: exit=0/' "$T/t09/.goal/goal.md" 2>/dev/null
+sed_in 's/^approved:/&\n- AC-2 | smuggled | check: `true` | expected: exit=0/' "$T/t09/.goal/goal.md" 2>/dev/null
 printf -- '- AC-2 | smuggled | check: `true` | expected: exit=0\n' >> "$T/t09/.goal/goal.md"
 close_iter t09
 bash "$GATE" --check --project "$T/t09" >/dev/null 2>&1; assert_rc "09 contract-tampered -> rc2" 2 $?
@@ -141,14 +146,14 @@ out=$(bash "$GATE" --check --project "$T/t13" 2>&1); assert_rc "13 forge not-dry
 assert_has "13 reason not-dry" 'not-dry' "$out"
 
 # 14 forge GO at dry_streak >= limit
-sed -i 's/^dry_streak=.*/dry_streak=3/' "$T/t13/.goal/state.rec"
+sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/t13/.goal/state.rec"
 out=$(bash "$GATE" --check --project "$T/t13" 2>&1); assert_rc "14 forge GO -> rc0" 0 $?
 assert_has "14 GO line says mode=forge" 'mode=forge' "$out"
 
 # 15 forge budget is a fuse -> rc3
 mkproj t15; FORGE=1 contract t15 "- AC-1 | f | check: \`true\` | expected: exit=0"
 close_iter t15 --dry yes
-sed -i 's/^iteration=.*/iteration=13/' "$T/t15/.goal/state.rec"
+sed_in 's/^iteration=.*/iteration=13/' "$T/t15/.goal/state.rec"
 out=$(bash "$GATE" --check --project "$T/t15" 2>&1); assert_rc "15 budget-fuse -> rc3" 3 $?
 assert_has "15 reason budget-fuse" 'budget-fuse' "$out"
 
@@ -206,12 +211,12 @@ done
 
 # 23 exit-policy lines are covered by the stamp (v1.2.1)
 FORGE=1 mkproj t23; FORGE=1 contract t23 "- AC-1 | f | check: \`true\` | expected: exit=0"
-sed -i 's/^exit: forge/exit: threshold/' "$T/t23/.goal/goal.md"   # now threshold: no --dry needed
+sed_in 's/^exit: forge/exit: threshold/' "$T/t23/.goal/goal.md"   # now threshold: no --dry needed
 close_iter t23
 out=$(bash "$GATE" --check --project "$T/t23" 2>&1); assert_rc "23a exit flip after stamp -> rc2" 2 $?
 assert_has "23a reason contract-tampered" 'contract-tampered' "$out"
 mkproj t24; contract t24 "- AC-1 | f | check: \`true\` | expected: exit=0"
-sed -i 's/^## Out of scope/exit: forge\n## Out of scope/' "$T/t24/.goal/goal.md"
+sed_in 's/^## Out of scope/exit: forge\n## Out of scope/' "$T/t24/.goal/goal.md"
 close_iter t24 --dry yes        # line now reads forge to ctl too - keep it writable
 out=$(bash "$GATE" --check --project "$T/t24" 2>&1); assert_rc "23b exit line smuggled -> rc2" 2 $?
 assert_has "23b reason contract-tampered" 'contract-tampered' "$out"
@@ -248,7 +253,7 @@ mkproj t28 >/dev/null; TB=1 contract t28 "- AC-1 | f | check: \`true\` | expecte
 # deterministically expired: deadline=1 (epoch 1) is always in the past - no
 # reliance on machine speed (a fast runner used to hit the same-second
 # boundary and wrongly answer GO)
-sed -i 's/^deadline=.*/deadline=1/' "$T/t28/.goal/state.rec"
+sed_in 's/^deadline=.*/deadline=1/' "$T/t28/.goal/state.rec"
 close_iter t28
 out=$(bash "$GATE" --check --project "$T/t28" 2>&1); assert_rc "28 expired green claim -> GO" 0 $?
 assert_has "28 NOTE fuse" 'time-budget-exhausted' "$out"
@@ -327,7 +332,7 @@ assert_rc "37 hook unclaimed allows stop" 0 $?
 # 38 BLOCKED state (breaker OPEN, rc3) -> allow: user decision, not a grind
 mkproj h38 >/dev/null; contract h38 "- AC-1 | f | check: \`true\` | expected: exit=0"
 close_iter h38
-sed -i 's/^breaker=.*/breaker=OPEN/' "$T/h38/.goal/state.rec"
+sed_in 's/^breaker=.*/breaker=OPEN/' "$T/h38/.goal/state.rec"
 (cd "$T/h38" && bash "$here/scripts/goal_hook.sh") >/dev/null 2>&1
 assert_rc "38 hook rc3 state allows stop" 0 $?
 
@@ -350,7 +355,7 @@ printf 'AC-1 | observed=7 | repeats=3 | cmd=echo 7\n' > "$T/h40/.goal/baseline.m
 bash "$CTL" stamp --project "$T/h40" --auto >/dev/null 2>&1
 assert_rc "41 stamp with baseline ok" 0 $?
 echo x > "$T/h40/a.txt"; close_iter h40 --dry yes
-sed -i 's/^dry_streak=.*/dry_streak=3/' "$T/h40/.goal/state.rec"
+sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/h40/.goal/state.rec"
 bash "$GATE" --check --project "$T/h40" >/dev/null 2>&1
 assert_rc "41 forge GO with baseline satisfied" 0 $?
 
@@ -365,7 +370,7 @@ bash "$GATE" --baseline-check --project "$T/h42" 2>&1 | grep -q baseline-cmd-mis
 NOSTAMP=1 mkproj h43 >/dev/null; FORGE=1 NOSTAMP=1 contract h43 "- AC-1 | m | check: \`echo 7\` | baseline: abs | expected: >=5"
 bash "$CTL" stamp --project "$T/h43" --auto >/dev/null 2>&1
 assert_rc "43 abs stamp ok without baseline" 0 $?
-close_iter h43 --dry yes; sed -i 's/^dry_streak=.*/dry_streak=3/' "$T/h43/.goal/state.rec"
+close_iter h43 --dry yes; sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/h43/.goal/state.rec"
 bash "$GATE" --check --project "$T/h43" >/dev/null 2>&1
 assert_rc "43 abs forge GO" 0 $?
 
@@ -470,10 +475,10 @@ assert_has "53 GO line carries score" 'score=7' "$out"
 grep -q 'best_score=7' "$T/t53/.goal/state.rec" && ok "53 best_score stored" || no "53 best_score missing"
 
 # 54 score-regressed claim refused
-sed -i 's/^iteration=.*/iteration=1/' "$T/t53/.goal/state.rec"
+sed_in 's/^iteration=.*/iteration=1/' "$T/t53/.goal/state.rec"
 # rewrite last block score and claim again with a lower gate rerun: lower echo
 # simulate by bumping best_score above the check's 7
-sed -i 's/^best_score=.*/best_score=9/' "$T/t53/.goal/state.rec"
+sed_in 's/^best_score=.*/best_score=9/' "$T/t53/.goal/state.rec"
 out=$(bash "$GATE" --check --project "$T/t53" 2>&1); assert_rc "54 score-regressed -> rc2" 2 $?
 assert_has "54 reason score-regressed" 'score-regressed' "$out"
 
@@ -528,7 +533,7 @@ mkproj t57
   printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t57/.goal/goal.md"
 bash "$CTL" stamp --project "$T/t57" --auto >/dev/null
-sed -i 's/^objective: maximize AC-1/objective: maximize AC-2/' "$T/t57/.goal/goal.md"
+sed_in 's/^objective: maximize AC-1/objective: maximize AC-2/' "$T/t57/.goal/goal.md"
 bash "$CTL" close-iteration --project "$T/t57" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --score 3 --no-gate >/dev/null 2>&1
@@ -698,7 +703,7 @@ out=$(bash "$GATE" --check --project "$T/t69" 2>&1); assert_rc "69 minimize GO a
 grep -q 'best_score=7' "$T/t69/.goal/state.rec" && ok "69 best_score stored" || no "69 best_score missing"
 
 # 70 minimize low-water mark: higher score is regression
-sed -i 's/^best_score=.*/best_score=5/' "$T/t69/.goal/state.rec"
+sed_in 's/^best_score=.*/best_score=5/' "$T/t69/.goal/state.rec"
 out=$(bash "$GATE" --check --project "$T/t69" 2>&1); assert_rc "70 score-regressed (minimize 7>5) -> rc2" 2 $?
 assert_has "70 reason score-regressed" 'score-regressed' "$out"
 assert_has "70 direction named" 'dir=minimize' "$out"
@@ -816,7 +821,7 @@ mkproj t76
 } > "$T/t76/.goal/goal.md"
 bash "$CTL" stamp --project "$T/t76" --auto >/dev/null
 # force deadline into the past
-sed -i 's/^deadline=.*/deadline=1/' "$T/t76/.goal/state.rec"
+sed_in 's/^deadline=.*/deadline=1/' "$T/t76/.goal/state.rec"
 bash "$CTL" close-iteration --project "$T/t76" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --no-gate >/dev/null 2>&1
@@ -834,7 +839,7 @@ mkproj t77
   printf '## Budget knobs\n\nmax_iterations=12  wallclock=1\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t77/.goal/goal.md"
 bash "$CTL" stamp --project "$T/t77" --auto >/dev/null
-sed -i 's/^deadline=.*/deadline=1/' "$T/t77/.goal/state.rec"
+sed_in 's/^deadline=.*/deadline=1/' "$T/t77/.goal/state.rec"
 bash "$CTL" close-iteration --project "$T/t77" --task T1 --files a.txt \
   --checks-pass 0 --checks-fail 1 --checks-unverifiable 0 --progress no \
   --strategy-delta 'try next' --exit-signal yes --no-gate >/dev/null 2>&1
@@ -859,7 +864,7 @@ bash "$CTL" stamp --project "$T/t78" --auto >/dev/null
 out=$(bash "$GATE" --verify --project "$T/t78" 2>&1)
 assert_has "78 metric regex extracts through ANSI" 'AC-1|PASS|observed=42.5' "$out"
 # regex mismatch -> BROKEN (fail-loud, not a silent last-line fallback lie)
-sed -i 's/metric: [^|]*| expected/metric: `nosuch=([0-9]+)` | expected/' "$T/t78/.goal/goal.md"
+sed_in 's/metric: [^|]*| expected/metric: `nosuch=([0-9]+)` | expected/' "$T/t78/.goal/goal.md"
 out=$(bash "$GATE" --verify --project "$T/t78" 2>&1)
 assert_has "78b regex miss -> BROKEN named" 'regex matched nothing' "$out"
 
@@ -995,7 +1000,7 @@ assert_has "86 unknown id named" 'unknown-ac-id:AC-99' "$out"
 mkproj t87
 contract t87 '- AC-1 | x | check: `true` | expected: exit=0'
 close_iter t87
-sed -i 's/^iteration=.*/iteration=banana/' "$T/t87/.goal/state.rec"
+sed_in 's/^iteration=.*/iteration=banana/' "$T/t87/.goal/state.rec"
 out=$(bash "$GATE" --check --project "$T/t87" 2>&1); assert_rc "87 alpha numeric-key -> rc4" 4 $?
 assert_has "87 offending key named" 'unparseable-state:iteration' "$out"
 
@@ -1028,7 +1033,7 @@ close_iter t89
 out=$(bash "$GATE" --check --project "$T/t89" 2>&1); rc89=$?
 [ "$rc89" -ne 0 ] && ok "89 ledger-mutating check never ends GO (rc=$rc89)" || no "89 ledger-mutating check ended GO"
 # --verify mode must also refuse a self-rewriting check in-run
-printf '# Goal contract - test\n\n## Objective\n\nt\n\n## Exit policy\n\nexit: threshold\n\n## Acceptance criteria\n\n- AC-1 | mutates | check: `sed -i "s/PENDING/PENX/" .goal/goal.md && true` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n' > "$T/t89/.goal/goal.md"
+printf '# Goal contract - test\n\n## Objective\n\nt\n\n## Exit policy\n\nexit: threshold\n\n## Acceptance criteria\n\n- AC-1 | mutates | check: `sed "s/PENDING/PENX/" .goal/goal.md > .goal/goal.md.mt && mv .goal/goal.md.mt .goal/goal.md` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n' > "$T/t89/.goal/goal.md"
 out=$(bash "$GATE" --verify --project "$T/t89" 2>&1); assert_rc "89b verify self-rewrite caught" 2 $?
 assert_has "89b ledger mutation named" 'check-mutated-ledger' "$out"
 
@@ -1130,14 +1135,14 @@ mkproj t95
 printf 'v=10\n' > "$T/t95/v.txt"
 bash "$CTL" stamp --project "$T/t95" --auto >/dev/null
 close_iter t95 --score 10
-sed -i 's/^best_score=.*/best_score=99/' "$T/t95/.goal/state.rec"
+sed_in 's/^best_score=.*/best_score=99/' "$T/t95/.goal/state.rec"
 printf 'v=50\n' > "$T/t95/v.txt"
 out=$(bash "$CTL" close-iteration --project "$T/t95" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --score 50 --exit-signal yes 2>&1); rc95=$?
 assert_rc "95a regression -> rc2" 2 $rc95
 assert_has "95a hint restore-best" 'hint=restore-best' "$out"
-sed -i 's/- AC-1 | v |/- AC-1 | tampered |/' "$T/t95/.goal/goal.md"
+sed_in 's/- AC-1 | v |/- AC-1 | tampered |/' "$T/t95/.goal/goal.md"
 out=$(bash "$GATE" --check --project "$T/t95" 2>&1); assert_rc "95b tampered -> rc2" 2 $?
 assert_has "95b hint proposal-to-user" 'hint=proposal-to-user' "$out"
 
@@ -1443,7 +1448,7 @@ assert_has "107d claimed => step 4" 'STEP 4-branch' "$out"
 mkproj t108; contract t108 "- AC-1 | t | check: \`true\` | expected: exit=0"
 printf '## iteration 1\ntask=SELF-AUDIT\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=yes\nfalse_complete=no\ndigest=X\nscore=none\nstrategy_delta=none\n' > "$T/t108/.goal/loop-log.md"
 d=$(bash "$GATE" --digest --project "$T/t108")
-sed -i "s/^digest=X$/digest=$d/" "$T/t108/.goal/loop-log.md"
+sed_in "s/^digest=X$/digest=$d/" "$T/t108/.goal/loop-log.md"
 out=$(bash "$GATE" --check --project "$T/t108" 2>&1); assert_rc "108a claim with illegal task id -> rc2" 2 $?
 assert_has "108a names bad-task" 'bad-task:' "$out"
 assert_has "108a hint routes the fix" 'hint=write-ledger-block' "$out"
@@ -1451,7 +1456,7 @@ assert_has "108a hint routes the fix" 'hint=write-ledger-block' "$out"
 mkproj t108b; contract t108b "- AC-1 | t | check: \`true\` | expected: exit=0"
 printf '## iteration 1\ntask=T5\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=yes\nfalse_complete=no\ndigest=X\nscore=none\nstrategy_delta=none\n' > "$T/t108b/.goal/loop-log.md"
 d=$(bash "$GATE" --digest --project "$T/t108b")
-sed -i "s/^digest=X$/digest=$d/" "$T/t108b/.goal/loop-log.md"
+sed_in "s/^digest=X$/digest=$d/" "$T/t108b/.goal/loop-log.md"
 out=$(bash "$GATE" --check --project "$T/t108b" 2>&1); assert_rc "108b bare legacy id still claims" 0 $?
 assert_has "108b legacy NOTE emitted" 'task-id-legacy' "$out"
 

@@ -31,6 +31,10 @@
 set -u
 export LC_ALL=C.UTF-8
 
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck source=goal_parse.sh
+. "$here/goal_parse.sh"   # gp_sed_inplace (BSD/GNU portability, v2.9)
+
 cmd="" project="." team="" description="" add=0 list=0
 name="" role="" prompt="" scope="" from="" to="" text="" summary=""
 unread=0 mark_read=0
@@ -65,8 +69,15 @@ cfg="$td/config.json"
 inbox_dir="$td/inboxes"
 board="$td/board.md"
 
-jesc(){ # JSON string escape, no jq
-  printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | awk '{gsub(/\t/,"\\t"); printf "%s", $0}' | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/\\n/g'
+jesc(){ # JSON string escape, no jq. Line-at-a-time awk: the old sed slurp
+  # idiom (':a;N;$!ba') returns EMPTY for trailing-newline-less input on
+  # BSD/macOS sed (GNU sed differs) - so every message escaped to nothing and
+  # inbox reads came back blank. awk is portable across both.
+  printf '%s\n' "$1" | awk '
+    { gsub(/\\/,"\\\\"); gsub(/"/,"\\\""); gsub(/\t/,"\\t") }
+    NR>1 { printf "\\n" }
+    { printf "%s", $0 }
+  '
 }
 now_iso(){ date -u +%Y-%m-%dT%H:%M:%SZ; }
 
@@ -165,7 +176,7 @@ EOF
       sed 's/^/  /' "$f"
     fi
     if [ "$mark_read" = 1 ]; then
-      sed -i 's/"read":false/"read":true/g; s/"read": false/"read": true/g' "$f"
+      gp_sed_inplace 's/"read":false/"read":true/g; s/"read": false/"read": true/g' "$f"
       echo "TEAM: INBOX marked-read name=$name"
     fi ;;
 

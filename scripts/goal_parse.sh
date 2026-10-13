@@ -28,6 +28,16 @@ gp_sha256_std(){                                         # one file -> 64 hex
   else echo ""; fi
 }
 
+# BSD/GNU portability (v2.9): `sed -i` with no extension is GNU-only; on
+# macOS/BSD sed swallows the expression as a backup suffix and corrupts or
+# silently skips the edit. CI runs GNU only, so the bug hid until a macOS
+# user. One in-place edit = transform to a sibling tmp + atomic mv.
+gp_sed_inplace(){                                        # $1 expression $2 file
+  local f="$2"
+  sed "$1" "$f" > "$f.gptmp" || { rm -f "$f.gptmp"; return 1; }
+  mv -f "$f.gptmp" "$f"
+}
+
 # ---- number validators ----------------------------------------------------
 # A score is: optional '-', digits, optional single decimal part.
 # "1.2.3", "1e3", "--5", "-.5" FAIL; "-10", "0", "7.5" pass.
@@ -61,6 +71,22 @@ gp_ac_calib_line(){  gp_ac_line_for "$1" "$2" | sed -E 's/`[^`]*`//g'; }
 gp_ac_calib_good(){  gp_ac_calib_line "$1" "$2" | sed -nE 's/^.*calib:[^|]*good *= *([^ |]+).*/\1/p' | tail -1; }
 gp_ac_calib_bad(){   gp_ac_calib_line "$1" "$2" | sed -nE 's/^.*calib:[^|]*bad *= *([^ |]+).*/\1/p' | tail -1; }
 gp_ac_calib_declared(){ gp_ac_calib_line "$1" "$2" | grep -qE 'calib:[^|]*(good|bad) *=' && echo yes || echo no; }
+# External/deferred check surface (v2.9): an `external:` command settles an AC
+# against an OUT-OF-TREE source (CRM, prod metrics, an async peer review) that
+# no in-tree file captures; `window:` = validity of the cached result in whole
+# seconds - inside it, the recorded measurement in deferred.rec IS the check
+# (re-querying a slow system every gate exit is not measurement, it is
+# spinning). Backtick decoys stripped first: the calib law, kept.
+gp_ac_external_cmd(){ gp_ac_calib_line "$1" "$2" | sed -nE 's/^.*external: *`([^`]*)`.*/\1/p' | tail -1; }
+gp_ac_window(){       gp_ac_calib_line "$1" "$2" | sed -nE 's/^.*window: *([0-9]+).*/\1/p' | tail -1; }
+# Horizon layer (v2.9): a contract may declare `horizon-waived: <reason>` to
+# accept an objective whose blind spot is unguarded. The parser only finds it;
+# the refuse-at-stamp tooth lives in goal_ctl.sh.
+gp_horizon_waived(){ gp_r < "$1/.goal/goal.md" 2>/dev/null | grep -iE '^horizon-waived:[[:space:]]*[^[:space:]]' | tail -1 | sed -E 's/^[^:]*:[[:space:]]*//' | cut -c1-200; }
+# var: (v2.9) a second capture-group regex pinning WHERE the measurement's
+# dispersion comes from, so the significance band is computed from data
+# instead of the AC author's memory of typical noise.
+gp_ac_var_re(){ gp_ac_line_for "$1" "$2" | sed -nE 's/^.*var: *`([^`]*)`.*/\1/p' | tail -1; }
 gp_objective_ac(){  gp_r < "$1/.goal/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1; }
 gp_objective_dir(){ gp_r < "$1/.goal/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\1/p' | tail -1; }
 # R3 frozen surface: AC section body + exit: + objective: lines. ctl stamp and
