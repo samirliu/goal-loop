@@ -35,11 +35,11 @@ done
 [ -z "${positional# }" ] || [ "$mode" = verify ] || { echo "GATE: NO-GO reason=unknown-arg:$positional" >&2; exit 4; }
 
 sd="$project/.goal"
-r(){ tr -d '\r'; }                                    # CR scrubber for every read
-hash_std(){                                            # one stable content hash
-  if command -v sha1sum >/dev/null 2>&1; then sha1sum | cut -c1-40
-  else cksum | awk '{print $1}'; fi
-}
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck source=goal_parse.sh
+. "$here/goal_parse.sh"                            # one grammar, one home (v2.7)
+r(){ gp_r; }                                       # CR scrubber for every read
+hash_std(){ gp_hash_std; }
 
 # Heavy third-party dirs skipped by the non-git tree walk (v2.6). Their bytes
 # are not what an AC measures; including them made the digest O(whole-repo)
@@ -73,17 +73,8 @@ tree_digest(){                                         # 12 hex, deterministic
     fi )
 }
 
-ac_body_hash(){                                        # 8 hex over AC body + ^exit: + ^objective: lines
-  { r < "$sd/goal.md" |
-    awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
-    r < "$sd/goal.md" | grep -E '^(exit|objective):' || true
-  } | hash_std | cut -c1-8
-}
-
-state_get(){                                           # $1 key -> value or empty
-  [ -f "$sd/state.rec" ] || { echo ""; return; }
-  grep -E "^$1=" "$sd/state.rec" | r | tail -1 | cut -d= -f2-
-}
+ac_body_hash(){ gp_ac_body_hash "$project"; }       # R3 frozen surface - single definition
+state_get(){ gp_state_get "$project" "$1"; }
 
 ledger_digest(){                                       # 8 hex over the LEDGER state files
   # Checks may write evidence (.goal/evidence/) but nothing else under
@@ -109,11 +100,7 @@ last_block(){                                          # last loop-log block as 
 }
 
 latest_verdicts(){                                     # id|verdict|iter|digest|evidence, latest per id
-  [ -f "$sd/verdicts.rec" ] || return 0
-  gawk -F'|' '
-    { id=$1; v=$2; it=$3+0; d=$4; e=$6; sub(/\r$/,"",e)
-      if (!(id in best) || it >= best[id]) { best[id]=it; ver[id]=v; dig[id]=d; ev[id]=e } }
-    END{ for (id in best) printf "%s|%s|%s|%s|%s\n", id, ver[id], best[id], dig[id], ev[id] }' "$sd/verdicts.rec"
+  gp_latest_verdicts "$project"
 }
 
 fail(){
@@ -133,10 +120,13 @@ fail(){
     not-dry:*)               hint=continue-forge ;;
     missing-strategy-delta*) hint=write-strategy-delta ;;
     verdicts-stale:*)        hint=rebind-judged ;;
+    verdict-conflict:*)      hint=rebind-judged ;;
     score-missing:*)         hint=objective-not-metric ;;
+    judge-score-missing:*)   hint=bind-seat ;;
     not-claimed:*)           hint=set-exit-signal ;;
     not-claimed)             hint=set-exit-signal ;;   # bare reason, no AC suffix
     empty-loop-log)          hint=write-ledger-block ;;
+    bad-task:*)              hint=write-ledger-block ;;
     DIVERGENCE:*)            hint=redesign-AC ;;
     contract-tampered:*)     hint=proposal-to-user ;;
     calibration-missing:*)   hint=bind-calib-grades ;;
@@ -160,21 +150,21 @@ state_err(){ echo "GATE: ERROR reason=$1" >&2; exit 4; }
 # expected spec: exit=0 (default) | <op><number> | judged      (no "|" inside)
 # AC lines are NOT parsed by "|" splitting (commands contain pipes); the
 # command is the backtick-quoted span, the expectation is the line tail.
-contract_mode(){ r < "$sd/goal.md" | grep -qE '^exit: *forge' && echo forge || echo threshold; }
-all_ac_ids(){ r < "$sd/goal.md" | grep -oE '^- AC-[0-9]+' | sort -u | sed 's/^- //'; }
-ac_line_for(){ r < "$sd/goal.md" | awk -v id="$1" '$0 ~ "^- "id"[ |]"'; }
-ac_check_cmd(){ ac_line_for "$1" | sed -nE 's/^.*check: *`([^`]*)`.*/\1/p' | tail -1; }
-ac_expected(){ ac_line_for "$1" | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1; }
-ac_baseline_marker(){ ac_line_for "$1" | sed -nE 's/^.*baseline: *(delta|abs).*/\1/p' | tail -1; }
+# Contract grammar lives in scripts/goal_parse.sh (v2.7); these wrappers keep
+# the call sites readable and every rule defined exactly once.
+contract_mode(){ gp_contract_mode "$project"; }
+all_ac_ids(){ gp_all_ac_ids "$project"; }
+ac_line_for(){ gp_ac_line_for "$project" "$1"; }
+ac_check_cmd(){ gp_ac_check_cmd "$project" "$1"; }
+ac_expected(){ gp_ac_expected "$project" "$1"; }
+ac_baseline_marker(){ gp_ac_baseline_marker "$project" "$1"; }
 # Verifier-of-the-verifier (R9): any metric/maximize/minimize AC may carry a probe:
-# check that must PASS before its number is trusted. The probe asserts the
-# measurement itself (instrument alive, fixture loaded, seed fixed).
-ac_probe_cmd(){ ac_line_for "$1" | sed -nE 's/^.*probe: *`([^`]*)`.*/\1/p' | tail -1; }
-# Optional measurement tokens (v2.5): `metric: ` <ERE with exactly one capture
-# group> pins WHERE the number comes from (immune to log noise / multi-number
-# output); tolerance: <rel> absorbs measurement noise in water-mark compares.
-ac_metric_re(){ ac_line_for "$1" | sed -nE 's/^.*metric: *`([^`]*)`.*/\1/p' | tail -1; }
-ac_tolerance(){ ac_line_for "$1" | sed -nE 's/^.*tolerance: *([0-9.]+).*/\1/p' | tail -1; }
+# check that must PASS before its number is trusted.
+ac_probe_cmd(){ gp_ac_probe_cmd "$project" "$1"; }
+# Optional measurement tokens (v2.5): metric: pins WHERE the number comes from;
+# tolerance: gives water-mark compares a noise band.
+ac_metric_re(){ gp_ac_metric_re "$project" "$1"; }
+ac_tolerance(){ gp_ac_tolerance "$project" "$1"; }
 # Calibration fixtures (v2.6, judged ACs): `calib: good=<f1> bad=<f2>` names a
 # known-good and a known-bad artifact of the AC's subject. A seat may claim
 # PASS only after grading both correctly (#good=PASS, #bad=FAIL, same
@@ -182,34 +172,17 @@ ac_tolerance(){ ac_line_for "$1" | sed -nE 's/^.*tolerance: *([0-9.]+).*/\1/p' |
 # bad one, and the claim is refused mechanically.
 # Backtick spans are command text, not calib declarations: strip them first
 # so an AC whose check greps the literal "calib:" is not mistaken for calibrated.
-ac_calib_line(){ ac_line_for "$1" | sed -E 's/`[^`]*`//g'; }
-ac_calib_good(){ ac_calib_line "$1" | sed -nE 's/^.*calib:[^|]*good *= *([^ |]+).*/\1/p' | tail -1; }
-ac_calib_bad(){ ac_calib_line "$1"  | sed -nE 's/^.*calib:[^|]*bad *= *([^ |]+).*/\1/p' | tail -1; }
-ac_calib_declared(){ ac_calib_line "$1" | grep -qE 'calib:[^|]*(good|bad) *=' && echo yes || echo no; }
-sha256_std(){                                           # one file -> 64 hex
-  if command -v sha256sum >/dev/null 2>&1; then sha256sum < "$1" | cut -c1-64
-  elif command -v openssl >/dev/null 2>&1; then openssl dgst -sha256 "$1" | awk '{print $NF}'
-  else echo ""; fi
-}
-strip_ansi(){                                           # colored CLIs must not cut the metric regex
-  gawk '{ gsub(/\033\[[0-9;?]*[A-Za-z]/, "", $0); print }'
-}
-extract_metric(){                                       # $1 text $2 regex-or-empty -> number or empty
-  # regex via ENVIRON: -v would eat backslashes in the user's ERE. The pipeline
-  # needs an EXPORT (assignment on the first command covers only printf).
-  [ -n "$2" ] || return 0
-  export MRE="$2"
-  printf '%s\n' "$1" | gawk '{
-    if (match($0, ENVIRON["MRE"], m)) {
-      for (i = 1; i <= length(m); i++) if (m[i] != "") { print m[i]; exit }
-    }
-  }' | sed -nE 's/^[^-0-9]*(-?[0-9]+(\.[0-9]+)?).*/\1/p' | head -1
-  # the leading-chars class must keep '-', or a captured "-10" is rewritten to 10
-}
+ac_calib_line(){ gp_ac_calib_line "$project" "$1"; }
+ac_calib_good(){ gp_ac_calib_good "$project" "$1"; }
+ac_calib_bad(){ gp_ac_calib_bad "$project" "$1"; }
+ac_calib_declared(){ gp_ac_calib_declared "$project" "$1"; }
+sha256_std(){ gp_sha256_std "$1"; }
+strip_ansi(){ gp_strip_ansi; }
+extract_metric(){ gp_extract_metric "$1" "$2"; }
 # Optional contract-level objective: maximize|minimize AC-N  (score-regressed guard).
 # objective_dir: "maximize" (higher is better) or "minimize" (lower is better).
-objective_ac(){ r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1; }
-objective_dir(){ r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\1/p' | tail -1; }
+objective_ac(){ gp_objective_ac "$project"; }
+objective_dir(){ gp_objective_dir "$project"; }
 # Baseline validation (forge only): every delta metric AC needs a
 # .goal/baseline.md line `AC-N | ... | repeats=<N>=2 | cmd=<check verbatim>`.
 # The cmd match is the "same yardstick" rule made mechanical; repeats>=2
@@ -236,25 +209,7 @@ baseline_validate(){                                   # fail-fast via fail(); f
     { [ -n "$rep" ] && [ "$rep" -ge 2 ]; } || fail "baseline-weak:$id (repeats>=2 required - single runs game the metric)"
   done
 }
-classify_expected(){                                   # $1 raw -> exit0 | judged | maximize | minimize | "metric <op> <num>"
-  v=$(printf '%s' "$1" | tr -d '[:space:]')
-  case "$v" in
-    ''|exit=0) echo "exit0" ;;
-    judged)    echo "judged" ;;
-    maximize)  echo "maximize" ;;
-    minimize)  echo "minimize" ;;
-    exit=[0-9]*) echo "rc ${v#exit=}" ;;
-    *)
-      op=$(printf '%s' "$v" | sed -nE 's/^([<>=!]+)[0-9].*/\1/p')
-      num=$(printf '%s' "$v" | sed -nE 's/^[<>=!]+([0-9][0-9.]*)$/\1/p')
-      if [ -n "$op" ] && [ -n "$num" ]; then
-        case "$op" in
-          '>='|'<='|'>'|'<'|'=='|'!=') echo "metric $op $num"; return ;;
-        esac
-      fi
-      echo "judged" ;;                                 # prose (incl. v1.1) -> judged
-  esac
-}
+classify_expected(){ gp_classify_expected "$1"; }       # grammar in goal_parse.sh
 
 run_one_check(){                                       # $1 id $2 class $3 op $4 num -> "id|VERDICT|detail"
   id="$1"; cls="$2"; m_op="${3:-}"; m_num="${4:-}"
@@ -371,7 +326,7 @@ if [ "$mode" = digest ]; then echo "$digest"; exit 0; fi
 [ -d "$sd" ] || state_err "no-goal-dir"
 [ -f "$sd/goal.md" ] || state_err "no-goal-md"
 tmo=$(state_get check_timeout); [ -n "$tmo" ] || tmo=120
-case "$tmo" in ''|*[!0-9]*) state_err "bad-check-timeout:$tmo" ;; esac
+gp_is_natural "$tmo" || state_err "bad-check-timeout:$tmo"
 
 if [ "$mode" = verify ]; then
   # an AC id that is not in the contract is a usage error, not a verdict -
@@ -434,9 +389,7 @@ maxit=$(state_get max_iterations); npl=$(state_get no_progress_limit)
 # state.rec with iteration=banana must never reach an arithmetic comparison);
 # breaker is the only word-valued key in this set.
 for k in iteration false_completes no_progress_streak max_iterations no_progress_limit replans; do
-  case "$(state_get "$k")" in
-    ''|*[!0-9]*) state_err "unparseable-state:$k=$(state_get "$k") (numeric key not numeric)" ;;
-  esac
+  gp_is_natural "$(state_get "$k")" || state_err "unparseable-state:$k=$(state_get "$k") (numeric key not numeric)"
 done
 case "$breaker" in CLOSED|HALF_OPEN|OPEN) : ;; *) state_err "unparseable-state:breaker=$breaker" ;; esac
 
@@ -452,8 +405,8 @@ body=$(ac_body_hash)
 dl=$(state_get deadline)                               # optional wall-clock fuse (v1.3)
 case "$dl" in
   ''|0) : ;;
-  *[!0-9]*) state_err "bad-deadline:$dl" ;;
-  *) now=$(date +%s)
+  *) gp_is_natural "$dl" || state_err "bad-deadline:$dl"
+     now=$(date +%s)
      # Overrun is a CONTINUATION fuse, not a delivery veto: flag it here;
      # fail() escalates to BLOCKED, a green claim still GO (see fail/GO).
      [ "$now" -gt "$dl" ] && deadline_expired=1 ;;
@@ -494,6 +447,18 @@ done
 [ -z "$missing_lk" ] || echo "GATE: NOTE loop-log-missing-keys:${missing_lk# }" >&2
 claim=$(printf '%s\n' "$lb" | grep -E '^exit_signal=' | tail -1 | cut -d= -f2-)
 [ "$claim" = yes ] || fail "not-claimed"
+# R12 tooth at the arbiter (v2.7): the CLAIMING block must carry a schema-valid
+# task= id. ctl enforces this at write time, but a hand-written ledger block
+# (the documented rescue path) could smuggle an id past the audit. History
+# blocks stay readable for v1.x-compatible ledgers - only what claims done
+# is held to the law.
+lbt=$(printf '%s\n' "$lb" | grep -E '^task=' | tail -1 | cut -d= -f2-)
+if ! gp_task_ok "$lbt"; then
+  # bare T<n> is a v1.x ledger form: valid but noted (ctl normalizes it at write).
+  printf '%s' "$lbt" | grep -qE '^T[0-9]+$' \
+    || fail "bad-task:$lbt (claiming block needs task=T<n>[crew:N|teams:N]; see R12)"
+  echo "GATE: NOTE task-id-legacy (bare $lbt: wave backend not stated; write it as T<n>[crew:1])" >&2
+fi
 lbdigest=$(printf '%s\n' "$lb" | grep -E '^digest=' | tail -1 | cut -d= -f2-)
 # A stale claim IS a false complete; the ratchet (ctl close-iteration) counts
 # it automatically - no manual bookkeeping asked of the controller anymore.
@@ -536,6 +501,11 @@ for id in $ac_ids; do
     continue
   fi
   # Judged AC: the stored seat verdict must be fresh (R7) and evidenced (R5).
+  # Contradiction gate (v2.7): two seat rows bound to the SAME (iter,digest)
+  # that disagree mean the judge plane contradicts itself on unchanged tree
+  # state (R2 makes re-judging illegal here) - mechanically a conflict.
+  [ "$(gp_verdict_conflict "$project" "$id" "$iter" "$digest")" = yes ] \
+    && fail "verdict-conflict:$id (two verdicts bound to iter=$iter digest=$digest disagree - resolve the seats and rebind)"
   rec=$(printf '%s\n' "$lv" | gawk -F'|' -v want="$id" '$1==want{print}')
   v=$(printf '%s' "$rec" | cut -d'|' -f2)
   vi=$(printf '%s' "$rec" | cut -d'|' -f3)
@@ -553,9 +523,7 @@ for id in $ac_ids; do
     # file whose bytes changed since, is worthless: verdict-unbound.
     # greedy match to the digest: token - artifact paths with spaces are
     # legal file names; stopping at whitespace silently loses the path.
-    art=$(printf '%s' "$ev" | sed -nE 's/^.*artifact:[[:space:]]*(.*[^[:space:]])[[:space:]]+digest:.*/\1/p' | head -1)
-    [ -n "$art" ] || art=$(printf '%s' "$ev" | grep -oE 'artifact:[[:space:]]*[^[:space:]]+' | head -1 | sed -E 's/^artifact:[[:space:]]*//')
-    dig=$(printf '%s' "$ev" | grep -oE 'digest:[[:space:]]*(sha256:)?[a-f0-9]{8,64}' | head -1 | sed -E 's/^digest:[[:space:]]*(sha256:)?//')
+    art=$(gp_ev_artifact "$ev"); dig=$(gp_ev_digest "$ev")
     [ -n "$art" ] && [ -n "$dig" ] || fail "verdict-unbound:$id (PASS evidence must cite artifact: <path> and digest: <sha256> - the seat must say WHAT it judged)"
     if [ -f "$project/$art" ]; then
       now=$(sha256_std "$project/$art")
@@ -580,12 +548,38 @@ for id in $ac_ids; do
       bv=$(printf '%s' "$b_rec" | cut -d'|' -f2); bvi=$(printf '%s' "$b_rec" | cut -d'|' -f3); bvd=$(printf '%s' "$b_rec" | cut -d'|' -f4)
       # Evidence must name the fixture the grade was read from (R5 spirit):
       # an unbound grade is an invented grade, same as an unbound PASS.
+      # v2.7 strengthening - EXCLUSIVE citation: the good row quotes cg and
+      # never cb (and vice versa). A single blob quoting both fixture paths
+      # used to satisfy both rows at once; exclusivity forces the seat to
+      # say which artifact each grade actually saw.
       gve=$(printf '%s' "$g_rec" | cut -d'|' -f5-)
       bve=$(printf '%s' "$b_rec" | cut -d'|' -f5-)
-      { [ "$gv" = PASS ] && [ "$gvi" = "$iter" ] && [ "$gvd" = "$digest" ] && printf '%s' "$gve" | grep -qF "$cg"; } \
-        || fail "calibration-missing:$id/good (needs a fresh PASS verdict this iteration whose evidence quotes the good fixture $cg)"
-      { [ "$bv" = FAIL ] && [ "$bvi" = "$iter" ] && [ "$bvd" = "$digest" ] && printf '%s' "$bve" | grep -qF "$cb"; } \
-        || fail "calibration-missing:$id/bad (known-bad fixture $cb needs a fresh FAIL verdict in the current iteration - a seat that cannot reject the bad case cannot be trusted on the real one)"
+      { [ "$gv" = PASS ] && [ "$gvi" = "$iter" ] && [ "$gvd" = "$digest" ] \
+        && printf '%s' "$gve" | grep -qF "$cg" && ! printf '%s' "$gve" | grep -qF "$cb"; } \
+        || fail "calibration-missing:$id/good (needs a fresh PASS verdict this iteration whose evidence quotes ONLY the good fixture $cg)"
+      { [ "$bv" = FAIL ] && [ "$bvi" = "$iter" ] && [ "$bvd" = "$digest" ] \
+        && printf '%s' "$bve" | grep -qF "$cb" && ! printf '%s' "$bve" | grep -qF "$cg"; } \
+        || fail "calibration-missing:$id/bad (known-bad fixture $cb needs a fresh FAIL verdict in the current iteration quoting ONLY $cb - a seat that cannot reject the bad case cannot be trusted on the real one)"
+    fi
+    # Judge-score duty at the arbiter (v2.7): R13's divergence guard is only
+    # alive while numeric judge scores are recorded. The moment a ledger
+    # records ANY comparable judge score (field 3 numeric at or before this
+    # iteration), a judged PASS claimed with judge=none on the same row is a
+    # seat saying "done" without its score - refuse it. A ledger that has
+    # never used the judge plane (v1.x / quickstart) is exempt but carries a
+    # NOTE; exemption is ledger state, not amnesia.
+    if [ -f "$sd/scores.rec" ]; then
+      ever=$(r < "$sd/scores.rec" | gawk -F'|' -v it="$iter" '
+        $3 ~ /^-?[0-9]+(\.[0-9]+)?$/ && $1+0 <= it+0 {c++} END{print c+0}')
+      crow=$(r < "$sd/scores.rec" | gawk -F'|' -v it="$iter" '$1+0==it+0{row=$0} END{print row}')
+      cjs=$(printf '%s' "$crow" | cut -d'|' -f3)
+      if printf '%s' "$cjs" | grep -qE '^-?[0-9]+(\.[0-9]+)?$'; then
+        : # this claim carries its score - R13 is alive, nothing owed
+      elif [ "$ever" -gt 0 ]; then
+        fail "judge-score-missing:$id (the ledger records numeric judge scores but this claim row is judge=none - close-iteration --judge-score N is mandatory when claiming a judged AC; R13 depends on it)"
+      else
+        echo "GATE: NOTE judge-score-unrecorded ($id claimed without a numeric judge score; R13 stays inert - record --judge-score N to activate the divergence guard)" >&2
+      fi
     fi
     passn=$((passn+1))
   elif [ "$v" = UNVERIFIABLE ]; then

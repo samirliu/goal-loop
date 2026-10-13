@@ -53,10 +53,12 @@ done
 [ -n "$cmd" ] || { echo "CTL: ERROR no-command (init|stamp|bind|close-iteration|status)" >&2; exit 4; }
 
 sd="$project/.goal"
-r(){ tr -d '\r'; }
+# shellcheck source=goal_parse.sh
+. "$here/goal_parse.sh"       # one grammar, one home (v2.7) - shared with goal_gate.sh
+r(){ gp_r; }
 # MUST match goal_gate.sh hash_std - stamp and verify share one digest rule
-hash_std(){ if command -v sha1sum >/dev/null 2>&1; then sha1sum | cut -c1-40; else cksum | awk '{print $1}'; fi }
-state_get(){ [ -f "$sd/state.rec" ] && grep -E "^$1=" "$sd/state.rec" | r | tail -1 | cut -d= -f2-; echo; }
+hash_std(){ gp_hash_std; }
+state_get(){ gp_state_get "$project" "$1"; }
 
 case "$cmd" in
   init)
@@ -83,9 +85,9 @@ case "$cmd" in
     # the objective must point at a score-producing AC (expected: maximize|
     # minimize); pointing it at a judged/exit AC can never yield a score and
     # only surfaces mid-loop as score-missing - catch the mismatch at t=0.
-    oac=$(r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1)
+    oac=$(gp_objective_ac "$project")
     if [ -n "$oac" ]; then
-      oexp=$(r < "$sd/goal.md" | awk -v id="$oac" '$0 ~ "^- "id"[ |]"' | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1 | tr -d '[:space:]')
+      oexp=$(gp_ac_expected "$project" "$oac" | tr -d '[:space:]')
       case "$oexp" in
         maximize|minimize) : ;;
         *) echo "CTL: ERROR stamp-refused: objective points at $oac whose expected= is not maximize|minimize (it would never produce a score)" >&2; exit 2 ;;
@@ -94,26 +96,21 @@ case "$cmd" in
     # Calibration fixtures (v2.6): calib: belongs to JUDGED ACs only, needs
     # both fixtures, and the fixture files must exist in the tree NOW - t=0
     # exposure so the loop never discovers mid-run that the yardstick is gone.
-    while IFS= read -r ac_line; do
-      # backtick spans are command text; strip before spotting calib: so a check
-      # that greps the literal "calib:" cannot masquerade as a calibration claim
-      ac_cline=$(printf '%s' "$ac_line" | sed -E 's/`[^`]*`//g')
-      printf '%s' "$ac_cline" | grep -qE 'calib:' || continue
-      ac_id=$(printf '%s' "$ac_line" | sed -nE 's/^- (AC-[0-9]+).*/\1/p')
-      exp=$(printf '%s' "$ac_line" | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1 | tr -d '[:space:]')
+    # Grammar (backtick decoys stripped) comes from the shared parser.
+    for ac_id in $(gp_all_ac_ids "$project"); do
+      [ "$(gp_ac_calib_declared "$project" "$ac_id")" = yes ] || continue
+      exp=$(gp_ac_expected "$project" "$ac_id" | tr -d '[:space:]')
       [ "$exp" = judged ] || { echo "CTL: ERROR stamp-refused: $ac_id declares calib: but expected= is not judged (calibration measures a seat, not a command)" >&2; exit 2; }
-      cg=$(printf '%s' "$ac_cline" | sed -nE 's/^.*calib:[^|]*good *= *([^ |]+).*/\1/p' | tail -1)
-      cb=$(printf '%s' "$ac_cline" | sed -nE 's/^.*calib:[^|]*bad *= *([^ |]+).*/\1/p' | tail -1)
+      cg=$(gp_ac_calib_good "$project" "$ac_id")
+      cb=$(gp_ac_calib_bad "$project" "$ac_id")
       { [ -n "$cg" ] && [ -n "$cb" ]; } || { echo "CTL: ERROR stamp-refused: $ac_id calib: needs BOTH good= and bad= fixtures" >&2; exit 2; }
       [ -f "$project/$cg" ] || { echo "CTL: ERROR stamp-refused: $ac_id good fixture $cg not found in the tree" >&2; exit 2; }
       [ -f "$project/$cb" ] || { echo "CTL: ERROR stamp-refused: $ac_id bad fixture $cb not found in the tree" >&2; exit 2; }
       # same file on both ends = one ruler claiming to measure both directions:
       # the pair's PASS+FAIL requirement is then a permanent block. Catch at t=0.
       [ "$cg" != "$cb" ] || { echo "CTL: ERROR stamp-refused: $ac_id calib: good= and bad= name the SAME file $cg (one ruler cannot calibrate both ways)" >&2; exit 2; }
-    done < <(r < "$sd/goal.md" | grep -E '^- AC-[0-9]+' || true)
-    h=$( { r < "$sd/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
-           r < "$sd/goal.md" | grep -E '^(exit|objective):' || true
-         } | hash_std | cut -c1-8)
+    done
+    h=$(gp_ac_body_hash "$project")
     # Budget knobs written in goal.md BIND at stamp. They used to be
     # decorative (contract said max_iterations=10, state.rec kept 12) -
     # that is a silent contract lie. Parse key=value tokens; CLI --time-budget
@@ -133,8 +130,8 @@ case "$cmd" in
     done
     case "${time_budget:-}" in                            # optional wall-clock fuse, stamped at approval
       ''|0) : ;;
-      *[!0-9]*) echo "CTL: ERROR bad-time-budget:$time_budget" >&2; exit 4 ;;
-      *) { grep -vE '^(time_budget|deadline)=' "$sd/state.rec"
+      *) gp_is_natural "$time_budget" || { echo "CTL: ERROR bad-time-budget:$time_budget" >&2; exit 4; }
+         { grep -vE '^(time_budget|deadline)=' "$sd/state.rec"
            printf 'time_budget=%s\ndeadline=%s\n' "$time_budget" "$(( $(date +%s) + time_budget ))"
          } > "$sd/state.rec.new" && mv "$sd/state.rec.new" "$sd/state.rec" ;;
     esac
@@ -185,22 +182,19 @@ case "$cmd" in
         ''|none) echo "CTL: ERROR missing-strategy-delta (progress=no needs --strategy-delta 'what you are changing')" >&2; exit 4 ;;
       esac
     fi
-    # score bookkeeping (objective: maximize|minimize)
+    # score bookkeeping (objective: maximize|minimize) - validator in goal_parse.sh
     if [ -n "$score" ]; then
-      # one optional leading '-', digits, optional decimal - not "..." or "--"
-      printf '%s' "$score" | grep -qE '^-?[0-9]+(\.[0-9]+)?$' \
-        || { echo "CTL: ERROR bad-score:$score" >&2; exit 4; }
+      gp_is_score "$score" || { echo "CTL: ERROR bad-score:$score" >&2; exit 4; }
     fi
     if [ -n "$judge_score" ]; then
-      printf '%s' "$judge_score" | grep -qE '^-?[0-9]+(\.[0-9]+)?$' \
-        || { echo "CTL: ERROR bad-judge-score:$judge_score" >&2; exit 4; }
+      gp_is_score "$judge_score" || { echo "CTL: ERROR bad-judge-score:$judge_score" >&2; exit 4; }
     fi
     # The score is MEASURED, never self-reported: ctl reruns the objective AC
     # (gate --verify, stateless) and records the observed value. A mismatch
     # from the controller is noted; an unmeasurable instrument records none
     # and the gate refuses any claim lacking a score.
-    obj_ac=$(r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1)
-    obj_dir=$(r < "$sd/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\1/p' | tail -1)
+    obj_ac=$(gp_objective_ac "$project")
+    obj_dir=$(gp_objective_dir "$project")
     [ -n "$obj_dir" ] || obj_dir=maximize
     if [ -n "$obj_ac" ] && [ -n "$score" ]; then
       vline=$(bash "$here/goal_gate.sh" --verify "$obj_ac" --project "$project" 2>/dev/null \
@@ -228,7 +222,7 @@ case "$cmd" in
       '') echo "CTL: ERROR missing-task (ledger needs --task T<n> or T<n>[backend:N])" >&2; exit 4 ;;
       T[0-9]*) printf '%s' "$task" | grep -qE '^T[0-9]+$' && task="$task[crew:1]" ;;
     esac
-    printf '%s' "$task" | grep -qE '^T[0-9]+\[(teams|crew):[0-9]+\]( *\(fallback:[a-z0-9-]+\))?$' \
+    gp_task_ok "$task" \
       || { echo "CTL: ERROR bad-task:$task (schema: T<n>[crew:N] / T<n>[teams:N], bare T<n> normalizes to crew:1)" >&2; exit 4; }
     printf '%s\n' "## iteration $new" "task=$task" "files_modified=$files" \
       "checks_pass=$cp" "checks_fail=$cf" "checks_unverifiable=$cu" \
@@ -315,6 +309,24 @@ case "$cmd" in
     g(){ state_get "$1"; }
     left="off"
     d=$(g deadline); if [ -n "$d" ] && [ "$d" != 0 ]; then left=$(( d - $(date +%s) ))s; [ "$left" = "" ] && left=0s; fi
+    # STEP line (v2.7): the loop's four steps are a cycle; "where am I" is
+    # derived from ledger facts (stamp present? blocks written? claim present?
+    # gate verdict recorded), not asked of the controller. This is the
+    # recall-free answer to "what does the loop do next" at ANY point, not
+    # only right after a NO-GO.
+    stamped=0; grep -qE '^approved: [0-9a-f]{6,}' "$sd/goal.md" 2>/dev/null && stamped=1
+    blocks=0; [ -s "$sd/loop-log.md" ] && blocks=$(grep -cE '^## iteration' "$sd/loop-log.md")
+    claimed=0; tail -n 40 "$sd/loop-log.md" 2>/dev/null | grep -qE '^exit_signal=yes' && claimed=1
+    if [ "$stamped" -eq 0 ]; then
+      step="1-contract: goal.md not stamped - fill ACs, smoke checks, then ctl stamp"
+    elif [ "$blocks" -eq 0 ]; then
+      step="2-dispatch: stamped, no iteration blocks yet - brief the first wave"
+    elif [ "$claimed" -eq 1 ]; then
+      step="4-branch: last block claims done - run gate --check, then deliver or follow NEXT"
+    else
+      step="3-join: work landed but not claimed - review evidence, close-iteration with exit-signal"
+    fi
+    echo "CTL: STEP $step (stamped=$stamped blocks=$blocks claim=$claimed)"
     printf 'CTL: STATUS iter=%s/%s breaker=%s dry_streak=%s/%s best_score=%s time_left=%s\n' \
       "$(g iteration)" "$(g max_iterations)" "$(g breaker)" "$(g dry_streak)" "$(g dry_limit)" "$(g best_score)" "$left"
     lb=$(awk '
@@ -352,6 +364,7 @@ case "$cmd" in
         continue-forge)      next="keep forging: dry_streak < dry_limit, run another exhaustion round" ;;
         write-strategy-delta) next="record what genuinely changes next, then close-iteration" ;;
         rebind-judged)       next="re-run the judging seat at the current digest and bind fresh" ;;
+        write-ledger-block)  next="close-iteration wrote nothing or an illegal task id - write the ledger block (task=T<n>[backend:N])" ;;
         set-exit-signal)     next="the block never claimed exit - close-iteration --exit-signal yes" ;;
         redesign-AC)         next="the metric and the cold seat disagree: rewrite the AC or its direction" ;;
         proposal-to-user)    next="the contract changed: propose an amendment, do not apply it" ;;

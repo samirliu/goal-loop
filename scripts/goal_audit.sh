@@ -25,6 +25,9 @@ while [ $# -gt 0 ]; do
   shift
 done
 r(){ tr -d '\r'; }
+here=$(cd "$(dirname "$0")" && pwd)
+# shellcheck source=goal_parse.sh
+. "$here/goal_parse.sh"       # task grammar + score validator shared (v2.7)
 sd="$project/.goal"
 [ -d "$sd" ] || { echo "AUDIT: ERROR no-goal-dir" >&2; exit 4; }
 [ -f "$sd/loop-log.md" ] || { echo "AUDIT: ERROR no-loop-log" >&2; exit 4; }
@@ -40,7 +43,7 @@ while IFS= read -r line; do
     *) continue ;;
   esac
   t=${line#task=}
-  if ! printf '%s' "$t" | grep -qE '^T[0-9]+\[(teams|crew):[0-9]+\]( *\(fallback:[a-z0-9-]+\))?$'; then
+  if ! gp_task_ok "$t"; then
     bad "A1 task-schema:$t"; continue
   fi
   case "$t" in
@@ -49,7 +52,7 @@ while IFS= read -r line; do
   esac
   case "$t" in
     *'(fallback:'*)
-      suf=$(printf '%s' "$t" | sed -nE 's/.*\(fallback:([a-z0-9-]+)\).*/\1/p')
+      suf=$(gp_task_fallback "$t")
       case "$suf" in
         teams-process-reaped|teams-unavailable) : ;;
         *) bad "A3 fallback-vocabulary:$suf" ;;

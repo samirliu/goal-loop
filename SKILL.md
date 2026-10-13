@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.6.0)
+# Goal Loop (v2.7.0)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -179,6 +179,7 @@ references/patterns.md。
 
 `scripts/{goal_gate.sh,goal_ctl.sh,goal_team.sh}`（门控只读仲裁 / 控制器
 记账手 / 便携 team 层）· `scripts/goal_hook.sh`（Stop hook）·
+`scripts/goal_parse.sh`（共享解析层：账本语法只定义一次，三脚本共用）·
 `assets/goal.contract.md`。
 自检：`bash tests/run_tests.sh`（全套）+ `bash tests/docs_consistency.sh`。
 卸载 = 删 skill 目录 + `~/.claude/agents/goal-*.md`。

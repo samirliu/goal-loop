@@ -1383,6 +1383,78 @@ assert_has "104c delivery line" 'DELIVERED iter=1' "$out"
 mkdir -p "$T/t104d"
 bash "$LOOPT" --continue --dry-run --project "$T/t104d" >/dev/null 2>&1; assert_rc "104d continue without contract -> rc4" 4 $?
 
+# 106 verdict-conflict (v2.7): two distinct seat verdicts bound to the SAME
+# (iter, digest) contradict each other on unchanged tree state (R2) - the
+# claim is mechanically refused. A same-verdict rebind is NOT a conflict
+# (latest wins by ledger order); clearing a real conflict moves state: the
+# old disagreeing pair stays as history on its old binding while the fresh
+# agreeing verdict binds the new (iter, digest).
+mkproj t106; contract t106 "- AC-1 | j | check: \`true\` | expected: judged"
+echo v1 > "$T/t106/x.txt"; S1=$(sha256sum "$T/t106/x.txt" | cut -c1-64)
+close_iter t106
+bind_v t106 "AC-1|PASS|1|DIGEST|cmd|\"a seat: good work\" artifact: x.txt digest: $S1"
+bind_v t106 "AC-1|FAIL|1|DIGEST|cmd|\"other seat: broken\" artifact: x.txt digest: $S1"
+out=$(bash "$GATE" --check --project "$T/t106" 2>&1); assert_rc "106a disagreeing same-binding pair -> rc2" 2 $?
+assert_has "106a reason verdict-conflict" 'verdict-conflict:AC-1' "$out"
+assert_has "106a hint routes rebind" 'hint=rebind-judged' "$out"
+# same verdict twice is a rebind, not a conflict: latest wins, no violation
+mkproj t106b; contract t106b "- AC-1 | j | check: \`true\` | expected: judged"
+echo ok > "$T/t106b/x.txt"; SB=$(sha256sum "$T/t106b/x.txt" | cut -c1-64)
+close_iter t106b
+bind_v t106b "AC-1|PASS|1|DIGEST|cmd|\"first\" artifact: x.txt digest: $SB"
+bind_v t106b "AC-1|PASS|1|DIGEST|cmd|\"confirmed\" artifact: x.txt digest: $SB"
+out=$(bash "$GATE" --check --project "$T/t106b" 2>&1); assert_rc "106b identical double-bind is NOT a conflict" 0 $?
+# conflict clearing: move state, bind ONE agreeing verdict on the new binding
+mkproj t106c; contract t106c "- AC-1 | j | check: \`true\` | expected: judged"
+echo v1 > "$T/t106c/x.txt"; SC=$(sha256sum "$T/t106c/x.txt" | cut -c1-64)
+close_iter t106c
+bind_v t106c "AC-1|PASS|1|DIGEST|cmd|\"a\" artifact: x.txt digest: $SC"
+bind_v t106c "AC-1|FAIL|1|DIGEST|cmd|\"b\" artifact: x.txt digest: $SC"
+echo v2 > "$T/t106c/x.txt"; SC2=$(sha256sum "$T/t106c/x.txt" | cut -c1-64)
+bash "$CTL" close-iteration --project "$T/t106c" --task T2 --files x.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate >/dev/null 2>&1
+bind_v t106c "AC-1|PASS|2|DIGEST|cmd|\"resolved by fresh seat\" artifact: x.txt digest: $SC2"
+out=$(bash "$GATE" --check --project "$T/t106c" 2>&1); assert_rc "106c conflict cleared by fresh binding on new state" 0 $?
+
+# 107 status STEP line (v2.7): the loop's current step is DERIVED from ledger
+# facts so "what do I do next" is answered without recalling the four-step
+# loop from memory, at any point (not only after a NO-GO).
+mkproj t107; printf '# G\n\n## Acceptance criteria\n\n- AC-1 | t | check: `true` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n' > "$T/t107/.goal/goal.md"
+out=$(bash "$CTL" status --project "$T/t107" 2>&1)
+assert_has "107a unstamped => step 1" 'STEP 1-contract' "$out"
+bash "$CTL" stamp --project "$T/t107" --auto >/dev/null
+out=$(bash "$CTL" status --project "$T/t107" 2>&1)
+assert_has "107b stamped, no work => step 2" 'STEP 2-dispatch' "$out"
+bash "$CTL" close-iteration --project "$T/t107" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate >/dev/null 2>&1
+out=$(bash "$CTL" status --project "$T/t107" 2>&1)
+assert_has "107c work unclaimed => step 3" 'STEP 3-join' "$out"
+bash "$CTL" close-iteration --project "$T/t107" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate >/dev/null 2>&1
+out=$(bash "$CTL" status --project "$T/t107" 2>&1)
+assert_has "107d claimed => step 4" 'STEP 4-branch' "$out"
+
+# 108 R12 tooth AT THE GATE (v2.7): a claiming block whose task= id violates
+# the ledger law is refused by the arbiter itself, not only by ctl's writer
+# or the audit. A v1.x bare id still claims, with a NOTE (read compat).
+mkproj t108; contract t108 "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf '## iteration 1\ntask=SELF-AUDIT\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=yes\nfalse_complete=no\ndigest=X\nscore=none\nstrategy_delta=none\n' > "$T/t108/.goal/loop-log.md"
+d=$(bash "$GATE" --digest --project "$T/t108")
+sed -i "s/^digest=X$/digest=$d/" "$T/t108/.goal/loop-log.md"
+out=$(bash "$GATE" --check --project "$T/t108" 2>&1); assert_rc "108a claim with illegal task id -> rc2" 2 $?
+assert_has "108a names bad-task" 'bad-task:' "$out"
+assert_has "108a hint routes the fix" 'hint=write-ledger-block' "$out"
+# v1.x bare id claims (read compat) with an explicit NOTE
+mkproj t108b; contract t108b "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf '## iteration 1\ntask=T5\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=yes\nfalse_complete=no\ndigest=X\nscore=none\nstrategy_delta=none\n' > "$T/t108b/.goal/loop-log.md"
+d=$(bash "$GATE" --digest --project "$T/t108b")
+sed -i "s/^digest=X$/digest=$d/" "$T/t108b/.goal/loop-log.md"
+out=$(bash "$GATE" --check --project "$T/t108b" 2>&1); assert_rc "108b bare legacy id still claims" 0 $?
+assert_has "108b legacy NOTE emitted" 'task-id-legacy' "$out"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1

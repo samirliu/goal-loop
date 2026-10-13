@@ -32,6 +32,12 @@ evidence. Judged ACs: PASS needs the quoted decisive output PLUS an
 `artifact: <path> digest: <sha256>` binding - the gate recomputes the
 sha256 of that path and voids the verdict on mismatch (`verdict-unbound`);
 UNVERIFIABLE needs `PROBE=.. REASON=..`; empty evidence voids a PASS.
+Two rows for one id at the SAME (iter,digest) that DISAGREE are a mechanical
+contradiction - the claim is refused `verdict-conflict` (R2 makes re-judging
+illegal while the files are unchanged, so a disagreeing pair means the judge
+plane contradicts itself on one bound state). A same-verdict rebind is legal:
+the later row wins by ledger order (v2.7; pre-v2.7 the winner was gawk hash
+order and therefore nondeterministic).
 Calibration rows share the same 6-field schema under derived ids: `AC-1#good`
 and `AC-1#bad` - the seat's grades on the declared fixtures (see `calib:`
 below). Derived ids count as ordinary rows for bind/stale rules: a digest
@@ -102,15 +108,23 @@ the contract or a state file mid-rerun trips `check-mutated-ledger`; only
 4  no_progress_streak <= limit                else 3 stagnation
 4b last two blocks same error_signature       else 3 repeated-error
 5  last block exit_signal=yes                 else 2 not-claimed
+5b claiming block task= is a valid ledger id  else 2 bad-task [R12 tooth at
+   (bare T<n] = v1.x read-compat, NOTE only)      the arbiter; ctl still
+                                                  enforces it at write time]
 6  block digest == current digest             else 2 verdicts-stale [R7]
    (ctl counts the false complete automatically - the ratchet is mechanical)
 6b every AC line has expected: and check:     else 4 contract-malformed
 7  per AC: probe (R9) then deterministic      FAIL 2 open-FAIL / BROKEN 2
      judged -> stored verdict fresh+non-FAIL  else 2 not-covered/open-FAIL [R7]
+7b same-(iter,digest) verdict pair disagrees  else 2 verdict-conflict [R16]
+   (latest wins only when identical; disagreement = R2 was violated)
 8  judged PASS evidence cited AND artifact    else 2 evidence-missing /
    digest recomputes same                     verdict-unbound [R5]
 8b calib: fixtures graded both ways fresh     else 2 calibration-missing /
-                                               calibration-broken [R15]
+   + EXCLUSIVE fixture citation per grade     calibration-broken [R15]
+8c judged PASS claims judge=N when the ledger  else 2 judge-score-missing
+   already records judge scores                 (NOTE once when it never
+                                                used the judge plane)
 9  judged UNVERIFIABLE *3 <= total            else 2 unverifiable-excessive [R4]
 10 digest unchanged after rerun batch         else 2 check-mutated-tree
 11 forge: dry_streak >= dry_limit             else 2 not-dry
@@ -170,6 +184,11 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
   points (iter|score|judge both numeric) and their directions oppose, the
   objective is optimizing away from perceived quality - refuse the claim.
   Flat movement is unverified, not divergence. Fewer than two points = skip.
+- **R16** verdict-conflict (v2.7): two rows for one id at the SAME
+  (iter,digest) with DIFFERENT verdicts = the judge plane contradicts itself
+  on one bound state; the claim is refused. Re-binding the same verdict is
+  legal (latest wins by ledger order), disagreement is not. R2's ban on
+  re-judging unchanged files now has a mechanical tooth at the arbiter.
 - **R12** controller self-audit: before claiming exit run
   `scripts/goal_audit.sh` (task= schema, fallback suffixes, no silent
   downgrade, strategy_delta honesty). rc!=0 blocks the claim. The gate

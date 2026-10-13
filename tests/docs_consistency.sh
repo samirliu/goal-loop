@@ -109,15 +109,16 @@ scripts/goal_gate.sh|probe-failed
 scripts/goal_gate.sh|score-regressed
 scripts/goal_gate.sh|missing-strategy-delta
 scripts/goal_ctl.sh|strategy-delta
-scripts/goal_ctl.sh|(exit|objective):
-scripts/goal_gate.sh|(exit|objective):
-scripts/goal_ctl.sh|hash_std
+scripts/goal_parse.sh|(exit|objective):
+scripts/goal_ctl.sh|gp_ac_body_hash
+scripts/goal_gate.sh|gp_ac_body_hash
+scripts/goal_ctl.sh|gp_hash_std
 references/teams.md|5.1b After approval lands
 SKILL.md|唤醒+完整简报
 SKILL.md|不要口语化成 crew
 SKILL.md|minimize
 references/gate.md|low-water for minimize
-scripts/goal_gate.sh|minimize)  echo "minimize"
+scripts/goal_parse.sh|minimize)  echo "minimize"
 scripts/goal_gate.sh|dir=minimize
 scripts/goal_ctl.sh|obj_dir
 SKILL.md|盖戳时绑定
