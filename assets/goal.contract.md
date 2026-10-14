@@ -27,7 +27,23 @@ exit: threshold
      worse than best_score in the objective's direction (R11). Floors stay
      as ordinary ACs. Use with exit: forge. Examples:
        objective: maximize AC-2
-       objective: minimize AC-1 -->
+       objective: minimize AC-1
+     The objective is a GRADIENT: what the number cannot see gets optimized
+     away. Gate it with the horizon layer - >=1 judged AC carrying calib:
+     fixtures (R15) on the qualities the metric can chase - or declare the
+     blind spot acceptable with a line (frozen by the stamp, R19):
+       horizon-waived: <why this objective's blind spot is immaterial>
+     Objective contracts refuse the stamp with neither. Every wave of an
+     objective loop must carry --strategy <attack direction> at close-
+     iteration (R17 attribution: slope is attributed per label).
+     Optional measurement tokens on the score AC:
+     - `sd:` / `var:` regexes naming the measurement's spread from its own
+       output ("stddev: 1.4") - the R11 noise band then comes from data
+       (z=2) instead of guessed tolerance.
+     - `external:` / `window:` (R18): settle the AC against an out-of-tree
+       source; window caches the verdict for <window> seconds. rc=75 from
+       the command = "not ready", AC settles DEFERRED. window: without
+       external: refuses the stamp. -->
 
 ## Acceptance criteria
 

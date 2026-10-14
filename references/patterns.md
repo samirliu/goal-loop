@@ -157,9 +157,18 @@ layers, at least one AC from each when the goal is genuinely complex:
   `calib:` good/bad fixtures (R15) on the qualities the metric can chase
   away from (perceptual quality, realism, readability). A complex goal
   with only floors + objective is a Goodhart machine waiting to happen.
+  Since v2.9 the horizon is a stamp TEETH: an objective contract without a
+  judged+calib AC is refused unless it writes down `horizon-waived: <reason>`
+  (R19) - accepting the blind spot must be a decision, not an oversight.
 
-If a complex goal will not yield all three layers, that is contract
-information too: name the missing layer in the summary so the user knows
-which failure mode is unprotected. Attribution (v2.8) needs the objective
-layer to record `--strategy` labels; without it, the efficiency block has
-nothing to attribute.
+Business-grade contracts often need a fourth reality: facts that settle
+OUTSIDE the tree (CRM state, prod metrics, an async human verdict). Shape
+them with `external:` commands (R18) - additive on the deterministic floor,
+rc=75 for not-ready -> DEFERRED, `window:` caching so the loop doesn't spin
+the slow system: re-querying a day-to-settle fact at every gate exit is not
+measurement, it is spinning. The significance discipline (R17) pairs with
+it: declare `sd:`/`var:` where the harness prints its spread so the
+water-mark band is computed from data, not from the author's memory of
+typical noise. Attribution (v2.9 tooth, R17) needs the objective layer to
+record `--strategy` labels; without it, the efficiency block has nothing
+to attribute.

@@ -16,6 +16,15 @@ wallclock, ...) BIND at stamp - goal_ctl.sh stamp copies them into state.rec.
 `best_score` is the water mark for `objective: maximize|minimize AC-N` (R11) -
 high-water for maximize, low-water for minimize.
 
+`.goal/scores.rec` 4 fields: `iter|score|judge|strategy` (v2.9; rows written
+before v2.9 carry 3 fields and every reader is field-indexed, so both shapes
+parse). The strategy column is what per-strategy attribution (SKILL.md
+Step 4) reads; objective contracts must label every wave (writer tooth, R17).
+`.goal/evidence/deferred.rec` 4 fields: `id|verdict|tstamp|detail` - the
+external-check cache (R18): append-only, latest-per-id wins by (tstamp,
+file order). Evidence lives under `.goal/evidence/`: exempt from BOTH
+digests, which is what lets a gate rerun batch write measurement cache
+without tripping check-mutated-ledger (R6-fair).
 `.goal/loop-log.md` append-only blocks, exact keys:
 `## iteration N` + task files_modified checks_pass checks_fail
 checks_unverifiable error_signature progress exit_signal false_complete
@@ -77,16 +86,36 @@ contract, not the ledger).
   reject the known-bad case cannot be trusted on the real one. Fixtures exist
   in the tree (stamp validates), fixture decay mid-loop = `calibration-broken`
   (fail-closed, never a silent exemption).
+- `external: \`<command>\`` (v2.9, R18) settles the AC against an OUT-OF-TREE
+  source (a CRM, prod metrics, an async reviewer). It is ADDITIVE: the in-tree
+  `check:` floor still runs and a floor FAIL/BROKEN is decisive - "something is
+  still pending" never masks a failure. rc=75 means "not ready yet" -> the AC
+  settles DEFERRED (wait, not deliver). `window: <seconds>` (default 3600) is
+  the cache validity: inside it the recorded verdict in `deferred.rec` IS the
+  measurement, so a day-to-settle fact costs one query per window, not one per
+  gate exit. `window:` without `external:` is refused at stamp (window caches
+  an out-of-tree check - declare both or neither).
+- `sd: \`regex one capture group\`` / `var: \`regex\`` (v2.9, R17) extract the
+  measurement's spread (stddev / variance, sqrt'd) from the check output. With
+  a spread the R11 water-mark band is `max(2*spread/|best|, tolerance)` - the
+  noise floor comes from data, not from the author's memory. Declared-but-
+  non-matching = BROKEN (fail-loud), never a silently band-less compare.
 - stderr is captured to the verdict detail (stdout stays the measurement
   channel); a FAIL/BROKEN that says only "failed" is the eval system
   violating fail-loud.
 - Optional contract line `objective: maximize|minimize AC-N` (R11): the gate tracks
   that AC's observed value against `best_score` and refuses a claim that
-  regresses. Stamp still covers only the AC body + `exit:` lines.
+  regresses. Stamp still covers only the AC body + `exit:`/`objective:`/
+  `horizon-waived:` lines.
+- Optional contract line `horizon-waived: <reason>` (v2.9, R19): declares that
+  the objective's blind spot is accepted. An objective contract needs either
+  >=1 judged AC with `calib:` (the horizon layer) or this waiver - otherwise
+  stamp refuses (a gradient without a guard-rail is a Goodhart machine).
 - Stamp `^approved: [0-9a-f]{8} [0-9]{4}-` = sha1-8 over the AC section body
-  PLUS every `^exit:` and `^objective:` line (exit policy and maximize
-  target are frozen too - R11 is unpatchable after stamping).
-  Direction comes from the objective line; changing it is contract-tampered.
+  PLUS every `^exit:`, `^objective:` and `^horizon-waived:` line (exit policy,
+  maximize target and horizon waiver are frozen too - R11/R19 are unpatchable
+  after stamping). Direction comes from the objective line; changing it is
+  contract-tampered.
 
 ## 2 Digest + mutation guard
 
@@ -121,8 +150,9 @@ digests by construction.
 6  block digest == current digest             else 2 verdicts-stale [R7]
    (ctl counts the false complete automatically - the ratchet is mechanical)
 6b every AC line has expected: and check:     else 4 contract-malformed
-7  per AC: probe (R9) then deterministic      FAIL 2 open-FAIL / BROKEN 2
-     judged -> stored verdict fresh+non-FAIL  else 2 not-covered/open-FAIL [R7]
+7  per AC: external settle (R18) + probe (R9)  FAIL 2 open-FAIL / BROKEN 2
+     then deterministic; judged -> stored      DEFERRED 2 deferred-pending
+     verdict fresh+non-FAIL                   else 2 not-covered/open-FAIL [R7]
 7b same-(iter,digest) verdict pair disagrees  else 2 verdict-conflict [R16]
    (latest wins only when identical; disagreement = R2 was violated)
 8  judged PASS evidence cited AND artifact    else 2 evidence-missing /
@@ -137,7 +167,7 @@ digests by construction.
 11 forge: dry_streak >= dry_limit             else 2 not-dry
 12 breaker=HALF_OPEN: strategy_delta set      else 2 missing-strategy-delta [R10]
 13 objective score vs best_score by direction else 2 score-regressed [R11]
-   (tolerance: absorbs noise inside the band)
+   (band = sd/var spread z2 or tolerance, wider wins; noise inside = holds)
 14 score<->judge direction on last 2 points  else 2 DIVERGENCE:score-vs-judge [R13]
    advisory NOTEs on GO: tautology-suspect / metric-flat (never block)
 GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
@@ -205,6 +235,25 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
   `scripts/goal_audit.sh` (task= schema, fallback suffixes, no silent
   downgrade, strategy_delta honesty). rc!=0 blocks the claim. The gate
   judges the artifact; the audit judges the controller.
+- **R17** significance + attribution (v2.9): (a) water-mark noise bands are
+  computed from declared data spread (`sd:`/`var:`, z=2) when available,
+  wider-of with `tolerance:`; declared-but-silent instruments are BROKEN,
+  not exempt. (b) Attribution is a writer duty: objective contracts refuse
+  unlabeled waves (`close-iteration --strategy` mandatory there), so the
+  `scores.rec` strategy column is non-empty by construction and the
+  per-strategy slope advisories in `ctl status` always have data.
+- **R18** external/deferred settle (v2.9): facts that live outside the tree
+  settle via `external:` commands with rc=75 -> DEFERRED and a validity
+  `window:` (cache under `.goal/evidence/deferred.rec`, digest-exempt
+  by design). DEFERRED never masks an in-tree FAIL and never delivers:
+  the claim routes `deferred-pending` / `hint=wait-for-source` - the loop
+  keeps working, the query stays cheap (one per window), and an expired
+  cache re-queries instead of measuring stale truth.
+- **R19** horizon hard constraint (v2.9): objective contracts declare either
+  a horizon layer (judged AC + `calib:`) or an explicit `horizon-waived:
+  <reason>`; stamp refuses neither. A gradient with an unguarded blind spot
+  is a Goodhart machine by construction, so the waiver must say so -
+  silently missing is the failure mode, not the default.
 
 ## 5 Breaker
 

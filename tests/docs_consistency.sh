@@ -109,7 +109,7 @@ scripts/goal_gate.sh|probe-failed
 scripts/goal_gate.sh|score-regressed
 scripts/goal_gate.sh|missing-strategy-delta
 scripts/goal_ctl.sh|strategy-delta
-scripts/goal_parse.sh|(exit|objective):
+scripts/goal_parse.sh|(exit|objective|horizon-waived):
 scripts/goal_ctl.sh|gp_ac_body_hash
 scripts/goal_gate.sh|gp_ac_body_hash
 scripts/goal_ctl.sh|gp_hash_std

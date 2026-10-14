@@ -170,6 +170,11 @@ ac_tolerance(){ gp_ac_tolerance "$project" "$1"; }
 # out-of-tree source; window: = cache validity in seconds (default 3600).
 ac_external_cmd(){ gp_ac_external_cmd "$project" "$1"; }
 ac_window(){ gp_ac_window "$project" "$1"; }
+# Significance layer (v2.9): sd:/var: name WHERE the measurement's dispersion
+# comes from, so the water-mark band is computed from data instead of the AC
+# author's memory of typical noise (z=2 law in the regression check).
+ac_sd_re(){ gp_ac_sd_re "$project" "$1"; }
+ac_var_re(){ gp_ac_var_re "$project" "$1"; }
 # Calibration fixtures (v2.6, judged ACs): `calib: good=<f1> bad=<f2>` names a
 # known-good and a known-bad artifact of the AC's subject. A seat may claim
 # PASS only after grading both correctly (#good=PASS, #bad=FAIL, same
@@ -302,11 +307,25 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   [ -n "$err_tail" ] || err_tail=""
   out=$(printf '%s\n' "$out" | r)                    # CR scrub: Windows-native checks print CRLF
   metric=$(ac_metric_re "$id")
+  clean=$(printf '%s\n' "$out" | strip_ansi)
   if [ -n "$metric" ]; then
-    clean=$(printf '%s\n' "$out" | strip_ansi)
     mval=$(extract_metric "$clean" "$metric")
   else
     mval=""
+  fi
+  # Significance layer (v2.9): sd: carries a stddev capture, var: a variance
+  # capture. Both are instruments: declared and matching nothing is BROKEN
+  # (same fail-loud law as metric probes), never a silently dropped band.
+  sdre=$(ac_sd_re "$id"); varre=$(ac_var_re "$id")
+  spread=""
+  if [ -n "$sdre" ]; then
+    v=$(extract_metric "$clean" "$sdre")
+    [ -n "$v" ] || { printf '%s|BROKEN|sd regex matched nothing: %s\n' "$id" "$sdre"; return; }
+    spread=$(awk -v s="$v" 'BEGIN{print (s<0)?-s:s}')
+  elif [ -n "$varre" ]; then
+    v=$(extract_metric "$clean" "$varre")
+    [ -n "$v" ] || { printf '%s|BROKEN|var regex matched nothing: %s\n' "$id" "$varre"; return; }
+    spread=$(awk -v s="$v" 'BEGIN{s=(s<0)?-s:s; print sqrt(s)}')
   fi
   case "$cls" in
     exit0)
@@ -349,7 +368,8 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
       esac
       # maximize is the objective, not a floor: numeric = PASS. The score
       # itself is compared to best_score by the caller (score-regressed).
-      line="$id|PASS|observed=$last expect=maximize" ;;
+      # spread rides along in the detail (run_one_check returns via subshell).
+      line="$id|PASS|observed=$last${spread:+ spread=$spread} expect=maximize" ;;
     minimize)
       last="$mval"
       if [ -z "$last" ] && [ -n "$metric" ]; then
@@ -364,7 +384,7 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
       esac
       # minimize: the objective is to push the number DOWN. Numeric = PASS;
       # the low-water mark is enforced by the caller (score-regressed).
-      line="$id|PASS|observed=$last expect=minimize" ;;
+      line="$id|PASS|observed=$last${spread:+ spread=$spread} expect=minimize" ;;
     *)
       printf '%s|BROKEN|unroutable expectation class\n' "$id"; return ;;
   esac
@@ -422,7 +442,16 @@ if [ "$mode" = verify ]; then
   ld1=$(ledger_digest)
   [ "$ld0" = "$ld1" ] || { echo "GATE: NO-GO reason=check-mutated-ledger:before=$ld0 after=$ld1 (a check wrote the ledger mid-run - only .goal/evidence/ is fair game)" >&2; exit 2; }
   [ "$nchecked" -gt 0 ] || { echo "GATE: VERIFY-OK nothing-deterministic"; exit 0; }
-  if [ $((nfail+nbroken)) -eq 0 ]; then echo "GATE: VERIFY-OK checked=$nchecked"; exit 0; fi
+  if [ $((nfail+nbroken)) -eq 0 ]; then
+    # DEFERRED rows are surfaced even on an otherwise-clean verify: --verify
+    # answers "is every measurement green?" and a pending out-of-tree fact is
+    # NOT green - the controller needs the line or it will re-query blind.
+    if [ "$npending" -gt 0 ]; then
+      echo "GATE: VERIFY-OK checked=$nchecked pending=$npending (external sources not settled - claim is NOT ready)"
+      exit 0
+    fi
+    echo "GATE: VERIFY-OK checked=$nchecked"; exit 0
+  fi
   echo "GATE: NO-GO reason=verify-failures:fail=$nfail broken=$nbroken" >&2
   exit 2
 fi
@@ -544,6 +573,7 @@ done
 lv=$(latest_verdicts)
 total=0; passn=0; unv=0
 observed_score=""
+observed_spread=""
 primary=$(objective_ac)
 for id in $ac_ids; do
   cls=$(classify_expected "$(ac_expected "$id")")
@@ -556,7 +586,8 @@ for id in $ac_ids; do
     case "$v" in
       PASS)   total=$((total+1)); passn=$((passn+1))
               if [ "$id" = "$primary" ]; then
-                observed_score=$(printf '%s' "$detail" | sed -nE 's/.*observed=([0-9.\-]+).*/\1/p' | tail -1)
+                observed_score=$(printf '%s' "$detail" | sed -nE 's/.*observed=([0-9.\-]+).*$/\1/p' | tail -1)
+                observed_spread=$(printf '%s' "$detail" | sed -nE 's/.*spread=([0-9.]+).*$/\1/p' | tail -1)
               fi ;;
       DEFERRED)
               # An external fact is still pending. The loop must not deliver
@@ -699,16 +730,27 @@ if [ -n "$primary" ]; then
   # teach the controller to distrust the metric). Inside the noise band the
   # score is treated as holding, not moving.
   tol=$(ac_tolerance "$primary"); case "$tol" in ''|*[!0-9.]*) tol=0 ;; esac
+  # Significance band (v2.9): with sd:/var: declared, the band is z*spread
+  # (z=2) or the declared tolerance, whichever is WIDER. The data says what
+  # noise this measurement carries; the author may still floor it. Without a
+  # spread declaration the band is exactly the v2.5 tolerance law.
+  if [ -n "$observed_spread" ]; then
+    band=$(awk -v s="$observed_spread" -v t="$tol" -v b="${best:-1}" \
+           'BEGIN{a=(b<0)?-b:b; if(a<1)a=1; print (2*s/a>t)?(2*s/a):t}')
+    src="band=z2*spread=$observed_spread"
+  else
+    band="$tol"; src="tol=$tol"
+  fi
   if [ -n "$best" ] && [ "$best" != "none" ]; then
     # Noise band = b +/- |b|*t. Multiplying (1-t)*b flips the band on
     # NEGATIVE water marks (b=-10,t=.1 -> band -9, so -10 reads "regressed");
     # absolute value keeps the band on the correct side in every sign.
     if [ "$pdir" = minimize ]; then
-      awk -v c="$observed_score" -v b="$best" -v t="$tol" 'BEGIN{a=(b<0)?-b:b; exit !(c+0 <= b+0 + a*t)}' \
-        || fail "score-regressed:current=$observed_score best=$best dir=minimize tol=$tol (restore the best-scoring state or do not claim)"
+      awk -v c="$observed_score" -v b="$best" -v t="$band" 'BEGIN{a=(b<0)?-b:b; exit !(c+0 <= b+0 + a*t)}' \
+        || fail "score-regressed:current=$observed_score best=$best dir=minimize $src (restore the best-scoring state or do not claim)"
     else
-      awk -v c="$observed_score" -v b="$best" -v t="$tol" 'BEGIN{a=(b<0)?-b:b; exit !(c+0 >= b+0 - a*t)}' \
-        || fail "score-regressed:current=$observed_score best=$best dir=maximize tol=$tol (restore the best-scoring state or do not claim)"
+      awk -v c="$observed_score" -v b="$best" -v t="$band" 'BEGIN{a=(b<0)?-b:b; exit !(c+0 >= b+0 - a*t)}' \
+        || fail "score-regressed:current=$observed_score best=$best dir=maximize $src (restore the best-scoring state or do not claim)"
     fi
   fi
 fi

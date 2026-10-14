@@ -14,7 +14,7 @@ description: |-
   irreversible side effects.
 ---
 
-# Goal Loop (v2.8.0)
+# Goal Loop (v2.9.0)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -54,10 +54,20 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
 
 ## Step 1 契约
 
-- 每条 AC：`- AC-N | <yes/no 陈述> | check: \`<命令>\` | [baseline: delta|abs] | [metric: \`提取正则\`] | [tolerance: <相对容差>] | expected: <spec>`
+- 每条 AC：`- AC-N | <yes/no 陈述> | check: \`<命令>\` | [baseline: delta|abs] | [metric: \`提取正则\`] | [tolerance: <相对容差>] | [sd: \`stddev正则\` | var: \`方差正则\`] | [external: \`外部命令\` | window: <秒>] | expected: <spec>`
 - spec：`exit=0`/`exit=N`（N=期望错误码，错误路径是一等公民）/ 数值比较（`>=60`）/ `maximize`|`minimize`（主指标）/ `judged`
 - **测量鲁棒面**：`metric:` 用捕获组从 stdout 取数（ANSI 先剥离，取不到即
   BROKEN 不蒙混）；`tolerance:` 给主指标水位留噪声带，带内视为持平不算回退。
+  **R17 数据算带**：harness 会印自己的散布（`stddev: 1.4`）就声明 `sd:`/`var:`
+  正则——水位带改由数据算（z=2，与 tolerance 取更宽者），而不是凭作者记忆的
+  噪声。声明了却匹配不到 = BROKEN，绝不静默降级成无带比较。
+  **R18 外部结算**：事实落在树外（CRM/生产指标/异步评审）就用 `external: \`命令\``
+  ——它是**附加**验证，树内 check 地板仍要跑且 FAIL 仍一票否决；命令 rc=75 =
+  "没就绪"，AC 转 DEFERRED（等，不 FAIL 不交付）；`window:` = 缓存有效秒数
+  （默认 3600），窗口内缓存裁决就是测量，慢系统一个窗口被问一次而不是每次
+  门控退出被问一次——对一天才结算的业务事实，天天重查不是测量，是白转。
+  缓存写在 `.goal/evidence/deferred.rec`（对两个指纹都豁免，R6-fair）。
+  只写 `window:` 不写 `external:` 盖戳即拒。
   **AC 行 fail-closed**：缺 expected: 或缺 check: 的 AC 门控直接拒评该契约
   （静默丢 AC = 评估面开天窗，最坏缺陷类）。语法细则见 references/gate.md §1。
 - **Goodhart 哨兵**：写每条 AC 自问"不推进目标能满足它吗"——能则是代理
@@ -73,6 +83,9 @@ rc=2 时物理阻止停车，并把门控 reason 注回——兜底假完成。
   **R13**：每轮记 `--judge-score`，分数与冷席反向 → 门控 `DIVERGENCE` 拒 claim。
   **R11**：`objective: maximize|minimize AC-N` 声明主指标，`best_score` 为水位
   （maximize 高水位 / minimize 低水位），劣于水位不许 claim。
+  **R19 地平线硬约束**：objective 契约要么带 ≥1 条 judged+calib 的 AC 看住
+  数字看不见的盲区，要么写一行 `horizon-waived: <为什么可接受>`（盖戳冻结，
+  删一行 = contract-tampered）——只声明渐变不设护栏的契约，盖戳即拒。
 - 盖章前冒烟每条检查（跑不了的当场改写）；优化类目标冒烟跑即基线测量，
   写入 `.goal/baseline.md`（forge 契约必须，stamp 校验）。
 - 压缩摘要（一屏：目标行 + exit 策略/预算声明 + AC 表含检查命令逐字 +
@@ -166,7 +179,9 @@ bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> 
   BLOCKED 停止烧时间。到期走 graceful best-so-far 交付。优化类目标（forge）以 `dry_limit` 轮"确定性
   全绿且无新发现"为穷尽退出；`objective: maximize|minimize` 还须 score 不劣于 best_score（方向按 objective）。
 - 记账：`close-iteration --score N`（主指标）/ `--strategy-delta "..."`（R10）
-  / `--strategy "方向词"`（可选：本轮主攻策略标签，供归因）。
+  / `--strategy "方向词"`（本轮主攻策略标签，供归因——objective 契约下它是
+  强制项，不写 close 会被 writer 牙拒掉 rc4：归因要斜率有数据可归，
+  靠写作面强制，不靠事后提醒。v2.9 起 scores.rec 第 4 列就是它）。
 - **评估驱动归因（v2.8，纯 advisory 不改 rc/路由）**：`ctl status` 在优化循环
   或停滞时打印 EFFICIENCY——按 `strategy=` 窗口从 scores.rec 算分数斜率，
   好的指 `-> exploit`，平的指 `-> prune`；分数平却停滞触发 `eval-gap:`
