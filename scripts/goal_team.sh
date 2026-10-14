@@ -20,6 +20,7 @@
 #        [--summary S]
 #   bash goal_team.sh inbox  --project DIR --name N [--unread] [--mark-read]
 #   bash goal_team.sh status --project DIR
+#   bash goal_team.sh health --project DIR
 #   bash goal_team.sh delete --project DIR
 #
 # TeammateMessage fields (cc-haha shape): from, text, timestamp, read,
@@ -41,7 +42,7 @@ unread=0 mark_read=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    init|roster|send|inbox|status|delete) cmd="$1" ;;
+    init|roster|send|inbox|status|health|delete) cmd="$1" ;;
     --project) [ $# -ge 2 ] || { echo "TEAM: ERROR missing-project" >&2; exit 4; }; project="$2"; shift ;;
     --team) [ $# -ge 2 ] || { echo "TEAM: ERROR missing-team" >&2; exit 4; }; team="$2"; shift ;;
     --description) [ $# -ge 2 ] || { echo "TEAM: ERROR missing-description" >&2; exit 4; }; description="$2"; shift ;;
@@ -57,12 +58,12 @@ while [ $# -gt 0 ]; do
     --summary) [ $# -ge 2 ] || { echo "TEAM: ERROR missing-summary" >&2; exit 4; }; summary="$2"; shift ;;
     --unread) unread=1 ;;
     --mark-read) mark_read=1 ;;
-    --help|-h) sed -n '2,28p' "$0"; exit 0 ;;
+    --help|-h) sed -n '2,29p' "$0"; exit 0 ;;
     *) echo "TEAM: ERROR unknown-flag:$1" >&2; exit 4 ;;
   esac
   shift
 done
-[ -n "$cmd" ] || { echo "TEAM: ERROR no-command (init|roster|send|inbox|status|delete)" >&2; exit 4; }
+[ -n "$cmd" ] || { echo "TEAM: ERROR no-command (init|roster|send|inbox|status|health|delete)" >&2; exit 4; }
 
 td="$project/.goal/team"
 cfg="$td/config.json"
@@ -90,6 +91,40 @@ need_team_dir(){
 # without jq; config.json itself keeps a members count + pointer for
 # humans/cc-haha-shaped readers. Canonical roster = roster.jsonl.
 roster_file(){ echo "$td/roster.jsonl"; }
+
+touch_heartbeat(){
+  mkdir -p "$td/heartbeat"
+  now_iso > "$td/heartbeat/$1.ts"
+}
+
+# closed tool-error vocabulary (spec §5.3)
+err_vocab_re='error:|exception:|traceback|panic:|exit status [1-9]|exit code [1-9]|rc=[1-9]|permission denied|command not found|no such file or directory|eacces|enoent|api error|rate limit'
+
+# portable time helpers (GNU date -d, BSD date -j/-r, coreutils/BSD stat)
+epoch_from_iso(){
+  date -u -d "$1" +%s 2>/dev/null \
+    || date -u -j -f %Y-%m-%dT%H:%M:%SZ "$1" +%s 2>/dev/null \
+    || echo 0
+}
+iso_from_epoch(){
+  date -u -d "@$1" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+    || date -u -r "$1" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+    || date -u -j -f %s "$1" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+    || echo "1970-01-01T00:00:00Z"
+}
+file_mtime(){
+  date -r "$1" +%s 2>/dev/null || stat -c %Y "$1" 2>/dev/null || stat -f %m "$1" 2>/dev/null || echo 0
+}
+max_tree_mtime(){
+  # $1 = path (file or dir); prints max mtime epoch or 0
+  [ -e "$1" ] || { echo 0; return 0; }
+  if [ -f "$1" ]; then file_mtime "$1"; return 0; fi
+  local m
+  m=$(find "$1" -type f -printf '%T@\n' 2>/dev/null | sort -n | tail -1 | cut -d. -f1)
+  [ -n "$m" ] || m=$(find "$1" -type f -exec stat -c %Y {} + 2>/dev/null | sort -n | tail -1)
+  [ -n "$m" ] || m=$(find "$1" -type f -exec stat -f %m {} + 2>/dev/null | sort -n | tail -1)
+  echo "${m:-0}"
+}
 
 case "$cmd" in
   init)
@@ -155,12 +190,13 @@ EOF
         m=$(printf '%s' "$line" | sed -n 's/.*"name":"\([^"]*\)".*/\1/p')
         [ -n "$m" ] && [ "$m" != "$from" ] || continue
         [ -f "$inbox_dir/$m.jsonl" ] || : >> "$inbox_dir/$m.jsonl"
-        deliver "$m"; n=$((n+1))
+        deliver "$m"; touch_heartbeat "$m"; n=$((n+1))
       done < "$(roster_file)"
       echo "TEAM: SEND ok to=* delivered=$n"
     else
       [ -f "$inbox_dir/$to.jsonl" ] || : >> "$inbox_dir/$to.jsonl"
       deliver "$to"
+      touch_heartbeat "$to"
       echo "TEAM: SEND ok to=$to"
     fi ;;
 
@@ -196,6 +232,81 @@ EOF
       u=${u:-0}; t=${t:-0}
       echo "  $(basename "$f"): total=$t unread=$u"
     done ;;
+
+  health)
+    # READ-ONLY probe (except send() may touch heartbeat). Row format EXACT:
+    #   name|liveness|idle_s|last_touch|open_items|err_tag
+    # liveness comes only from roster "active": true/false — never invented.
+    # Stall: idle_s >= GOAL_STALL_SEC (default 300) AND open_items > 0.
+    need_team_dir
+    stall="${GOAL_STALL_SEC:-300}"
+    case "$stall" in ''|*[!0-9]*) stall=300 ;; esac
+    hbdir="$td/heartbeat"
+    now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    now_s=$(date -u +%s)
+    echo "TEAM: HEALTH stall_sec=$stall"
+    while IFS= read -r line; do
+      [ -n "$line" ] || continue
+      nm=$(printf '%s' "$line" | sed -n 's/.*"name":"\([^"]*\)".*/\1/p')
+      sc=$(printf '%s' "$line" | sed -n 's/.*"scope":"\([^"]*\)".*/\1/p')
+      act=$(printf '%s' "$line" | sed -n 's/.*"active":\([a-z]*\).*/\1/p')
+      [ -n "$nm" ] || continue
+      # liveness from roster active flag only — never invent "active"
+      live=unknown
+      [ "$act" = "true" ] && live=active
+      [ "$act" = "false" ] && live=stopped
+      # last_touch = max(heartbeat, inbox mtime, scope mtime)
+      last_s=0
+      last_iso=""
+      hb="$hbdir/$nm.ts"
+      if [ -f "$hb" ]; then
+        last_iso=$(tr -d '\r\n' < "$hb")
+        # empty/garbage sidecar must not call `date -d ''` (GNU returns today)
+        if [ -n "$last_iso" ]; then
+          last_s=$(epoch_from_iso "$last_iso")
+          case "$last_s" in ''|*[!0-9]*) last_s=0 ;; esac
+        fi
+      fi
+      ib="$inbox_dir/$nm.jsonl"
+      if [ -f "$ib" ]; then
+        ims=$(file_mtime "$ib")
+        case "$ims" in ''|*[!0-9]*) ims=0 ;; esac
+        if [ "$ims" -gt "$last_s" ]; then
+          last_s=$ims
+          last_iso=$(iso_from_epoch "$ims")
+        fi
+      fi
+      if [ -n "$sc" ] && [ -e "$project/$sc" ]; then
+        sms=$(max_tree_mtime "$project/$sc")
+        case "$sms" in ''|*[!0-9]*) sms=0 ;; esac
+        if [ "$sms" -gt "$last_s" ]; then
+          last_s=$sms
+          last_iso=$(iso_from_epoch "$sms")
+        fi
+      fi
+      [ -n "$last_iso" ] || last_iso="$now"
+      idle_s=$(( now_s - last_s ))
+      [ "$idle_s" -lt 0 ] && idle_s=0
+      # open work-plan items assigned to this name
+      open_n=0
+      if [ -f "$project/.goal/work-plan.md" ]; then
+        open_n=$(grep -E '^\- \[ \]' "$project/.goal/work-plan.md" 2>/dev/null | grep -c "$nm" || true)
+        open_n=${open_n:-0}
+      fi
+      # err_tag hint from last inbox text + stall/death
+      err=""
+      if [ "$live" = "stopped" ] || [ "$live" = "terminated" ]; then
+        err=death
+      fi
+      if [ -f "$ib" ]; then
+        last_txt=$(tr -d '\r' < "$ib" | tail -5 | tr '\n' ' ')
+        printf '%s' "$last_txt" | grep -qiE "$err_vocab_re" && err=tool-error
+      fi
+      if [ -z "$err" ] && [ "$idle_s" -ge "$stall" ] && [ "$open_n" -gt 0 ]; then
+        err=stall
+      fi
+      printf '%s|%s|%s|%s|%s|%s\n' "$nm" "$live" "$idle_s" "$last_iso" "$open_n" "$err"
+    done < "$(roster_file)" ;;
 
   delete)
     if [ ! -d "$td" ]; then echo "TEAM: DELETE none"; exit 0; fi

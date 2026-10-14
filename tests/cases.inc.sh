@@ -1853,3 +1853,66 @@ out=$(bash "$CTL" close-iteration --project "$T/t121b" --task T1 --files a.txt \
   --checks-pass 0 --checks-fail 1 --checks-unverifiable 0 --progress yes \
   --exit-signal yes 2>&1)
 assert_has "121b real FAIL still counted" 'false-complete-counted=1' "$out"
+
+# 122 teams runtime health probe (robustness v1)
+# 122a health lists members and empty err when healthy
+mkproj t122a
+bash "$TEAM" init --project "$T/t122a" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t122a" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
+mkdir -p "$T/t122a/.goal/team/heartbeat" "$T/t122a/src"
+date -u +%Y-%m-%dT%H:%M:%SZ > "$T/t122a/.goal/team/heartbeat/w1.ts"
+echo x > "$T/t122a/src/a.txt"
+out=$(bash "$TEAM" health --project "$T/t122a" 2>&1); assert_rc "122a health rc0" 0 $?
+assert_has "122a health has w1 row" 'w1\|' "$out"
+assert_has "122a idle is numeric" 'w1\|[a-z]+\|[0-9]+' "$out"
+printf '%s' "$out" | grep -qE 'w1\|[^|]*\|[^|]*\|[^|]*\|[^|]*\|$' \
+  && ok "122a healthy has empty err_tag" || no "122a unexpected err_tag: $out"
+
+# 122b stall fires when idle_s exceeds GOAL_STALL_SEC
+# (needs open_items>0; age heartbeat + inbox + scope so last_touch stays ancient)
+mkproj t122b
+bash "$TEAM" init --project "$T/t122b" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t122b" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
+mkdir -p "$T/t122b/.goal/team/heartbeat" "$T/t122b/src"
+printf -- '- [ ] T1 | w1 | pending | files: a\n' > "$T/t122b/.goal/work-plan.md"
+# ancient heartbeat
+printf '2020-01-01T00:00:00Z\n' > "$T/t122b/.goal/team/heartbeat/w1.ts"
+echo old > "$T/t122b/src/a.txt"
+touch -t 202001010000 "$T/t122b/src/a.txt"
+touch -t 202001010000 "$T/t122b/.goal/team/inboxes/w1.jsonl"
+out=$(GOAL_STALL_SEC=1 bash "$TEAM" health --project "$T/t122b" 2>&1); assert_rc "122b health rc0" 0 $?
+assert_has "122b stall tag" 'stall$' "$out"
+printf '%s' "$out" | grep -q 'stall' && ok "122b stall named" || no "122b stall missing: $out"
+
+# 122c tool-error vocab hits
+mkproj t122c
+bash "$TEAM" init --project "$T/t122c" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t122c" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
+printf '{"from":"w1","text":"Error: command not found","timestamp":"2026-10-14T00:00:00Z","read":true}\n' \
+  > "$T/t122c/.goal/team/inboxes/w1.jsonl"
+out=$(bash "$TEAM" health --project "$T/t122c" 2>&1)
+printf '%s' "$out" | grep -q 'tool-error' && ok "122c tool-error tag" || no "122c tool-error missing: $out"
+
+# 122d tool-error vocab false friend (no hit)
+mkproj t122d
+bash "$TEAM" init --project "$T/t122d" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t122d" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
+printf '{"from":"w1","text":"no errors here, all good","timestamp":"2026-10-14T00:00:00Z","read":true}\n' \
+  > "$T/t122d/.goal/team/inboxes/w1.jsonl"
+out=$(bash "$TEAM" health --project "$T/t122d" 2>&1)
+printf '%s' "$out" | grep -q 'tool-error' && no "122d false friend hit" || ok "122d false friend clean"
+
+# 122e open_items from work-plan
+mkproj t122e
+bash "$TEAM" init --project "$T/t122e" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t122e" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
+printf -- '- [ ] T1 | w1 | first | files: a\n- [x] T2 | w1 | done | files: b\n' > "$T/t122e/.goal/work-plan.md"
+out=$(bash "$TEAM" health --project "$T/t122e" 2>&1)
+assert_has "122e open_items=1" 'w1\|[^|]*\|[^|]*\|[^|]*\|1\|' "$out"
+
+# 122f send touches heartbeat
+mkproj t122f
+bash "$TEAM" init --project "$T/t122f" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t122f" --add --name w1 --role backend --prompt 'x' >/dev/null
+bash "$TEAM" send --project "$T/t122f" --from controller --to w1 --text 'wake' >/dev/null
+[ -f "$T/t122f/.goal/team/heartbeat/w1.ts" ] && ok "122f heartbeat written on send" || no "122f heartbeat missing"
