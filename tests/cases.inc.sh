@@ -1917,6 +1917,56 @@ bash "$TEAM" roster --project "$T/t122f" --add --name w1 --role backend --prompt
 bash "$TEAM" send --project "$T/t122f" --from controller --to w1 --text 'wake' >/dev/null
 [ -f "$T/t122f/.goal/team/heartbeat/w1.ts" ] && ok "122f heartbeat written on send" || no "122f heartbeat missing"
 
+# 122g no signal at all → idle_s=0 (last_s=now), never epoch-0 false stall
+mkproj t122g
+bash "$TEAM" init --project "$T/t122g" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t122g" --add --name w1 --role backend --prompt 'x' >/dev/null
+# roster --add creates an empty inbox (a real mtime signal) - remove so the
+# probe sees NO heartbeat / inbox / scope signal at all
+rm -f "$T/t122g/.goal/team/inboxes/w1.jsonl"
+printf -- '- [ ] T1 | w1 | pending | files: a\n' > "$T/t122g/.goal/work-plan.md"
+out=$(GOAL_STALL_SEC=1 bash "$TEAM" health --project "$T/t122g" 2>&1); assert_rc "122g health rc0" 0 $?
+assert_has "122g idle_s=0 when no signal" 'w1\|[^|]*\|0\|' "$out"
+printf '%s' "$out" | grep -qE '^[a-z0-9_]+\|[^|]*\|[^|]*\|[^|]*\|[^|]*\|stall$' && no "122g false stall with no signal: $out" || ok "122g no false stall when silent"
+
+# 122h garbage heartbeat ISO must not freeze last_s=0 (giant idle_s / false stall)
+mkproj t122h
+bash "$TEAM" init --project "$T/t122h" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t122h" --add --name w1 --role backend --prompt 'x' >/dev/null
+rm -f "$T/t122h/.goal/team/inboxes/w1.jsonl"
+mkdir -p "$T/t122h/.goal/team/heartbeat"
+printf 'garbage-not-iso\n' > "$T/t122h/.goal/team/heartbeat/w1.ts"
+printf -- '- [ ] T1 | w1 | pending | files: a\n' > "$T/t122h/.goal/work-plan.md"
+out=$(GOAL_STALL_SEC=1 bash "$TEAM" health --project "$T/t122h" 2>&1); assert_rc "122h health rc0" 0 $?
+assert_has "122h idle_s=0 after ISO parse fail" 'w1\|[^|]*\|0\|' "$out"
+assert_has "122h last_touch is ISO now, not garbage" 'w1\|[^|]*\|0\|[0-9]{4}-[0-9]{2}-[0-9]{2}T' "$out"
+printf '%s' "$out" | grep -qE '^[a-z0-9_]+\|[^|]*\|[^|]*\|[^|]*\|[^|]*\|stall$' && no "122h false stall after parse fail: $out" || ok "122h no false stall after parse fail"
+
+# 122i open_items = exact assignee field (w12 rows must not count for w1)
+mkproj t122i
+bash "$TEAM" init --project "$T/t122i" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t122i" --add --name w1 --role backend --prompt 'x' >/dev/null
+bash "$TEAM" roster --project "$T/t122i" --add --name w12 --role backend --prompt 'x' >/dev/null
+printf -- '- [ ] T1 | w12 | first | files: a\n- [ ] T2 | w12 | second | files: b\n- [x] T3 | w1 | done | files: c\n' > "$T/t122i/.goal/work-plan.md"
+out=$(bash "$TEAM" health --project "$T/t122i" 2>&1)
+assert_has "122i w1 open_items=0 (w12 rows are not w1)" 'w1\|[^|]*\|[^|]*\|[^|]*\|0\|' "$out"
+assert_has "122i w12 open_items=2" 'w12\|[^|]*\|[^|]*\|[^|]*\|2\|' "$out"
+
+# 122j tree digest ignores .goal/ heartbeat (R6 digest-exempt sidecar)
+mkproj t122j
+bash "$TEAM" init --project "$T/t122j" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t122j" --add --name w1 --role backend --prompt 'x' >/dev/null
+mkdir -p "$T/t122j/.goal/team/heartbeat"
+date -u +%Y-%m-%dT%H:%M:%SZ > "$T/t122j/.goal/team/heartbeat/w1.ts"
+echo x > "$T/t122j/src.txt"
+d1=$(bash "$GATE" --digest --project "$T/t122j")
+date -u +%Y-%m-%dT%H:%M:%SZ > "$T/t122j/.goal/team/heartbeat/w1.ts"
+d2=$(bash "$GATE" --digest --project "$T/t122j")
+[ "$d1" = "$d2" ] && ok "122j digest unchanged by heartbeat touch" || no "122j heartbeat moved digest (d1=$d1 d2=$d2)"
+echo y >> "$T/t122j/src.txt"
+d3=$(bash "$GATE" --digest --project "$T/t122j")
+[ "$d3" != "$d2" ] && ok "122j real source change still moves digest" || no "122j digest blind to source change"
+
 # 123 audit recovery-suffix acceptance + invented-token rejection (T123a-c).
 # 65a-e pin: re-run:evil on crew (A1), crew+recovery A4, crew+fallback exempt,
 # re-run:death on teams, re-run:stall on crew. These pin the remaining

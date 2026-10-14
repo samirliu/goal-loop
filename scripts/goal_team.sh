@@ -256,41 +256,64 @@ EOF
       [ "$act" = "true" ] && live=active
       [ "$act" = "false" ] && live=stopped
       # last_touch = max(heartbeat, inbox mtime, scope mtime)
-      last_s=0
+      # last_s is epoch seconds of the newest usable signal; "" = none yet.
+      # Never leave it at 0 with last_iso=now — that pair made idle_s=now_s
+      # (giant) and a false stall whenever a member simply had no signal.
+      last_s=""
       last_iso=""
       hb="$hbdir/$nm.ts"
       if [ -f "$hb" ]; then
-        last_iso=$(tr -d '\r\n' < "$hb")
-        # empty/garbage sidecar must not call `date -d ''` (GNU returns today)
-        if [ -n "$last_iso" ]; then
-          last_s=$(epoch_from_iso "$last_iso")
-          case "$last_s" in ''|*[!0-9]*) last_s=0 ;; esac
+        hb_iso=$(tr -d '\r\n' < "$hb")
+        # empty/garbage sidecar must not call `date -d ''` (GNU returns today);
+        # a failed ISO parse is also NOT a signal (do not freeze last_s at 0).
+        if [ -n "$hb_iso" ]; then
+          hb_s=$(epoch_from_iso "$hb_iso")
+          case "$hb_s" in ''|*[!0-9]*) hb_s="" ;; esac
+          if [ -n "$hb_s" ] && [ "$hb_s" -gt 0 ]; then
+            last_s=$hb_s
+            last_iso=$hb_iso
+          fi
         fi
       fi
       ib="$inbox_dir/$nm.jsonl"
       if [ -f "$ib" ]; then
         ims=$(file_mtime "$ib")
-        case "$ims" in ''|*[!0-9]*) ims=0 ;; esac
-        if [ "$ims" -gt "$last_s" ]; then
+        case "$ims" in ''|*[!0-9]*) ims="" ;; esac
+        if [ -n "$ims" ] && { [ -z "$last_s" ] || [ "$ims" -gt "$last_s" ]; }; then
           last_s=$ims
           last_iso=$(iso_from_epoch "$ims")
         fi
       fi
       if [ -n "$sc" ] && [ -e "$project/$sc" ]; then
         sms=$(max_tree_mtime "$project/$sc")
-        case "$sms" in ''|*[!0-9]*) sms=0 ;; esac
-        if [ "$sms" -gt "$last_s" ]; then
+        case "$sms" in ''|*[!0-9]*) sms="" ;; esac
+        if [ -n "$sms" ] && { [ -z "$last_s" ] || [ "$sms" -gt "$last_s" ]; }; then
           last_s=$sms
           last_iso=$(iso_from_epoch "$sms")
         fi
       fi
+      # no usable signal → pretend touch at now (idle_s=0), not epoch 0
+      if [ -z "$last_s" ]; then
+        last_s=$now_s
+        last_iso=$now
+      fi
       [ -n "$last_iso" ] || last_iso="$now"
       idle_s=$(( now_s - last_s ))
       [ "$idle_s" -lt 0 ] && idle_s=0
-      # open work-plan items assigned to this name
+      # open work-plan items assigned to this name — exact assignee field
+      # (2nd `|` column of `- [ ] Tid | assignee | ...`). Substring grep
+      # counted w12 rows against w1; field equality does not.
       open_n=0
       if [ -f "$project/.goal/work-plan.md" ]; then
-        open_n=$(grep -E '^\- \[ \]' "$project/.goal/work-plan.md" 2>/dev/null | grep -c "$nm" || true)
+        open_n=$(grep -E '^\- \[ \]' "$project/.goal/work-plan.md" 2>/dev/null \
+          | awk -F'|' -v nm="$nm" '
+              NF >= 2 {
+                a = $2
+                gsub(/^[ \t]+|[ \t]+$/, "", a)
+                if (a == nm) n++
+              }
+              END { print n+0 }
+            ')
         open_n=${open_n:-0}
       fi
       # err_tag hint from last inbox text + stall/death
