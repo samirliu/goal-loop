@@ -6,6 +6,8 @@
 #   C2 the version markers agree with the VERSION file
 #   C3 every numbered TOC entry has a matching ## heading
 #   C5 teams-backend protocol markers stay wired (dual-layer rule)
+#   C6 case knowledge stays out of generic skill surfaces
+#   C7 rule compaction: five invariants + packs + legacy index retained
 # Run from anywhere:  bash tests/docs_consistency.sh
 # Exit 0 = consistent. (Semantic review still belongs to humans + the loop.)
 set -u
@@ -176,12 +178,35 @@ EOF
 # C6 generality: case knowledge stays in examples/. Generic skill surfaces
 # must not name any validation case or its domain recipe.
 leak=$(grep -nE 'tsp-minimize|logcli|svg-dash|goal-loop-case-|波音|b747|threejs|THREEJS|goal-loop-747' \
-        SKILL.md references/*.md scripts/*.sh tests/*.sh assets/* 2>/dev/null | grep -v '^tests/docs_consistency.sh:' || true)
+        SKILL.md references/*.md references/packs/*.md scripts/*.sh tests/*.sh assets/* 2>/dev/null | grep -v '^tests/docs_consistency.sh:' || true)
 if [ -z "$leak" ]; then
   ok "C6 no case knowledge leaked into generic skill files"
 else
   bad "C6 case knowledge leaked: $leak"
 fi
+
+# C7 rule compaction: five invariants stay on the always-on surface; packs
+# remain the only depth; SKILL.md must not reintroduce R-numbers.
+for needle in GATE BIND PROVE GRADIENT FENCE; do
+  grep -q "$needle" SKILL.md && ok "C7 SKILL has invariant $needle" || bad "C7 SKILL missing $needle"
+done
+if grep -qE 'R[0-9]+' SKILL.md; then
+  bad "C7 SKILL.md reintroduced R-numbers (legacy index lives in references/gate.md)"
+else
+  ok "C7 SKILL.md free of R-numbers"
+fi
+for p in instrument gradient external; do
+  [ -f "references/packs/$p.md" ] && ok "C7 pack exists: $p.md" || bad "C7 pack missing: $p.md"
+done
+for needle in GATE BIND PROVE GRADIENT FENCE; do
+  grep -q "$needle" references/gate.md && ok "C7 gate.md maps $needle" || bad "C7 gate.md missing $needle"
+done
+for r in R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15 R16 R17 R18 R19; do
+  grep -q "\*\*$r\*\*" references/gate.md && ok "C7 legacy $r retained" || bad "C7 legacy $r missing from gate.md"
+done
+for needle in instrument.md gradient.md external.md; do
+  grep -q "$needle" SKILL.md && ok "C7 SKILL activates pack $needle" || bad "C7 SKILL missing pack $needle"
+done
 
 echo "== docs consistency: $([ $fail -eq 0 ] && echo CONSISTENT || echo DRIFT) =="
 exit $fail
