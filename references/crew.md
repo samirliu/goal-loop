@@ -1,5 +1,7 @@
 # Crew - parallel dispatch, join, final review
 
+深度协议见 `references/packs/README.md`（按契约能力键打开 instrument / gradient / external）。
+
 ## 1 When crew applies
 
 Decompose the objective; crew applies when the split yields ≥2 task domains

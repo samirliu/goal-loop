@@ -173,91 +173,46 @@ digests by construction.
 GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
 ```
 
-## 4 Rules
+## 4 Invariants + legacy index
 
-- **R1** false-complete: claimed exit honored only with all floors verified
-  AND exit_signal=yes AND digest match (forge: also dry). Two gate-caught
-  false claims -> BLOCKED. The counting is MECHANICAL: close-iteration with
-  exit-signal=yes that the gate answers rc=2 auto-increments
-  false_completes (NOTE `false-complete-counted=N`) - the controller no
-  longer has to append the count by hand. Exemption (v2.9/R18): an rc=2 whose
-  reason is `deferred-pending:*` is NOT counted - an in-tree-settled claim
-  waiting honestly on a slow external source is patience, not a lie
-  (NOTE `deferred-wait-not-counted`). The ratchet catches lies, not waiting.
-- **R2** seat re-judgment illegal while covered files unchanged; gate
-  re-runs are measurement, always legal.
-- **R3** stamped contract frozen (AC body + `exit:` lines); amendments are
-  proposals to the user.
-- **R4** judged UNVERIFIABLE <= 1/3, always PROBE/REASON.
-- **R5** judged briefs carry verbatim AC text + evidence paths only; no
-  producer reasoning; verdicts without observation are void.
-- **R6** workers never WRITE `.goal/`; only goal_ctl.sh writes state. Reads
-  are limited to the worker's own inbox file and files its brief explicitly
-  names - nothing else under `.goal/` (ledger, verdicts, other inboxes).
-  Exception (v2.8): each worker may APPEND at most one line per iteration to
-  `.goal/evidence/peer-notes/<task>.md` - the shared-findings pool. The
-  evidence directory is digest-excluded and note-free, so this cannot move
-  any fingerprint; the exception covers that single path and nothing else
-  (protocol law in crew.md §4: claims not instructions).
-- **R7** judged verdicts bind (iter, digest); digest move voids all judged
-  verdicts, no sharding. Deterministic exempt (gate recomputes).
-- **R8** findings bind evidence - manufactured discoveries as forbidden as
-  manufactured passes.
-- **R9** verify the verifier: metric/maximize/minimize numbers require a passing
-  `probe:` (instrument alive). An unprobed metric is a Goodhart magnet.
-- **R10** no-progress must be paired with `strategy_delta=` (what changes
-  next). Grinding without revising is make-work.
-- **R11** objective score never delivers worse than `best_score`
-  (maximize: current >= best; minimize: current <= best) - restore
-  the best-scoring state or do not claim. `tolerance:` widens the comparison
-  by a relative band so benchmark noise is "holds", not "regressed". The band
-  is computed from `|best|*tol` so it survives NEGATIVE water marks (a
-  multiply-by-(1-tol) flips the band when best<0).
-- **R14** measurement honesty (v2.5): metric regex pins the number, ANSI is
-  stripped before matching, stderr rides along in verdicts (fail-loud),
-  judged PASS must bind its artifact hash, and deterministic checks that
-  cannot fail across rounds get flagged `tautology-suspect` (advisory).
-- **R15** judge calibration (v2.6, `calib:` fixtures on judged ACs): the
-  verifier-of-the-verifier rule (R9) extended to the judgment plane. A judged
-  AC that names `good=`/`bad=` fixtures owes correct grades on both in the
-  current iteration - mechanically checked from derived-id rows in
-  `verdicts.rec`. A too-lenient seat passes `#good` and FAILS `#bad`, and the
-  claim is refused `calibration-missing:*/*`; declared-but-missing fixtures
-  are `calibration-broken` (fail-closed). Stamp refuses calib on non-judged
-  ACs, one-sided declarations, and missing fixture files (t=0 exposure).
-- **R13** score/judge divergence: when .goal/scores.rec holds two comparable
-  points (iter|score|judge both numeric) and their directions oppose, the
-  objective is optimizing away from perceived quality - refuse the claim.
-  Flat movement is unverified, not divergence. Fewer than two points = skip.
-- **R16** verdict-conflict (v2.7): two rows for one id at the SAME
-  (iter,digest) with DIFFERENT verdicts = the judge plane contradicts itself
-  on one bound state; the claim is refused. Re-binding the same verdict is
-  legal (latest wins by ledger order), disagreement is not. R2's ban on
-  re-judging unchanged files now has a mechanical tooth at the arbiter.
-- **R12** controller self-audit: before claiming exit run
-  `scripts/goal_audit.sh` (task= schema, fallback suffixes, no silent
-  downgrade, strategy_delta honesty). rc!=0 blocks the claim. The gate
-  judges the artifact; the audit judges the controller.
-- **R17** significance + attribution (v2.9): (a) water-mark noise bands are
-  computed from declared data spread (`sd:`/`var:`, z=2) when available,
-  wider-of with `tolerance:`; declared-but-silent instruments are BROKEN,
-  not exempt. (b) Attribution is a writer duty: objective contracts refuse
-  unlabeled waves (`close-iteration --strategy` mandatory there), so the
-  `scores.rec` strategy column is non-empty by construction and the
-  per-strategy slope advisories in `ctl status` always have data.
-- **R18** external/deferred settle (v2.9): facts that live outside the tree
-  settle via `external:` commands with rc=75 -> DEFERRED and a validity
-  `window:` (cache under `.goal/evidence/deferred.rec`, digest-exempt
-  by design). DEFERRED never masks an in-tree FAIL and never delivers:
-  the claim routes `deferred-pending` / `hint=wait-for-source` - the loop
-  keeps working, the query stays cheap (one per window), and an expired
-  cache re-queries instead of measuring stale truth.
-- **R19** horizon hard constraint (v2.9): objective contracts declare either
-  a horizon layer (judged AC + `calib:`) or an explicit `horizon-waived:
-  <reason>`; stamp refuses neither. A gradient with an unguarded blind spot
-  is a Goodhart machine by construction, so the waiver must say so -
-  silently missing is the failure mode, not the default.
+The always-on law is **five invariants**. Depth lives in `references/packs/README.md` (instrument / gradient / external).
+Check order (§3) is the mechanical statute; this section is the map.
 
+### 4.1 Invariant map
+
+| Invariant | One sentence | Enforced by (check order / surface) | Depth |
+|---|---|---|---|
+| **GATE** | Completion is declared only by the gate re-run; the model never self-declares. | whole check order; false-complete ratchet (§4.2 R1) | SKILL.md |
+| **BIND** | Every claim binds (stamped-contract × iteration × digest × evidence-hash); unbound claims are void. | 1, 3, 5b, 6, 7b, 8, 14 | packs/instrument.md |
+| **PROVE** | An instrument must prove itself before its number or verdict is trusted. | 7 (probe), 8 (calib), 14 (measurement) | packs/instrument.md |
+| **GRADIENT** | Optimization never delivers below the water mark; blind spots are declared; waves are labeled. | 12–14; stamp `objective:` / `horizon-waived:` | packs/gradient.md |
+| **FENCE** | Ledger write-fence, honest progress, controller self-audit; out-of-tree facts settle via cache. | 5b, 11–12; `external:` / DEFERRED | packs/external.md + goal_audit.sh |
+
+### 4.2 Legacy index (R1–R19)
+
+Stable IDs for docs/tests anchors. Each line is an **instance** of an invariant, not a separate law.
+
+- **R1** false-complete ratchet → **GATE**. Claimed exit honored only with floors verified ∧ `exit_signal=yes` ∧ digest match (forge: also dry). Two gate-caught false claims → BLOCKED. Counting is mechanical (`false-complete-counted=N`). Exemption: `deferred-pending:*` is not counted (patience ≠ lie; NOTE `deferred-wait-not-counted`).
+- **R2** seat re-judgment illegal while covered files unchanged; gate re-runs are measurement, always legal → **BIND**.
+- **R3** stamped contract frozen (AC body + `exit:` / `objective:` / `horizon-waived:` lines); amendments are proposals to the user → **BIND**.
+- **R4** judged UNVERIFIABLE ≤ 1/3, always PROBE/REASON → **FENCE** (process confidence ceiling).
+- **R5** judged briefs carry verbatim AC text + evidence paths only; no producer reasoning; verdicts without observation are void → **BIND** / **PROVE**.
+- **R6** workers never WRITE `.goal/`; only `goal_ctl.sh` writes state. Reads limited to own inbox + brief-named files. Exception: APPEND ≤1 line/iteration to `.goal/evidence/peer-notes/<task>.md` (evidence dir is digest-exempt) → **FENCE**.
+- **R7** judged verdicts bind (iter, digest); digest move voids all judged verdicts, no sharding. Deterministic exempt (gate recomputes) → **BIND**.
+- **R8** findings bind evidence — manufactured discoveries as forbidden as manufactured passes → **BIND**.
+- **R9** verify the verifier: metric/maximize/minimize numbers require a passing `probe:` → **PROVE**.
+- **R10** no-progress must be paired with `strategy_delta=` (what changes next) → **FENCE** / **GRADIENT**.
+- **R11** objective score never delivers worse than `best_score` (direction-aware; tolerance band; band = `|best|*tol` so it survives NEGATIVE water marks) → **GRADIENT**.
+- **R12** controller self-audit (`goal_audit.sh`) before claim; gate judges artifacts, audit judges the controller → **FENCE**.
+- **R13** score↔judge direction oppose on last two comparable points → `DIVERGENCE:score-vs-judge`; flat is unverified → **GRADIENT**.
+- **R14** measurement honesty: metric regex pins the number, ANSI stripped, stderr in verdicts, judged PASS binds artifact hash, tautology-suspect advisory → **PROVE** / **BIND**.
+- **R15** judge calibration (`calib: good= bad=`): seat must PASS #good ∧ FAIL #bad this iteration; missing = `calibration-missing` / `calibration-broken` → **PROVE**.
+- **R16** verdict-conflict: two rows one id at same (iter,digest) with different verdicts = refuse claim; same-verdict rebind legal (latest wins) → **BIND**.
+- **R17** significance + attribution: (a) water-mark band from `sd:`/`var:` data (z=2) wider-of with tolerance, declared-but-silent = BROKEN; (b) objective contracts require `--strategy` at close (writer tooth) → **PROVE** (a) / **GRADIENT** (b).
+- **R18** external/deferred settle: `external:` additive to in-tree floor; rc=75 → DEFERRED; `window:` cache in `deferred.rec`; never deliver on pending → **FENCE** / **BIND**. Detail: `references/packs/external.md`.
+- **R19** horizon hard constraint: objective contracts declare judged+calib layer or `horizon-waived: <reason>` (stamp-frozen) → **GRADIENT**.
+
+Depth documents: `references/packs/instrument.md` · `gradient.md` · `external.md`. Crew protocol: `references/crew.md`. Check shapes: `references/patterns.md`.
 ## 5 Breaker
 
 CLOSED -> HALF_OPEN (any progress=no: change strategy) -> OPEN (beyond, or

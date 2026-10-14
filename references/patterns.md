@@ -1,4 +1,6 @@
-# Domain patterns - failable check SHAPES per claim family (R4 basis)
+# Domain patterns - failable check SHAPES per claim family
+
+深度协议见 `references/packs/README.md`（按契约能力键打开）。本文件仍是检查形状库。
 
 Contents: [1 how to read] [2 executable-correctness] [3 behavioral]
 [4 quantitative] [5 perceptual/quality] [6 data] [7 documents]
