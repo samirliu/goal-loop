@@ -163,3 +163,68 @@ bash scripts/goal_team.sh delete --project .
 ```
 
 No jq, no python, no daemon. Same deps as the rest of the skill.
+
+## 7 Runtime watchdog (unattended robustness)
+
+Between dispatch and join the controller **watches** the team. Gate still
+decides GO; the watchdog only keeps the wave alive.
+
+### 7.1 Health probe (mechanical)
+
+`bash scripts/goal_team.sh health --project .` prints one row per member:
+
+```
+name|liveness|idle_s|last_touch|open_items|err_tag
+```
+
+- `err_tag`: empty | `death` | `stall` | `tool-error` (hint, not a verdict)
+- Stall when `idle_s >= ${GOAL_STALL_SEC:-300}` **and** `open_items > 0`
+- Progress = scope mtime ∪ inbox mtime ∪ heartbeat `.goal/team/heartbeat/<name>.ts`
+  (digest-exempt). Thinking-only is not progress.
+
+### 7.2 Taxonomy
+
+| Class | Signal | Controller confirm |
+|---|---|---|
+| death | roster stopped/terminated + wake yields no heartbeat | transcript resumable? |
+| stall | idle_s >= stall_sec and open work | long tool vs stuck |
+| tool-error | closed vocab in last inbox/extract (error: / exit code / ENOENT / …) | one-line root cause |
+
+### 7.3 Recovery playbook (resume-first, 2-strike, unknown → re-run)
+
+```
+classify → env_fixable? → fix workspace/brief → wake (breakpoint brief)
+        → no progress → wake #2
+        → 2 wakes failed OR not resumable → re-run THIS work-item
+        → re-run failed again → existing fallback / BLOCKED
+```
+
+**Resume** when partial products exist. **Re-run** only the open failed item.
+
+Breakpoint brief:
+
+```
+Continue task <id>.
+Done so far: <files / checks green>
+Still owed: <remaining AC or deliverable>
+Blocked by (if any): <root cause one-liner>
+Run: <named check>
+Do not rewrite unrelated files. (R6)
+```
+
+### 7.4 Ledger honesty (task= suffix only)
+
+Closed vocabulary — no new loop-log keys:
+
+- `(stall-recovered)` — resumed after stall
+- `(tool-error-fixed)` — env/brief fixed then resumed
+- `(re-run:stall)` `(re-run:tool-error)` `(re-run:death)` — item redone
+- `(fallback:teams-process-reaped)` `(fallback:teams-unavailable)` unchanged
+
+Forbidden: mid-run TeamDelete; silent downgrade; inventing suffix tokens.
+
+### 7.5 Watch window defaults
+
+- Poll `health` immediately, then every 60s
+- End watch when all wave items closed, or `GOAL_WATCH_MAX_SEC` (default 3600)
+- Other members keep working while one is recovered

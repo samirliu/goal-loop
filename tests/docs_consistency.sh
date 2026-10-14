@@ -173,6 +173,16 @@ scripts/goal_ctl.sh|CTL: EFFICIENCY
 scripts/goal_ctl.sh|eval-gap:
 scripts/goal_ctl.sh|promote:
 scripts/goal_ctl.sh|attribution-unused:
+references/teams.md|goal_team.sh health
+references/teams.md|GOAL_STALL_SEC
+references/teams.md|stall-recovered
+references/teams.md|tool-error-fixed
+references/teams.md|re-run:stall
+references/teams.md|breakpoint brief
+references/crew.md|Watch window
+scripts/goal_team.sh|err_tag
+scripts/goal_audit.sh|recovery-vocabulary
+scripts/goal_parse.sh|stall-recovered
 EOF
 
 # C6 generality: case knowledge stays in examples/. Generic skill surfaces

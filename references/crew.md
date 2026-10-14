@@ -45,6 +45,14 @@ Teams backend: each roster member's TeamPlan prompt carries the same
 brief fields below; the shared task item description repeats Task /
 Output paths / Scope / Pass condition so the backlog is self-describing.
 
+## 3.5 Watch window (Teams backend)
+
+After dispatch and before join, poll `goal_team.sh health` (first poll
+immediately, then every 60s). On `death` / `stall` / `tool-error` for a
+member, run the playbook in `teams.md` §7 against **that member only**.
+Join with whatever closed; open failed items follow the playbook
+(resume-first, 2-strike, re-run). Non-Teams backend: skip this window.
+
 ## 4 Join
 
 Wave finished (default: all workers returned; Teams: all wave items
@@ -70,7 +78,8 @@ notes cannot move any fingerprint.
 
 Deterministic FAIL after join: fix within the owning worker's scope, then
 `goal_gate.sh --verify [AC-ID]`. A FAIL that cannot be attributed -> rerun
-the batch serially (bundle unbundle rule). Loop-log the wave as
+the batch serially (bundle unbundle rule). Teams runtime faults are handled
+in the watch window (teams.md §7) before join attribution. Loop-log the wave as
 `task=T2[crew:N]` (N = that wave's actual concurrent workers) with each
 worker's file list (`task=T2[teams:N]` when the
 Teams backend below is in use).
