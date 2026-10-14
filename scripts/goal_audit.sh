@@ -52,6 +52,8 @@ while IFS= read -r line; do
     *'[teams:'*) teams_seen=1 ;;
     *'[crew:'*) teams_seen=$teams_seen ;;
   esac
+  # A3: fallback vocabulary, then recovery vocabulary - one independent check
+  # per tag class so [crew:] lines cannot skip the recovery allowlist.
   case "$t" in
     *'(fallback:'*)
       suf=$(gp_task_fallback "$t")
@@ -59,9 +61,6 @@ while IFS= read -r line; do
         teams-process-reaped|teams-unavailable) : ;;
         *) bad "A3 fallback-vocabulary:$suf" ;;
       esac ;;
-    *'[crew:'*)
-      [ "$teams_seen" = 1 ] && bad "A4 silent-downgrade:$t (teams run, crew wave without (fallback:...) suffix)"
-      ;;
     *'('*)
       # recovery tags also come from a closed list
       rsuf=$(gp_task_recovery "$t")
@@ -69,6 +68,15 @@ while IFS= read -r line; do
         '' ) bad "A3 recovery-vocabulary:$t" ;;
         stall-recovered|tool-error-fixed|re-run:stall|re-run:tool-error|re-run:death) : ;;
         *) bad "A3 recovery-vocabulary:$rsuf" ;;
+      esac ;;
+  esac
+  # A4: silent backend downgrade - independent of A3 (first-match would let a
+  # recovery suffix explain away the downgrade; only fallback: is an excuse).
+  case "$t" in
+    *'[crew:'*)
+      case "$t" in
+        *'(fallback:'*) : ;;
+        *) [ "$teams_seen" = 1 ] && bad "A4 silent-downgrade:$t (teams run, crew wave without (fallback:...) suffix)"
       esac ;;
   esac
 done <<< "$log"

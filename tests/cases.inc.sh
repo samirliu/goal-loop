@@ -570,6 +570,39 @@ assert_has "65 vocab" 'fallback-vocabulary' "$out"
 assert_has "65 score-format" 'score-format' "$out"
 assert_has "65 missing strategy_delta" 'progress-no-without-strategy-delta' "$out"
 
+# 65a-e A3 recovery allowlist + A4 across crew:/teams: (round-1 fix pins)
+# 65a invented recovery token on crew: is rejected (A1 closed grammar)
+mkproj t65a
+printf '## iteration 1\ntask=T2[crew:1] (re-run:evil)\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t65a/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t65a" 2>&1); rc=$?
+assert_rc "65a crew invented recovery rc1" 1 $rc
+assert_has "65a rejected at schema gate" 'A1 task-schema' "$out"
+# 65b A4 still fires for crew+recovery inside a teams run (recovery does not
+#     explain a backend downgrade - only fallback: does)
+mkproj t65b
+printf '## iteration 1\ntask=T1[teams:3]\nprogress=yes\nexit_signal=no\nscore=1\nstrategy_delta=none\n## iteration 2\ntask=T2[crew:3] (stall-recovered)\nprogress=yes\nexit_signal=no\nscore=2\nstrategy_delta=none\n' > "$T/t65b/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t65b" 2>&1); rc=$?
+assert_rc "65b crew+recovery inside teams run rc1" 1 $rc
+assert_has "65b names silent-downgrade" 'silent-downgrade' "$out"
+# 65c crew+fallback inside a teams run stays exempt from A4
+mkproj t65c
+printf '## iteration 1\ntask=T1[teams:3]\nprogress=yes\nexit_signal=no\nscore=1\nstrategy_delta=none\n## iteration 2\ntask=T2[crew:3] (fallback:teams-unavailable)\nprogress=yes\nexit_signal=no\nscore=2\nstrategy_delta=none\n' > "$T/t65c/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t65c" 2>&1); rc=$?
+assert_rc "65c crew+fallback exempt from A4" 0 $rc
+assert_has "65c clean" 'AUDIT: clean' "$out"
+# 65d valid recovery suffix on teams: is A3-clean
+mkproj t65d
+printf '## iteration 1\ntask=T2[teams:2] (re-run:death)\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t65d/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t65d" 2>&1); rc=$?
+assert_rc "65d teams recovery suffix clean" 0 $rc
+assert_has "65d clean" 'AUDIT: clean' "$out"
+# 65e valid recovery suffix on crew: (no teams run) is A3-clean, no A4
+mkproj t65e
+printf '## iteration 1\ntask=T2[crew:2] (re-run:stall)\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t65e/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t65e" 2>&1); rc=$?
+assert_rc "65e crew recovery suffix clean" 0 $rc
+assert_has "65e clean" 'AUDIT: clean' "$out"
+
 # 66-68 R13 score<->judge divergence guard
 mkproj t66
 {
