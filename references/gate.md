@@ -180,7 +180,10 @@ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
   false claims -> BLOCKED. The counting is MECHANICAL: close-iteration with
   exit-signal=yes that the gate answers rc=2 auto-increments
   false_completes (NOTE `false-complete-counted=N`) - the controller no
-  longer has to append the count by hand.
+  longer has to append the count by hand. Exemption (v2.9/R18): an rc=2 whose
+  reason is `deferred-pending:*` is NOT counted - an in-tree-settled claim
+  waiting honestly on a slow external source is patience, not a lie
+  (NOTE `deferred-wait-not-counted`). The ratchet catches lies, not waiting.
 - **R2** seat re-judgment illegal while covered files unchanged; gate
   re-runs are measurement, always legal.
 - **R3** stamped contract frozen (AC body + `exit:` lines); amendments are

@@ -344,11 +344,20 @@ case "$cmd" in
     { grep -vE '^last_(reason|hint)=' "$sd/state.rec" 2>/dev/null
       printf 'last_reason=%s\nlast_hint=%s\n' "${last_reason:-ok}" "${last_hint:-}"; } > "$sd/state.rec.new" \
       && mv "$sd/state.rec.new" "$sd/state.rec"
+    # deferred-pending never counts: the gate said "in-tree settled, one
+    # out-of-tree fact is still pending" (R18) - waiting honestly on a slow
+    # source is not a false complete. Counting waits would BLOCK a loop whose
+    # CRM simply hasn't settled yet: the ratchet catches lies, not patience.
     if [ "$grc" -eq 2 ] && [ "$exit_signal" = yes ]; then
-      fc=$(( $(state_get false_completes) + 1 ))
-      { grep -vE '^false_completes=' "$sd/state.rec"; printf 'false_completes=%s\n' "$fc"; } > "$sd/state.rec.new" \
-        && mv "$sd/state.rec.new" "$sd/state.rec"
-      echo "CTL: NOTE false-complete-counted=$fc (gate caught a failing claim; two catches BLOCK the loop - fix the artifact, do not re-claim)" >&2
+      case "$last_reason" in
+        deferred-pending:*) echo "CTL: NOTE deferred-wait-not-counted ($last_reason) - patience is not a false complete" >&2 ;;
+        *)
+        fc=$(( $(state_get false_completes) + 1 ))
+        { grep -vE '^false_completes=' "$sd/state.rec"; printf 'false_completes=%s\n' "$fc"; } > "$sd/state.rec.new" \
+          && mv "$sd/state.rec.new" "$sd/state.rec"
+        echo "CTL: NOTE false-complete-counted=$fc (gate caught a failing claim; two catches BLOCK the loop - fix the artifact, do not re-claim)" >&2
+        ;;
+      esac
     fi
     exit "$grc" ;;
 

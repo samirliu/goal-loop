@@ -190,7 +190,8 @@ bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> 
   这些只读 loop-log+scores.rec，绝不碰 last_hint——门控仍是一锤定音的裁判。
 - **假完成棘轮已机械**：你带 `--exit-signal yes` 交账而门控答 NO-GO，计数自动
   +1（NOTE 里会告诉你）；两次被抓自动 BLOCKED。看到计数 NOTE 的对策是**修产物
-  而不是再 claim 一次**。
+  而不是再 claim 一次**。唯一豁免：`deferred-pending` 的 NO-GO 不计数（NOTE
+  deferred-wait-not-counted）——诚实等慢源不是假完成，棘轮抓谎不抓耐心。
 
 ## 账本
 

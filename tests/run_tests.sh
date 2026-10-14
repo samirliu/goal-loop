@@ -1850,6 +1850,31 @@ out=$(bash "$GATE" --check --project "$T/t120" 2>&1); assert_rc "120a legacy row
 printf '%s' "$(bash "$CTL" status --project "$T/t120" 2>&1)" | grep -qE 'EFFICIENCY|error' \
   && ok "120b status survives mixed-field ledger" || no "120b status crashed on legacy rows"
 
+# 121 deferred honesty: an external-deferred claim is patience, not a lie -
+# the false-complete ratchet must not count waits (R18 meets R1).
+mkproj t121
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | biz | check: `true` | external: `exit 75` | window: 3600 | expected: exit=0\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t121/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t121" --auto >/dev/null
+out=$(bash "$CTL" close-iteration --project "$T/t121" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes 2>&1); rc121=$?
+assert_rc "121a deferred claim -> rc2" 2 $rc121
+assert_has "121a waits, not counted" 'deferred-wait-not-counted' "$out"
+grep -q '^false_completes=0$' "$T/t121/.goal/state.rec" \
+  && ok "121a ratchet stayed at 0" || no "121a deferred was counted: $(grep false_completes "$T/t121/.goal/state.rec")"
+# 121b a REAL failing claim still counts (the exemption is scoped to waits)
+mkproj t121b
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | f | check: `false` | expected: exit=0\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t121b/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t121b" --auto >/dev/null
+out=$(bash "$CTL" close-iteration --project "$T/t121b" --task T1 --files a.txt \
+  --checks-pass 0 --checks-fail 1 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes 2>&1)
+assert_has "121b real FAIL still counted" 'false-complete-counted=1' "$out"
+
 echo
 echo "== results: pass=$pass fail=$failn =="
 [ "$failn" -eq 0 ] && exit 0 || exit 1
