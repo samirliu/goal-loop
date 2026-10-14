@@ -29,6 +29,7 @@ git clone https://github.com/samirliu/goal-loop.git
 mkdir -p ~/.claude/skills/goal-loop
 cp -r goal-loop/SKILL.md goal-loop/VERSION goal-loop/assets \
       goal-loop/references goal-loop/scripts goal-loop/tests \
+      goal-loop/examples \
       ~/.claude/skills/goal-loop/
 
 # 2) 5 个 agent 定义 → agents 目录
@@ -44,7 +45,7 @@ cp goal-loop/agents/*.md ~/.claude/agents/
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check
 # 无 .goal/ 的目录里应返回 rc=4, reason=no-goal-dir —— 说明门控在岗
 bash ~/.claude/skills/goal-loop/tests/run_tests.sh
-# 场景套件应 fail=0 全绿 —— 门控语义的完整回归（当前 ~285 项）
+# 场景套件应 fail=0 全绿 —— 门控语义的完整回归（当前 395 项）
 bash ~/.claude/skills/goal-loop/tests/docs_consistency.sh
 # 文档一致性（含 Teams 后端铁律字面量）应 CONSISTENT
 bash ~/.claude/skills/goal-loop/examples/quickstart-one-shot/run.sh
@@ -220,8 +221,36 @@ that only goal-loop has; for optimization specifically, /goal cannot pin a
 baseline or a noise floor, so "better" is judged on vibes while goal-loop
 spends its tokens on deltas against a measured baseline. 一句话模糊目标、有人
 盯着 → /goal 更省；要交付物、要指标 delta、要可审计完成 → goal-loop。
-感知型高迭代目标（逼真/手感/文采）也是 /goal 主场——契约只能写代理指标时
-Goodhart 必然发生。
+
+## When NOT to use goal-loop / 何时不要用
+
+Two orthogonal axes decide the instrument. **Do not force goal-loop into the
+wrong quadrant.** 两个正交轴决定用什么工具，别把 goal-loop 塞进错误象限。
+
+| | low iteration density / 低迭代 | high iteration density / 高迭代 |
+|---|---|---|
+| **enumerable done** / 完成信号可枚举（tests · benchmarks · invariants） | **goal-loop home turf** — migrate / build / harden | hybrid: gate for regression, let the craft loop run free |
+| **non-enumerable done** / 不可枚举（逼真 · 手感 · 文采 · 洞见） | **dangerous** — split into sub-goals + human final review | **`/goal` (or producer self-view) home turf** — visual · copy · UI · research |
+
+**Why the bottom-right rejects goal-loop / 右下象限为什么不要用**:
+when the contract can only be written as proxy metrics, Goodhart is structural —
+the loop optimizes the proxy, not the goal (a tris-count floor can be “passed”
+by densifying geometry without making a better aircraft). Cold-seat rounds also
+destroy the “change → look → tweak” cadence that perceptual craft needs.
+契约只能写代理指标时 Goodhart 是结构性的；冷席往返还会摧毁感知工艺的改→看→调节奏。
+
+**Do not use when / 不要用的场景**:
+- trivial one-pass tasks / 一眼就能做完的琐事
+- pure Q&A or exploration with no deliverable / 无交付物的问答与探索
+- irreversible side effects (merge · push · prod writes · deletes) / 不可逆副作用
+- “make it beautiful / realistic / moving” with no measurable acceptance /
+  无可测验收的“更好看/更逼真/更动人”
+- you only want a parallel task board — bare Agent Teams is cheaper /
+  只要并行分工面板：裸 Teams 更便宜，别套验收门
+
+**Do use when / 该用的场景**: the predicate of “done” is itself the goal
+(checks, benchmarks, migrations, audit trails), or you need delivery + metric
+deltas + regression protection that must survive later review.
 
 **Physical tooth / 物理的牙**：register `scripts/goal_hook.sh` as a Stop hook
 (see the install snippet in the script header) and the harness blocks stopping
