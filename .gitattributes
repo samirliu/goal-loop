@@ -1,0 +1,5 @@
+# Shell must stay LF or macOS/Linux bash chokes on CRLF shebangs.
+*.sh text eol=lf
+# Markdown/JSON can follow platform checkout; content is EOL-tolerant in tooling.
+*.md text
+*.json text

@@ -1,2 +1,9 @@
 .goal/
 .worktrees
+
+# junk
+.DS_Store
+Thumbs.db
+*~
+*.bak
+*.tmp

@@ -11,14 +11,9 @@ goal-loop 本体**不绑定**下列任何 skill。这是**边界拼装**建议�
 | 组件 | 路径 | 装到 | 作用 |
 |---|---|---|---|
 | **contract-forge** | `companions/contract-forge/` | `~/.claude/skills/contract-forge/` | grilling 式评估访谈 → DRAFT 契约 + stamp 风险 + lint |
-| **skill-vetter** | `skillreference/skill-vetter/` | `~/.claude/skills/skill-vetter/` | 第三方 skill 安装前安全审计（OpenClaw 快照，无公开 git） |
 
 ```bash
-# 从本仓安装首方 companion
 cp -R companions/contract-forge ~/.claude/skills/
-mkdir -p ~/.claude/skills/skill-vetter
-cp skillreference/skill-vetter/SKILL.md skillreference/skill-vetter/skill-card.md \
-   ~/.claude/skills/skill-vetter/
 bash ~/.claude/skills/contract-forge/tests/run_fixtures.sh   # 应全绿
 ```
 
@@ -57,7 +52,7 @@ marketplaces: mattpocock/skills · obra/superpowers-marketplace · anthropics/cl
 |---|---|---|
 | **agent-browser** | 感知/视觉 judged 证据 | `vercel-labs/agent-browser` |
 | **reverse-engineer-anything** | 逆向/重构类交付的证据与结构分析（REA） | 本机已装；跨机按 REA 环境另配 |
-| **multi-search-engine** | 研究阈值/竞品指标 | 无公开 git（OpenClaw 系）；偏重，**不收** skillreference，按需自装 |
+| **multi-search-engine** | 研究阈值/竞品指标 | 无公开 git；偏重，按需自装 |
 
 ---
 
@@ -80,8 +75,7 @@ marketplaces: mattpocock/skills · obra/superpowers-marketplace · anthropics/cl
 [2 派工并行]     worker 自带 TDD / codebase-design
 [3 Join+Gate]    code-review · 门控重跑（零拼装）
 [4 NO-GO/进化]   diagnosing-bugs · strategy_delta · eval-gap
-[安装期]         skill-vetter（审第三方 skill）
-[元层]           skill-creator · writing-for-agents · claude-mem
+[元层]           skill-creator · writing-for-agents
 ```
 
 ---
@@ -106,11 +100,10 @@ Teams：优先原生 TeamCreate/SendMessage；无则 portable（`goal_team.sh`�
 1. brew install bash coreutils git
 2. goal-loop → ~/.claude/skills/goal-loop
 3. companions/contract-forge → ~/.claude/skills/contract-forge
-4. skillreference/skill-vetter → ~/.claude/skills/skill-vetter
-5. marketplaces: mattpocock + superpowers + claude-plugins-official
-6. 装 P0/P1（上表）；用 skill-vetter 审第三方
-7. 注册 goal_hook.sh（可选 Stop hook）
-8. 自检: goal-loop tests/run_tests.sh && contract-forge tests/run_fixtures.sh
+4. marketplaces: mattpocock + superpowers + claude-plugins-official
+5. 装 P0/P1（上表）
+6. 注册 goal_hook.sh（可选 Stop hook）
+7. 自检: goal-loop tests/run_tests.sh && contract-forge tests/run_fixtures.sh
 ```
 
 ---

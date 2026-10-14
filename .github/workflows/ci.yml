@@ -13,13 +13,15 @@ jobs:
       - name: Bash syntax check (bash -n)
         run: |
           echo "Running bash -n on all shipped scripts"
-          bash -n scripts/goal_gate.sh
-          bash -n scripts/goal_loop.sh
-          bash -n scripts/goal_ctl.sh
-          bash -n scripts/goal_hook.sh
-          bash -n assets/evidence_cache.sh
+          for s in scripts/*.sh assets/*.sh companions/contract-forge/scripts/*.sh companions/contract-forge/tests/*.sh; do
+            bash -n "$s" || exit 1
+          done
           echo "All shipped scripts passed bash -n"
+      - name: Docs consistency (invariants, packs, legacy R index)
+        run: bash tests/docs_consistency.sh
       - name: Scenario test suite (gate semantics, no API needed)
         run: |
           bash tests/run_tests.sh
           bash tests/run_tests.sh 2>/dev/null | grep -E '^== results'
+      - name: Companion contract-forge lint fixtures
+        run: bash companions/contract-forge/tests/run_fixtures.sh

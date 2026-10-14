@@ -166,7 +166,7 @@ iterations grind on the same error signature.
 判断类裁决绑定 `(迭代号, 树指纹)`；树一动全部过期、强制重判（R7）；确定性 AC 豁免——门控
 每次出口亲自重跑。连续两轮踩同一错误签名会被熔断（4b）。
 
-## Anti-gaming rules R1–R8 / 防作弊八规
+## Anti-gaming rules R1–R19 (legacy index) / 防作弊规则（旧编号索引）
 
 - **R1** false-complete counting: two gate-caught false claims → halt BLOCKED / 假完成两次即熔断
 - **R2** re-running a **seat judgment** is illegal while its files are unchanged (gate re-runs are measurement, always legal) / 指纹未动的判断席复跑不算工作（门控重跑是测量，不受限）
@@ -260,7 +260,7 @@ its discretionary evaluator. rc=0/3/4 pass, fail-open.
 
 ## More docs / 更多文档
 
-- `references/gate.md` — rules R1–R8, check order, schemas（门控规格与规则）
+- `references/gate.md` — five invariants, R1–R19 legacy index, check order, schemas（门控规格与旧规则索引）
 - `references/crew.md` — crew protocol, Teams backend, judged-seat brief（派工与 Teams 协议）
 - `references/teams.md` — portable Agent-Teams layer（便携 team 协议，零 harness 依赖）
 - `references/patterns.md` — failable check shapes per artifact type（可失败检查形状库）
