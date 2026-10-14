@@ -47,7 +47,12 @@ exit: threshold
 
 ## Acceptance criteria
 
-<!-- verbatim, frozen by the stamp. Grammar per line:
+<!-- Level 0 (default): statement | check: `<cmd>` | expected: exit=0|exit=N|<op>N
+     Capability keys open packs before you finish authoring:
+     probe/metric/sd/var/calib/judged → references/packs/instrument.md
+     objective / exit: forge / horizon-waived → references/packs/gradient.md
+     external/window → references/packs/external.md
+     verbatim, frozen by the stamp. Grammar per line:
      - AC-N | <yes/no statement> | check: `<command>` | [probe: `<cmd>`] | [baseline: delta|abs] | expected: <spec>
      spec: exit=0 (default) | exit=N (expect this exact failure code) |
            metric comparison (>=60, <=1.8, ...) | maximize | minimize | judged
