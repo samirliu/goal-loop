@@ -48,14 +48,15 @@ Unchanged from crew.md §7:
 
 1. `goal_team.sh init --team goal` once per run (after contract stamp).
 2. `roster --add --name w1 --role backend --prompt '...' --scope 'src/api'`
-   for each role (≤3 concurrent). Role card = persistent identity across
+   for each role (wave width fits disjoint scopes; no default cap). Role card = persistent identity across
    waves; the process does not persist.
 3. Per wave: for each open work-plan item, dispatch an Agent-tool worker
    with the role card + "unread inbox" + interface excerpt + brief fields.
    Workers write their deliverables; they may leave a note for another
    role via a return message the controller will `send`.
 4. Controller `send`s negotiated notes (or board.md is the relay), then
-   join + `goal_gate.sh --check` as usual. loop-log: `task=T2[teams:3]`.
+   join + `goal_gate.sh --check` as usual. loop-log: `task=T2[teams:N]`
+   (N = that wave's actual concurrent workers).
 5. Delivery/fuse: `goal_team.sh delete`.
 
 Negotiation without SendMessage: worker returns
@@ -69,7 +70,8 @@ When TeamCreate + TeamPlan + SendMessage are in the tool list, use them:
 - Detection is trivial: if TeamCreate is in the tool list, native wins -
   do not "prefer portable for safety", that silently loses the session
   resume path and the panel. The user-facing flag is always `--teams`.
-- TeamCreate + TeamPlan submit (roster ≤3 role cards, tasks carry the
+- TeamCreate + TeamPlan submit (roster = role cards for disjoint scopes,
+  width fits the work; tasks carry the
   brief fields). Then STOP — see §5.1. The user's panel approval starts
   the run; nothing runs before it.
 - Teammates negotiate via SendMessage directly; an interface change is

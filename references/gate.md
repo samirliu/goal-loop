@@ -28,8 +28,9 @@ without tripping check-mutated-ledger (R6-fair).
 `.goal/loop-log.md` append-only blocks, exact keys:
 `## iteration N` + task files_modified checks_pass checks_fail
 checks_unverifiable error_signature progress exit_signal false_complete
-digest score strategy_delta. `task=T2[crew:3]` marks a one-shot crew wave,
-`task=T2[teams:3]` a Teams-backend wave (same gate authority either way).
+digest score strategy_delta. `task=T2[crew:N]` marks a one-shot crew wave,
+`task=T2[teams:N]` a Teams-backend wave (N = actual concurrent workers that
+wave; same gate authority either way).
 Bare `T<n>` normalizes to `T<n>[crew:1]` at write; free-form task ids are
 refused by ctl (R12/A1 is enforced by the writer, not only by the audit).
 `score=` holds the objective value or `none`; `strategy_delta=`

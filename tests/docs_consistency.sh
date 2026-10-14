@@ -71,7 +71,7 @@ while IFS='|' read -r f needle; do
 done <<'EOF'
 references/crew.md|Teams backend
 references/crew.md|NEVER a GO signal
-references/crew.md|task=T2[teams:3]
+references/crew.md|task=T2[teams:N]
 references/crew.md|work-plan.md
 references/crew.md|No `isolation: worktree`
 references/crew.md|fallback:teams-unavailable
@@ -79,12 +79,12 @@ references/crew.md|Do not invent new loop-log keys
 references/gate.md|never WRITE `.goal/`
 references/crew.md|INLINED
 references/teams.md|own inbox file
-references/gate.md|task=T2[teams:3]
+references/gate.md|task=T2[teams:N]
 references/teams.md|TeammateMessage
 references/teams.md|goal_team.sh
 references/teams.md|NEVER a GO signal
 scripts/goal_team.sh|TeammateMessage
-SKILL.md|task=T2[teams:3]
+SKILL.md|task=T<n>[teams:N]
 SKILL.md|禁止
 SKILL.md|worktree
 references/gate.md|R9

@@ -37,8 +37,10 @@ Interface contract: <excerpt INLINED here by the controller - workers must
 not open .goal/interfaces.md themselves>
 ```
 
-Dispatch up to 3 workers in ONE message (they run concurrently). Their
-execution craft is theirs - do not put goal-loop rules in the brief.
+Dispatch the wave's workers in ONE message (they run concurrently). Wave
+width fits the work and disjoint scopes — no default cap, no recommended
+headcount. Their execution craft is theirs - do not put goal-loop rules in
+the brief.
 Teams backend: each roster member's TeamPlan prompt carries the same
 brief fields below; the shared task item description repeats Task /
 Output paths / Scope / Pass condition so the backlog is self-describing.
@@ -69,7 +71,8 @@ notes cannot move any fingerprint.
 Deterministic FAIL after join: fix within the owning worker's scope, then
 `goal_gate.sh --verify [AC-ID]`. A FAIL that cannot be attributed -> rerun
 the batch serially (bundle unbundle rule). Loop-log the wave as
-`task=T2[crew:3]` with each worker's file list (`task=T2[teams:3]` when the
+`task=T2[crew:N]` (N = that wave's actual concurrent workers) with each
+worker's file list (`task=T2[teams:N]` when the
 Teams backend below is in use).
 
 ## 6 Final review (judged ACs - once, before claiming exit)
@@ -149,7 +152,7 @@ and the team queue is repaired to match.
      failure. This is the PRIMARY path whenever native exists; do not
      quietly use the portable layer just because it is available.
    - Portable (native absent/unusable): `goal_team.sh init` + `roster
-     --add` per role (≤3).
+     --add` per role (one card per disjoint scope).
    Summary line declares `派工: teams native` or `teams portable`.
    **No `isolation: worktree`** - teammates edit the shared workspace.
    A worktree would hide their diffs from the digest and poison R7
@@ -198,10 +201,10 @@ SendMessage, not fallback. Fall back only when revive fails twice or the
 roster / TeamCreate is truly gone.
 
 - revive failed 2x / process reaped and unresumable -> portable (or
-  default if portable also dead); close the wave with `task=T2[crew:3]`
+  default if portable also dead); close the wave with `task=T2[crew:N]`
   and suffix `(fallback:teams-process-reaped)`.
 - native AND portable both unavailable or refused -> default backend,
-  close the wave with `task=T2[crew:3]` and suffix
+  close the wave with `task=T2[crew:N]` and suffix
   `(fallback:teams-unavailable)`.
 - Ledger and report MUST carry the suffix.
   Do not invent new loop-log keys (schema is exact); only task= suffixes.

@@ -10,7 +10,7 @@
 
 ```
 objective → contract (AC-1..N, each with a NAMED failable check) → user approval stamp
-  → loop: crew wave (≤3 workers) → join → gate re-runs deterministic checks
+  → loop: crew wave (parallel workers, width fits the work) → join → gate re-runs deterministic checks
     → GO  → deliver
     → NO-GO → next wave (never stop) · BLOCKED → stop & report
   → GO only when every AC holds at THIS digest
@@ -66,7 +66,7 @@ Four steps, no fifth / 四步循环，没有第五步：
    **plus the exact command that settles it** (a check must be able to FAIL).
    You approve with one word → AC section frozen by a sha1 stamp (R3).
    每条 AC = 可判定陈述 + 能让它失败的指名检测命令；你回一个字即盖章冻结。
-2. **Dispatch / 派工** — ≤3 concurrent workers on disjoint file scopes;
+2. **Dispatch / 派工** — concurrent workers on disjoint file scopes (width fits the work; no default cap);
    interfaces frozen in `.goal/interfaces.md` first.
    默认一波 subagent；`--teams` 换 Agent Teams 队友（见下）。
 3. **Join + gate** — merge review, then `bash scripts/goal_gate.sh --check`

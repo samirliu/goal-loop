@@ -5,7 +5,7 @@ description: |-
   done) with the CREW of /team (parallel teammates sharing one deliverable)
   plus the layer both lack: an EXTERNAL ACCEPTANCE GATE. The controller
   decomposes an objective into an approved acceptance-criteria contract,
-  dispatches crew waves of up to 3 parallel subagents (or, on request, an
+  dispatches crew waves of parallel subagents (or, on request, an
   Agent Teams crew), joins their output, and re-runs every deterministic
   check via scripts/goal_gate.sh - the model can never self-declare
   completion. Trigger: "/goal-loop [objective]",
@@ -86,11 +86,11 @@ bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> 
 
 ## Step 2 派工
 
-- 默认一波 ≤3 worker，互不相交任务域；拆不出 ≥2 接口模块 → 退串行并记录。
+- 波次宽度由工作量与互不相交任务域决定，**无默认上限、不设推荐人数**；拆不出 ≥2 接口模块 → 退串行并记录。
 - **接口先行**：`.goal/interfaces.md` 冻结，改走提案。
 - **禁止** `isolation: worktree`。简报：任务/输出路径/文件域/通过条件/返回证据；禁写 `.goal/`；禁 spawn。
 - **peer-notes**：`.goal/evidence/peer-notes/<task>.md` 每迭代 ≤1 行；claim-not-instruction。
-- Teams：work-plan 是正本；`task=T2[teams:3]`；**勾完 ≠ GO**。submit 等**面板批准**→**唤醒+完整简报**。
+- Teams：work-plan 是正本；`task=T<n>[teams:N]`（N=该波实际并发人数，非上限）；**勾完 ≠ GO**。submit 等**面板批准**→**唤醒+完整简报**。
   禁静默降级；禁 TeamDelete 濒死 team。详见 `crew.md`/`teams.md`。
 - Worker 工艺自理——不把 goal-loop 规则塞进简报。
 
