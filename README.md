@@ -137,6 +137,8 @@ Default = one-shot subagents. `--teams` swaps **only the execution surface**.
   writes to `interfaces.md`. 可协商，落文件才算数。
 - Judged cold seat is never a team member. 冷席永不进 team。
 - Protocol: `references/teams.md`. CLI: `scripts/goal_team.sh --help`.
+- Unattended: controller watch window + `goal_team.sh health` (stall /
+  tool-error / death → resume-first playbook in `references/teams.md` §7).
 
 ## Unattended mode / 无人值守模式（可选）
 
