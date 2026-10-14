@@ -264,6 +264,7 @@ its discretionary evaluator. rc=0/3/4 pass, fail-open.
 - `references/crew.md` — crew protocol, Teams backend, judged-seat brief（派工与 Teams 协议）
 - `references/teams.md` — portable Agent-Teams layer（便携 team 协议，零 harness 依赖）
 - `references/patterns.md` — failable check shapes per artifact type（可失败检查形状库）
+- `references/companions.md` — companion skills + cross-machine install（组合技能与跨设备安装）
 - `assets/goal.contract.md` — contract template（契约模板）
 
 ## Provenance / 出处
