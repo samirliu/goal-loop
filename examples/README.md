@@ -22,3 +22,4 @@ Rules for this folder:
 | case-svg-dash | 2D data viz | threshold + judged | calibration anchors, cold-seat, judged×deterministic mix |
 | case-probe-campaign | hostile contracts ×10 | mixed | rule seams: duplicate ids, verify filters, state garbage, ledger self-mutation |
 | case-probe-campaign2 | state-machine loops ×10 | mixed | sequences: breaker arcs, ratchet arcs, fuse escalation, check-order walk, audit lifecycle |
+| case-independent-repro | domain-neutral CSV tool | threshold | external-validation scaffold: multi-AC, false-complete denial then GO, zero author domain |
