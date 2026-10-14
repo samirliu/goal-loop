@@ -2,6 +2,8 @@
 
 **EN** — goal-loop combines the DRIVE of the harness /goal (never stop until done) with the CREW of /team (parallel teammates on one deliverable) plus the layer both lack: an external acceptance gate with a frozen contract. **/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
+**v3.0.0** — legal-surface compaction only. The always-on law is five invariants (GATE / BIND / PROVE / GRADIENT / FENCE); depth lives in `references/packs/`. Mechanical gate checks are unchanged from 2.9.0.
+
 **v2.8.0** — two execution backends (default one-shot subagents; opt-in Agent Teams), one judge (the gate). 执行面两档、判命面一档。 v2.8 新增：评估驱动归因（`--strategy` 策略标签 + `ctl status` 的 EFFICIENCY 斜率 / eval-gap / promote advisory，纯旁路不改门控）、worker 间 peer-notes 共享发现池（claim-not-instruction 铁律）、复杂目标契约三层形状（patterns §12）。
 
 **中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明交冷席终验。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。
