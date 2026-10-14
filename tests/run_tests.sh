@@ -462,7 +462,7 @@ printf '%s' "$out" | grep -qE 'w1\.jsonl: total=1 unread=0$' && ok "52c unread i
 mkproj t53
 {
   printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
-  printf 'objective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf 'objective: maximize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n## Acceptance criteria\n\n'
   printf -- '- AC-1 | score | check: `echo 7` | expected: maximize\n'
   printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t53/.goal/goal.md"
@@ -528,7 +528,7 @@ grep -q 'strategy_delta=switch camera' "$T/t56/.goal/loop-log.md" && ok "56 stra
 mkproj t57
 {
   printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
-  printf 'objective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf 'objective: maximize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n## Acceptance criteria\n\n'
   printf -- '- AC-1 | s | check: `echo 3` | expected: maximize\n'
   printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t57/.goal/goal.md"
@@ -559,7 +559,7 @@ assert_rc "59 bad-score refused" 4 $?
 mkproj t60
 {
   printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
-  printf 'objective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf 'objective: maximize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n## Acceptance criteria\n\n'
   printf -- '- AC-1 | s | check: `echo 5` | expected: maximize\n'
   printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t60/.goal/goal.md"
@@ -574,7 +574,7 @@ assert_has "60 status best_score" 'best_score=5' "$out"
 mkproj t61
 {
   printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
-  printf 'objective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf 'objective: maximize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n## Acceptance criteria\n\n'
   printf -- '- AC-1 | s | check: `echo 42` | expected: maximize\n'
   printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t61/.goal/goal.md"
@@ -590,7 +590,7 @@ grep -q '^best_score=42$' "$T/t61/.goal/state.rec" && ok "61 best_score from mea
 mkproj t62
 {
   printf '# Goal contract - t\n\n## Objective\n\nt\n\n'
-  printf 'objective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf 'objective: maximize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n## Acceptance criteria\n\n'
   printf -- '- AC-1 | s | check: `cat missing_file_xyz` | expected: maximize\n'
   printf '\n## Out of scope\n\n- n\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t62/.goal/goal.md"
@@ -688,7 +688,7 @@ assert_has "68 A8 warns judge-score-unrecorded" 'A8 judge-score-unrecorded' "$ou
 mkproj t69
 {
   printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
-  printf 'objective: minimize AC-1\n\n## Acceptance criteria\n\n'
+  printf 'objective: minimize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n## Acceptance criteria\n\n'
   printf -- '- AC-1 | score | check: `echo 7` | expected: minimize\n'
   printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t69/.goal/goal.md"
@@ -712,7 +712,7 @@ assert_has "70 direction named" 'dir=minimize' "$out"
 mkproj t70b
 {
   printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
-  printf 'objective: minimize AC-1\n\n## Acceptance criteria\n\n'
+  printf 'objective: minimize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n## Acceptance criteria\n\n'
   printf -- '- AC-1 | score | check: `echo 3` | expected: minimize\n'
   printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t70b/.goal/goal.md"
@@ -729,7 +729,7 @@ out=$(bash "$GATE" --check --project "$T/t70b" 2>&1); assert_rc "70b minimize GO
 mkproj t71
 {
   printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
-  printf 'objective: minimize AC-1\n\n## Acceptance criteria\n\n'
+  printf 'objective: minimize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n## Acceptance criteria\n\n'
   printf -- '- AC-1 | score | check: `echo 10` | expected: minimize\n'
   printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t71/.goal/goal.md"
@@ -750,7 +750,7 @@ assert_has "71 dir named" 'dir=minimize' "$out"
 mkproj t72
 {
   printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'
-  printf 'objective: minimize AC-1\n\n## Acceptance criteria\n\n'
+  printf 'objective: minimize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n## Acceptance criteria\n\n'
   printf -- '- AC-1 | score | check: `echo 10` | expected: minimize\n'
   printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
 } > "$T/t72/.goal/goal.md"
@@ -871,7 +871,7 @@ assert_has "78b regex miss -> BROKEN named" 'regex matched nothing' "$out"
 # 79 tolerance: inside noise band the water-mark holds (no false regression)
 mkproj t79
 {
-  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n'
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n'
   printf '## Acceptance criteria\n\n'
   printf -- '- AC-1 | perf | check: `cat n.txt` | tolerance: 0.1 | expected: maximize\n'
   printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
@@ -947,7 +947,7 @@ grep -q 'false_completes=2' "$T/t83/.goal/state.rec" && ok "83 state holds count
 # 84 advisory notes: tautology suspect + metric-flat (never block)
 mkproj t84
 {
-  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n'
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n'
   printf '## Acceptance criteria\n\n'
   printf -- '- AC-1 | m | check: `cat n.txt` | expected: maximize\n'
   printf -- '- AC-2 | t | check: `true` | expected: exit=0\n'
@@ -1007,7 +1007,7 @@ assert_has "87 offending key named" 'unparseable-state:iteration' "$out"
 # 88 negative scores: metric capture AND the tolerance band must survive '-'
 mkproj t88
 {
-  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n'
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n'
   printf '## Acceptance criteria\n\n'
   printf -- '- AC-1 | m | check: `printf "score=-10\\n"` | metric: `score=(-?[0-9.]+)` | tolerance: 0.1 | expected: maximize\n'
   printf '\n## Approval\n\napproved: PENDING\n'
@@ -1055,7 +1055,7 @@ grep -q '^false_completes=1$' "$T/t90/.goal/state.rec" && ok "90 fc counted exac
 # 91 stamp: objective pointing at a non-metric AC is refused at t=0
 mkproj t91
 {
-  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n'
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n'
   printf '## Acceptance criteria\n\n'
   printf -- '- AC-1 | judged obj | check: `true` | expected: judged\n'
   printf '\n## Approval\n\napproved: PENDING\n'
@@ -1127,7 +1127,7 @@ assert_rc "94b none signatures never trip" 0 $?
 # actionable routing or the controller stalls on dead pointers.
 mkproj t95
 {
-  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n'
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\nobjective: maximize AC-1\nhorizon-waived: toy single-metric contract - blind spot immaterial\n\n'
   printf '## Acceptance criteria\n\n'
   printf -- '- AC-1 | v | check: `cat v.txt` | metric: `v=(-?[0-9]+)` | expected: maximize\n'
   printf '\n## Out of scope\n\n- none\n\n## Approval\n\napproved: PENDING\n'
@@ -1501,7 +1501,7 @@ bash "$CTL" close-iteration --project "$T/t109d" --task T1 --files a.txt \
 assert_has "109d label trimmed" '^strategy=pad$' "$(cat "$T/t109d/.goal/loop-log.md")"
 # 109e legacy block without strategy reads fine + attribution-unused (objective)
 mkproj t109e; contract t109e "- AC-1 | t | check: \`true\` | expected: maximize"
-printf 'objective: maximize AC-1\n' >> "$T/t109e/.goal/goal.md"
+printf 'objective: maximize AC-1\nhorizon-waived: toy label fixture - blind spot immaterial\n' >> "$T/t109e/.goal/goal.md"
 bash "$CTL" stamp --project "$T/t109e" --auto >/dev/null 2>&1
 printf '## iteration 1\ntask=T1[crew:1]\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=deadbeefcafe\nscore=none\nstrategy_delta=none\n' > "$T/t109e/.goal/loop-log.md"
 out=$(bash "$CTL" status --project "$T/t109e" 2>&1); assert_rc "109e legacy block status rc0" 0 $?
@@ -1523,7 +1523,7 @@ obj110(){ # $1 proj NAME under $T, optional $2 = tolerance token (inserted BEFOR
   local p="$T/$1" tol=""
   [ -n "${2:-}" ] && tol=" $2 |"
   contract "$1" "- AC-1 | t | check: \`true\` |${tol} expected: maximize"
-  printf 'objective: maximize AC-1\n' >> "$p/.goal/goal.md"
+  printf 'objective: maximize AC-1\nhorizon-waived: toy slope fixture - blind spot immaterial\n' >> "$p/.goal/goal.md"
   bash "$CTL" stamp --project "$p" --auto >/dev/null 2>&1; }
 # 110a anchors over none rows: scores 10,none,11 => +0.5 /2 exploit
 mkproj t110a; obj110 t110a ""; hblocks t110a T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110a 10 none 11
@@ -1544,7 +1544,7 @@ out=$(bash "$CTL" status --project "$T/t110d" 2>&1)
 assert_has "110d negative slope format" 'strategy=A \-2.5 /3 iters$' "$out"
 printf '%s' "$out" | grep -qE '-> exploit|-> prune' && no "110d no advisory on negative maximize" || ok "110d no advisory on negative maximize"
 # 110e minimize objective flips exploit
-mkproj t110e; contract t110e "- AC-1 | t | check: \`true\` | expected: maximize"; printf 'objective: minimize AC-1\n' >> "$T/t110e/.goal/goal.md"; bash "$CTL" stamp --project "$T/t110e" --auto >/dev/null 2>&1
+mkproj t110e; contract t110e "- AC-1 | t | check: \`true\` | expected: maximize" NOSTAMP=1; printf 'objective: minimize AC-1\nhorizon-waived: toy slope fixture - blind spot immaterial\n' >> "$T/t110e/.goal/goal.md"; bash "$CTL" stamp --project "$T/t110e" --auto >/dev/null 2>&1
 hblocks t110e T1[crew:1] A T1[crew:1] A; scorefile t110e 100 90
 out=$(bash "$CTL" status --project "$T/t110e" 2>&1)
 assert_has "110e minimize direction exploit" 'strategy=A \-10.0 /1 iters -> exploit' "$out"
@@ -1693,6 +1693,98 @@ i4=$(printf '%s' "$out" | grep -n 'promote:' | head -1 | cut -d: -f1)
 [ -n "$i1" ] && [ -n "$i2" ] && [ -n "$i3" ] && [ -n "$i4" ] && [ "$i1" -lt "$i2" ] && [ "$i2" -lt "$i3" ] && [ "$i3" -lt "$i4" ] \
   && ok "115g advisory order deterministic" || no "115g advisory order deterministic"
 assert_has "115g promote present too" 'promote: T1' "$out"
+
+# 116 horizon hard constraint (v2.9): objective contracts must carry a
+# horizon layer (judged AC + calib) or an explicit waiver - Goodhart guard.
+# 116a objective without horizon and without waiver -> stamp refused
+mkproj t116a
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `echo 5` | expected: maximize\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t116a/.goal/goal.md"
+out=$(bash "$CTL" stamp --project "$T/t116a" --auto 2>&1); assert_rc "116a horizon-less objective -> rc2" 2 $?
+assert_has "116a refusal names horizon" 'no horizon layer' "$out"
+# 116b same contract WITH a horizon-waived: line -> stamps
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\nobjective: maximize AC-1\nhorizon-waived: single benchmark, blind spot declared\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `echo 5` | expected: maximize\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t116a/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t116a" --auto >/dev/null 2>&1; assert_rc "116b waived stamps -> rc0" 0 $?
+# 116c objective + one judged AC carrying calib: -> stamps without waiver
+mkproj t116b
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\nobjective: maximize AC-1\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | s | check: `echo 5` | expected: maximize\n'
+  printf -- '- AC-2 | j | check: `true` | calib: good=g.txt bad=b.txt | expected: judged\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t116b/.goal/goal.md"
+printf 'good\n' > "$T/t116b/g.txt"; printf 'bad\n' > "$T/t116b/b.txt"
+bash "$CTL" stamp --project "$T/t116b" --auto >/dev/null 2>&1; assert_rc "116c judged+calib horizon stamps" 0 $?
+# 116d waiver is part of the frozen surface: patching it away = contract-tampered
+close_iter t116a --score 5
+sed_in '/^horizon-waived:/d' "$T/t116a/.goal/goal.md"
+out=$(bash "$GATE" --check --project "$T/t116a" 2>&1); assert_rc "116d waiver strip -> rc2" 2 $?
+assert_has "116d tamper named" 'contract-tampered' "$out"
+
+# 117 external/deferred check surface (v2.9): AC settles against out-of-tree
+# sources; rc=75 defers; window: caches so a day-to-settle fact costs one
+# query per window, not one per gate exit.
+# 117a external PASS -> GO; 117b source revoked -> FAIL. The out-of-tree
+# marker lives under .goal/evidence/ (digest-exempt) so flipping it changes
+# neither tree nor ledger digest - an external fact must flip without the
+# claim going stale for a reason unrelated to the external source.
+mkproj t117a
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | biz | check: `true` | external: `test -f .goal/evidence/settled` | window: 3600 | expected: exit=0\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t117a/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t117a" --auto >/dev/null
+printf 'settled\n' > "$T/t117a/.goal/evidence/settled"
+close_iter t117a
+out=$(bash "$GATE" --check --project "$T/t117a" 2>&1); assert_rc "117a external PASS -> GO" 0 $?
+rm -f "$T/t117a/.goal/evidence/settled" "$T/t117a/.goal/evidence/deferred.rec"
+out=$(bash "$GATE" --check --project "$T/t117a" 2>&1); assert_rc "117b external FAIL -> rc2" 2 $?
+assert_has "117b external fail named" 'external' "$out"
+# 117c rc=75 -> DEFERRED, claim blocked as deferred-pending (not FAIL)
+mkproj t117c
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | biz | check: `true` | external: `exit 75` | expected: exit=0\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t117c/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t117c" --auto >/dev/null
+close_iter t117c
+out=$(bash "$GATE" --check --project "$T/t117c" 2>&1); assert_rc "117c rc75 -> deferred rc2" 2 $?
+assert_has "117c deferred routing" 'deferred-pending:AC-1' "$out"
+assert_has "117c wait hint" 'hint=wait-for-source' "$out"
+# 117d window caching: PASS is cached; second --check must NOT rerun the
+# external command (counter stays 1 inside the window)
+mkproj t117d
+# counter lands in .goal/evidence/ - that's the only directory a check may
+# write during --check (tree-digest-safe by design, like deferred.rec itself)
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | biz | check: `true` | external: `mkdir -p .goal/evidence; c=$(cat .goal/evidence/calls 2>/dev/null||echo 0); echo $((c+1)) > .goal/evidence/calls; exit 0` | window: 3600 | expected: exit=0\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t117d/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t117d" --auto >/dev/null
+close_iter t117d                              # check #1: query (calls=1)
+bash "$GATE" --check --project "$T/t117d" >/dev/null 2>&1   # inside window: cached
+c=$(cat "$T/t117d/.goal/evidence/calls" 2>/dev/null || echo 0)
+[ "$c" = 1 ] && ok "117d window cache: one query per window" || no "117d external reran inside window (calls=$c)"
+# 117e expired window -> re-query: overwrite the cache with an aged row
+# (latest-wins reader takes it; now-1e6 > window, so the gate re-queries)
+printf 'AC-1|PASS|1000000|aged\n' > "$T/t117d/.goal/evidence/deferred.rec"
+bash "$GATE" --check --project "$T/t117d" >/dev/null 2>&1
+c=$(cat "$T/t117d/.goal/evidence/calls" 2>/dev/null || echo 0)
+[ "$c" -ge 2 ] && ok "117e expired window re-queries" || no "117e stale cache not refreshed (calls=$c)"
+# 117f window: without external: is refused at stamp
+mkproj t117f
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | biz | check: `true` | window: 600 | expected: exit=0\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t117f/.goal/goal.md"
+out=$(bash "$CTL" stamp --project "$T/t117f" --auto 2>&1); assert_rc "117f window-without-external -> rc2" 2 $?
+assert_has "117f refusal names window/external" 'window:.*external|declare both' "$out"
+# 117g external DEFERRED row never masks a FAILing in-tree floor
+mkproj t117g
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | biz | check: `false` | external: `exit 75` | expected: exit=0\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t117g/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t117g" --auto >/dev/null
+close_iter t117g
+out=$(bash "$GATE" --check --project "$T/t117g" 2>&1); assert_rc "117g floor FAIL beats DEFERRED" 2 $?
+printf '%s' "$out" | grep -qE 'deferred-pending' && no "117g DEFERRED masked a FAIL" || ok "117g in-tree FAIL surfaced not masked"
 
 echo
 echo "== results: pass=$pass fail=$failn =="

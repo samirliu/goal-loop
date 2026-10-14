@@ -113,6 +113,30 @@ case "$cmd" in
       # the pair's PASS+FAIL requirement is then a permanent block. Catch at t=0.
       [ "$cg" != "$cb" ] || { echo "CTL: ERROR stamp-refused: $ac_id calib: good= and bad= name the SAME file $cg (one ruler cannot calibrate both ways)" >&2; exit 2; }
     done
+    # External tokens (v2.9): external: is ADDITIVE (the in-tree check: floor
+    # is still required), so window: without external: measures nothing -
+    # refuse the half-declaration at t=0 instead of letting it decay into an
+    # ignored decoration later.
+    for ac_id in $(gp_all_ac_ids "$project"); do
+      [ -n "$(gp_ac_window "$project" "$ac_id")" ] || continue
+      [ -n "$(gp_ac_external_cmd "$project" "$ac_id")" ] \
+        || { echo "CTL: ERROR stamp-refused: $ac_id declares window: but no external: (window caches an out-of-tree check - declare both or neither)" >&2; exit 2; }
+    done
+    # Horizon hard constraint (v2.9): an objective layer is a gradient - with
+    # no horizon AC (judged + calib) guarding what the number does not see,
+    # the contract is a Goodhart machine by design. Refuse the stamp unless
+    # the contract explicitly says why that blind spot is acceptable.
+    if [ -n "$(gp_objective_ac "$project")" ]; then
+      horizon_ok=0
+      for ac_id in $(gp_all_ac_ids "$project"); do
+        [ "$(gp_ac_expected "$project" "$ac_id" | tr -d '[:space:]')" = judged ] || continue
+        [ "$(gp_ac_calib_declared "$project" "$ac_id")" = yes ] && horizon_ok=1 && break
+      done
+      if [ "$horizon_ok" -ne 1 ] && [ -z "$(gp_horizon_waived "$project")" ]; then
+        echo "CTL: ERROR stamp-refused: objective contract has no horizon layer (needs >=1 judged AC with calib: guarding the objective's blind spot) - or declare why the blind spot is acceptable with a line: horizon-waived: <reason>" >&2
+        exit 2
+      fi
+    fi
     h=$(gp_ac_body_hash "$project")
     # Budget knobs written in goal.md BIND at stamp. They used to be
     # decorative (contract said max_iterations=10, state.rec kept 12) -

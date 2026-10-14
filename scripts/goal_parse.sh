@@ -77,7 +77,11 @@ gp_ac_calib_declared(){ gp_ac_calib_line "$1" "$2" | grep -qE 'calib:[^|]*(good|
 # seconds - inside it, the recorded measurement in deferred.rec IS the check
 # (re-querying a slow system every gate exit is not measurement, it is
 # spinning). Backtick decoys stripped first: the calib law, kept.
-gp_ac_external_cmd(){ gp_ac_calib_line "$1" "$2" | sed -nE 's/^.*external: *`([^`]*)`.*/\1/p' | tail -1; }
+# external: its command lives INSIDE backticks, so the calib line-strip would
+# delete the very declaration it is looking for (v2.9 self-inflicted bug caught
+# by t117). Greedy .* means the LAST external: span wins: a decoy inside the
+# check: command sits earlier in the line than the real trailing declaration.
+gp_ac_external_cmd(){ gp_ac_line_for "$1" "$2" | sed -nE 's/^.*external: *`([^`]*)`.*/\1/p' | tail -1; }
 gp_ac_window(){       gp_ac_calib_line "$1" "$2" | sed -nE 's/^.*window: *([0-9]+).*/\1/p' | tail -1; }
 # Horizon layer (v2.9): a contract may declare `horizon-waived: <reason>` to
 # accept an objective whose blind spot is unguarded. The parser only finds it;
@@ -87,6 +91,23 @@ gp_horizon_waived(){ gp_r < "$1/.goal/goal.md" 2>/dev/null | grep -iE '^horizon-
 # dispersion comes from, so the significance band is computed from data
 # instead of the AC author's memory of typical noise.
 gp_ac_var_re(){ gp_ac_line_for "$1" "$2" | sed -nE 's/^.*var: *`([^`]*)`.*/\1/p' | tail -1; }
+# sd: (v2.9) stddev regex for significance bands on an objective metric -
+# one capture group; extracts the measurement's spread (what benchmark
+# harnesses actually print: "stddev: 1.4"), sqrt'd into the z-band.
+gp_ac_sd_re(){ gp_ac_line_for "$1" "$2" | sed -nE 's/^.*sd: *`([^`]*)`.*/\1/p' | tail -1; }
+# ---- deferred.rec grammar (v2.9 external checks) ---------------------------
+# Lives under .goal/evidence/ (digest-excluded, R6-fair) because the GATE
+# writes it during a rerun batch - it is a measurement cache, not ledger state.
+# 4 fields: id|verdict|tstamp|detail. Append-only; reader takes the LAST row
+# per id (ties by file order - latest wins, the verdicts.rec law).
+gp_defer_path(){ echo "$1/.goal/evidence/deferred.rec"; }
+gp_defer_latest(){
+  [ -f "$(gp_defer_path "$1")" ] || return 0
+  gp_r < "$(gp_defer_path "$1")" | gawk -F'|' '{ id=$1; v=$2; t=$3+0; d=$4; sub(/\r$/,"",d); l=NR
+    if (!(id in bt) || t > bt[id] || (t == bt[id] && l > bn[id])) {
+      bt[id]=t; bn[id]=l; bv[id]=v; bd[id]=d } }
+  END { for (id in bt) printf "%s|%s|%s|%s\n", id, bv[id], bt[id], bd[id] }'
+}
 gp_objective_ac(){  gp_r < "$1/.goal/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1; }
 gp_objective_dir(){ gp_r < "$1/.goal/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\1/p' | tail -1; }
 # R3 frozen surface: AC section body + exit: + objective: lines. ctl stamp and
@@ -94,7 +115,7 @@ gp_objective_dir(){ gp_r < "$1/.goal/goal.md" | sed -nE 's/^objective: *(maximiz
 # contract-tampered. This is that one definition.
 gp_ac_body_hash(){
   { gp_r < "$1/.goal/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
-    gp_r < "$1/.goal/goal.md" | grep -E '^(exit|objective):' || true
+    gp_r < "$1/.goal/goal.md" | grep -E '^(exit|objective|horizon-waived):' || true
   } | gp_hash_std | cut -c1-8
 }
 

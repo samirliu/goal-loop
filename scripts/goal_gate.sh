@@ -131,6 +131,7 @@ fail(){
     contract-tampered:*)     hint=proposal-to-user ;;
     calibration-missing:*)   hint=bind-calib-grades ;;
     calibration-*)           hint=fix-calib-fixture ;;
+    deferred-pending:*)      hint=wait-for-source ;;
     time-budget-exhausted*)  hint=graceful-deliver ;;
     stagnation*|repeated-error*) hint=replan-or-stop ;;
     *)                       hint=see-reason ;;
@@ -165,6 +166,10 @@ ac_probe_cmd(){ gp_ac_probe_cmd "$project" "$1"; }
 # tolerance: gives water-mark compares a noise band.
 ac_metric_re(){ gp_ac_metric_re "$project" "$1"; }
 ac_tolerance(){ gp_ac_tolerance "$project" "$1"; }
+# External/deferred layer (v2.9): external: settles an AC against an
+# out-of-tree source; window: = cache validity in seconds (default 3600).
+ac_external_cmd(){ gp_ac_external_cmd "$project" "$1"; }
+ac_window(){ gp_ac_window "$project" "$1"; }
 # Calibration fixtures (v2.6, judged ACs): `calib: good=<f1> bad=<f2>` names a
 # known-good and a known-bad artifact of the AC's subject. A seat may claim
 # PASS only after grading both correctly (#good=PASS, #bad=FAIL, same
@@ -215,8 +220,56 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   id="$1"; cls="$2"; m_op="${3:-}"; m_num="${4:-}"
   cmd=$(ac_check_cmd "$id")
   if [ -z "$cmd" ]; then printf '%s|BROKEN|no check command in AC line\n' "$id"; return; fi
+  # External layer (v2.9): `external:` is ADDITIVE verification on a
+  # deterministic AC - the in-tree check: floor still runs and can still
+  # FAIL on its own; the external command settles the AC against an
+  # out-of-tree source (CRM query, prod metric, async reviewer verdict).
+  # rc 75 (EX_TEMPPOAL) means "not ready yet" -> DEFERRED: neither pass nor
+  # fail, the loop waits instead of spinning. `window:` = cache validity:
+  # inside it the last recorded verdict IS the measurement; outside it the
+  # gate reruns the query. This is what makes a day-to-settle business fact
+  # an AC: the loop keeps working, the gate keeps counting, and the query
+  # costs one call per window instead of one per gate exit.
+  #
+  # The cache lives in .goal/evidence/deferred.rec: evidence is exempt from
+  # BOTH digests, so a cache write during a rerun batch trips neither
+  # check-mutated-tree nor check-mutated-ledger (R6: evidence is where
+  # measurement artifacts legitimately live).
+  ext_state=""; ext_note=""
+  ecmd=$(ac_external_cmd "$id")
+  if [ -n "$ecmd" ]; then
+    win=$(ac_window "$id"); win=${win:-3600}
+    gp_is_natural "$win" || { printf '%s|BROKEN|window must be whole seconds (got: %s)\n' "$id" "$win"; return; }
+    rec=$(gp_defer_latest "$project" | gawk -F'|' -v w="$id" '$1==w{print $2"|"$3"|"$4}')
+    cv=$(printf '%s' "$rec" | cut -d'|' -f1); ct=$(printf '%s' "$rec" | cut -d'|' -f2)
+    now=$(date +%s); ct=${ct:-0}
+    if { [ "$cv" = PASS ] || [ "$cv" = FAIL ]; } && [ $(( now - ct )) -le "$win" ]; then
+      ext_state="$cv"; ext_note="window=${win}s cached age=$(( now - ct ))s"
+    elif [ "$cv" = DEFERRED ] && [ $(( now - ct )) -lt "$win" ]; then
+      ext_state=DEFERRED; ext_note="not-ready ${ct:+$(( now - ct ))}s ago (window=${win}s)"
+    else
+      ec_err=$(mktemp "${TMPDIR:-/tmp}/goal-ecmd-err.XXXXXX" 2>/dev/null) || ec_err=/tmp/ecmd-err.$$
+      if command -v timeout >/dev/null 2>&1; then
+        ec_out=$(cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$ecmd" 2>"$ec_err"); ec_rc=$?
+      else
+        ec_out=$(cd "$project" 2>/dev/null && bash -c "$ecmd" 2>"$ec_err"); ec_rc=$?
+      fi
+      ec_tail=$(r < "$ec_err" | tail -3 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-160)
+      rm -f "$ec_err"
+      case "$ec_rc" in
+        75)        ext_state=DEFERRED; ext_note="source not ready (rc=75), retry after window" ;;
+        0)         ext_state=PASS; ext_note="external ok" ;;
+        124|127)   ext_state=BROKEN; ext_note="external cmd rc=$ec_rc $ec_tail" ;;
+        *)         ext_state=FAIL; ext_note="external rc=$ec_rc $ec_tail" ;;
+      esac
+      printf '%s|%s|%s|%s\n' "$id" "$ext_state" "$now" "$ext_note" >> "$(gp_defer_path "$project")"
+    fi
+    [ "$ext_state" = FAIL ]   && { printf '%s|FAIL|external (out-of-tree claim): %s\n' "$id" "$ext_note"; return; }
+    [ "$ext_state" = BROKEN ] && { printf '%s|BROKEN|external: %s\n' "$id" "$ext_note"; return; }
+  fi
   # R9 verifier-of-the-verifier: metric/maximize numbers are untrustworthy
   # unless their probe (instrument alive) passes first.
+  line=""
   case "$cls" in metric*|maximize|minimize)
     pcmd=$(ac_probe_cmd "$id")
     if [ -n "$pcmd" ]; then
@@ -257,16 +310,16 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   fi
   case "$cls" in
     exit0)
-      if [ "$rc" -eq 0 ]; then printf '%s|PASS|exit=0\n' "$id"
-      elif [ "$rc" -eq 127 ] || [ "$rc" -eq 124 ]; then printf '%s|BROKEN|check not executable (rc=%d) %s\n' "$id" "$rc" "$err_tail"
-      elif [ "$rc" -gt 128 ]; then printf '%s|BROKEN|check killed (rc=%d, signal) %s\n' "$id" "$rc" "$err_tail"
-      else printf '%s|FAIL|exit=%d %s\n' "$id" "$rc" "$err_tail"; fi ;;
+      if [ "$rc" -eq 0 ]; then line="$id|PASS|exit=0"
+      elif [ "$rc" -eq 127 ] || [ "$rc" -eq 124 ]; then line="$id|BROKEN|check not executable (rc=$rc) $err_tail"
+      elif [ "$rc" -gt 128 ]; then line="$id|BROKEN|check killed (rc=$rc, signal) $err_tail"
+      else line="$id|FAIL|exit=$rc $err_tail"; fi ;;
     rc\ *)                                            # negative assertion: rc==N passes
       want=${cls#rc }
-      if [ "$rc" -eq "$want" ]; then printf '%s|PASS|exit=%d\n' "$id" "$rc"
-      elif [ "$rc" -eq 124 ] && [ "$want" != 124 ]; then printf '%s|BROKEN|timed out (rc=124) %s\n' "$id" "$err_tail"
-      elif [ "$rc" -eq 127 ] && [ "$want" != 127 ]; then printf '%s|BROKEN|check not executable (rc=127) %s\n' "$id" "$err_tail"
-      else printf '%s|FAIL|exit=%d expect=exit=%s %s\n' "$id" "$rc" "$want" "$err_tail"; fi ;;
+      if [ "$rc" -eq "$want" ]; then line="$id|PASS|exit=$rc"
+      elif [ "$rc" -eq 124 ] && [ "$want" != 124 ]; then line="$id|BROKEN|timed out (rc=124) $err_tail"
+      elif [ "$rc" -eq 127 ] && [ "$want" != 127 ]; then line="$id|BROKEN|check not executable (rc=127) $err_tail"
+      else line="$id|FAIL|exit=$rc expect=exit=$want $err_tail"; fi ;;
     metric\ *)
       last="$mval"
       if [ -z "$last" ] && [ -n "$metric" ]; then
@@ -281,7 +334,7 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
       esac
       v=$(awk -v a="$last" -v b="$m_num" -v o="$m_op" \
           'BEGIN{ok=(o==">=")?(a>=b):(o=="<=")?(a<=b):(o==">")?(a>b):(o=="<")?(a<b):(o=="==")?(a==b):(a!=b); print ok?"PASS":"FAIL"}')
-      printf '%s|%s|observed=%s expect=%s%s\n' "$id" "$v" "$last" "$m_op" "$m_num" ;;
+      line="$id|$v|observed=$last expect=$m_op$m_num" ;;
     maximize)
       last="$mval"
       if [ -z "$last" ] && [ -n "$metric" ]; then
@@ -296,7 +349,7 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
       esac
       # maximize is the objective, not a floor: numeric = PASS. The score
       # itself is compared to best_score by the caller (score-regressed).
-      printf '%s|PASS|observed=%s expect=maximize\n' "$id" "$last" ;;
+      line="$id|PASS|observed=$last expect=maximize" ;;
     minimize)
       last="$mval"
       if [ -z "$last" ] && [ -n "$metric" ]; then
@@ -311,10 +364,20 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
       esac
       # minimize: the objective is to push the number DOWN. Numeric = PASS;
       # the low-water mark is enforced by the caller (score-regressed).
-      printf '%s|PASS|observed=%s expect=minimize\n' "$id" "$last" ;;
+      line="$id|PASS|observed=$last expect=minimize" ;;
     *)
-      printf '%s|BROKEN|unroutable expectation class\n' "$id" ;;
+      printf '%s|BROKEN|unroutable expectation class\n' "$id"; return ;;
   esac
+  # Merge with the external layer (v2.9). Out-of-tree FAIL/BROKEN already
+  # returned. What is left: an in-tree FAIL/BROKEN stays decisive (the floor
+  # is not masked by "something is still pending"), and DEFERRED means
+  # "everything in-tree settled, one business fact is still pending" - the
+  # loop waits for it, that is not a failure and not a delivery.
+  if [ "$ext_state" = DEFERRED ]; then
+    bv=$(printf '%s' "$line" | cut -d'|' -f2)
+    [ "$bv" = PASS ] && line="$id|DEFERRED|in-tree settled, awaiting external: $ext_note"
+  fi
+  printf '%s\n' "$line"
 }
 
 digest=$(tree_digest) || state_err "unreadable-project"
@@ -337,7 +400,7 @@ if [ "$mode" = verify ]; then
       || { echo "GATE: NO-GO reason=unknown-ac-id:$rid (no such AC in the contract)" >&2; exit 4; }
   done
   want="$positional "
-  d0="$digest"; ld0=$(ledger_digest); nfail=0; nbroken=0; nchecked=0
+  d0="$digest"; ld0=$(ledger_digest); nfail=0; nbroken=0; nchecked=0; npending=0
   for id in $(all_ac_ids); do
     if [ -n "${want// /}" ]; then case "$want" in *" $id "*) ;; *) continue ;; esac; fi
     cls=$(classify_expected "$(ac_expected "$id")")
@@ -346,8 +409,9 @@ if [ "$mode" = verify ]; then
     echo "GATE: VERIFY $line"
     nchecked=$((nchecked+1))
     case "$line" in
-      *'|FAIL|'*)   nfail=$((nfail+1)) ;;
-      *'|BROKEN|'*) nbroken=$((nbroken+1)) ;;
+      *'|FAIL|'*)    nfail=$((nfail+1)) ;;
+      *'|BROKEN|'*)  nbroken=$((nbroken+1)) ;;
+      *'|DEFERRED|'*) npending=$((npending+1)) ;;
     esac
   done
   d1=$(tree_digest)
@@ -494,6 +558,12 @@ for id in $ac_ids; do
               if [ "$id" = "$primary" ]; then
                 observed_score=$(printf '%s' "$detail" | sed -nE 's/.*observed=([0-9.\-]+).*/\1/p' | tail -1)
               fi ;;
+      DEFERRED)
+              # An external fact is still pending. The loop must not deliver
+              # (not-claimable) but the wait is not a failure: no false-
+              # complete pressure, no breaker push - a distinct NO-GO reason
+              # routes the controller to WAIT, not to dispatch another wave.
+              fail "deferred-pending:$id ($detail)" ;;
       FAIL)   fail "open-FAIL:$id (gate rerun: $detail)" ;;
       BROKEN) fail "check-broken:$id ($detail)" ;;
       *)      fail "check-unknown:$id ($line)" ;;
