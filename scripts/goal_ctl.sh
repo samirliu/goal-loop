@@ -217,6 +217,15 @@ case "$cmd" in
     if [ -n "$judge_score" ]; then
       gp_is_score "$judge_score" || { echo "CTL: ERROR bad-judge-score:$judge_score" >&2; exit 4; }
     fi
+    # Attribution writer tooth (v2.9): an objective loop is a search - every
+    # wave must say which direction it attacks, or the eval plane can never
+    # attribute slope to strategy and the EFFICIENCY advisories run blind.
+    # Mechanical (writer-side), so the advisory always has data when it fires.
+    if [ -n "$(gp_objective_ac "$project")" ]; then
+      case "$strategy" in
+        ''|none) echo "CTL: ERROR missing-strategy-label (objective contracts must label every wave: close-iteration --strategy <attack direction>)" >&2; exit 4 ;;
+      esac
+    fi
     # The score is MEASURED, never self-reported: ctl reruns the objective AC
     # (gate --verify, stateless) and records the observed value. A mismatch
     # from the controller is noted; an unmeasurable instrument records none
@@ -260,7 +269,9 @@ case "$cmd" in
     # points later let the gate refuse DIVERGENCE:score-vs-judge claims.
     # v2.8: written AFTER task validation - a refused close must not orphan a
     # score row with no iteration block behind it.
-    printf '%s|%s|%s\n' "$new" "${score:-none}" "${judge_score:-none}" >> "$sd/scores.rec"
+    # v2.9: 4th field = strategy label (empty rows = legacy 3-field, readers
+    # stay field-indexed so both shapes parse). Attribution: slope per label.
+    printf '%s|%s|%s|%s\n' "$new" "${score:-none}" "${judge_score:-none}" "$strat_show" >> "$sd/scores.rec"
     printf '%s\n' "## iteration $new" "task=$task" "files_modified=$files" \
       "checks_pass=$cp" "checks_fail=$cf" "checks_unverifiable=$cu" \
       "error_signature=$errsig" "progress=$progress" "exit_signal=$exit_signal" \

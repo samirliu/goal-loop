@@ -469,7 +469,7 @@ mkproj t53
 bash "$CTL" stamp --project "$T/t53" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t53" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal yes --score 7 --no-gate >/dev/null 2>&1
+  --exit-signal yes --score 7 --strategy probe-first --no-gate >/dev/null 2>&1
 out=$(bash "$GATE" --check --project "$T/t53" 2>&1); assert_rc "53 maximize GO at score 7" 0 $?
 assert_has "53 GO line carries score" 'score=7' "$out"
 grep -q 'best_score=7' "$T/t53/.goal/state.rec" && ok "53 best_score stored" || no "53 best_score missing"
@@ -536,7 +536,7 @@ bash "$CTL" stamp --project "$T/t57" --auto >/dev/null
 sed_in 's/^objective: maximize AC-1/objective: maximize AC-2/' "$T/t57/.goal/goal.md"
 bash "$CTL" close-iteration --project "$T/t57" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal yes --score 3 --no-gate >/dev/null 2>&1
+  --exit-signal yes --score 3 --strategy probe-first --no-gate >/dev/null 2>&1
 out=$(bash "$GATE" --check --project "$T/t57" 2>&1); assert_rc "57 tampered objective -> rc2" 2 $?
 assert_has "57 reason contract-tampered" 'contract-tampered' "$out"
 
@@ -566,7 +566,7 @@ mkproj t60
 bash "$CTL" stamp --project "$T/t60" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t60" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal yes --score 5 --no-gate >/dev/null 2>&1
+  --exit-signal yes --score 5 --strategy probe-first --no-gate >/dev/null 2>&1
 out=$(bash "$CTL" status --project "$T/t60" 2>&1)
 assert_has "60 status best_score" 'best_score=5' "$out"
 
@@ -581,7 +581,7 @@ mkproj t61
 bash "$CTL" stamp --project "$T/t61" --auto >/dev/null
 out=$(bash "$CTL" close-iteration --project "$T/t61" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal no --score 7 --no-gate 2>&1)
+  --exit-signal no --score 7 --strategy probe-first --no-gate 2>&1)
 assert_has "61 mismatch noted" 'score-measured-override' "$out"
 grep -q '^score=42$' "$T/t61/.goal/loop-log.md" && ok "61 measured score recorded" || no "61 recorded claimed score"
 grep -q '^best_score=42$' "$T/t61/.goal/state.rec" && ok "61 best_score from measurement" || no "61 best_score wrong"
@@ -597,7 +597,7 @@ mkproj t62
 bash "$CTL" stamp --project "$T/t62" --auto >/dev/null
 out=$(bash "$CTL" close-iteration --project "$T/t62" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal no --score 9 --no-gate 2>&1)
+  --exit-signal no --score 9 --strategy probe-first --no-gate 2>&1)
 assert_rc "62 unmeasurable records ok rc0" 0 $?
 assert_has "62 warns unmeasurable" 'objective-unmeasurable' "$out"
 grep -q '^score=none$' "$T/t62/.goal/loop-log.md" && ok "62 score=none recorded" || no "62 score not none"
@@ -695,7 +695,7 @@ mkproj t69
 bash "$CTL" stamp --project "$T/t69" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t69" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal yes --score 7 --no-gate >/dev/null 2>&1
+  --exit-signal yes --score 7 --strategy probe-first --no-gate >/dev/null 2>&1
 out=$(bash "$GATE" --verify AC-1 --project "$T/t69" 2>&1)
 assert_has "69 minimize classified deterministic" 'AC-1|PASS|observed=7' "$out"
 printf '%s' "$out" | grep -q '|SKIP|judged' && no "69 minimize misrouted to judged" || ok "69 not judged"
@@ -719,7 +719,7 @@ mkproj t70b
 bash "$CTL" stamp --project "$T/t70b" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t70b" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal yes --score 3 --no-gate >/dev/null 2>&1
+  --exit-signal yes --score 3 --strategy probe-first --no-gate >/dev/null 2>&1
 out=$(bash "$GATE" --check --project "$T/t70b" 2>&1); assert_rc "70b minimize GO at improved score 3" 0 $?
 
 # 71 R13 divergence direction-aware for minimize
@@ -736,10 +736,10 @@ mkproj t71
 bash "$CTL" stamp --project "$T/t71" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t71" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal no --no-gate --judge-score 8 >/dev/null 2>&1
+  --exit-signal no --no-gate --judge-score 8 --strategy probe-first >/dev/null 2>&1
 bash "$CTL" close-iteration --project "$T/t71" --task T2 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal yes --no-gate --judge-score 3 >/dev/null 2>&1
+  --exit-signal yes --no-gate --judge-score 3 --strategy probe-first >/dev/null 2>&1
 # score improved (20->10, lower=better) but judge fell (8->3) -> DIVERGENCE
 printf '1|20|8\n2|10|3\n' >> "$T/t71/.goal/scores.rec"
 out=$(bash "$GATE" --check --project "$T/t71" 2>&1); assert_rc "71 minimize divergence -> rc2" 2 $?
@@ -757,10 +757,10 @@ mkproj t72
 bash "$CTL" stamp --project "$T/t72" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t72" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal no --no-gate --judge-score 3 >/dev/null 2>&1
+  --exit-signal no --no-gate --judge-score 3 --strategy probe-first >/dev/null 2>&1
 bash "$CTL" close-iteration --project "$T/t72" --task T2 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal yes --no-gate --judge-score 8 >/dev/null 2>&1
+  --exit-signal yes --no-gate --judge-score 8 --strategy probe-first >/dev/null 2>&1
 printf '1|20|3\n2|10|8\n' >> "$T/t72/.goal/scores.rec"
 out=$(bash "$GATE" --check --project "$T/t72" 2>&1); assert_rc "72 minimize agree -> GO" 0 $?
 printf '%s' "$out" | grep -q 'DIVERGENCE' && no "72 unexpected DIVERGENCE" || ok "72 no DIVERGENCE"
@@ -880,17 +880,17 @@ printf '100\n' > "$T/t79/n.txt"
 bash "$CTL" stamp --project "$T/t79" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t79" --task T1 --files n.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal no --no-gate --score 100 >/dev/null 2>&1
+  --exit-signal no --no-gate --score 100 --strategy tune-params >/dev/null 2>&1
 printf '96\n' > "$T/t79/n.txt"   # 4% noise, inside 10% band
 bash "$CTL" close-iteration --project "$T/t79" --task T2 --files n.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal yes --no-gate --score 96 >/dev/null 2>&1
+  --exit-signal yes --no-gate --score 96 --strategy tune-params >/dev/null 2>&1
 out=$(bash "$GATE" --check --project "$T/t79" 2>&1); assert_rc "79 noise-band holds -> GO" 0 $?
 # 80 below band -> score-regressed names the tolerance
 printf '80\n' > "$T/t79/n.txt"
 bash "$CTL" close-iteration --project "$T/t79" --task T3 --files n.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal yes --no-gate --score 80 >/dev/null 2>&1
+  --exit-signal yes --no-gate --score 80 --strategy rewrite-hot >/dev/null 2>&1
 out=$(bash "$GATE" --check --project "$T/t79" 2>&1); assert_rc "80 below band -> rc2" 2 $?
 assert_has "80 regressed names tol" 'tol=0.1' "$out"
 
@@ -955,10 +955,10 @@ mkproj t84
 } > "$T/t84/.goal/goal.md"
 printf '10\n' > "$T/t84/n.txt"
 bash "$CTL" stamp --project "$T/t84" --auto >/dev/null
-close_iter t84 --score 10
+close_iter t84 --score 10 --strategy probe-first
 printf '10\n' > "$T/t84/n2.txt"; # same digest not needed; just append score rows
-printf '2|10|none\n3|10|none\n' >> "$T/t84/.goal/scores.rec"
-close_iter t84 --score 10
+printf '2|10|none|probe-first\n3|10|none|probe-first\n' >> "$T/t84/.goal/scores.rec"
+close_iter t84 --score 10 --strategy probe-first
 out=$(bash "$GATE" --check --project "$T/t84" 2>&1); assert_rc "84 notes never block -> GO" 0 $?
 assert_has "84 tautology suspect named" 'tautology-suspect:AC-2' "$out"
 
@@ -1015,7 +1015,7 @@ mkproj t88
 bash "$CTL" stamp --project "$T/t88" --auto >/dev/null
 out=$(bash "$GATE" --verify --project "$T/t88" 2>&1)
 assert_has "88 negative score extracted with sign" 'observed=-10' "$out"
-close_iter t88 --score -10
+close_iter t88 --score -10 --strategy probe-first
 out=$(bash "$GATE" --check --project "$T/t88" 2>&1); assert_rc "88 negative band holds -> GO" 0 $?
 
 # 89 ledger guard: a check that rewrites goal.md mid-run is caught in-run
@@ -1134,12 +1134,12 @@ mkproj t95
 } > "$T/t95/.goal/goal.md"
 printf 'v=10\n' > "$T/t95/v.txt"
 bash "$CTL" stamp --project "$T/t95" --auto >/dev/null
-close_iter t95 --score 10
+close_iter t95 --score 10 --strategy tune-params
 sed_in 's/^best_score=.*/best_score=99/' "$T/t95/.goal/state.rec"
 printf 'v=50\n' > "$T/t95/v.txt"
 out=$(bash "$CTL" close-iteration --project "$T/t95" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --score 50 --exit-signal yes 2>&1); rc95=$?
+  --score 50 --strategy tune-params --exit-signal yes 2>&1); rc95=$?
 assert_rc "95a regression -> rc2" 2 $rc95
 assert_has "95a hint restore-best" 'hint=restore-best' "$out"
 sed_in 's/- AC-1 | v |/- AC-1 | tampered |/' "$T/t95/.goal/goal.md"
@@ -1785,6 +1785,70 @@ bash "$CTL" stamp --project "$T/t117g" --auto >/dev/null
 close_iter t117g
 out=$(bash "$GATE" --check --project "$T/t117g" 2>&1); assert_rc "117g floor FAIL beats DEFERRED" 2 $?
 printf '%s' "$out" | grep -qE 'deferred-pending' && no "117g DEFERRED masked a FAIL" || ok "117g in-tree FAIL surfaced not masked"
+
+# 118 significance band from data (v2.9): sd: gives the objective its own
+# noise floor - regressions inside z*spread are noise, not regressions.
+mkproj t118
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\nobjective: maximize AC-1\nhorizon-waived: toy significance fixture\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | perf | check: `cat n.txt` | metric: `^([0-9]+)` | sd: `sd=([0-9.]+)` | expected: maximize\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t118/.goal/goal.md"
+printf '100\nsd=2\n' > "$T/t118/n.txt"
+bash "$CTL" stamp --project "$T/t118" --auto >/dev/null
+bash "$CTL" close-iteration --project "$T/t118" --task T1 --files n.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate --score 100 --strategy base >/dev/null 2>&1
+# drift 100 -> 95: inside z=2 band (band = 2*2/100 = 4%... 5% drift!) pick
+# inside: 100 -> 97 (3% <= 4% band)
+printf '97\nsd=2\n' > "$T/t118/n.txt"
+bash "$CTL" close-iteration --project "$T/t118" --task T2 --files n.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate --score 97 --strategy base >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t118" 2>&1); assert_rc "118a drift inside z-band -> GO" 0 $?
+# 118b beyond the band (100 -> 91, 9% > 4% z-band) -> regressed names the band
+printf '91\nsd=2\n' > "$T/t118/n.txt"
+bash "$CTL" close-iteration --project "$T/t118" --task T3 --files n.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate --score 91 --strategy rewrite >/dev/null 2>&1
+out=$(bash "$GATE" --check --project "$T/t118" 2>&1); assert_rc "118b drift beyond z-band -> rc2" 2 $?
+assert_has "118b band source named" 'band=z2\*spread' "$out"
+# 118c declared sd that matches nothing is a broken instrument, not a silent
+# band-less compare (fail-loud law of R9). Flip the harness's spread line so
+# the declared sd regex no longer sees "sd=" (data drift = instrument rot).
+printf '100\nstddev=2\n' > "$T/t118/n.txt"
+out=$(bash "$GATE" --verify --project "$T/t118" 2>&1); assert_has "118c silent sd -> BROKEN" 'sd regex matched nothing' "$out"
+
+# 119 attribution writer tooth (v2.9): objective waves MUST carry a strategy
+# label or the eval plane cannot attribute slope to anything.
+mkproj t119
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\nobjective: maximize AC-1\nhorizon-waived: toy attribution fixture\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | m | check: `cat n.txt` | expected: maximize\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t119/.goal/goal.md"
+printf '5\n' > "$T/t119/n.txt"
+bash "$CTL" stamp --project "$T/t119" --auto >/dev/null
+out=$(bash "$CTL" close-iteration --project "$T/t119" --task T1 --files n.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate --score 5 2>&1); assert_rc "119a objective unlabeled wave refused" 4 $?
+assert_has "119a names the strategy duty" 'missing-strategy-label' "$out"
+# 119b labeled wave lands AND records the label in scores.rec (attribution
+# data is real by construction - no silent 'none' windows for objective loops)
+bash "$CTL" close-iteration --project "$T/t119" --task T1 --files n.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate --score 5 --strategy cache-warm >/dev/null 2>&1
+grep -qE '^1\|5\|none\|cache-warm$' "$T/t119/.goal/scores.rec" \
+  && ok "119b scores.rec carries the strategy column" || no "119b strategy column missing: $(cat "$T/t119/.goal/scores.rec")"
+
+# 120 legacy 3-field scores.rec rows stay readable by every v2.9 reader
+mkproj t120
+{ printf '# Goal contract - t\n\n## Objective\n\nt\n\nobjective: maximize AC-1\nhorizon-waived: legacy reader fixture\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | m | check: `cat n.txt` | expected: maximize\n'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t120/.goal/goal.md"
+printf '7\n' > "$T/t120/n.txt"
+bash "$CTL" stamp --project "$T/t120" --auto >/dev/null
+printf '1|7|none\n2|7|none\n' >> "$T/t120/.goal/scores.rec"
+close_iter t120 --score 7 --strategy legacy-note
+out=$(bash "$GATE" --check --project "$T/t120" 2>&1); assert_rc "120a legacy rows parse, claim GO" 0 $?
+printf '%s' "$(bash "$CTL" status --project "$T/t120" 2>&1)" | grep -qE 'EFFICIENCY|error' \
+  && ok "120b status survives mixed-field ledger" || no "120b status crashed on legacy rows"
 
 echo
 echo "== results: pass=$pass fail=$failn =="
