@@ -179,6 +179,7 @@ references/teams.md|stall-recovered
 references/teams.md|tool-error-fixed
 references/teams.md|re-run:stall
 references/teams.md|breakpoint brief
+references/teams.md|back to `[ ]` (OPEN)
 references/crew.md|Watch window
 scripts/goal_team.sh|err_tag
 scripts/goal_audit.sh|recovery-vocabulary

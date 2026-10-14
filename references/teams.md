@@ -200,6 +200,9 @@ classify → env_fixable? → fix workspace/brief → wake (breakpoint brief)
 ```
 
 **Resume** when partial products exist. **Re-run** only the open failed item.
+On re-run, mark the work-plan item back to `[ ]` (OPEN) before redispatch —
+a ticked row is never a re-run target, and the queue of record must show the
+redo as still owed (spec §9.4 mechanical tooth).
 
 Breakpoint brief:
 
