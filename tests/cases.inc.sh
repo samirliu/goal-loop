@@ -1916,3 +1916,30 @@ bash "$TEAM" init --project "$T/t122f" --team goal >/dev/null
 bash "$TEAM" roster --project "$T/t122f" --add --name w1 --role backend --prompt 'x' >/dev/null
 bash "$TEAM" send --project "$T/t122f" --from controller --to w1 --text 'wake' >/dev/null
 [ -f "$T/t122f/.goal/team/heartbeat/w1.ts" ] && ok "122f heartbeat written on send" || no "122f heartbeat missing"
+
+# 123 audit recovery-suffix acceptance + invented-token rejection (T123a-c).
+# 65a-e pin: re-run:evil on crew (A1), crew+recovery A4, crew+fallback exempt,
+# re-run:death on teams, re-run:stall on crew. These pin the remaining
+# combinations end-to-end through goal_audit.sh: the BARE recovery token
+# (stall-recovered) on teams:, re-run:stall on teams:, and a wholly invented
+# tag SHAPE (invented:oops - neither fallback: nor a recovery token).
+# 123a bare recovery token on teams: is audit-clean
+mkproj t123a
+printf '## iteration 1\ntask=T2[teams:2] (stall-recovered)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t123a/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t123a" 2>&1); rc=$?
+assert_rc "123a recovery suffix clean" 0 $rc
+assert_has "123a clean said" 'AUDIT: clean' "$out"
+# 123b re-run:stall on teams: is audit-clean (teams x re-run:stall pairing)
+mkproj t123b
+printf '## iteration 1\ntask=T2[teams:2] (re-run:stall)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t123b/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t123b" 2>&1); rc=$?
+assert_rc "123b re-run suffix clean" 0 $rc
+assert_has "123b clean said" 'AUDIT: clean' "$out"
+# 123c invented tag shape must fail: A1 closed grammar catches it today; the
+# pattern allows A3 recovery-vocabulary as the backstop if a looser suffix
+# pattern ever slips past gp_task_ok (brief step 3: A1 OR A3)
+mkproj t123c
+printf '## iteration 1\ntask=T2[teams:2] (invented:oops)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t123c/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t123c" 2>&1); rc=$?
+assert_rc "123c invented suffix fails A1/A3" 1 $rc
+assert_has "123c rejected at schema/vocab gate" 'A1 task-schema|A3 recovery-vocabulary' "$out"
