@@ -96,6 +96,18 @@ gp_task_ok "T1[crew:3](fallback:evil mode)" && no "space fallback accepted" || o
 t "fallback token" "teams-unavailable" "$(gp_task_fallback 'T1[crew:1] (fallback:teams-unavailable)')"
 t "backend" "teams" "$(gp_task_backend 'T1[teams:2]')"
 
+# recovery suffix grammar (teams runtime robustness)
+gp_task_ok "T2[teams:3] (stall-recovered)" && ok "task stall-recovered ok" || no "task stall-recovered ok"
+gp_task_ok "T2[teams:2] (tool-error-fixed)" && ok "task tool-error-fixed ok" || no "task tool-error-fixed ok"
+gp_task_ok "T2[crew:1] (re-run:stall)" && ok "task re-run:stall ok" || no "task re-run:stall ok"
+gp_task_ok "T2[crew:1] (re-run:tool-error)" && ok "task re-run:tool-error ok" || no "task re-run:tool-error ok"
+gp_task_ok "T2[crew:1] (re-run:death)" && ok "task re-run:death ok" || no "task re-run:death ok"
+gp_task_ok "T2[teams:3] (re-run:evil)" && no "bad re-run token accepted" || ok "bad re-run token rejected"
+gp_task_ok "T2[teams:3] (fallback:teams-unavailable)" && ok "fallback still ok" || no "fallback still ok"
+[ "$(gp_task_recovery 'T2[teams:3] (stall-recovered)')" = "stall-recovered" ] && ok "recovery extract" || no "recovery extract"
+[ "$(gp_task_recovery 'T2[teams:3] (re-run:stall)')" = "re-run:stall" ] && ok "re-run extract" || no "re-run extract"
+[ "$(gp_task_recovery 'T2[teams:3]')" = "" ] && ok "recovery empty when none" || no "recovery empty when none"
+
 # --- verdict grammar + latest-wins + conflict -------------------------------
 pv="$P/verd"; mkdir -p "$pv/.goal"
 # 6-field rows: id|verdict|iter|digest|command|evidence

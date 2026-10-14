@@ -6,7 +6,9 @@
 # cover-up, shredded strategy_delta).
 #   A1 every task= line matches the exact schema
 #   A2 progress=no must carry a real strategy_delta (R10 mirror)
-#   A3 fallback suffixes come from the closed vocabulary only
+#   A3 task= suffixes come from closed vocabularies only: fallback:
+#      (teams-process-reaped|teams-unavailable) plus recovery
+#      (stall-recovered|tool-error-fixed|re-run:stall|re-run:tool-error|re-run:death)
 #   A4 no silent backend downgrade: a crew: wave inside a teams run without
 #      a (fallback:...) suffix is a violation
 #   A6 score= is none or a decimal number
@@ -60,6 +62,14 @@ while IFS= read -r line; do
     *'[crew:'*)
       [ "$teams_seen" = 1 ] && bad "A4 silent-downgrade:$t (teams run, crew wave without (fallback:...) suffix)"
       ;;
+    *'('*)
+      # recovery tags also come from a closed list
+      rsuf=$(gp_task_recovery "$t")
+      case "$rsuf" in
+        '' ) bad "A3 recovery-vocabulary:$t" ;;
+        stall-recovered|tool-error-fixed|re-run:stall|re-run:tool-error|re-run:death) : ;;
+        *) bad "A3 recovery-vocabulary:$rsuf" ;;
+      esac ;;
   esac
 done <<< "$log"
 

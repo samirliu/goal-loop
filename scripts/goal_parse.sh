@@ -206,6 +206,10 @@ gp_verdict_conflict(){                                 # $1 project $2 id $3 ite
 }
 
 # ---- task= id grammar (R12/A1: ledger law, enforced by the writer) ----------
-gp_task_ok(){ printf '%s' "$1" | grep -qE '^T[0-9]+\[(teams|crew):[0-9]+\]( *\(fallback:[a-z0-9-]+\))?$'; }
+# Optional trailing tag is either a fallback: token or a recovery token.
+# Recovery vocabulary is CLOSED (teams runtime robustness).
+gp_task_ok(){ printf '%s' "$1" | grep -qE \
+  '^T[0-9]+\[(teams|crew):[0-9]+\]( *\((fallback:[a-z0-9-]+|stall-recovered|tool-error-fixed|re-run:(stall|tool-error|death))\))?$'; }
 gp_task_fallback(){ printf '%s' "$1" | sed -nE 's/.*\(fallback:([a-z0-9-]+)\).*/\1/p'; }
+gp_task_recovery(){ printf '%s' "$1" | sed -nE 's/.*\((stall-recovered|tool-error-fixed|re-run:(stall|tool-error|death))\).*/\1/p'; }
 gp_task_backend(){ printf '%s' "$1" | sed -nE 's/.*\[(teams|crew):[0-9]+\].*/\1/p'; }
