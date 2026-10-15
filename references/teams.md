@@ -9,6 +9,19 @@ run: it implements the cc-haha file protocol over bash + files
 (`scripts/goal_team.sh`) so multi-role crews work everywhere. The flag
 asks for a team; the tool list decides which kind.
 
+**Three tool surfaces, one law (no silent fallback):**
+
+| tool list has | dispatch path | ledger mark |
+|---|---|---|
+| TeamCreate+TeamPlan+SendMessage | native teams | `task=T<n>[teams:N]` |
+| Agent tool only (no Teams) | portable file layer + Agent wave workers | `task=T<n>[crew:N]` + note |
+| neither (subagent / restricted harness) | **controller self-dispatches** disjoint scopes in one turn | `task=T<n>[crew:N](fallback:teams-unavailable)` |
+
+The third row is common for subagent executors: they never receive
+TeamCreate or Agent. That is not a skill failure and must not stall the
+loop. Probe the tool list once at Step 2, pick the row, write the mark,
+and continue. Do not ask the user to "install teams" mid-run.
+
 Native "persistence" is the teammate sessionId/transcript, not an
 independent OS process. Process workers stop with the lead turn; SendMessage
 resumes the saved conversation. See §5.
@@ -142,10 +155,13 @@ Fall back only after revive fails twice for the same member, or the
 roster / TeamCreate is truly gone.
 
 - Fallback target: portable layer; if portable is also unavailable,
-  default backend.
+  default backend (controller self-dispatches disjoint scopes).
 - The ledger and report MUST name the failure mode in the existing
   task= suffix form, e.g. `(fallback:teams-process-reaped)` or
   `(fallback:teams-unavailable)`. No silent fallback.
+- Probe result belongs in the first wave's timeline / loop-log line, e.g.
+  `dispatch: teams-unavailable → self-dispatch A/B/C/D`. Writing friction
+  is encouraged; stalling is not.
 - Do not invent new loop-log keys; only task= suffixes.
 
 ## 6 CLI cheat sheet

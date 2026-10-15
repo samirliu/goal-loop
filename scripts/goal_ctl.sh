@@ -68,7 +68,15 @@ case "$cmd" in
     [ -d "$sd" ] || mkdir -p "$sd/logs"
     if [ -f "$sd/goal.md" ]; then echo "CTL: ERROR already-initialized ($sd/goal.md)" >&2; exit 2; fi
     printf 'iteration=0\nbreaker=CLOSED\nfalse_completes=0\nreplans=0\nno_progress_streak=0\nlast_progress_iteration=0\nmax_iterations=%s\nno_progress_limit=2\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=0\ndry_limit=3\ncheck_timeout=120\ntime_budget=0\ndeadline=0\n' "$max_iterations" > "$sd/state.rec"
-    : > "$sd/loop-log.md"; : > "$sd/verdicts.rec"; : > "$sd/work-plan.md"; mkdir -p "$sd/evidence"
+    : > "$sd/loop-log.md"; : > "$sd/verdicts.rec"; mkdir -p "$sd/evidence"
+    # work-plan skeleton (SB-8): an empty file is a trap - Write/Edit tools
+    # refuse to overwrite unread empty files and controllers waste a turn
+    # inventing the format. The schema is fixed; seed it once.
+    {
+      printf '# work-plan (controller ticks; NEVER a GO signal)\n\n'
+      printf '# format: - [ ] T1 <scope> | owner=<name> | files=<paths>\n'
+      printf '# done:   - [x] T1 ...\n'
+    } > "$sd/work-plan.md"
     echo "CTL: INIT ok - fill $sd/goal.md, then: goal_ctl.sh stamp --project $project" ;;
 
   stamp)
@@ -76,6 +84,21 @@ case "$cmd" in
     if grep -qE '^approved: [0-9a-f]{6,}' "$sd/goal.md"; then
       echo "CTL: ERROR already-stamped (R3: one stamp; amendments go to the user)" >&2; exit 2
     fi
+    # AC grammar at t=0 (SB-1): one AC = one line carrying check: AND expected:.
+    # Multi-line check commands push expected: onto a continuation the parser
+    # never sees, and the loop only learns contract-malformed mid-wave - after
+    # workers have already burned a round. Refuse the stamp instead.
+    for ac_id in $(gp_all_ac_ids "$project"); do
+      body=$(gp_ac_line_for "$project" "$ac_id")
+      [ -n "$body" ] || { echo "CTL: ERROR stamp-refused: $ac_id vanished from the AC section (unparseable)" >&2; exit 2; }
+      printf '%s\n' "$body" | grep -q 'expected:' \
+        || { echo "CTL: ERROR stamp-refused: $ac_id is not a single-line AC (no expected: on the AC line - put the whole check in one line inside backticks; do not wrap it)" >&2; exit 2; }
+      printf '%s\n' "$body" | grep -q 'check:' \
+        || { echo "CTL: ERROR stamp-refused: $ac_id has no check: field (every AC needs a failable named check)" >&2; exit 2; }
+      exp=$(gp_ac_expected "$project" "$ac_id" | tr -d '[:space:]')
+      [ -n "$exp" ] \
+        || { echo "CTL: ERROR stamp-refused: $ac_id expected: token is empty after parse (single-line AC required)" >&2; exit 2; }
+    done
     # forge contracts: baseline must cover every delta metric AC BEFORE the
     # stamp - t=0 exposure, never a mid-loop rc=4 surprise (v1.5)
     if grep -qE '^exit: *forge' "$sd/goal.md" 2>/dev/null; then
@@ -192,6 +215,14 @@ case "$cmd" in
       [ -n "$v" ] || { echo "CTL: ERROR close-iteration needs --task --files --checks-pass --checks-fail --checks-unverifiable" >&2; exit 4; }
     done
     [ -f "$sd/loop-log.md" ] || { echo "CTL: ERROR no-loop-log" >&2; exit 4; }
+    # --files is evidence of what landed (SB-6). A missing path is usually a
+    # typo or a scope lie; warn loud but do not refuse the bookkeeping write -
+    # the gate's check-mutated-tree already owns the "did it really land" side.
+    miss=0
+    for f in $(printf '%s' "$files" | tr ',' ' '); do
+      [ -e "$project/$f" ] || { echo "CTL: WARN missing-claimed-file: $f (listed in --files but not under $project)" >&2; miss=$((miss+1)); }
+    done
+    [ "$miss" -eq 0 ] || echo "CTL: NOTE files-missing=$miss (bookkeeping continues; fix the list or the artifacts)" >&2
     # forge bookkeeping: validate BEFORE anything is written - a rc=4 refusal
     # must never leave an orphan loop-log block (checker finding, v1.2)
     if grep -qE '^exit: *forge' "$sd/goal.md" 2>/dev/null; then
@@ -351,6 +382,11 @@ case "$cmd" in
     if [ "$grc" -eq 2 ] && [ "$exit_signal" = yes ]; then
       case "$last_reason" in
         deferred-pending:*) echo "CTL: NOTE deferred-wait-not-counted ($last_reason) - patience is not a false complete" >&2 ;;
+        # contract-malformed is a drafting defect, not a lying claim (SB-2).
+        # Counting it toward the false-complete ratchet BLOCKs a loop whose
+        # author wrapped a check command across lines - the ratchet exists to
+        # catch manufactured passes, not typos in the yardstick.
+        contract-malformed:*) echo "CTL: NOTE contract-defect-not-counted ($last_reason) - a broken yardstick is not a false complete; restamp after fixing the AC line" >&2 ;;
         *)
         fc=$(( $(state_get false_completes) + 1 ))
         { grep -vE '^false_completes=' "$sd/state.rec"; printf 'false_completes=%s\n' "$fc"; } > "$sd/state.rec.new" \

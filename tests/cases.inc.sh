@@ -1993,3 +1993,78 @@ printf '## iteration 1\ntask=T2[teams:2] (invented:oops)\nfiles_modified=a.txt\n
 out=$(bash "$AUDIT" --project "$T/t123c" 2>&1); rc=$?
 assert_rc "123c invented suffix fails A1/A3" 1 $rc
 assert_has "123c rejected at schema/vocab gate" 'A1 task-schema|A3 recovery-vocabulary' "$out"
+
+# 124 stamp-time AC grammar (SB-1) + contract-defect ratchet exemption (SB-2).
+# 124a multi-line AC (expected: on a continuation) is stamp-refused at t=0
+mkproj t124a
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\n'
+  printf '## Acceptance criteria\n\n'
+  # deliberately wrap the check so expected: is not on the AC line
+  printf -- '- AC-1 | wrapped | check: `echo a\n  echo b` | expected: exit=0\n'
+  printf '\n## Approval\n\napproved: PENDING\n'
+} > "$T/t124a/.goal/goal.md"
+out=$(bash "$CTL" stamp --project "$T/t124a" --auto 2>&1); assert_rc "124a multi-line AC stamp refused" 2 $?
+assert_has "124a refusal names single-line" 'single-line AC' "$out"
+grep -qE '^approved: [0-9a-f]{6,}' "$T/t124a/.goal/goal.md" \
+  && no "124a bad contract still got stamped" || ok "124a left unstamped"
+
+# 124b missing expected: on the AC line is stamp-refused
+mkproj t124b
+{
+  printf '# Goal contract - test\n\n## Objective\n\nt\n\n'
+  printf '## Acceptance criteria\n\n'
+  printf -- '- AC-1 | no exp | check: `true`\n'
+  printf '\n## Approval\n\napproved: PENDING\n'
+} > "$T/t124b/.goal/goal.md"
+out=$(bash "$CTL" stamp --project "$T/t124b" --auto 2>&1); assert_rc "124b missing expected refused" 2 $?
+assert_has "124b names expected" 'expected:' "$out"
+
+# 124c contract-malformed claim must NOT advance the false-complete ratchet
+mkproj t124c
+# stamp a clean contract first, then corrupt the AC after stamp so the gate
+# sees contract-malformed on a claimed iteration (the SB-2 path)
+contract t124c "- AC-1 | ok | check: \`test -f a.txt\` | expected: exit=0"
+printf 'x' > "$T/t124c/a.txt"
+# force a malformed claim: remove expected: from the frozen AC (gate will
+# also see contract-tampered; craft via a fresh unstamped-like parse path
+# instead: close-iteration on a contract that gate reports as contract-malformed)
+# Build the exact SB-2 shape: unstamped project cannot close; so use a stamped
+# contract whose AC line is still single-line but gate fails a check, then a
+# SECOND claim against a contract that gate classifies contract-malformed.
+# Easiest pin: call close-iteration --exit-signal yes on a project whose
+# goal.md AC lost its expected: token while still carrying approved: (tampers
+# to contract-malformed:AC-1 before contract-tampered is checked... gate order
+# checks form first). Re-stamp is forbidden; so simulate via direct state.
+printf 'y' > "$T/t124c/a.txt"
+rm -f "$T/t124c/a.txt"
+out=$(bash "$CTL" close-iteration --project "$T/t124c" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes 2>&1)
+rc124c=$?
+# first catch: real FAIL (missing a.txt) IS counted
+assert_has "124c real FAIL counted" 'false-complete-counted=1' "$out"
+# now break the AC grammar without breaking the stamp hash? hash will move.
+# Direct unit: the ratchet branch must special-case contract-malformed
+# Re-create the branch condition by making the gate report contract-malformed:
+# write an AC without expected: into a NEW unstamped project and claim via
+# a synthetic loop-log + close with --no-gate, then invoke the gate path
+# through close-iteration by stamping a valid contract and then... 
+# Simpler teeth: grep the source for the exemption (mechanical) AND run the
+# gate on a malformed contract to confirm reason= contract-malformed
+mkproj t124c2
+{
+  printf '# c\n\n## Acceptance criteria\n\n'
+  printf -- '- AC-1 | bad | check: `true` | expected: exit=0\n'
+  printf -- '- AC-2 | wrapped | check: `echo x\n  echo y`\n'
+  printf '\n## Approval\n\napproved: PENDING\n'
+} > "$T/t124c2/.goal/goal.md"
+# stamp will refuse AC-2; stamp AC-only-1 by removing AC-2 then break after stamp
+printf '# c\n\n## Acceptance criteria\n\n- AC-1 | ok | check: `true` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n' > "$T/t124c2/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t124c2" --auto >/dev/null 2>&1
+# inject a malformed AC line after stamp (gate form-check runs before tamper hash)
+printf -- '- AC-2 | wrapped | check: `echo x\n  echo y`\n' >> "$T/t124c2/.goal/goal.md"
+out=$(bash "$CTL" close-iteration --project "$T/t124c2" --task T1 --files x.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes 2>&1)
+assert_has "124c2 contract-defect not counted" 'contract-defect-not-counted' "$out"
+grep -q '^false_completes=0$' "$T/t124c2/.goal/state.rec" \
+  && ok "124c2 ratchet stayed 0 on contract defect" || no "124c2 ratchet moved on contract defect: $(grep false_completes "$T/t124c2/.goal/state.rec")"
