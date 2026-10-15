@@ -400,13 +400,20 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   printf '%s\n' "$line"
 }
 
+# -0. state present and complete -----------------------------------------
+# Fail BEFORE tree_digest: walking an accidental cwd (e.g. $HOME) to learn
+# "no goal here" is the wrong cost shape -- and --check with no ledger must
+# stay instant. --digest still works with no .goal (it is a pure tree hash).
+if [ "$mode" != digest ]; then
+  [ -d "$sd" ] || state_err "no-goal-dir"
+  [ -f "$sd/goal.md" ] || state_err "no-goal-md"
+fi
+
 digest=$(tree_digest) || state_err "unreadable-project"
 # ledger state before the rerun batch (the tree guard is blind to .goal/)
 [ -d "$sd" ] && ld_check0=$(ledger_digest) || ld_check0=none
 if [ "$mode" = digest ]; then echo "$digest"; exit 0; fi
 
-# -0. state present and complete -----------------------------------------
-[ -d "$sd" ] || state_err "no-goal-dir"
 [ -f "$sd/goal.md" ] || state_err "no-goal-md"
 tmo=$(state_get check_timeout); [ -n "$tmo" ] || tmo=120
 gp_is_natural "$tmo" || state_err "bad-check-timeout:$tmo"
