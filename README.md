@@ -38,7 +38,9 @@ cp goal-loop/agents/*.md ~/.claude/agents/
 ```
 
 - Windows（git-bash）路径同上：`C:\Users\<你>\.claude\skills\goal-loop\` 与 `C:\Users\<你>\.claude\agents\`。
-- 依赖：`grep / sed / awk(gawk) / sha1sum / cksum`，**无 jq**；CR 与 `LC_ALL` 已内置处理。有 coreutils `timeout` 时每条门控重跑检查限时（默认 120s）。
+- 依赖：`grep / sed / gawk / sha1sum|cksum`，**无 jq**；CR 与 `LC_ALL` 已内置处理。有 coreutils `timeout` 时每条门控重跑检查限时（默认 120s）。
+  - **macOS**：系统 `bash` 是 3.2，系统 `awk` 是 BSD —— 脚本已兼容 bash 3.2；`gawk` 必装且会自动发现 `~/.local/bin/gawk`、Homebrew 路径。`brew install gawk`（可选 `coreutils` 提供 `timeout`/`gtimeout`）。
+  - **Linux**：`apt install gawk`（通常已带）。
 - Smoke test / 冒烟验证（不耗 API）：
 
 ```bash

@@ -17,6 +17,20 @@
 
 gp_r(){ tr -d '\r'; }
 
+# ---- GNU awk resolution (macOS / BSD) --------------------------------------
+# goal-loop needs GNU awk (3-arg match(re, arr) capture groups). macOS ships
+# BSD awk as /usr/bin/awk and often has gawk off-PATH (Homebrew, ~/.local).
+# Resolve once and keep the call sites saying `gawk`.
+if ! command -v gawk >/dev/null 2>&1; then
+  for _gp_gawk in "$HOME/.local/bin/gawk" /opt/homebrew/bin/gawk /usr/local/bin/gawk /usr/bin/gawk; do
+    if [ -x "$_gp_gawk" ]; then
+      gawk(){ "$_gp_gawk" "$@"; }
+      break
+    fi
+  done
+  unset _gp_gawk
+fi
+
 gp_hash_std(){                                           # one stable content hash
   if command -v sha1sum >/dev/null 2>&1; then sha1sum | cut -c1-40
   else cksum | awk '{print $1}'; fi

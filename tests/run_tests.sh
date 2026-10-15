@@ -52,10 +52,10 @@ block_map() {
   awk '
     /^# [0-9]/ {
       if (start) print start "\t" NR-1 "\t" id "\t" label
-      match($0, /^# ([0-9]+)([a-z]?)/, m)
-      id = m[1] m[2]
       label = $0
       sub(/^# /, "", label)
+      id = label
+      sub(/[^0-9a-z].*/, "", id)
       start = NR
       next
     }
@@ -71,13 +71,24 @@ projs_in() {
   sed -n "${s},${e}p" "$BODY" | awk '
     {
       line=$0
-      while (match(line, /\$T\/([A-Za-z0-9_]+)/, c)) { print c[1]; line=substr(line, RSTART+RLENGTH) }
+      while (match(line, /\$T\/[A-Za-z0-9_]+/)) {
+        print substr(line, RSTART+3, RLENGTH-3)
+        line = substr(line, RSTART+RLENGTH)
+      }
     }
     /mkproj[[:space:]]+[A-Za-z0-9_]+/ {
-      if (match($0, /mkproj[[:space:]]+([A-Za-z0-9_]+)/, c)) print c[1]
+      if (match($0, /mkproj[[:space:]]+[A-Za-z0-9_]+/)) {
+        tok = substr($0, RSTART, RLENGTH)
+        sub(/^mkproj[[:space:]]+/, "", tok)
+        print tok
+      }
     }
     /close_iter[[:space:]]+[A-Za-z0-9_]+/ {
-      if (match($0, /close_iter[[:space:]]+([A-Za-z0-9_]+)/, c)) print c[1]
+      if (match($0, /close_iter[[:space:]]+[A-Za-z0-9_]+/)) {
+        tok = substr($0, RSTART, RLENGTH)
+        sub(/^close_iter[[:space:]]+/, "", tok)
+        print tok
+      }
     }
   ' | sort -u
 }
@@ -119,20 +130,23 @@ findr() {
   printf '%s' "$r"
 }
 
-declare -A seen_proj_owner   # projid -> block index (first)
+# bash 3.2: no declare -A. Project keys are [A-Za-z0-9_]+ (safe as var suffix);
+# numeric maps use indexed arrays, which bash 3.2 has always supported.
+spo_get(){ eval "printf '%s' \"\${spo_$1:-}\""; }
+spo_set(){ eval "spo_$1=\$2"; }
 for i in $(seq 1 "$NB"); do
   while read -r proj; do
     [ -n "$proj" ] || continue
-    if [ -n "${seen_proj_owner[$proj]:-}" ]; then
-      union "$i" "${seen_proj_owner[$proj]}"
+    if [ -n "$(spo_get "$proj")" ]; then
+      union "$i" "$(spo_get "$proj")"
     else
-      seen_proj_owner[$proj]=$i
+      spo_set "$proj" "$i"
     fi
   done < <(projs_in "${START[$i]}" "${END[$i]}")
 done
 
 # cluster id per block = findr(i); order clusters by min start line
-declare -A cluster_of
+declare -a cluster_of
 for i in $(seq 1 "$NB"); do
   cluster_of[$i]=$(findr "$i")
 done
@@ -178,7 +192,7 @@ declare -a SEL
 nsel=0
 if [ -n "$only" ]; then
   # first pass: matching blocks → their clusters
-  declare -A want_cluster
+  declare -a want_cluster
   for i in $(seq 1 "$NB"); do
     if want_idx "${BID[$i]}"; then
       want_cluster[${cluster_of[$i]}]=1
@@ -212,7 +226,7 @@ fi
 # ---- pack selected clusters into $jobs shards (greedy by line count) ----
 # unique clusters in order of first appearance
 declare -a CLUSTERS
-declare -A cl_lines cl_members
+declare -a cl_lines cl_members
 ncl=0
 for i in $(seq 1 "$nsel"); do
   b=${SEL[$i]}
@@ -231,7 +245,7 @@ nj=$jobs
 
 declare -a bucket_w
 for j in $(seq 1 "$nj"); do bucket_w[$j]=0; done
-declare -A cluster_bucket
+declare -a cluster_bucket
 for k in $(seq 1 "$ncl"); do
   c=${CLUSTERS[$k]}
   best=1; bestw=${bucket_w[1]}

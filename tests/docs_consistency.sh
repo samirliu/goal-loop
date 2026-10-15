@@ -32,6 +32,12 @@ skills_dir="$HOME/.claude/skills"
 while IFS= read -r r; do
   [ -n "$r" ] || continue
   [ -f "$r" ] && continue
+  # Companion skills ship inside this repo; docs often cite their paths as if
+  # installed (contract-forge/tests/run_fixtures.sh). Accept companions/*/.
+  if ls companions/*/"$r" >/dev/null 2>&1; then
+    ok "C1 companion reference resolves: $r"
+    continue
+  fi
   if [ -d "$skills_dir" ] && ls "$skills_dir/"*/"$r" >/dev/null 2>&1; then
     ok "C1 external reference resolves: $r"
   elif [ -d "$skills_dir" ]; then

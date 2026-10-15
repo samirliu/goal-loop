@@ -65,19 +65,19 @@ obj_ac="" obj_dir=""
 exit_line=""
 horizon_line=""
 is_forge=0
-declare -A seen_ids
-declare -A ac_expected
-declare -A ac_has_check
-declare -A ac_has_calib
-declare -A ac_calib_good
-declare -A ac_calib_bad
-declare -A ac_has_probe
-declare -A ac_has_metric
-declare -A ac_has_baseline
-declare -A ac_has_external
-declare -A ac_has_window
-declare -A ac_spec
-declare -A ac_line
+
+# bash 3.2 (macOS /bin/bash) has no declare -A. Keys are AC-ids / short tokens;
+# store as m_<name>_<sanitized> and keep an explicit key list for iteration.
+m_san(){ printf '%s' "$1" | tr -c 'A-Za-z0-9' '_'; }
+m_set(){ eval "m_$1_$(m_san "$2")=\$3"; }
+m_get(){ eval "printf '%s' \"\${m_$1_$(m_san "$2")-}\""; }
+m_has(){ eval "[ -n \"\${m_$1_$(m_san "$2")+x}\" ]"; }
+m_add_key(){ # $1=list-var $2=key
+  eval "case \" \${$1-} \" in *' $2 '*) ;; *) $1=\"\${$1-} $2\" ;; esac"
+}
+m_keys(){ eval "printf '%s' \"\${$1-}\""; }
+
+ac_id_list=""   # every seen AC id, in order
 
 # scan lines
 while IFS= read -r line; do
@@ -99,8 +99,9 @@ while IFS= read -r line; do
       ;;
     objective:*)
       # objective: maximize AC-N  |  objective: minimize AC-N
-      obj_dir=$(printf '%s' "$line" | sed -n 's/.*objective:[[:space:]]*\(maximize\|minimize\).*/\1/p' | head -1)
-      obj_ac=$(printf '%s' "$line" | sed -n 's/.*objective:[[:space:]]*\(maximize\|minimize\)[[:space:]]\{1,\}\(AC-[0-9A-Za-z][0-9A-Za-z-]*\).*/\2/p' | head -1)
+      # sed -E (BSD+GNU): BRE \| is a GNU extension and silently fails on macOS
+      obj_dir=$(printf '%s' "$line" | sed -nE 's/.*objective:[[:space:]]*(maximize|minimize).*/\1/p' | head -1)
+      obj_ac=$(printf '%s' "$line" | sed -nE 's/.*objective:[[:space:]]*(maximize|minimize)[[:space:]]+(AC-[0-9A-Za-z][0-9A-Za-z-]*).*/\2/p' | head -1)
       ;;
     horizon-waived:*)
       horizon_line=$(printf '%s' "$line" | sed 's/^horizon-waived:[[:space:]]*//' | sed 's/[[:space:]]*$//')
@@ -113,19 +114,20 @@ while IFS= read -r line; do
       masked=$(printf '%s\n' "$line" | mask_bts)
       id=$(printf '%s\n' "$masked" | sed -n 's/^-[[:space:]]*\(AC-[0-9A-Za-z][0-9A-Za-z-]*\).*/\1/p')
       [ -n "$id" ] || continue
-      if [ -n "${seen_ids[$id]:-}" ]; then
+      if m_has seen_ids "$id"; then
         err "ac-id-unique $id: duplicate AC id"
       fi
-      seen_ids[$id]=1
-      ac_line[$id]=$line
+      m_set seen_ids "$id" 1
+      m_add_key ac_id_list "$id"
+      m_set ac_line "$id" "$line"
 
       # expected: take from original, after expected: to end (spec cannot contain |)
       exp=$(printf '%s\n' "$line" | sed -n 's/.*expected:[[:space:]]*//p' | head -1 | sed 's/[[:space:]]*$//')
       if [ -z "$exp" ]; then
         err "missing-expected $id: no expected: field"
       else
-        ac_spec[$id]=$exp
-        ac_expected[$id]=$exp
+        m_set ac_spec "$id" "$exp"
+        m_set ac_expected "$id" "$exp"
         if printf '%s' "$exp" | grep -q '|'; then
           err "spec-pipe $id: expected: spec must not contain |"
         fi
@@ -146,7 +148,7 @@ while IFS= read -r line; do
 
       # check:
       if printf '%s\n' "$line" | grep -q 'check:[[:space:]]*`'; then
-        ac_has_check[$id]=1
+        m_set ac_has_check "$id" 1
         cmd=$(printf '%s\n' "$line" | sed -n 's/.*check:[[:space:]]*`\([^`]*\)`.*/\1/p' | head -1)
         if [ -z "$cmd" ] || printf '%s' "$cmd" | grep -qE '^(<exact command>|TODO|todo|<command>)$'; then
           err "empty-check $id: empty or placeholder check"
@@ -154,7 +156,7 @@ while IFS= read -r line; do
       else
         # check without backticks?
         if printf '%s\n' "$masked" | grep -q 'check:'; then
-          ac_has_check[$id]=1
+          m_set ac_has_check "$id" 1
           warn "ac-grammar $id: check: not in backticks"
         else
           err "missing-check $id: no check: field"
@@ -162,42 +164,43 @@ while IFS= read -r line; do
       fi
 
       # probe / metric / sd / var / external in backticks on this line
-      if printf '%s\n' "$line" | grep -q 'probe:[[:space:]]*`'; then ac_has_probe[$id]=1; fi
+      if printf '%s\n' "$line" | grep -q 'probe:[[:space:]]*`'; then m_set ac_has_probe "$id" 1; fi
       if printf '%s\n' "$line" | grep -q 'metric:[[:space:]]*`'; then
-        ac_has_metric[$id]=1
+        m_set ac_has_metric "$id" 1
         mre=$(printf '%s\n' "$line" | sed -n 's/.*metric:[[:space:]]*`\([^`]*\)`.*/\1/p' | head -1)
         if ! printf '%s' "$mre" | grep -q '('; then
           warn "metric-capture $id: metric: regex should contain one capture group"
         fi
       fi
-      if printf '%s\n' "$line" | grep -q 'external:[[:space:]]*`'; then ac_has_external[$id]=1; fi
-      if printf '%s\n' "$line" | grep -qE 'window:[[:space:]]*[0-9]+'; then ac_has_window[$id]=1; fi
+      if printf '%s\n' "$line" | grep -q 'external:[[:space:]]*`'; then m_set ac_has_external "$id" 1; fi
+      if printf '%s\n' "$line" | grep -qE 'window:[[:space:]]*[0-9]+'; then m_set ac_has_window "$id" 1; fi
 
       # baseline
       if printf '%s\n' "$line" | grep -qE 'baseline:[[:space:]]*(delta|abs)'; then
-        ac_has_baseline[$id]=1
+        m_set ac_has_baseline "$id" 1
       fi
 
       # calib
       if printf '%s\n' "$line" | grep -q 'calib:'; then
-        ac_has_calib[$id]=1
+        m_set ac_has_calib "$id" 1
         good=$(printf '%s\n' "$line" | sed -n 's/.*calib:[[:space:]]*.*good=\([^ |]*\).*/\1/p' | head -1)
         bad=$(printf '%s\n' "$line" | sed -n 's/.*calib:[[:space:]]*.*bad=\([^ |]*\).*/\1/p' | head -1)
-        ac_calib_good[$id]=$good
-        ac_calib_bad[$id]=$bad
+        m_set ac_calib_good "$id" "$good"
+        m_set ac_calib_bad "$id" "$bad"
         if [ -z "$good" ] || [ -z "$bad" ]; then
           err "calib-both $id: calib: needs both good= and bad="
         elif [ "$good" = "$bad" ]; then
           err "calib-both $id: calib: good= and bad= must differ"
         fi
         # calib only on judged
-        if [ -n "${ac_expected[$id]:-}" ] && [ "${ac_expected[$id]}" != "judged" ]; then
-          err "calib-judged-only $id: calib: only on expected: judged (got ${ac_expected[$id]})"
+        exp_now=$(m_get ac_expected "$id")
+        if [ -n "$exp_now" ] && [ "$exp_now" != "judged" ]; then
+          err "calib-judged-only $id: calib: only on expected: judged (got $exp_now)"
         fi
       fi
 
       # window without external
-      if [ -n "${ac_has_window[$id]:-}" ] && [ -z "${ac_has_external[$id]:-}" ]; then
+      if m_has ac_has_window "$id" && ! m_has ac_has_external "$id"; then
         err "window-external $id: window: requires external:"
       fi
       ;;
@@ -208,10 +211,10 @@ EOF
 
 # --- contract-level relations ---------------------------------------------
 if [ -n "$obj_ac" ] && [ -n "$obj_dir" ]; then
-  if [ -z "${seen_ids[$obj_ac]:-}" ]; then
+  if ! m_has seen_ids "$obj_ac"; then
     err "objective-target $obj_ac: objective names missing AC"
   else
-    exp=${ac_expected[$obj_ac]:-}
+    exp=$(m_get ac_expected "$obj_ac")
     if [ "$exp" != "$obj_dir" ]; then
       err "objective-target $obj_ac: expected: '$exp' != objective direction '$obj_dir'"
     fi
@@ -222,8 +225,8 @@ if [ -n "$obj_ac" ] && [ -n "$obj_dir" ]; then
   if [ -n "$horizon_line" ]; then
     ok_horizon=1
   else
-    for id in "${!ac_expected[@]}"; do
-      if [ "${ac_expected[$id]}" = "judged" ] && [ -n "${ac_has_calib[$id]:-}" ]; then
+    for id in $ac_id_list; do
+      if [ "$(m_get ac_expected "$id")" = "judged" ] && m_has ac_has_calib "$id"; then
         ok_horizon=1
         break
       fi
@@ -246,20 +249,20 @@ if [ "$is_forge" -eq 1 ]; then
   if ! printf '%s' "$body" | grep -qE 'dry_limit='; then
     warn "forge-dry-limit: exit: forge without dry_limit= in budget knobs"
   fi
-  for id in "${!ac_expected[@]}"; do
-    exp=${ac_expected[$id]}
+  for id in $ac_id_list; do
+    exp=$(m_get ac_expected "$id")
     need_base=0
     case "$exp" in
       maximize|minimize) need_base=1 ;;
     esac
-    if [ -n "${ac_has_metric[$id]:-}" ] && [ "$need_base" -eq 0 ]; then
+    if m_has ac_has_metric "$id" && [ "$need_base" -eq 0 ]; then
       # metric with comparison is also delta-risk for forge
       if printf '%s' "$exp" | grep -qE '^(>=|<=|>|<|==|!=)'; then
         need_base=1
       fi
     fi
     if [ "$need_base" -eq 1 ]; then
-      if [ -z "${ac_has_baseline[$id]:-}" ]; then
+      if ! m_has ac_has_baseline "$id"; then
         err "forge-baseline $id: forge score/metric AC needs baseline: delta|abs"
       else
         bl="$project/.goal/baseline.md"
@@ -276,28 +279,29 @@ if [ "$is_forge" -eq 1 ]; then
 fi
 
 # probe spirit
-for id in "${!ac_expected[@]}"; do
-  exp=${ac_expected[$id]}
+for id in $ac_id_list; do
+  exp=$(m_get ac_expected "$id")
   case "$exp" in
     maximize|minimize)
-      if [ -z "${ac_has_probe[$id]:-}" ]; then
+      if ! m_has ac_has_probe "$id"; then
         warn "probe-spirit $id: maximize/minimize without probe: (R9)"
       fi
       ;;
   esac
-  if [ -n "${ac_has_metric[$id]:-}" ] && [ -z "${ac_has_probe[$id]:-}" ]; then
+  if m_has ac_has_metric "$id" && ! m_has ac_has_probe "$id"; then
     warn "probe-spirit $id: metric: without probe:"
   fi
 done
 
 # calib files if --project
 if [ -n "$project" ]; then
-  for id in "${!ac_has_calib[@]}"; do
+  for id in $ac_id_list; do
+    m_has ac_has_calib "$id" || continue
     for kind in good bad; do
       f=""
       case $kind in
-        good) f=${ac_calib_good[$id]:-} ;;
-        bad) f=${ac_calib_bad[$id]:-} ;;
+        good) f=$(m_get ac_calib_good "$id") ;;
+        bad) f=$(m_get ac_calib_bad "$id") ;;
       esac
       if [ -n "$f" ] && [ ! -e "$project/$f" ] && [ ! -e "$f" ]; then
         err "calib-files $id: fixture $kind=$f not found under project"
