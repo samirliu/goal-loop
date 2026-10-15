@@ -24,28 +24,43 @@ bad(){ fail=1; echo "  FAIL - $1"; }
 # references are verified only when other skills ARE installed locally;
 # on machines without them (CI runners) they degrade to a skip - a bare
 # environment must not fail the check for a reference it cannot see.
-refs=$(grep -ohE '(references|scripts|assets|tests)/[A-Za-z0-9_][A-Za-z0-9_./-]*' \
-        SKILL.md INTEGRATION.md references/*.md assets/goal.contract.md 2>/dev/null |
-      sed 's/[.,;:)]*$//' | sort -u)
+#
+# Mid-path matches are the trap: `contract-forge/tests/run_fixtures.sh` greps
+# as `tests/run_fixtures.sh`, which looks internal and then "breaks" on a
+# minimal install that does not ship companions/. Keep the optional skill
+# prefix, and treat a citation as external when its source line names another
+# skill / companions/ / ~/.claude/skills/.
 missing=0; skipped=0
 skills_dir="$HOME/.claude/skills"
-while IFS= read -r r; do
-  [ -n "$r" ] || continue
-  [ -f "$r" ] && continue
-  # Companion skills ship inside this repo; docs often cite their paths as if
-  # installed (contract-forge/tests/run_fixtures.sh). Accept companions/*/.
-  if ls companions/*/"$r" >/dev/null 2>&1; then
-    ok "C1 companion reference resolves: $r"
-    continue
-  fi
-  if [ -d "$skills_dir" ] && ls "$skills_dir/"*/"$r" >/dev/null 2>&1; then
-    ok "C1 external reference resolves: $r"
-  elif [ -d "$skills_dir" ]; then
+while IFS= read -r line; do
+  [ -n "$line" ] || continue
+  case "$line" in
+    *contract-forge*|*companions/*|*"$skills_dir"*|*skill-creator*|*mattpocock*) ext_line=1 ;;
+    *) ext_line=0 ;;
+  esac
+  while IFS= read -r r; do
+    [ -n "$r" ] || continue
+    r=$(printf '%s' "$r" | sed 's/[.,;:)]*$//')
+    [ -f "$r" ] && continue
+    if [ -f "companions/$r" ] || ls companions/*/"$r" >/dev/null 2>&1; then
+      ok "C1 companion reference resolves: $r"
+      continue
+    fi
+    if [ -d "$skills_dir" ] && { [ -f "$skills_dir/$r" ] || ls "$skills_dir/"*/"$r" >/dev/null 2>&1; }; then
+      ok "C1 external reference resolves: $r"
+      continue
+    fi
+    # Cited as another skill / install layout and that skill is not here.
+    if [ "$ext_line" -eq 1 ]; then
+      skipped=$((skipped+1))
+      continue
+    fi
     bad "C1 broken reference: $r"; missing=$((missing+1))
-  else
-    skipped=$((skipped+1))
-  fi
-done <<< "$refs"
+  done <<EOF
+$(printf '%s\n' "$line" | grep -ohE '([A-Za-z0-9_.-]+/)?(references|scripts|assets|tests)/[A-Za-z0-9_][A-Za-z0-9_./-]*' | sort -u)
+EOF
+done < <(grep -hE '(references|scripts|assets|tests)/[A-Za-z0-9_]' \
+        SKILL.md INTEGRATION.md references/*.md assets/goal.contract.md 2>/dev/null | sort -u)
 [ "$missing" -eq 0 ] && ok "C1 all internal cited files exist (external skipped=$skipped)"
 
 # C2 version agreement with the VERSION file

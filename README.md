@@ -29,12 +29,15 @@ git clone https://github.com/samirliu/goal-loop.git
 mkdir -p ~/.claude/skills/goal-loop
 cp -r goal-loop/SKILL.md goal-loop/VERSION goal-loop/assets \
       goal-loop/references goal-loop/scripts goal-loop/tests \
-      goal-loop/examples \
+      goal-loop/examples goal-loop/companions \
       ~/.claude/skills/goal-loop/
 
 # 2) 5 个 agent 定义 → agents 目录
 mkdir -p ~/.claude/agents
 cp goal-loop/agents/*.md ~/.claude/agents/
+
+# 可选：companion skill contract-forge（盖戳前访谈，不是硬依赖）
+# cp -R goal-loop/companions/contract-forge ~/.claude/skills/
 ```
 
 - Windows（git-bash）路径同上：`C:\Users\<你>\.claude\skills\goal-loop\` 与 `C:\Users\<你>\.claude\agents\`。
