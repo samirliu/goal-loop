@@ -1869,7 +1869,9 @@ printf '%s' "$out" | grep -qE 'w1\|[^|]*\|[^|]*\|[^|]*\|[^|]*\|$' \
   && ok "122a healthy has empty err_tag" || no "122a unexpected err_tag: $out"
 
 # 122b stall fires when idle_s exceeds GOAL_STALL_SEC
-# (needs open_items>0; age heartbeat + inbox + scope so last_touch stays ancient)
+# (needs open_items>0; age heartbeat + inbox + scope so last_touch stays ancient).
+# Raise GOAL_ZERO_WRITE_SEC so zero-write does not steal the tag — both
+# classes share "open work + old scope"; zsec selects which fuse speaks.
 mkproj t122b
 bash "$TEAM" init --project "$T/t122b" --team goal >/dev/null
 bash "$TEAM" roster --project "$T/t122b" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
@@ -1882,7 +1884,7 @@ touch -t 202001010000 "$T/t122b/src/a.txt"
 touch -t 202001010000 "$T/t122b/.goal/team/inboxes/w1.jsonl"
 out=$(GOAL_STALL_SEC=1 bash "$TEAM" health --project "$T/t122b" 2>&1); assert_rc "122b health rc0" 0 $?
 assert_has "122b stall tag" 'stall$' "$out"
-printf '%s' "$out" | grep -q 'stall' && ok "122b stall named" || no "122b stall missing: $out"
+printf '%s' "$out" | grep -qE 'w1\|.*\|stall$' && ok "122b stall named" || no "122b stall missing: $out"
 
 # 122c tool-error vocab hits
 mkproj t122c
@@ -2068,3 +2070,56 @@ out=$(bash "$CTL" close-iteration --project "$T/t124c2" --task T1 --files x.txt 
 assert_has "124c2 contract-defect not counted" 'contract-defect-not-counted' "$out"
 grep -q '^false_completes=0$' "$T/t124c2/.goal/state.rec" \
   && ok "124c2 ratchet stayed 0 on contract defect" || no "124c2 ratchet moved on contract defect: $(grep false_completes "$T/t124c2/.goal/state.rec")"
+
+# 125 team health taxonomy (SB-10/11 from 2026-10-16 Mira Teams incident).
+# 125a provider-fatal (NoRoom / stream max) must not look like a plain death
+mkproj t125a
+bash "$TEAM" init --project "$T/t125a" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t125a" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
+mkdir -p "$T/t125a/src" "$T/t125a/.goal/team/inboxes"
+printf 'idle failed API Error: NoRoom\n' > "$T/t125a/.goal/team/inboxes/w1.jsonl"
+out=$(bash "$TEAM" health --project "$T/t125a" 2>&1)
+assert_has "125a NoRoom tagged provider-fatal" 'provider-fatal' "$out"
+printf '%s' "$out" | grep -q 'w1|.*|provider-fatal' && ok "125a row is provider-fatal" || no "125a wrong tag: $out"
+
+# 125b stream-max duration is provider-fatal too
+mkproj t125b
+bash "$TEAM" init --project "$T/t125b" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t125b" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
+mkdir -p "$T/t125b/src"
+printf 'API Error: Stream max duration exceeded - thinking_delta\n' > "$T/t125b/.goal/team/inboxes/w1.jsonl"
+out=$(bash "$TEAM" health --project "$T/t125b" 2>&1)
+assert_has "125b stream-max tagged provider-fatal" 'provider-fatal' "$out"
+
+# 125c zero-write: live member (fresh heartbeat) + open work + stale scope
+# — the "thinking-only, Write=0" shape from the Mira Teams incident.
+mkproj t125c
+bash "$TEAM" init --project "$T/t125c" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t125c" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
+mkdir -p "$T/t125c/src" "$T/t125c/.goal/team/heartbeat"
+printf -- '- [ ] T1 task | w1 | files=x\n' >> "$T/t125c/.goal/work-plan.md"
+# LIVE signal: heartbeat now → idle_s < stall
+date -u +%Y-%m-%dT%H:%M:%SZ > "$T/t125c/.goal/team/heartbeat/w1.ts"
+# scope never really written (ancient file)
+printf 'x' > "$T/t125c/src/old.txt"
+touch -t 202001010000 "$T/t125c/src/old.txt"
+GOAL_ZERO_WRITE_SEC=1 GOAL_STALL_SEC=300 out=$(bash "$TEAM" health --project "$T/t125c" 2>&1)
+assert_has "125c zero-write tagged" 'zero-write' "$out"
+
+# 125d provider-fatal beats stall: dark + NoRoom => provider-fatal not stall
+mkproj t125d
+bash "$TEAM" init --project "$T/t125d" --team goal >/dev/null
+bash "$TEAM" roster --project "$T/t125d" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
+mkdir -p "$T/t125d/src"
+printf -- '- [ ] T1 task | w1 | files=x\n' >> "$T/t125d/.goal/work-plan.md"
+printf 'API Error: NoRoom\n' > "$T/t125d/.goal/team/inboxes/w1.jsonl"
+GOAL_STALL_SEC=1 GOAL_ZERO_WRITE_SEC=1 out=$(bash "$TEAM" health --project "$T/t125d" 2>&1)
+assert_has "125d provider-fatal wins" 'provider-fatal' "$out"
+printf '%s' "$out" | grep -qE 'w1\|.*\|stall$' && no "125d mis-tagged stall" || ok "125d not stall"
+
+# 125e fallback:provider-fatal is a legal task suffix
+mkproj t125e
+printf '## iteration 1\ntask=T1[teams:2] (fallback:provider-fatal)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t125e/.goal/loop-log.md"
+out=$(bash "$AUDIT" --project "$T/t125e" 2>&1); rc=$?
+assert_rc "125e provider-fatal suffix accepted" 0 $rc
+assert_has "125e audit clean" 'AUDIT: clean' "$out"

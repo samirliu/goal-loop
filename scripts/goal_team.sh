@@ -99,6 +99,9 @@ touch_heartbeat(){
 
 # closed tool-error vocabulary (spec §5.3)
 err_vocab_re='error:|exception:|traceback|panic:|exit status [1-9]|exit code [1-9]|rc=[1-9]|permission denied|command not found|no such file or directory|eacces|enoent|api error|rate limit'
+# Provider-fatal (SB-10): the API/process is gone, not a recoverable tool error.
+# Revive is useless; the controller must stop reviving and escalate.
+prov_fatal_re='NoRoom|stream max duration|Stream max duration|max duration exceeded|context_length_exceeded|invalid_api_key|quota exceeded'
 
 # portable time helpers (GNU date -d, BSD date -j/-r, coreutils/BSD stat)
 epoch_from_iso(){
@@ -316,14 +319,45 @@ EOF
             ')
         open_n=${open_n:-0}
       fi
-      # err_tag hint from last inbox text + stall/death
+      # err_tag hint from last inbox text + stall/death + provider-fatal
+      # (SB-10) + zero-write (SB-11). Classification order: provider-fatal
+      # beats death (NoRoom/stream-max means the API is gone, not a revive
+      # case); zero-write beats stall when open work never landed files.
       err=""
-      if [ "$live" = "stopped" ] || [ "$live" = "terminated" ]; then
+      last_txt=""
+      [ -f "$ib" ] && last_txt=$(tr -d '\r' < "$ib" | tail -8 | tr '\n' ' ')
+      if printf '%s' "$last_txt" | grep -qiE "$prov_fatal_re"; then
+        err=provider-fatal
+      elif [ "$live" = "stopped" ] || [ "$live" = "terminated" ]; then
         err=death
       fi
-      if [ -f "$ib" ]; then
-        last_txt=$(tr -d '\r' < "$ib" | tail -5 | tr '\n' ' ')
+      if [ -z "$err" ] && [ -f "$ib" ]; then
         printf '%s' "$last_txt" | grep -qiE "$err_vocab_re" && err=tool-error
+      fi
+      # zero-write (SB-11) vs stall (7.2):
+      #   zero-write = still signalling (idle below stall) but scope has not
+      #     moved for GOAL_ZERO_WRITE_SEC — thinking-only bulk mapping (Mira
+      #     2026-10-16: Write=0 then stream-max).
+      #   stall = gone quiet: idle_s >= stall_sec with open work.
+      # Checking zero-write only while idle < stall keeps a fully dark member
+      # a stall (122b) and a live-but-non-writing member a zero-write (125c).
+      if [ -z "$err" ] && [ "$open_n" -gt 0 ] && [ "$idle_s" -lt "$stall" ]; then
+        zsec="${GOAL_ZERO_WRITE_SEC:-600}"
+        case "$zsec" in ''|*[!0-9]*) zsec=600 ;; esac
+        sms2=""
+        if [ -n "$sc" ] && [ -e "$project/$sc" ]; then
+          sms2=$(max_tree_mtime "$project/$sc")
+          printf '%s' "$sms2" | grep -qE '^-?[0-9]+$' || sms2=""
+        fi
+        if [ -n "$sms2" ]; then
+          age=$(( now_s - sms2 ))
+          [ "$age" -lt 0 ] && age=0
+          [ "$age" -ge "$zsec" ] && err=zero-write
+        else
+          # scope missing / never created: open work with no landing zone
+          # while the member is still in the watch window
+          err=zero-write
+        fi
       fi
       if [ -z "$err" ] && [ "$idle_s" -ge "$stall" ] && [ "$open_n" -gt 0 ]; then
         err=stall

@@ -422,6 +422,25 @@ case "$cmd" in
     echo "CTL: STEP $step (stamped=$stamped blocks=$blocks claim=$claimed)"
     printf 'CTL: STATUS iter=%s/%s breaker=%s dry_streak=%s/%s best_score=%s time_left=%s\n' \
       "$(g iteration)" "$(g max_iterations)" "$(g breaker)" "$(g dry_streak)" "$(g dry_limit)" "$(g best_score)" "$left"
+    # Provider / team surface one-liner (SB-12): when the run is under an
+    # Agent Teams roster, surface lastError/model so a NoRoom / stream-max
+    # death is visible from status without opening team config.json.
+    tname=$(g team_name)
+    if [ -z "$tname" ] && [ -f "$project/.goal/team/config.json" ]; then
+      tname=$(sed -n 's/.*"name": *"\([^"]*\)".*/\1/p' "$project/.goal/team/config.json" 2>/dev/null | head -1)
+    fi
+    if [ -z "$tname" ]; then
+      tdir=$(ls -dt "$HOME/.claude/teams/"* 2>/dev/null | head -1)
+    else
+      tdir="$HOME/.claude/teams/$tname"
+    fi
+    if [ -n "$tdir" ] && [ -f "$tdir/config.json" ]; then
+      prov=$(sed -n 's/.*"providerName": *"\([^"]*\)".*/\1/p' "$tdir/config.json" 2>/dev/null | head -1)
+      model=$(sed -n 's/.*"model": *"\([^"]*\)".*/\1/p' "$tdir/config.json" 2>/dev/null | head -1)
+      errs=$(sed -n 's/.*"lastError": *"\([^"]*\)".*/\1/p' "$tdir/config.json" 2>/dev/null | sort | uniq -c | sort -rn | head -3 | tr '\n' ';')
+      term=$(grep -c '"terminated": true' "$tdir/config.json" 2>/dev/null || echo 0)
+      echo "CTL: PROVIDER team=$(basename "$tdir") model=${model:-?} provider=${prov:-?} terminated=$term lastError=${errs:-none}"
+    fi
     lb=$(awk '
       /^## iteration/ { delete l; next }
       { line=$0; sub(/\r$/,"",line)

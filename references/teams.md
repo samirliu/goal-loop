@@ -193,7 +193,8 @@ decides GO; the watchdog only keeps the wave alive.
 name|liveness|idle_s|last_touch|open_items|err_tag
 ```
 
-- `err_tag`: empty | `death` | `stall` | `tool-error` (hint, not a verdict)
+- `err_tag`: empty | `death` | `stall` | `tool-error` | `provider-fatal` | `zero-write`
+  (hint, not a verdict)
 - Stall when `idle_s >= ${GOAL_STALL_SEC:-300}` **and** `open_items > 0`
 - Progress = scope mtime ∪ inbox mtime ∪ heartbeat `.goal/team/heartbeat/<name>.ts`
   (digest-exempt). Thinking-only is not progress.
@@ -205,20 +206,37 @@ name|liveness|idle_s|last_touch|open_items|err_tag
 | death | roster stopped/terminated + wake yields no heartbeat | transcript resumable? |
 | stall | idle_s >= stall_sec and open work | long tool vs stuck |
 | tool-error | closed vocab in last inbox/extract (error: / exit code / ENOENT / …) | one-line root cause |
+| **provider-fatal** | inbox/API text matches `NoRoom\|stream max duration\|max duration exceeded\|…` | **never revive** — escalate (below) |
+| **zero-write** | open_items > 0 and scope mtime older than `${GOAL_ZERO_WRITE_SEC:-600}` (or scope never created) | join whatever landed; do not wait for thoughts |
+
+`provider-fatal` and `zero-write` are the 2026-10-16 Mira incident shapes:
+seven process teammates died in thinking-only bulk CSV mapping
+(`Stream max … 1800s … thinking_delta`) and then `API Error: NoRoom`
+killed revive attempts. Treating those as ordinary `stall`/`death` burns
+the watch window on wakes that cannot work.
 
 ### 7.3 Recovery playbook (resume-first, 2-strike, unknown → re-run)
 
 ```
-classify → env_fixable? → fix workspace/brief → wake (breakpoint brief)
-        → no progress → wake #2
-        → 2 wakes failed OR not resumable → re-run THIS work-item
-        → re-run failed again → existing fallback / BLOCKED
+classify → provider-fatal?  → NO revive. Write (fallback:provider-fatal),
+                              preserve partials, BLOCKED or degrade to
+                              controller self-dispatch on remaining items
+         → zero-write?      → join partials; shrink brief to "script first";
+                              re-dispatch ONCE with a mechanical-only brief;
+                              second zero-write → re-run or BLOCKED
+         → env_fixable?     → fix workspace/brief → wake (breakpoint brief)
+         → no progress      → wake #2
+         → 2 wakes failed OR not resumable → re-run THIS work-item
+         → re-run failed again → existing fallback / BLOCKED
 ```
 
 **Resume** when partial products exist. **Re-run** only the open failed item.
 On re-run, mark the work-plan item back to `[ ]` (OPEN) before redispatch —
 a ticked row is never a re-run target, and the queue of record must show the
 redo as still owed (spec §9.4 mechanical tooth).
+
+**Never TeamDelete to clear a dying team mid-run** — including after
+provider-fatal. Leave the roster for forensics; TeamDelete is delivery only.
 
 Breakpoint brief:
 
@@ -229,6 +247,8 @@ Still owed: <remaining AC or deliverable>
 Blocked by (if any): <root cause one-liner>
 Run: <named check>
 Do not rewrite unrelated files. (R6)
+Script-first: do not restate the whole table in thinking — write and run a
+transform script, then verify row counts. Land files early.
 ```
 
 ### 7.4 Ledger honesty (task= suffix only)
@@ -239,6 +259,7 @@ Closed vocabulary — no new loop-log keys:
 - `(tool-error-fixed)` — env/brief fixed then resumed
 - `(re-run:stall)` `(re-run:tool-error)` `(re-run:death)` — item redone
 - `(fallback:teams-process-reaped)` `(fallback:teams-unavailable)` unchanged
+- `(fallback:provider-fatal)` — API/stream death; no revive (SB-10)
 
 Forbidden: mid-run TeamDelete; silent downgrade; inventing suffix tokens.
 
@@ -247,3 +268,13 @@ Forbidden: mid-run TeamDelete; silent downgrade; inventing suffix tokens.
 - Poll `health` immediately, then every 60s
 - End watch when all wave items closed, or `GOAL_WATCH_MAX_SEC` (default 3600)
 - Other members keep working while one is recovered
+- **Zero-write fuse (SB-11):** if any member is `zero-write` (or the whole
+  wave has produced no scope mtime movement for `GOAL_ZERO_WRITE_SEC`,
+  default 600), do not keep polling. Join what landed, close-iteration on
+  the real artifacts, and either shrink remaining work into script-first
+  briefs or park BLOCKED. An empty-scope watch is not patience — it is a
+  stalled deliverable.
+- **Provider-fatal fuse (SB-10):** one `provider-fatal` (NoRoom / stream
+  max) means revive is theater. Stop the watch, mark
+  `(fallback:provider-fatal)`, keep the roster for forensics (never
+  TeamDelete mid-run), and either self-dispatch the remainder or BLOCKED.

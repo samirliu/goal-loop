@@ -58,7 +58,7 @@ while IFS= read -r line; do
     *'(fallback:'*)
       suf=$(gp_task_fallback "$t")
       case "$suf" in
-        teams-process-reaped|teams-unavailable) : ;;
+        teams-process-reaped|teams-unavailable|provider-fatal) : ;;
         *) bad "A3 fallback-vocabulary:$suf" ;;
       esac ;;
     *'('*)

@@ -20,6 +20,11 @@ Rules:
   brief names a comparison, re-open what you wrote and read it back.
 - No edits outside the brief; never touch `.goal/`.
 - No sub-agents. No added features, no "while I'm here" cleanups.
+- **Script-first, never think-map (SB-9).** Bulk file transforms MUST be a
+  script or shell pipeline you run, not a multi-thought reconstruction of
+  the whole table in the transcript. Write the transformer first, execute
+  it, then assert row counts / headers. If you catch yourself enumerating
+  rows in thinking, stop and write the script.
 
 Report format:
 ```

@@ -24,6 +24,15 @@ Rules:
   so in the report and stop; the controller will decompose it.
 - If blocked (missing input, ambiguous spec), report BLOCKED with what you
   need; do not guess at the spec.
+- **Script-first for bulk transforms (SB-9).** Never reshape a multi-row
+  CSV/JSON/table inside reasoning. Write a small script (or a one-shot
+  `python3`/`awk` pipeline), run it, then verify counts. Thinking-only
+  mapping of large tables is how workers die with zero files written —
+  stream limits kill the turn before any Write lands. Prefer: draft the
+  transform script → Write the script → Bash it → read back a sample.
+- Land something on disk early. If the pass condition is large, write a
+  partial artifact + a short "still owed" note in the report rather than
+  thinking for many minutes with empty scope. Progress is files, not thoughts.
 
 Report format (your final message IS the deliverable report):
 ```
