@@ -47,11 +47,12 @@ GO requires **all** of:
 - Metric ACs default `baseline: delta`; stamp requires `.goal/baseline.md` (pre-stamp smoke run **is** the baseline measurement, repeats≥2).
 - Threshold exit (default) is the other policy: deliver when every AC floor passes. Exit policy is a **contract field**, not a mode matrix.
 
-## 6 EFFICIENCY / eval-gap / promote (advisory only)
+## 6 EFFICIENCY / STRATEGY-PICK / eval-gap / promote
 
-Printed by `ctl status` when optimizing or stalled. **Never** changes gate rc, hint, or NEXT routing.
+Printed by `ctl status` when optimizing or stalled. **Advisory to the gate** — never changes gate rc or hint. **STRATEGY-PICK is what the next wave uses** (brief + replan/delta NEXT text).
 
 - **EFFICIENCY** — window = same-`strategy=` runs; slope vs band; `-> exploit` / `-> prune` / `unmeasured`.
+- **STRATEGY-PICK** — `prefer=<exploit label> avoid=<prune labels>` derived from those slopes. Paste into every wave brief (crew/Teams). The controller must not re-exploit a label in `avoid`.
 - **eval-gap** — objective scores flat while stalled: dispatch goal-critic to draft candidate ACs into `.goal/proposals/` (user-approved; do not self-edit the contract).
 - **promote** — same bare task id ≥3 waves + stalled: consider role-card promotion (suggestion only).
 - **attribution-unused** — objective contract that never recorded a strategy.

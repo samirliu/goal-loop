@@ -2123,3 +2123,78 @@ printf '## iteration 1\ntask=T1[teams:2] (fallback:provider-fatal)\nfiles_modifi
 out=$(bash "$AUDIT" --project "$T/t125e" 2>&1); rc=$?
 assert_rc "125e provider-fatal suffix accepted" 0 $rc
 assert_has "125e audit clean" 'AUDIT: clean' "$out"
+
+# ---------------------------------------------------------------------------
+# 126 STRATEGY-PICK: attribution must drive the next wave (eval->action)
+# Pre-reg: docs/deepen-2026-10-24.md — fail lines: missing pick / NEXT without
+# prefer= on replan-or-stop / gate rc-hint drift.
+# ---------------------------------------------------------------------------
+
+# 126a A flat (prune) + B rising (exploit) => prefer=B avoid=A
+mkproj t126a; obj110 t126a ""
+hblocks t126a T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] B T1[crew:1] B
+scorefile t126a 12 12 12 12 10 20
+out=$(bash "$CTL" status --project "$T/t126a" 2>&1); assert_rc "126a rc0" 0 $?
+assert_has "126a STRATEGY-PICK prefer=B avoid=A" 'STRATEGY-PICK prefer=B avoid=A' "$out"
+
+# 126b only prune => prefer=none avoid=A
+mkproj t126b; obj110 t126b ""
+hblocks t126b T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A
+scorefile t126b 12 12 12 12
+out=$(bash "$CTL" status --project "$T/t126b" 2>&1)
+assert_has "126b prune-only pick" 'STRATEGY-PICK prefer=none avoid=A' "$out"
+
+# 126c only exploit => prefer=B avoid=none
+mkproj t126c; obj110 t126c ""
+hblocks t126c T1[crew:1] B T1[crew:1] B T1[crew:1] B
+scorefile t126c 10 20 30
+out=$(bash "$CTL" status --project "$T/t126c" 2>&1)
+assert_has "126c exploit-only pick" 'STRATEGY-PICK prefer=B avoid=none' "$out"
+
+# 126d replan-or-stop NEXT must carry prefer=
+mkproj t126d; obj110 t126d ""
+hblocks t126d T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] B T1[crew:1] B
+scorefile t126d 12 12 12 12 10 20
+printf 'last_reason=repeated-error:x\nlast_hint=replan-or-stop\n' >> "$T/t126d/.goal/state.rec"
+out=$(bash "$CTL" status --project "$T/t126d" 2>&1)
+assert_has "126d NEXT carries pick" 'prefer=B' "$out"
+assert_has "126d NEXT hint intact" 'hint=replan-or-stop' "$out"
+
+# 126e write-strategy-delta NEXT must carry prefer=
+mkproj t126e; obj110 t126e ""
+hblocks t126e T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] B T1[crew:1] B
+scorefile t126e 12 12 12 12 10 20
+printf 'last_reason=missing-strategy-delta\nlast_hint=write-strategy-delta\n' >> "$T/t126e/.goal/state.rec"
+out=$(bash "$CTL" status --project "$T/t126e" 2>&1)
+assert_has "126e NEXT carries pick" 'prefer=B' "$out"
+assert_has "126e NEXT hint intact" 'hint=write-strategy-delta' "$out"
+
+# 126f pick must not move gate authority
+mkproj t126f; obj110 t126f ""
+hblocks t126f T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] B T1[crew:1] B
+scorefile t126f 12 12 12 12 10 20
+printf 'no_progress_streak=1\n' >> "$T/t126f/.goal/state.rec"
+out=$(bash "$CTL" status --project "$T/t126f" 2>&1)
+assert_has "126f pick present while stalled" 'STRATEGY-PICK prefer=B avoid=A' "$out"
+# gate check on a healthy claim path is independent of pick text
+mkproj t126f2; contract t126f2 "- AC-1 | t | check: \`true\` | expected: exit=0"
+close_iter t126f2 --strategy demo
+d=$(bash "$GATE" --digest --project "$T/t126f2")
+sed_in "s/^digest=.*/digest=$d/" "$T/t126f2/.goal/loop-log.md"
+out=$(bash "$GATE" --check --project "$T/t126f2" 2>&1); assert_rc "126f2 gate GO untouched by pick work" 0 $?
+printf '%s' "$out" | grep -qE 'STRATEGY-PICK|prefer=' && no "126f2 gate must not speak STRATEGY-PICK" || ok "126f2 gate silent on pick"
+
+# 126g no attribution data => no pick line
+mkproj t126g; contract t126g "- AC-1 | t | check: \`true\` | expected: exit=0"
+hblocks t126g T1[crew:1] x T1[crew:1] y
+scorefile t126g 1 2
+printf '%s\n' "$(bash "$CTL" status --project "$T/t126g" 2>&1)" | grep -qE 'STRATEGY-PICK' \
+  && no "126g threshold without objective prints no pick" || ok "126g threshold without objective prints no pick"
+
+# 126h docs: gradient must say pick supplies the next wave (not gate-adjacent)
+grep -qE 'STRATEGY-PICK' "$here/references/packs/gradient.md" \
+  && ok "126h gradient documents STRATEGY-PICK" || no "126h gradient documents STRATEGY-PICK"
+grep -qE 'STRATEGY-PICK' "$here/references/crew.md" \
+  && ok "126h crew briefs cite STRATEGY-PICK" || no "126h crew briefs cite STRATEGY-PICK"
+grep -qE 'STRATEGY-PICK' "$here/references/teams.md" \
+  && ok "126h teams briefs cite STRATEGY-PICK" || no "126h teams briefs cite STRATEGY-PICK"

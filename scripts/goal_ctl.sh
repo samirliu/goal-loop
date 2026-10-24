@@ -458,10 +458,78 @@ case "$cmd" in
     else
       echo "CTL: OPEN none (all tasks closed)"
     fi
+    # ---- eval-drive attribution inputs (shared by STRATEGY-PICK + EFFICIENCY)
+    obj_ac=$(gp_objective_ac "$project")
+    obj_dir=$(gp_objective_dir "$project")
+    tol=$( [ -n "$obj_ac" ] && gp_ac_tolerance "$project" "$obj_ac" )
+    tol=${tol:-0}
+    # STRATEGY-PICK: attribution must drive the next wave. Prefer = steepest
+    # exploit window; avoid = every prune label. Advisory to the GATE (rc and
+    # hint never change) but binding for the controller's brief / NEXT text.
+    pick_prefer=""; pick_avoid=""
+    if [ -n "$obj_ac" ] && [ -s "$sd/scores.rec" ] && [ -s "$sd/loop-log.md" ]; then
+      pick_line=$(gawk -v obj="${obj_dir:-none}" -v tol="$tol" '
+        function absv(x){ return x<0 ? -x : x }
+        FILENAME==ARGV[1] {
+          line=$0; sub(/\r$/,"",line)
+          split(line,a,"|")
+          if (a[1] ~ /^[0-9]+$/ && a[2] ~ /^-?[0-9]+(\.[0-9]+)?$/) { SC[a[1]+0]=a[2]; sn++ }
+          next }
+        { line=$0; sub(/\r$/,"",line)
+          if (line ~ /^## iteration/) {
+            num=line; sub(/^[^0-9]+/,"",num); num+=0
+            if (cur>0 && ORD[cur]==num) { STRAT[cur]="none" }
+            else { cur++; STRAT[cur]="none" }
+            ORD[cur]=num; blk=cur; next }
+          p=index(line,"=")
+          if (p>1 && cur>0) { k=substr(line,1,p-1); v=substr(line,p+1)
+            sub(/^ +/,"",v); sub(/ +$/,"",v)
+            if (k=="strategy") STRAT[cur]=(v==""?"none":v) } }
+        END {
+          prefer=""; pbest=""; avoid=""
+          i=1
+          while (i<=blk) {
+            j=i
+            while (j<blk && STRAT[j+1]==STRAT[i]) j++
+            lab=STRAT[i]
+            if (lab!="none") {
+              p1=0; p2=0; nk=0
+              for (q=i;q<=j;q++) { it=ORD[q]
+                if ((it in SC) && SC[it] ~ /^-?[0-9]+(\.[0-9]+)?$/) {
+                  v=SC[it]+0; nk++
+                  if (p1==0) { p1=q-i+1; v1=v }
+                  p2=q-i+1; v2=v } }
+              if (nk>=2) {
+                D=p2-p1; if (D<1) D=1
+                slope=(v2-v1)/D
+                band=tol*(absv(v1)>absv(v2)?absv(v1):absv(v2))
+                if (D>=3 && absv(v2-v1)<=band) {
+                  avoid = (avoid=="" ? lab : avoid "," lab)
+                } else if (obj=="minimize" ? slope < -(band/D) : slope > band/D) {
+                  better = (prefer=="") ? 1 : (obj=="minimize" ? (slope<pbest) : (slope>pbest))
+                  if (better) { prefer=lab; pbest=slope }
+                }
+              }
+            }
+            i=j+1 }
+          if (prefer!="" || avoid!="")
+            printf "prefer=%s avoid=%s\n", (prefer==""?"none":prefer), (avoid==""?"none":avoid)
+        }' "$sd/scores.rec" "$sd/loop-log.md" 2>/dev/null || true)
+      if [ -n "${pick_line:-}" ]; then
+        pick_prefer=$(printf '%s\n' "$pick_line" | sed -n 's/^prefer=\([^ ]*\).*/\1/p')
+        pick_avoid=$(printf '%s\n' "$pick_line" | sed -n 's/^prefer=[^ ]* avoid=\(.*\)$/\1/p')
+        echo "CTL: STRATEGY-PICK prefer=${pick_prefer:-none} avoid=${pick_avoid:-none}"
+      fi
+    fi
+    pick_txt=""
+    if [ -n "${pick_prefer:-}" ] || [ -n "${pick_avoid:-}" ]; then
+      pick_txt="STRATEGY-PICK prefer=${pick_prefer:-none} avoid=${pick_avoid:-none}"
+    fi
     # NEXT= is the mechanical routing the controller must otherwise remember
     # from the gate's hint token: state.rec carries the pair recorded by the
     # last close-iteration, and this maps it to one sentence. No judgment:
     # the mapping lives in one place and matches references/gate.md section 3.
+    # When attribution already names a direction, replan/delta routes paste it.
     lr=$(g last_reason); lh=$(g last_hint)
     if [ -z "$lr" ] || [ "$lr" = ok ]; then
       echo "CTL: NEXT (nothing pending at last gate check - claim when ready)"
@@ -474,28 +542,23 @@ case "$cmd" in
         fix-calib-fixture)   next="restore the named calibration fixture (or restamp with valid paths)" ;;
         restore-best)        next="return the tree to best_score state before claiming" ;;
         continue-forge)      next="keep forging: dry_streak < dry_limit, run another exhaustion round" ;;
-        write-strategy-delta) next="record what genuinely changes next, then close-iteration" ;;
+        write-strategy-delta) next="record what genuinely changes next${pick_txt:+ ($pick_txt)}, then close-iteration" ;;
         rebind-judged)       next="re-run the judging seat at the current digest and bind fresh" ;;
         write-ledger-block)  next="close-iteration wrote nothing or an illegal task id - write the ledger block (task=T<n>[backend:N])" ;;
         set-exit-signal)     next="the block never claimed exit - close-iteration --exit-signal yes" ;;
         redesign-AC)         next="the metric and the cold seat disagree: rewrite the AC or its direction" ;;
         proposal-to-user)    next="the contract changed: propose an amendment, do not apply it" ;;
         graceful-deliver)    next="time fuse expired: deliver the passing work as best-so-far and stop" ;;
-        replan-or-stop)      next="same error signature twice: change strategy (HALF_OPEN) or stop and report" ;;
+        replan-or-stop)      next="same error signature twice: change strategy (HALF_OPEN)${pick_txt:+ — $pick_txt} or stop and report" ;;
         *)                   next="read reason=$lr (hint=$lh) and route literally" ;;
       esac
       echo "CTL: NEXT reason=$lr hint=${lh:-none}"
       echo "CTL:   -> $next"
     fi
-    # ---- v2.8 eval-drive: EFFICIENCY attribution (advisory lines only - it
-    # never changes rc, last_reason/last_hint or the NEXT route). Ledger-is-
-    # truth: reads only loop-log.md + scores.rec. Fires when an objective line
-    # exists (optimization loops always report attribution) or when the loop
-    # is stalled (no_progress_streak>=1, or forge with a live dry_streak).
-    obj_ac=$(gp_objective_ac "$project")
-    obj_dir=$(gp_objective_dir "$project")
-    tol=$( [ -n "$obj_ac" ] && gp_ac_tolerance "$project" "$obj_ac" )
-    tol=${tol:-0}
+    # ---- v2.8 eval-drive: EFFICIENCY attribution (advisory to the gate - rc
+    # and hint never change; STRATEGY-PICK above is what the next wave uses).
+    # Ledger-is-truth: reads only loop-log.md + scores.rec. Fires when an
+    # objective line exists or when the loop is stalled.
     nps=$(g no_progress_streak); drys=$(g dry_streak)
     case "${nps:-0}" in ''|*[!0-9]*) nps=0;; esac
     case "${drys:-0}" in ''|*[!0-9]*) drys=0;; esac

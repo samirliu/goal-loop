@@ -62,6 +62,14 @@ yourself. Interface conflict needing a redesign -> one serial repair
 round; two failed repairs -> fall back to serial execution (log it).
 Join is bookkeeping. It is not GO - only the gate decides that.
 
+### Wave brief: paste STRATEGY-PICK
+
+If `ctl status` printed `CTL: STRATEGY-PICK prefer=… avoid=…`, that line goes
+verbatim into every wave brief (and Teams roster prompts). Prefer is the
+attack direction with a live slope; avoid is flat/exhausted. Workers report
+which label they followed; the next `close-iteration --strategy` must not
+repeat an `avoid` label without a `strategy_delta` explaining the retry.
+
 ### Peer-notes (v2.8, shared-findings pool)
 
 Workers may append at most ONE line per iteration to

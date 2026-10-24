@@ -64,7 +64,10 @@ Unchanged from crew.md §7:
    for each role (wave width fits disjoint scopes; no default cap). Role card = persistent identity across
    waves; the process does not persist.
 3. Per wave: for each open work-plan item, dispatch an Agent-tool worker
-   with the role card + "unread inbox" + interface excerpt + brief fields.
+   with the role card + "unread inbox" + interface excerpt + brief fields
+   + current `CTL: STRATEGY-PICK prefer=… avoid=…` (same paste rule as crew.md;
+   native TeamPlan prompts carry it too). Parallelism explores the prefer
+   direction; it does not multiply waves on avoid labels.
    Workers write their deliverables; they may leave a note for another
    role via a return message the controller will `send`.
 4. Controller `send`s negotiated notes (or board.md is the relay), then
