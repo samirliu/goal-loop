@@ -67,9 +67,12 @@ gp_state_get(){                                          # $1 project $2 key -> 
 }
 
 # ---- goal.md contract grammar (references/gate.md section 1) --------------
-gp_contract_mode(){ gp_r < "$1/.goal/goal.md" 2>/dev/null | grep -qE '^exit: *forge' && echo forge || echo threshold; }
-gp_all_ac_ids(){ gp_r < "$1/.goal/goal.md" | grep -oE '^- AC-[0-9]+' | sort -u | sed 's/^- //'; }
-gp_ac_line_for(){ gp_r < "$1/.goal/goal.md" | awk -v id="$2" '$0 ~ "^- "id"[ |]"'; }
+# Missing goal.md is a legal pre-stamp state (STEP 1-contract). Readers must
+# return empty silently - status must not spray "No such file" from parse.
+gp_goal_r(){ [ -f "$1/.goal/goal.md" ] || return 0; gp_r < "$1/.goal/goal.md"; }
+gp_contract_mode(){ gp_goal_r "$1" | grep -qE '^exit: *forge' && echo forge || echo threshold; }
+gp_all_ac_ids(){ gp_goal_r "$1" | grep -oE '^- AC-[0-9]+' | sort -u | sed 's/^- //'; }
+gp_ac_line_for(){ gp_goal_r "$1" | awk -v id="$2" '$0 ~ "^- "id"[ |]"'; }
 # Commands stay in backticks; AC lines are never split on '|' (commands
 # contain pipes). The expectation is the line tail after "expected:".
 gp_ac_check_cmd(){  gp_ac_line_for "$1" "$2" | sed -nE 's/^.*check: *`([^`]*)`.*/\1/p' | tail -1; }
@@ -100,7 +103,7 @@ gp_ac_window(){       gp_ac_calib_line "$1" "$2" | sed -nE 's/^.*window: *([0-9]
 # Horizon layer (v2.9): a contract may declare `horizon-waived: <reason>` to
 # accept an objective whose blind spot is unguarded. The parser only finds it;
 # the refuse-at-stamp tooth lives in goal_ctl.sh.
-gp_horizon_waived(){ gp_r < "$1/.goal/goal.md" 2>/dev/null | grep -iE '^horizon-waived:[[:space:]]*[^[:space:]]' | tail -1 | sed -E 's/^[^:]*:[[:space:]]*//' | cut -c1-200; }
+gp_horizon_waived(){ gp_goal_r "$1" | grep -iE '^horizon-waived:[[:space:]]*[^[:space:]]' | tail -1 | sed -E 's/^[^:]*:[[:space:]]*//' | cut -c1-200; }
 # var: (v2.9) a second capture-group regex pinning WHERE the measurement's
 # dispersion comes from, so the significance band is computed from data
 # instead of the AC author's memory of typical noise.
@@ -122,14 +125,14 @@ gp_defer_latest(){
       bt[id]=t; bn[id]=l; bv[id]=v; bd[id]=d } }
   END { for (id in bt) printf "%s|%s|%s|%s\n", id, bv[id], bt[id], bd[id] }'
 }
-gp_objective_ac(){  gp_r < "$1/.goal/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1; }
-gp_objective_dir(){ gp_r < "$1/.goal/goal.md" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\1/p' | tail -1; }
+gp_objective_ac(){  gp_goal_r "$1" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\2/p' | tail -1; }
+gp_objective_dir(){ gp_goal_r "$1" | sed -nE 's/^objective: *(maximize|minimize) +(AC-[0-9]+).*/\1/p' | tail -1; }
 # R3 frozen surface: AC section body + exit: + objective: lines. ctl stamp and
 # gate check MUST hash the same thing or every legitimate run trips
 # contract-tampered. This is that one definition.
 gp_ac_body_hash(){
-  { gp_r < "$1/.goal/goal.md" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
-    gp_r < "$1/.goal/goal.md" | grep -E '^(exit|objective|horizon-waived):' || true
+  { gp_goal_r "$1" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
+    gp_goal_r "$1" | grep -E '^(exit|objective|horizon-waived):' || true
   } | gp_hash_std | cut -c1-8
 }
 

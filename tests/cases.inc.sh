@@ -2198,3 +2198,13 @@ grep -qE 'STRATEGY-PICK' "$here/references/crew.md" \
   && ok "126h crew briefs cite STRATEGY-PICK" || no "126h crew briefs cite STRATEGY-PICK"
 grep -qE 'STRATEGY-PICK' "$here/references/teams.md" \
   && ok "126h teams briefs cite STRATEGY-PICK" || no "126h teams briefs cite STRATEGY-PICK"
+
+# ---------------------------------------------------------------------------
+# 127 parse hygiene: missing goal.md is pre-stamp legal, status must stay quiet
+# ---------------------------------------------------------------------------
+mkproj t127a
+# goal.md not written yet (STEP 1-contract). status must rc0 and not spray parse errors.
+out=$(bash "$CTL" status --project "$T/t127a" 2>&1); assert_rc "127a status rc0 without goal.md" 0 $?
+assert_has "127a STEP says fill contract" 'goal.md not stamped' "$out"
+printf '%s' "$out" | grep -qE 'No such file or directory' && no "127a parse sprayed missing-goal.md" || ok "127a parse silent on missing goal.md"
+printf '%s' "$out" | grep -qE 'goal_parse.sh:' && no "127a parse path leaked" || ok "127a no goal_parse.sh traceback"
