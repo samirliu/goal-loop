@@ -34,6 +34,7 @@ bind_v(){ # $1 proj NAME under $T; $2 verdict-line with DIGEST placeholder
 
 close_iter(){ # $1 proj NAME under $T, rest passed to close-iteration (--no-gate implied)
   local name="$1" p="$T/$1"; shift
+  : > "$p/a.txt"
   bash "$CTL" close-iteration --project "$p" --task T1 --files a.txt \
     --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
     --exit-signal yes "$@" --no-gate >/dev/null 2>&1

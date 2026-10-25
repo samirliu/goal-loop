@@ -138,6 +138,37 @@ if [ "$blocks" -eq 0 ] && [ "$tb" -gt 0 ] && [ "$dl" -gt 0 ]; then
   fi
 fi
 
+# ---- A10 false-tick (work-plan [x] without landed files=) -----------------
+# A tick is a claim that the wave's files landed. `files=a..b` ranges and
+# missing paths cannot be proven on disk - refuse the tick (seen live: a
+# worker "completed" ch-001..012 that never existed).
+if [ -f "$sd/work-plan.md" ]; then
+  while IFS= read -r wp; do
+    case "$wp" in
+      '- [x]'*|'- [X]'*) ;;
+      *) continue ;;
+    esac
+    fp=$(printf '%s' "$wp" | sed -nE 's/.*files=([^|]*).*/\1/p' | tail -1)
+    [ -n "$fp" ] || continue
+    for f in $(printf '%s' "$fp" | tr ',' ' '); do
+      [ -n "$f" ] || continue
+      case "$f" in
+        *..*) bad "A10 false-tick:unverifiable-range:$f (write concrete paths; ranges cannot be proven on disk)" ;;
+        *)
+          # glob ok only if it matches at least one existing path under $project
+          set +f
+          matched=0
+          for m in $f; do
+            [ -e "$m" ] || [ -e "$project/$m" ] && matched=1
+          done
+          set -f
+          [ "$matched" = 1 ] || bad "A10 false-tick:missing-file:$f"
+          ;;
+      esac
+    done
+  done < "$sd/work-plan.md"
+fi
+
 if [ "$fail" -eq 0 ]; then
   echo "AUDIT: clean (controller ledger hygiene OK)"; exit 0
 fi

@@ -90,6 +90,7 @@ bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> 
 2. **objective 冷启动**：首波必须 `--score` + `--strategy`，否则不开多 worker 扩产。
 3. **开跑即有** `.goal/pre-reg.md`（stamp 播种模板：假设/策略标签槽/杀点/降级线）；策略标签从 objective 抽 2–4 个短英文名，一词一波。
 4. **杀点**：墙钟过半仍 `iteration=0` → 停派工，收账或降级交付（已过线部分 + 续写接口），禁止堆产量冒充完成。
+   **假勾**：work-plan `[x]` 的 `files=` 必须已在盘上（audit **A10**）；`a..b` 区间不可证 = 拒绝。墙钟过期零记账 → 收账/降级，不得再派波。
 5. **终报**（claim 后）：loop-log/`STRATEGY-PICK`/分数轨迹（按标签）/gate 行 + 三牙路径。字数或文件数不进优化分子。
 
 ## Step 2 派工

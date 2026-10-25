@@ -251,11 +251,29 @@ case "$cmd" in
     # --files is evidence of what landed (SB-6). A missing path is usually a
     # typo or a scope lie; warn loud but do not refuse the bookkeeping write -
     # the gate's check-mutated-tree already owns the "did it really land" side.
-    miss=0
+    miss=0; miss_names=""
     for f in $(printf '%s' "$files" | tr ',' ' '); do
-      [ -e "$project/$f" ] || { echo "CTL: WARN missing-claimed-file: $f (listed in --files but not under $project)" >&2; miss=$((miss+1)); }
+      [ -n "$f" ] || continue
+      [ -e "$project/$f" ] || [ -e "$f" ] || { miss=$((miss+1)); miss_names="$miss_names $f"; }
     done
-    [ "$miss" -eq 0 ] || echo "CTL: NOTE files-missing=$miss (bookkeeping continues; fix the list or the artifacts)" >&2
+    if [ "$miss" -gt 0 ]; then
+      # False-tick tooth: if work-plan has [x] naming a missing path, refuse
+      # even a bookkeeping close - the tick is a lie on disk (seen live:
+      # ch-001..012 never landed). Unrelated --files stubs stay WARN so
+      # non-ticked bookkeeping is not blocked.
+      lie=0
+      for f in $miss_names; do
+        if [ -f "$sd/work-plan.md" ] && grep -E '^- \[x\]' "$sd/work-plan.md" 2>/dev/null | grep -qF "$f"; then
+          lie=1
+        fi
+      done
+      if [ "$lie" = 1 ]; then
+        echo "CTL: ERROR missing-claimed-file:${miss_names# } (work-plan [x] names paths that do not exist - untick or land the files)" >&2
+        exit 4
+      fi
+      echo "CTL: WARN missing-claimed-file:${miss_names# } (listed in --files but not under $project)" >&2
+      echo "CTL: NOTE files-missing=$miss (bookkeeping continues; fix the list or the artifacts)" >&2
+    fi
     # forge bookkeeping: validate BEFORE anything is written - a rc=4 refusal
     # must never leave an orphan loop-log block (checker finding, v1.2)
     if grep -qE '^exit: *forge' "$sd/goal.md" 2>/dev/null; then
@@ -656,9 +674,21 @@ case "$cmd" in
     # the mapping lives in one place and matches references/gate.md section 3.
     # When attribution already names a direction, replan/delta routes paste it.
     lr=$(g last_reason); lh=$(g last_hint)
+    # Deadline crossed with no books = do not pretend "nothing pending".
+    dl_now=$(g deadline); tb_now=$(g time_budget)
+    case "$dl_now" in ''|*[!0-9]*) dl_now=0 ;; esac
+    case "$tb_now" in ''|*[!0-9]*) tb_now=0 ;; esac
+    expired=0
+    [ "$dl_now" -gt 0 ] && [ "$(date +%s)" -ge "$dl_now" ] && expired=1
     if [ "${unbooked:-0}" = 1 ]; then
       echo "CTL: NEXT reason=unbooked-wave hint=close-iteration"
       echo "CTL:   -> close-iteration now (work-plan ticked / work product exists but no loop-log row) - do NOT dispatch another wave first"
+    elif [ "$expired" = 1 ] && [ "${blocks:-0}" -eq 0 ]; then
+      echo "CTL: NEXT reason=deadline-expired hint=close-iteration"
+      echo "CTL:   -> wallclock expired with zero books: close-iteration on what landed (or degrade-deliver) - do NOT dispatch another wave"
+    elif [ "$expired" = 1 ] && [ -z "$lr" -o "$lr" = ok ]; then
+      echo "CTL: NEXT reason=deadline-expired hint=graceful-deliver"
+      echo "CTL:   -> wallclock expired: claim what passes (GO+NOTE) or fix and claim - do not expand scope"
     elif [ -z "$lr" ] || [ "$lr" = ok ]; then
       echo "CTL: NEXT (nothing pending at last gate check - claim when ready)"
     else

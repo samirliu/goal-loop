@@ -2465,3 +2465,55 @@ printf '%s' "$out" | grep -qE 'NEXT.*claim when ready' && no "133e soft NEXT whi
 close_iter t133c --strategy boot --score 1
 out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t133c" 2>&1); rc=$?
 assert_rc "133f audit clean after close" 0 $rc
+
+# ---------------------------------------------------------------------------
+# 134 false-tick + expired clock routing (goal-agnostic; seen: files= never landed)
+# ---------------------------------------------------------------------------
+# 134a [x] work-plan line whose files= paths are absent = A10 false-tick
+mkproj t134a; contract t134a "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf -- '- [x] T1 scope | owner=w1 | files=chapters/a.md,chapters/b.md\n' > "$T/t134a/.goal/work-plan.md"
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t134a" 2>&1); rc=$?
+assert_rc "134a false-tick fails audit" 1 $rc
+assert_has "134a A10 named" 'A10' "$out"
+assert_has "134a names missing path" 'chapters/a.md' "$out"
+
+# 134b range notation files=a..b is unverifiable -> A10 (cannot prove landed)
+mkproj t134b; contract t134b "- AC-1 | t | check: \`true\` | expected: exit=0"
+mkdir -p "$T/t134b/chapters"
+printf -- '- [x] T1 p | owner=w1 | files=chapters/ch-001..ch-012\n' > "$T/t134b/.goal/work-plan.md"
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t134b" 2>&1); rc=$?
+assert_rc "134b range files= refused" 1 $rc
+assert_has "134b A10 or unverifiable" 'A10' "$out"
+
+# 134c files really landed -> A10 quiet
+mkproj t134c; contract t134c "- AC-1 | t | check: \`true\` | expected: exit=0"
+mkdir -p "$T/t134c/chapters"
+echo x > "$T/t134c/chapters/a.md"; echo x > "$T/t134c/chapters/b.md"
+printf -- '- [x] T1 p | owner=w1 | files=chapters/a.md,chapters/b.md\n' > "$T/t134c/.goal/work-plan.md"
+touch "$T/t134c/a.txt"
+close_iter t134c --strategy landed
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t134c" 2>&1); rc=$?
+assert_rc "134c clean when files exist" 0 $rc
+printf '%s' "$out" | grep -qE 'A10' && no "134c false A10" || ok "134c no A10"
+
+# 134d open [ ] line with missing files is OK (not claimed yet)
+mkproj t134d; contract t134d "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf -- '- [ ] T1 p | owner=w1 | files=not-yet.md\n' > "$T/t134d/.goal/work-plan.md"
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t134d" 2>&1); rc=$?
+assert_rc "134d open item missing files allowed" 0 $rc
+
+# 134e expired wallclock + iter=0 => status must not say claim-when-ready
+mkproj t134e; contract t134e "- AC-1 | t | check: \`true\` | expected: exit=0" TB=100
+sed_in "s/^deadline=.*/deadline=$(( $(date +%s) - 10 ))/" "$T/t134e/.goal/state.rec"
+sed_in "s/^time_budget=.*/time_budget=100/" "$T/t134e/.goal/state.rec"
+out=$(bash "$CTL" status --project "$T/t134e" 2>&1)
+printf '%s' "$out" | grep -qE 'nothing pending|claim when ready' && no "134e soft NEXT after deadline" || ok "134e no soft claim NEXT"
+assert_has "134e routes close or degrade" 'close-iteration|degrade' "$out"
+
+# 134f close-iteration refuses when work-plan [x] names a ghost path
+mkproj t134f; contract t134f "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf -- '- [x] T1 p | owner=w1 | files=ghost.txt\n' > "$T/t134f/.goal/work-plan.md"
+out=$(bash "$CTL" close-iteration --project "$T/t134f" --task T1 --files ghost.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --exit-signal yes 2>&1); rc=$?
+assert_rc "134f claim with ghost file refused" 4 $rc
+assert_has "134f names missing-claimed-file" 'missing-claimed-file' "$out"

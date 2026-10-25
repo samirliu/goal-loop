@@ -162,6 +162,11 @@ the panel and self-claim - it is not a second source of truth.
 | says the GOAL is done | — | `goal_gate.sh` rc=0 only |
 
 **`TaskUpdate = completed` (and a ticked work-plan item) is NEVER a GO signal.**
+A work-plan `[x]` is only legal after `files=` paths **exist on disk** (audit
+**A10** / ctl `missing-claimed-file`); `files=a..b` ranges are unverifiable and
+refused. Team-side "completed" without landed files is a false tick - keep the
+item open. Deadline expired + zero books ⇒ close-iteration or degrade, never a
+new wave.
 The gate is the only completion authority. Teammates still never touch
 `.goal/` (R6). If work-plan and the Team task list disagree, work-plan wins
 and the team queue is repaired to match.
