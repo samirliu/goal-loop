@@ -235,15 +235,19 @@ case "$cmd" in
     it=$(state_get iteration); [ -n "$it" ] || it=0
     new=$((it+1))
     # Human panel wait (native TeamCreate/TeamPlan submit → approval) is not
-    # worker time. A multi-hour review_pending must not permanently fuse the
-    # stamp's wallclock before wave 1. Rebase once at iteration 0 only.
+    # worker time. Rebase a burned wallclock once at iteration 0, and ONLY when
+    # this wave is actually on a teams backend (or a roster exists) - a plain
+    # crew close with an intentionally expired deadline must stay expired.
     if [ "$it" -eq 0 ]; then
+      teams_ctx=0
+      case "$task" in *'[teams:'*) teams_ctx=1 ;; esac
+      [ -f "$sd/team/config.json" ] && teams_ctx=1
       tb0=$(state_get time_budget); [ -n "$tb0" ] || tb0=0
       dl0=$(state_get deadline); [ -n "$dl0" ] || dl0=0
       now0=$(date +%s)
       case "$tb0" in ''|*[!0-9]*) tb0=0 ;; esac
       case "$dl0" in ''|*[!0-9]*) dl0=0 ;; esac
-      if [ "$tb0" -gt 0 ] && [ "$dl0" -gt 0 ] && [ "$dl0" -le "$now0" ]; then
+      if [ "$teams_ctx" = 1 ] && [ "$tb0" -gt 0 ] && [ "$dl0" -gt 0 ] && [ "$dl0" -le "$now0" ]; then
         dl0=$((now0 + tb0))
         { grep -vE '^deadline=' "$sd/state.rec"; echo "deadline=$dl0"; } > "$sd/state.rec.rebase" \
           && mv -f "$sd/state.rec.rebase" "$sd/state.rec"

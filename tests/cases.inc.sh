@@ -2222,7 +2222,7 @@ sed_in "s/^time_budget=.*/time_budget=2/" "$T/t128a/.goal/state.rec"
 out=$(bash "$CTL" status --project "$T/t128a" 2>&1)
 assert_has "128a expired deadline visible" 'time_left=-' "$out"
 # first close-iteration at iter 0 rewrites deadline from remaining budget once
-out=$(bash "$CTL" close-iteration --project "$T/t128a" --task T1 --files a.txt \
+out=$(bash "$CTL" close-iteration --project "$T/t128a" --task T1[teams:2] --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy panel-wait \
   --no-gate 2>&1)
 dl=$(grep -E '^deadline=' "$T/t128a/.goal/state.rec" | cut -d= -f2)
@@ -2231,7 +2231,17 @@ now=$(date +%s)
 assert_has "128a rebase note" 'deadline-rebased' "$out"
 # second close must NOT rebase again (budget is real)
 sleep 1
-out=$(bash "$CTL" close-iteration --project "$T/t128a" --task T2 --files b.txt \
+out=$(bash "$CTL" close-iteration --project "$T/t128a" --task T2[teams:2] --files b.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy panel-wait \
   --no-gate 2>&1)
 printf '%s' "$out" | grep -qE 'deadline-rebased' && no "128a rebased twice" || ok "128a rebase is one-shot"
+
+# 128b plain crew close must NOT resurrect an intentionally expired deadline
+mkproj t128b; contract t128b "- AC-1 | t | check: \`true\` | expected: exit=0" TB=2
+sed_in "s/^deadline=.*/deadline=1/" "$T/t128b/.goal/state.rec"
+out=$(bash "$CTL" close-iteration --project "$T/t128b" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy plain \
+  --no-gate 2>&1)
+printf '%s' "$out" | grep -qE 'deadline-rebased' && no "128b crew must not rebase" || ok "128b crew must not rebase"
+dl=$(grep -E '^deadline=' "$T/t128b/.goal/state.rec" | cut -d= -f2)
+[ "$dl" = "1" ] && ok "128b deadline still 1" || no "128b deadline moved (dl=$dl)"
