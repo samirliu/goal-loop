@@ -234,6 +234,22 @@ case "$cmd" in
     digest=$(bash "$here/goal_gate.sh" --digest --project "$project") || { echo "CTL: ERROR digest-unavailable" >&2; exit 4; }
     it=$(state_get iteration); [ -n "$it" ] || it=0
     new=$((it+1))
+    # Human panel wait (native TeamCreate/TeamPlan submit → approval) is not
+    # worker time. A multi-hour review_pending must not permanently fuse the
+    # stamp's wallclock before wave 1. Rebase once at iteration 0 only.
+    if [ "$it" -eq 0 ]; then
+      tb0=$(state_get time_budget); [ -n "$tb0" ] || tb0=0
+      dl0=$(state_get deadline); [ -n "$dl0" ] || dl0=0
+      now0=$(date +%s)
+      case "$tb0" in ''|*[!0-9]*) tb0=0 ;; esac
+      case "$dl0" in ''|*[!0-9]*) dl0=0 ;; esac
+      if [ "$tb0" -gt 0 ] && [ "$dl0" -gt 0 ] && [ "$dl0" -le "$now0" ]; then
+        dl0=$((now0 + tb0))
+        { grep -vE '^deadline=' "$sd/state.rec"; echo "deadline=$dl0"; } > "$sd/state.rec.rebase" \
+          && mv -f "$sd/state.rec.rebase" "$sd/state.rec"
+        echo "CTL: NOTE deadline-rebased (panel wait is not work time; restored ${tb0}s)" >&2
+      fi
+    fi
     # R10: any no-progress landing sets HALF_OPEN/OPEN and must carry a
     # strategy change - otherwise the loop is grinding without revising.
     if [ "$progress" != yes ]; then

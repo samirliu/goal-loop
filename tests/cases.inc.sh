@@ -2208,3 +2208,30 @@ out=$(bash "$CTL" status --project "$T/t127a" 2>&1); assert_rc "127a status rc0 
 assert_has "127a STEP says fill contract" 'goal.md not stamped' "$out"
 printf '%s' "$out" | grep -qE 'No such file or directory' && no "127a parse sprayed missing-goal.md" || ok "127a parse silent on missing goal.md"
 printf '%s' "$out" | grep -qE 'goal_parse.sh:' && no "127a parse path leaked" || ok "127a no goal_parse.sh traceback"
+
+# ---------------------------------------------------------------------------
+# 128 wallclock vs human panel wait: deadline burned while review_pending
+# must not permanently fuse the run at iter 0. First ledger write rebases it.
+# ---------------------------------------------------------------------------
+mkproj t128a; contract t128a "- AC-1 | t | check: \`true\` | expected: exit=0" TB=2
+# simulate: stamp bound a 2s budget, then a long Teams panel wait expired it
+printf 'iteration=0\n' > /dev/null
+# force deadline into the past the way a multi-hour panel wait would
+sed_in "s/^deadline=.*/deadline=1/" "$T/t128a/.goal/state.rec"
+sed_in "s/^time_budget=.*/time_budget=2/" "$T/t128a/.goal/state.rec"
+out=$(bash "$CTL" status --project "$T/t128a" 2>&1)
+assert_has "128a expired deadline visible" 'time_left=-' "$out"
+# first close-iteration at iter 0 rewrites deadline from remaining budget once
+out=$(bash "$CTL" close-iteration --project "$T/t128a" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy panel-wait \
+  --no-gate 2>&1)
+dl=$(grep -E '^deadline=' "$T/t128a/.goal/state.rec" | cut -d= -f2)
+now=$(date +%s)
+[ "$dl" -gt "$now" ] && ok "128a deadline rebased after panel wait" || no "128a deadline still past (dl=$dl now=$now)"
+assert_has "128a rebase note" 'deadline-rebased' "$out"
+# second close must NOT rebase again (budget is real)
+sleep 1
+out=$(bash "$CTL" close-iteration --project "$T/t128a" --task T2 --files b.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy panel-wait \
+  --no-gate 2>&1)
+printf '%s' "$out" | grep -qE 'deadline-rebased' && no "128a rebased twice" || ok "128a rebase is one-shot"
