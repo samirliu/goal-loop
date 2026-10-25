@@ -724,7 +724,7 @@ mkproj t71
 bash "$CTL" stamp --project "$T/t71" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t71" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal no --no-gate --judge-score 8 --strategy probe-first >/dev/null 2>&1
+  --exit-signal no --no-gate --judge-score 8 --strategy probe-first --score 20 >/dev/null 2>&1
 bash "$CTL" close-iteration --project "$T/t71" --task T2 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --no-gate --judge-score 3 --strategy probe-first >/dev/null 2>&1
@@ -745,7 +745,7 @@ mkproj t72
 bash "$CTL" stamp --project "$T/t72" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t72" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
-  --exit-signal no --no-gate --judge-score 3 --strategy probe-first >/dev/null 2>&1
+  --exit-signal no --no-gate --judge-score 3 --strategy probe-first --score 20 >/dev/null 2>&1
 two_pass t72
 bash "$CTL" close-iteration --project "$T/t72" --task T2 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
@@ -2416,3 +2416,52 @@ mkdir -p "$T/t132b/.goal/evidence/raw"
 out=$(bash "$GATE" --check --project "$T/t132b" 2>&1); rc=$?
 assert_rc "132b empty raw still NO-GO" 2 $rc
 assert_has "132b raw-evidence-missing" 'raw-evidence-missing' "$out"
+
+# ---------------------------------------------------------------------------
+# 133 goal-agnostic run defaults: pre-reg seed, cold-start score, zero-bookkeeping
+# ---------------------------------------------------------------------------
+# 133a stamp seeds .goal/pre-reg.md from assets template (idempotent)
+mkproj t133a; contract t133a "- AC-1 | t | check: \`true\` | expected: exit=0"
+[ -f "$T/t133a/.goal/pre-reg.md" ] && ok "133a pre-reg seeded at stamp" || no "133a pre-reg missing after stamp"
+assert_has "133a has kill lines" 'Kill lines|杀点|iteration=0' "$(cat "$T/t133a/.goal/pre-reg.md" 2>/dev/null)"
+assert_has "133a has strategy slot" 'Strategy labels|策略' "$(cat "$T/t133a/.goal/pre-reg.md" 2>/dev/null)"
+
+# 133b objective first close needs --score (cold-start baseline)
+mkproj t133b; obj110 t133b ""
+out=$(bash "$CTL" close-iteration --project "$T/t133b" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy boot \
+  --no-gate 2>&1); rc=$?
+assert_rc "133b first close without --score refused" 4 $rc
+assert_has "133b names missing-score" 'missing-score' "$out"
+out=$(bash "$CTL" close-iteration --project "$T/t133b" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy boot --score 1 \
+  --no-gate 2>&1); rc=$?
+assert_rc "133b first close with --score ok" 0 $rc
+
+# 133c A9 zero-bookkeeping: work-plan ticked but no iteration blocks
+mkproj t133c; contract t133c "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf -- '- [x] T1 done | owner=w1 | files=a.txt\n' > "$T/t133c/.goal/work-plan.md"
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t133c" 2>&1); rc=$?
+assert_rc "133c audit fails on ticked-but-unbooked" 1 $rc
+assert_has "133c A9 named" 'A9' "$out"
+
+# 133d A9b: iteration=0 past half wallclock -> fail (loop never turned)
+mkproj t133d; contract t133d "- AC-1 | t | check: \`true\` | expected: exit=0" TB=100
+# deadline = now+100 at stamp; pretend 60s already burned by moving deadline closer
+sed_in "s/^deadline=.*/deadline=$(( $(date +%s) + 30 ))/" "$T/t133d/.goal/state.rec"
+sed_in "s/^time_budget=.*/time_budget=100/" "$T/t133d/.goal/state.rec"
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t133d" 2>&1); rc=$?
+assert_rc "133d audit fails on zero-bookkeeping under clock" 1 $rc
+assert_has "133d A9 clock named" 'A9' "$out"
+
+# 133e status hard-routes close-iteration when books empty but work ticked
+mkproj t133e; contract t133e "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf -- '- [x] T1 done | owner=w1 | files=a.txt\n' > "$T/t133e/.goal/work-plan.md"
+out=$(bash "$CTL" status --project "$T/t133e" 2>&1)
+assert_has "133e NEXT forces close-iteration" 'close-iteration' "$out"
+printf '%s' "$out" | grep -qE 'NEXT.*claim when ready' && no "133e soft NEXT while unbooked" || ok "133e not soft-claim NEXT"
+
+# 133f healthy close clears A9 (bookkeeping exists)
+close_iter t133c --strategy boot --score 1
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t133c" 2>&1); rc=$?
+assert_rc "133f audit clean after close" 0 $rc

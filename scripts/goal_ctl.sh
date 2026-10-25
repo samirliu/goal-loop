@@ -216,6 +216,16 @@ case "$cmd" in
     # unstamped. Fail loud instead (the contract template always ships one).
     grep -E '^approved:' "$sd/goal.md" | head -1 | grep -qE '[0-9a-f]{6,}' \
       || { echo "CTL: ERROR stamp-refused: goal.md has no 'approved: <placeholder>' line to write the hash onto" >&2; exit 4; }
+    # Goal-agnostic run defaults: seed pre-reg if the controller has not.
+    # Template lives in assets/ (kill lines, strategy slots, degrade). Never
+    # overwrite an authored pre-reg.
+    if [ ! -f "$sd/pre-reg.md" ] && [ -f "$here/../assets/pre-reg.template.md" ]; then
+      {
+        echo "# pre-reg.md — seeded at stamp $(date +%F)"
+        echo
+        sed "s/^T0 = .*/T0 = $(date +%FT%T)/" "$here/../assets/pre-reg.template.md"
+      } > "$sd/pre-reg.md"
+    fi
     grep -E '^approved:' "$sd/goal.md" | head -1 ;;
 
   bind)
@@ -318,6 +328,14 @@ case "$cmd" in
       case "$strategy" in
         ''|none) echo "CTL: ERROR missing-strategy-label (objective contracts must label every wave: close-iteration --strategy <attack direction>)" >&2; exit 4 ;;
       esac
+      # Cold-start baseline: the FIRST score row turns the eval loop on.
+      # Without it there is no slope, no STRATEGY-PICK, and multi-worker
+      # expansion is just file generation.
+      if [ ! -s "$sd/scores.rec" ]; then
+        case "$score" in
+          ''|none) echo "CTL: ERROR missing-score (objective cold-start: first close-iteration must pass --score N so scores.rec has a baseline before further waves)" >&2; exit 4 ;;
+        esac
+      fi
     fi
     # The score is MEASURED, never self-reported: ctl reruns the objective AC
     # (gate --verify, stateless) and records the observed value. A mismatch
@@ -496,11 +514,18 @@ case "$cmd" in
     stamped=0; grep -qE '^approved: [0-9a-f]{6,}' "$sd/goal.md" 2>/dev/null && stamped=1
     blocks=0; [ -s "$sd/loop-log.md" ] && blocks=$(grep -cE '^## iteration' "$sd/loop-log.md")
     claimed=0; tail -n 40 "$sd/loop-log.md" 2>/dev/null | grep -qE '^exit_signal=yes' && claimed=1
+    # Goal-agnostic: work without a bookkeeping row is an unbooked wave.
+    ticked=0; [ -f "$sd/work-plan.md" ] && ticked=$(grep -cE '^- \[x\]' "$sd/work-plan.md" 2>/dev/null || echo 0)
+    case "$ticked" in ''|*[!0-9]*) ticked=0 ;; esac
+    unbooked=0
+    [ "$blocks" -eq 0 ] && [ "$ticked" -gt 0 ] && unbooked=1
     if [ "$stamped" -eq 0 ]; then
       step="1-contract: goal.md not stamped - fill ACs, smoke checks, then ctl stamp"
+    elif [ "$unbooked" = 1 ]; then
+      step="3-join: work-plan is ticked but loop-log has no iteration - close-iteration before any further dispatch"
     elif [ "$blocks" -eq 0 ]; then
-      step="2-dispatch: stamped, no iteration blocks yet - brief the first wave"
-    elif [ "$claimed" -eq 1 ]; then
+      step="2-dispatch: stamped, no iteration blocks yet - brief the first wave (then close-iteration)"
+    elif [ "$claimed" = 1 ]; then
       step="4-branch: last block claims done - run gate --check, then deliver or follow NEXT"
     else
       step="3-join: work landed but not claimed - review evidence, close-iteration with exit-signal"
@@ -631,7 +656,10 @@ case "$cmd" in
     # the mapping lives in one place and matches references/gate.md section 3.
     # When attribution already names a direction, replan/delta routes paste it.
     lr=$(g last_reason); lh=$(g last_hint)
-    if [ -z "$lr" ] || [ "$lr" = ok ]; then
+    if [ "${unbooked:-0}" = 1 ]; then
+      echo "CTL: NEXT reason=unbooked-wave hint=close-iteration"
+      echo "CTL:   -> close-iteration now (work-plan ticked / work product exists but no loop-log row) - do NOT dispatch another wave first"
+    elif [ -z "$lr" ] || [ "$lr" = ok ]; then
       echo "CTL: NEXT (nothing pending at last gate check - claim when ready)"
     else
       case "$lh" in

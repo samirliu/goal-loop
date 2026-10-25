@@ -115,6 +115,29 @@ if grep -qE 'expected: *judged' "$sd/goal.md" 2>/dev/null; then
   [ "${has_j:-0}" -gt 0 ] || echo "AUDIT: WARN A8 judge-score-unrecorded (judged ACs present but no numeric judge= in scores.rec; pass --judge-score to close-iteration - R13 divergence guard is inert)"
 fi
 
+# ---- A9 zero-bookkeeping (goal-agnostic loop law) --------------------------
+# Work without a close-iteration row is an unbooked wave - the eval plane
+# never turns (no scores.rec, no STRATEGY-PICK). Seen live: dispatch for hours
+# with iteration=0. Two independent teeth: ticks without books; half-clock.
+blocks=$(printf '%s\n' "$log" | grep -cE '^## iteration' 2>/dev/null || echo 0)
+case "$blocks" in ''|*[!0-9]*) blocks=0 ;; esac
+ticked=0
+[ -f "$sd/work-plan.md" ] && ticked=$(grep -cE '^- \[x\]' "$sd/work-plan.md" 2>/dev/null || echo 0)
+case "$ticked" in ''|*[!0-9]*) ticked=0 ;; esac
+if [ "$blocks" -eq 0 ] && [ "$ticked" -gt 0 ]; then
+  bad "A9 unbooked-wave (work-plan has $ticked ticked item(s) but loop-log has no iteration - close-iteration before claiming)"
+fi
+tb=$(grep -E '^time_budget=' "$sd/state.rec" 2>/dev/null | tail -1 | cut -d= -f2-)
+dl=$(grep -E '^deadline=' "$sd/state.rec" 2>/dev/null | tail -1 | cut -d= -f2-)
+case "$tb" in ''|*[!0-9]*) tb=0 ;; esac
+case "$dl" in ''|*[!0-9]*) dl=0 ;; esac
+if [ "$blocks" -eq 0 ] && [ "$tb" -gt 0 ] && [ "$dl" -gt 0 ]; then
+  now=$(date +%s)
+  if [ "$((dl - now))" -lt "$((tb / 2))" ]; then
+    bad "A9 zero-bookkeeping-under-clock (iteration=0 and >50% wallclock spent - close-iteration or degrade-deliver)"
+  fi
+fi
+
 if [ "$fail" -eq 0 ]; then
   echo "AUDIT: clean (controller ledger hygiene OK)"; exit 0
 fi

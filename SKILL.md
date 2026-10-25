@@ -84,9 +84,18 @@ bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> 
 
 证明：`bash examples/quickstart-one-shot/run.sh`。
 
+## 缺省跑规（与目标无关；`/goal-loop --teams {objective}` 即用）
+
+1. **一波一收账**：`close-iteration` 是唯一波次出口；未收账不得再派下一波。有产物/勾账却 0 迭代 = unbooked（audit **A9**）。
+2. **objective 冷启动**：首波必须 `--score` + `--strategy`，否则不开多 worker 扩产。
+3. **开跑即有** `.goal/pre-reg.md`（stamp 播种模板：假设/策略标签槽/杀点/降级线）；策略标签从 objective 抽 2–4 个短英文名，一词一波。
+4. **杀点**：墙钟过半仍 `iteration=0` → 停派工，收账或降级交付（已过线部分 + 续写接口），禁止堆产量冒充完成。
+5. **终报**（claim 后）：loop-log/`STRATEGY-PICK`/分数轨迹（按标签）/gate 行 + 三牙路径。字数或文件数不进优化分子。
+
 ## Step 2 派工
 
 - 波次宽度由工作量与互不相交任务域决定，**无默认上限、不设推荐人数**；拆不出 ≥2 接口模块 → 退串行并记录。
+- **一波一收账**（缺省 1）：join 后必须 `close-iteration`（objective 带 `--score --strategy`）再开下一波。
 - **接口先行**：`.goal/interfaces.md` 冻结，改走提案。
 - **禁止** `isolation: worktree`。简报：任务/输出路径/文件域/通过条件/返回证据；禁写 `.goal/`；禁 spawn。
 - **peer-notes**：`.goal/evidence/peer-notes/<task>.md` 每迭代 ≤1 行；claim-not-instruction。
