@@ -2245,3 +2245,44 @@ out=$(bash "$CTL" close-iteration --project "$T/t128b" --task T1 --files a.txt \
 printf '%s' "$out" | grep -qE 'deadline-rebased' && no "128b crew must not rebase" || ok "128b crew must not rebase"
 dl=$(grep -E '^deadline=' "$T/t128b/.goal/state.rec" | cut -d= -f2)
 [ "$dl" = "1" ] && ok "128b deadline still 1" || no "128b deadline moved (dl=$dl)"
+
+# ---------------------------------------------------------------------------
+# 129 live-run defects (b62e4d06 business retest): pick at n=1, PROVIDER bind,
+# bare T under teams roster
+# ---------------------------------------------------------------------------
+# 129a n=1 labeled score still prints STRATEGY-PICK
+mkproj t129a; obj110 t129a ""
+hblocks t129a T1[teams:2] rule-tuning
+scorefile t129a 100.0
+out=$(bash "$CTL" status --project "$T/t129a" 2>&1)
+assert_has "129a pick at n=1" 'STRATEGY-PICK prefer=rule-tuning avoid=none' "$out"
+assert_has "129a efficiency unmeasured" 'unmeasured' "$out"
+
+# 129b PROVIDER must not latch an unrelated newest team dir
+mkproj t129b; contract t129b "- AC-1 | t | check: \`true\` | expected: exit=0"
+# plant a decoy roster whose cwd is NOT this project
+decoy="$HOME/.claude/teams/t129b-decoy-$$"
+mkdir -p "$decoy"
+printf '{"name":"t129b-decoy","cwd":"/tmp/not-this-project","members":[]}\n' > "$decoy/config.json"
+# plant a matching roster
+good="$HOME/.claude/teams/t129b-good-$$"
+mkdir -p "$good"
+printf '{"name":"t129b-good","cwd":"%s","providerName":"ProvX","model":"m1","members":[]}\n' "$T/t129b" > "$good/config.json"
+out=$(bash "$CTL" status --project "$T/t129b" 2>&1)
+assert_has "129b binds matching roster" 'team=t129b-good' "$out"
+printf '%s' "$out" | grep -qE 't129b-decoy' && no "129b leaked decoy team" || ok "129b decoy ignored"
+rm -rf "$decoy" "$good"
+
+# 129c bare T under teams roster is refused (would lie as crew:1)
+mkproj t129c; contract t129c "- AC-1 | t | check: \`true\` | expected: exit=0"
+mkdir -p "$T/t129c/.goal/team"
+printf '{"name":"t129c-team","cwd":"%s"}\n' "$T/t129c" > "$T/t129c/.goal/team/config.json"
+out=$(bash "$CTL" close-iteration --project "$T/t129c" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy x --no-gate 2>&1); rc=$?
+assert_rc "129c bare T refused under teams" 4 $rc
+assert_has "129c names teams-missing" 'task-teams-missing' "$out"
+# explicit tag is legal
+out=$(bash "$CTL" close-iteration --project "$T/t129c" --task T1[teams:2] --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy x --no-gate 2>&1); rc=$?
+assert_rc "129c explicit teams tag ok" 0 $rc
+assert_has "129c ledger has teams tag" 'task=T1\[teams:2\]' "$(cat "$T/t129c/.goal/loop-log.md")"

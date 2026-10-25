@@ -236,12 +236,31 @@ case "$cmd" in
     new=$((it+1))
     # Human panel wait (native TeamCreate/TeamPlan submit → approval) is not
     # worker time. Rebase a burned wallclock once at iteration 0, and ONLY when
-    # this wave is actually on a teams backend (or a roster exists) - a plain
-    # crew close with an intentionally expired deadline must stay expired.
+    # this wave is actually on a teams backend. Detection: explicit
+    # T<n>[teams:N], portable .goal/team roster, state team_name, or a native
+    # ~/.claude/teams roster whose config cwd points at this project.
     if [ "$it" -eq 0 ]; then
       teams_ctx=0
       case "$task" in *'[teams:'*) teams_ctx=1 ;; esac
       [ -f "$sd/team/config.json" ] && teams_ctx=1
+      [ -n "$(state_get team_name)" ] && teams_ctx=1
+      if [ "$teams_ctx" = 0 ]; then
+        for td in "$HOME/.claude/teams/"*; do
+          [ -f "$td/config.json" ] || continue
+          # native roster bound to this project (cwd field) counts as teams ctx
+          if grep -q "\"cwd\": *\"$project\"" "$td/config.json" 2>/dev/null \
+            || grep -q "\"cwd\": *\"$(cd "$project" 2>/dev/null && pwd)\"" "$td/config.json" 2>/dev/null; then
+            teams_ctx=1
+            # remember the binding so later status does not guess
+            if [ -z "$(state_get team_name)" ]; then
+              tn=$(basename "$td")
+              { grep -vE '^team_name=' "$sd/state.rec"; echo "team_name=$tn"; } > "$sd/state.rec.tn" \
+                && mv -f "$sd/state.rec.tn" "$sd/state.rec"
+            fi
+            break
+          fi
+        done
+      fi
       tb0=$(state_get time_budget); [ -n "$tb0" ] || tb0=0
       dl0=$(state_get deadline); [ -n "$dl0" ] || dl0=0
       now0=$(date +%s)
@@ -310,9 +329,19 @@ case "$cmd" in
     # task= is ledger law (R12/A1): wave ids must carry their backend. A bare
     # T<n> means an ordinary one-shot subagent wave - normalize it (crew:1)
     # instead of letting the self-audit refuse the claim after the fact.
+    # Under a teams roster, bare T<n> is ambiguous (seen live: native Teams
+    # recorded as crew:1, then hand-edited). Fail closed: demand T<n>[teams:N].
     case "$task" in
       '') echo "CTL: ERROR missing-task (ledger needs --task T<n> or T<n>[backend:N])" >&2; exit 4 ;;
-      T[0-9]*) printf '%s' "$task" | grep -qE '^T[0-9]+$' && task="$task[crew:1]" ;;
+      T[0-9]*)
+        if printf '%s' "$task" | grep -qE '^T[0-9]+$'; then
+          if [ "${teams_ctx:-0}" = 1 ]; then
+            echo "CTL: ERROR task-teams-missing (this run has a teams roster: use --task T<n>[teams:N] with N=actual concurrent workers; bare T<n> would lie as crew:1)" >&2
+            exit 4
+          fi
+          task="$task[crew:1]"
+        fi
+        ;;
     esac
     gp_task_ok "$task" \
       || { echo "CTL: ERROR bad-task:$task (schema: T<n>[crew:N] / T<n>[teams:N], bare T<n> normalizes to crew:1)" >&2; exit 4; }
@@ -445,14 +474,25 @@ case "$cmd" in
     # Provider / team surface one-liner (SB-12): when the run is under an
     # Agent Teams roster, surface lastError/model so a NoRoom / stream-max
     # death is visible from status without opening team config.json.
+    # Bind PROVIDER to THIS project's roster only. Guessing the newest
+    # ~/.claude/teams/* directory attributes another run's CudaFailed/NoRoom
+    # to this goal (seen live: mira-legacy-* leaked into goal-retest-biz).
     tname=$(g team_name)
     if [ -z "$tname" ] && [ -f "$project/.goal/team/config.json" ]; then
       tname=$(sed -n 's/.*"name": *"\([^"]*\)".*/\1/p' "$project/.goal/team/config.json" 2>/dev/null | head -1)
     fi
-    if [ -z "$tname" ]; then
-      tdir=$(ls -dt "$HOME/.claude/teams/"* 2>/dev/null | head -1)
-    else
+    tdir=""
+    if [ -n "$tname" ]; then
       tdir="$HOME/.claude/teams/$tname"
+    else
+      pw=$(cd "$project" 2>/dev/null && pwd)
+      for td in "$HOME/.claude/teams/"*; do
+        [ -f "$td/config.json" ] || continue
+        if grep -q "\"cwd\": *\"$pw\"" "$td/config.json" 2>/dev/null \
+          || grep -q "\"cwd\": *\"$project\"" "$td/config.json" 2>/dev/null; then
+          tdir="$td"; break
+        fi
+      done
     fi
     if [ -n "$tdir" ] && [ -f "$tdir/config.json" ]; then
       prov=$(sed -n 's/.*"providerName": *"\([^"]*\)".*/\1/p' "$tdir/config.json" 2>/dev/null | head -1)
@@ -506,7 +546,7 @@ case "$cmd" in
             sub(/^ +/,"",v); sub(/ +$/,"",v)
             if (k=="strategy") STRAT[cur]=(v==""?"none":v) } }
         END {
-          prefer=""; pbest=""; avoid=""
+          prefer=""; pbest=""; avoid=""; lab_any=""
           i=1
           while (i<=blk) {
             j=i
@@ -519,6 +559,7 @@ case "$cmd" in
                   v=SC[it]+0; nk++
                   if (p1==0) { p1=q-i+1; v1=v }
                   p2=q-i+1; v2=v } }
+              if (nk>=1) lab_any=lab
               if (nk>=2) {
                 D=p2-p1; if (D<1) D=1
                 slope=(v2-v1)/D
@@ -534,6 +575,8 @@ case "$cmd" in
             i=j+1 }
           if (prefer!="" || avoid!="")
             printf "prefer=%s avoid=%s\n", (prefer==""?"none":prefer), (avoid==""?"none":avoid)
+          else if (lab_any!="")
+            printf "prefer=%s avoid=none\n", lab_any
         }' "$sd/scores.rec" "$sd/loop-log.md" 2>/dev/null || true)
       if [ -n "${pick_line:-}" ]; then
         pick_prefer=$(printf '%s\n' "$pick_line" | sed -n 's/^prefer=\([^ ]*\).*/\1/p')
