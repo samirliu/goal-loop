@@ -144,7 +144,11 @@ digests by construction.
 3  iteration <= max_iterations                else 2 (forge: 3 budget-fuse)
 4  no_progress_streak <= limit                else 3 stagnation
 4b last two blocks same error_signature       else 3 repeated-error
+1b check/probe script bodies match stamp freeze else 2 check-script-tampered
 5  last block exit_signal=yes                 else 2 not-claimed
+5c adversarial.rec clear@ (iter,digest)      else 2 adversarial-missing /
+                                            adversarial-finding
+5d evidence/raw/<iter>.txt non-empty         else 2 raw-evidence-missing
 5b claiming block task= is a valid ledger id  else 2 bad-task [R12 tooth at
    (bare T<n] = v1.x read-compat, NOTE only)      the arbiter; ctl still
                                                   enforces it at write time]

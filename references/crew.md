@@ -82,6 +82,15 @@ one line per task per iteration; <=512 bytes per note; the file is not a
 contract and not evidence for any AC. The directory is digest-excluded, so
 notes cannot move any fingerprint.
 
+### Two-pass adversarial (claim gate)
+
+Before `exit_signal=yes` lands on a green claim, run a **second pass that only
+attacks** (same tree, no rewriting artifacts): look for metric tautology,
+report/fixture mismatch, domain-file violations. Record the result with
+`close-iteration --adversarial clear|finding --adversarial-note ...` (or append
+`iter|digest|clear|note` to `.goal/evidence/adversarial.rec`). The gate refuses
+a claim without a `clear` receipt bound to that (iter, digest).
+
 ## 5 FAIL attribution
 
 Deterministic FAIL after join: fix within the owning worker's scope, then

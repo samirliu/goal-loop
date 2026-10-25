@@ -272,6 +272,7 @@ grep -qE 'open-FAIL:AC-1' "$T/h36.err" && ok "36 gate reason preserved in block 
 mkproj h37 >/dev/null; contract h37 "- AC-1 | f | check: \`true\` | expected: exit=0"
 bash "$CTL" close-iteration --project "$T/h37" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --exit-signal no --no-gate >/dev/null 2>&1
+two_pass h37
 (cd "$T/h37" && bash "$here/scripts/goal_hook.sh") >/dev/null 2>&1
 assert_rc "37 hook unclaimed allows stop" 0 $?
 
@@ -348,6 +349,7 @@ mkproj t47; contract t47 "- AC-1 | f | check: \`true\` | expected: exit=0"
 bash "$CTL" close-iteration --project "$T/t47" --task 'T2[teams:3]' --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal no --no-gate >/dev/null 2>&1
+two_pass t47
 out=$(bash "$CTL" status --project "$T/t47" 2>&1)
 assert_has "47 status echoes teams wave marker" 'CTL: LAST task=T2\[teams:3\]' "$out"
 
@@ -416,6 +418,7 @@ bash "$CTL" stamp --project "$T/t53" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t53" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --score 7 --strategy probe-first --no-gate >/dev/null 2>&1
+two_pass t53
 out=$(bash "$GATE" --check --project "$T/t53" 2>&1); assert_rc "53 maximize GO at score 7" 0 $?
 assert_has "53 GO line carries score" 'score=7' "$out"
 grep -q 'best_score=7' "$T/t53/.goal/state.rec" && ok "53 best_score stored" || no "53 best_score missing"
@@ -455,6 +458,7 @@ bash "$CTL" stamp --project "$T/t55b" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t55b" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --no-gate >/dev/null 2>&1
+two_pass t55b
 out=$(bash "$GATE" --check --project "$T/t55b" 2>&1); assert_rc "55b probe-ok GO" 0 $?
 
 # 56 HALF_OPEN requires strategy_delta (R10)
@@ -544,6 +548,7 @@ bash "$CTL" stamp --project "$T/t62" --auto >/dev/null
 out=$(bash "$CTL" close-iteration --project "$T/t62" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal no --score 9 --strategy probe-first --no-gate 2>&1)
+two_pass t62
 assert_rc "62 unmeasurable records ok rc0" 0 $?
 assert_has "62 warns unmeasurable" 'objective-unmeasurable' "$out"
 grep -q '^score=none$' "$T/t62/.goal/loop-log.md" && ok "62 score=none recorded" || no "62 score not none"
@@ -644,6 +649,7 @@ bash "$CTL" close-iteration --project "$T/t67" --task T2 --files a.txt \
 # last scores.rec row: 2|none|4 (no objective) - that's not comparable, so
 # pair is 1|10|2 vs earlier... append a clean agreeing pair as the tail
 printf '3|30|5\n4|40|5\n' >> "$T/t67/.goal/scores.rec"
+two_pass t67
 out=$(bash "$GATE" --check --project "$T/t67" 2>&1); rc=$?
 assert_has "67 no DIVERGENCE on same-direction" 'GATE: GO' "$out"
 printf '%s' "$out" | grep -q 'DIVERGENCE' && no "67 unexpected DIVERGENCE" || ok "67 no DIVERGENCE token"
@@ -659,6 +665,7 @@ bash "$CTL" stamp --project "$T/t68" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t68" --task 'T1[crew:1]' --files a.txt \
   --checks-pass 0 --checks-fail 0 --checks-unverifiable 1 --progress yes \
   --exit-signal no --no-gate >/dev/null 2>&1
+two_pass t68
 out=$(bash "$AUDIT" --project "$T/t68" 2>&1); rc=$?
 assert_rc "68 A8 warn does not block rc0" 0 $rc
 assert_has "68 A8 warns judge-score-unrecorded" 'A8 judge-score-unrecorded' "$out"
@@ -675,6 +682,7 @@ bash "$CTL" stamp --project "$T/t69" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t69" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --score 7 --strategy probe-first --no-gate >/dev/null 2>&1
+two_pass t69
 out=$(bash "$GATE" --verify AC-1 --project "$T/t69" 2>&1)
 assert_has "69 minimize classified deterministic" 'AC-1|PASS|observed=7' "$out"
 printf '%s' "$out" | grep -q '|SKIP|judged' && no "69 minimize misrouted to judged" || ok "69 not judged"
@@ -699,6 +707,7 @@ bash "$CTL" stamp --project "$T/t70b" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t70b" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --score 3 --strategy probe-first --no-gate >/dev/null 2>&1
+two_pass t70b
 out=$(bash "$GATE" --check --project "$T/t70b" 2>&1); assert_rc "70b minimize GO at improved score 3" 0 $?
 
 # 71 R13 divergence direction-aware for minimize
@@ -737,9 +746,11 @@ bash "$CTL" stamp --project "$T/t72" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t72" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal no --no-gate --judge-score 3 --strategy probe-first >/dev/null 2>&1
+two_pass t72
 bash "$CTL" close-iteration --project "$T/t72" --task T2 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --no-gate --judge-score 8 --strategy probe-first >/dev/null 2>&1
+two_pass t72
 printf '1|20|3\n2|10|8\n' >> "$T/t72/.goal/scores.rec"
 out=$(bash "$GATE" --check --project "$T/t72" 2>&1); assert_rc "72 minimize agree -> GO" 0 $?
 printf '%s' "$out" | grep -q 'DIVERGENCE' && no "72 unexpected DIVERGENCE" || ok "72 no DIVERGENCE"
@@ -804,6 +815,7 @@ sed_in 's/^deadline=.*/deadline=1/' "$T/t76/.goal/state.rec"
 bash "$CTL" close-iteration --project "$T/t76" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --no-gate >/dev/null 2>&1
+two_pass t76
 out=$(bash "$GATE" --check --project "$T/t76" 2>&1); assert_rc "76 expired wallclock green claim -> GO" 0 $?
 assert_has "76 NOTE fuse" 'time-budget-exhausted' "$out"
 assert_has "76 still GO" 'GATE: GO' "$out"
@@ -860,10 +872,12 @@ bash "$CTL" stamp --project "$T/t79" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t79" --task T1 --files n.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal no --no-gate --score 100 --strategy tune-params >/dev/null 2>&1
+two_pass t79
 printf '96\n' > "$T/t79/n.txt"   # 4% noise, inside 10% band
 bash "$CTL" close-iteration --project "$T/t79" --task T2 --files n.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --no-gate --score 96 --strategy tune-params >/dev/null 2>&1
+two_pass t79
 out=$(bash "$GATE" --check --project "$T/t79" 2>&1); assert_rc "79 noise-band holds -> GO" 0 $?
 # 80 below band -> score-regressed names the tolerance
 printf '80\n' > "$T/t79/n.txt"
@@ -1071,6 +1085,7 @@ close_iter t93 --progress yes
 out=$(bash "$CTL" close-iteration --project "$T/t93" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes 2>&1)
+two_pass t93
 assert_rc "93d progress reset + claim GO" 0 $?
 grep -q '^breaker=CLOSED$' "$T/t93/.goal/state.rec" && ok "93d breaker back CLOSED" || no "93d breaker stuck"
 # OPEN: three consecutive no-progress (limit 2)
@@ -1099,6 +1114,7 @@ close_iter t94 --progress yes --error-signature none
 out=$(bash "$CTL" close-iteration --project "$T/t94" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --error-signature none --exit-signal yes 2>&1)
+two_pass t94
 assert_rc "94b none signatures never trip" 0 $?
 
 # 95 hint routing beyond bind-seat (probe campaign 2 / S6): score-regressed ->
@@ -1133,6 +1149,7 @@ printf 'x' > "$T/t96/a.txt"
 # dry_limit defaults to 3; dry_streak increments when --dry yes lands.
 close_iter t96 --dry yes          # dry_streak 1
 close_iter t96 --dry yes          # dry_streak 2
+two_pass t96
 out=$(bash "$CTL" close-iteration --project "$T/t96" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --dry yes --exit-signal yes 2>&1); rc96=$?
@@ -1205,6 +1222,7 @@ assert_has "103a NEXT is one actionable sentence" '\-> ' "$out"
 # after a clean pass the NEXT line reports nothing pending
 mkproj t104; contract t104 "- AC-1 | f | check: \`test -f ok.txt\` | expected: exit=0"
 echo ok > "$T/t104/ok.txt"
+two_pass t104
 bash "$CTL" close-iteration --project "$T/t104" --task T1 --files ok.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes >/dev/null 2>&1
@@ -1398,6 +1416,7 @@ echo v2 > "$T/t106c/x.txt"; SC2=$(sha256sum "$T/t106c/x.txt" | cut -c1-64)
 bash "$CTL" close-iteration --project "$T/t106c" --task T2 --files x.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --no-gate >/dev/null 2>&1
+two_pass t106c
 bind_v t106c "AC-1|PASS|2|DIGEST|cmd|\"resolved by fresh seat\" artifact: x.txt digest: $SC2"
 out=$(bash "$GATE" --check --project "$T/t106c" 2>&1); assert_rc "106c conflict cleared by fresh binding on new state" 0 $?
 
@@ -1436,6 +1455,7 @@ mkproj t108b; contract t108b "- AC-1 | t | check: \`true\` | expected: exit=0"
 printf '## iteration 1\ntask=T5\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=yes\nfalse_complete=no\ndigest=X\nscore=none\nstrategy_delta=none\n' > "$T/t108b/.goal/loop-log.md"
 d=$(bash "$GATE" --digest --project "$T/t108b")
 sed_in "s/^digest=X$/digest=$d/" "$T/t108b/.goal/loop-log.md"
+two_pass t108b
 out=$(bash "$GATE" --check --project "$T/t108b" 2>&1); assert_rc "108b bare legacy id still claims" 0 $?
 assert_has "108b legacy NOTE emitted" 'task-id-legacy' "$out"
 
@@ -1469,6 +1489,7 @@ mkproj t109c; contract t109c "- AC-1 | t | check: \`true\` | expected: exit=0"
 bash "$CTL" close-iteration --project "$T/t109c" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --exit-signal yes \
   --strategy "$(printf 'x\ny\tz')" --no-gate >/dev/null 2>&1
+two_pass t109c
 assert_has "109c folded to one line" '^strategy=x y z$' "$(cat "$T/t109c/.goal/loop-log.md")"
 [ "$(grep -cE '^## iteration' "$T/t109c/.goal/loop-log.md")" = 1 ] \
   && ok "109c no block shred" || no "109c label shredded the block"
@@ -1477,6 +1498,7 @@ out=$(bash "$GATE" --check --project "$T/t109c" 2>&1); assert_rc "109c gate stil
 mkproj t109d; contract t109d "- AC-1 | t | check: \`true\` | expected: exit=0"
 bash "$CTL" close-iteration --project "$T/t109d" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy "  pad  " --no-gate >/dev/null 2>&1
+two_pass t109d
 assert_has "109d label trimmed" '^strategy=pad$' "$(cat "$T/t109d/.goal/loop-log.md")"
 # 109e legacy block without strategy reads fine + attribution-unused (objective)
 mkproj t109e; contract t109e "- AC-1 | t | check: \`true\` | expected: maximize"
@@ -1489,6 +1511,7 @@ assert_has "109e attribution-unused fires" 'attribution-unused:' "$out"
 mkproj t109f; contract t109f "- AC-1 | t | check: \`true\` | expected: exit=0"
 bash "$CTL" close-iteration --project "$T/t109f" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy probe-first --no-gate >/dev/null 2>&1
+two_pass t109f
 out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t109f" 2>&1); assert_rc "109f audit clean w/ strategy" 0 $?
 assert_has "109f audit says clean" 'AUDIT: clean' "$out"
 # 109g R10 unchanged: progress=no still demands --strategy-delta
@@ -1776,12 +1799,14 @@ bash "$CTL" stamp --project "$T/t118" --auto >/dev/null
 bash "$CTL" close-iteration --project "$T/t118" --task T1 --files n.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal no --no-gate --score 100 --strategy base >/dev/null 2>&1
+two_pass t118
 # drift 100 -> 95: inside z=2 band (band = 2*2/100 = 4%... 5% drift!) pick
 # inside: 100 -> 97 (3% <= 4% band)
 printf '97\nsd=2\n' > "$T/t118/n.txt"
 bash "$CTL" close-iteration --project "$T/t118" --task T2 --files n.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal yes --no-gate --score 97 --strategy base >/dev/null 2>&1
+two_pass t118
 out=$(bash "$GATE" --check --project "$T/t118" 2>&1); assert_rc "118a drift inside z-band -> GO" 0 $?
 # 118b beyond the band (100 -> 91, 9% > 4% z-band) -> regressed names the band
 printf '91\nsd=2\n' > "$T/t118/n.txt"
@@ -2279,10 +2304,115 @@ mkdir -p "$T/t129c/.goal/team"
 printf '{"name":"t129c-team","cwd":"%s"}\n' "$T/t129c" > "$T/t129c/.goal/team/config.json"
 out=$(bash "$CTL" close-iteration --project "$T/t129c" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy x --no-gate 2>&1); rc=$?
+two_pass t129c
 assert_rc "129c bare T refused under teams" 4 $rc
 assert_has "129c names teams-missing" 'task-teams-missing' "$out"
 # explicit tag is legal
 out=$(bash "$CTL" close-iteration --project "$T/t129c" --task T1[teams:2] --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy x --no-gate 2>&1); rc=$?
+two_pass t129c
 assert_rc "129c explicit teams tag ok" 0 $rc
 assert_has "129c ledger has teams tag" 'task=T1\[teams:2\]' "$(cat "$T/t129c/.goal/loop-log.md")"
+
+# ---------------------------------------------------------------------------
+# 130 two-pass adversarial receipt (claim needs a second pass bound to digest)
+# ---------------------------------------------------------------------------
+mkproj t130a; contract t130a "- AC-1 | t | check: \`true\` | expected: exit=0"
+close_iter t130a
+rm -f "$T/t130a/.goal/evidence/adversarial.rec"
+out=$(bash "$GATE" --check --project "$T/t130a" 2>&1); rc=$?
+assert_rc "130a claim without adversarial is NO-GO" 2 $rc
+assert_has "130a reason adversarial-missing" 'adversarial-missing' "$out"
+# write a receipt for the CURRENT digest
+d=$(bash "$GATE" --digest --project "$T/t130a")
+mkdir -p "$T/t130a/.goal/evidence"
+printf '1|%s|clear|no gaming found\n' "$d" > "$T/t130a/.goal/evidence/adversarial.rec"
+out=$(bash "$GATE" --check --project "$T/t130a" 2>&1); rc=$?
+assert_rc "130a GO with bound adversarial receipt" 0 $rc
+assert_has "130a GO line" 'GATE: GO' "$out"
+
+# 130b receipt on a stale digest is void
+mkproj t130b; contract t130b "- AC-1 | t | check: \`true\` | expected: exit=0"
+close_iter t130b
+mkdir -p "$T/t130b/.goal/evidence"
+printf '1|deadbeef|clear|stale\n' > "$T/t130b/.goal/evidence/adversarial.rec"
+out=$(bash "$GATE" --check --project "$T/t130b" 2>&1); rc=$?
+assert_rc "130b stale receipt refuses claim" 2 $rc
+assert_has "130b still adversarial-missing" 'adversarial-missing' "$out"
+
+# 130c adversarial finding blocks until cleared
+mkproj t130c; contract t130c "- AC-1 | t | check: \`true\` | expected: exit=0"
+close_iter t130c
+d=$(bash "$GATE" --digest --project "$T/t130c")
+printf '1|%s|finding|metric tautology\n' "$d" > "$T/t130c/.goal/evidence/adversarial.rec"
+out=$(bash "$GATE" --check --project "$T/t130c" 2>&1); rc=$?
+assert_rc "130c finding refuses claim" 2 $rc
+assert_has "130c reason adversarial-finding" 'adversarial-finding' "$out"
+printf '1|%s|clear|rechecked\n' "$d" > "$T/t130c/.goal/evidence/adversarial.rec"
+out=$(bash "$GATE" --check --project "$T/t130c" 2>&1); rc=$?
+assert_rc "130c clear receipt GO" 0 $rc
+
+# ---------------------------------------------------------------------------
+# 131 dual-encode: check/probe scripts frozen at stamp (metric body mechanical)
+# ---------------------------------------------------------------------------
+mkproj t131a
+cat > "$T/t131a/check.sh" <<'EOS'
+#!/usr/bin/env bash
+exit 0
+EOS
+chmod +x "$T/t131a/check.sh"
+contract t131a "- AC-1 | t | check: \`bash check.sh\` | expected: exit=0"
+# mutate AFTER stamp but BEFORE close so tree digest stays self-consistent -
+# this is the silent metric-swap hole (goal.md unchanged, script body swapped)
+echo 'exit 0 # swapped body' > "$T/t131a/check.sh"
+close_iter t131a
+d=$(bash "$GATE" --digest --project "$T/t131a")
+printf '1|%s|clear|x\n' "$d" > "$T/t131a/.goal/evidence/adversarial.rec"
+mkdir -p "$T/t131a/.goal/evidence/raw"
+printf 'GATE: VERIFY AC-1|PASS|exit=0\n' > "$T/t131a/.goal/evidence/raw/1.txt"
+out=$(bash "$GATE" --check --project "$T/t131a" 2>&1); rc=$?
+assert_rc "131a check-script mutation refuses claim" 2 $rc
+assert_has "131a reason check-script-tampered" 'check-script-tampered' "$out"
+
+# 131b no script-backed checks => freeze empty, no false positive
+mkproj t131b; contract t131b "- AC-1 | t | check: \`true\` | expected: exit=0"
+close_iter t131b
+d=$(bash "$GATE" --digest --project "$T/t131b")
+printf '1|%s|clear|x\n' "$d" > "$T/t131b/.goal/evidence/adversarial.rec"
+out=$(bash "$GATE" --check --project "$T/t131b" 2>&1); rc=$?
+assert_rc "131b builtin check still GO" 0 $rc
+
+# ---------------------------------------------------------------------------
+# 132 raw sensor output: claim needs evidence/raw/<iter>.txt
+# ---------------------------------------------------------------------------
+mkproj t132a; contract t132a "- AC-1 | t | check: \`true\` | expected: exit=0"
+close_iter t132a
+d=$(bash "$GATE" --digest --project "$T/t132a")
+printf '1|%s|clear|x\n' "$d" > "$T/t132a/.goal/evidence/adversarial.rec"
+# close-iteration auto-writes evidence/raw; remove it to prove the gate tooth
+rm -f "$T/t132a/.goal/evidence/raw/1.txt"
+out=$(bash "$GATE" --check --project "$T/t132a" 2>&1); rc=$?
+assert_rc "132a claim without raw dump is NO-GO" 2 $rc
+assert_has "132a reason raw-evidence-missing" 'raw-evidence-missing' "$out"
+mkdir -p "$T/t132a/.goal/evidence/raw"
+printf 'GATE: VERIFY AC-1|PASS|exit=0\n' > "$T/t132a/.goal/evidence/raw/1.txt"
+out=$(bash "$GATE" --check --project "$T/t132a" 2>&1); rc=$?
+assert_rc "132a GO with raw dump" 0 $rc
+# auto-write path: a fresh close leaves a non-empty raw for its iter
+mkproj t132c; contract t132c "- AC-1 | t | check: \`true\` | expected: exit=0"
+close_iter t132c
+[ -s "$T/t132c/.goal/evidence/raw/1.txt" ] && ok "132c close auto-writes raw" || no "132c close auto-writes raw"
+d=$(bash "$GATE" --digest --project "$T/t132c")
+printf '1|%s|clear|x\n' "$d" > "$T/t132c/.goal/evidence/adversarial.rec"
+out=$(bash "$GATE" --check --project "$T/t132c" 2>&1); assert_rc "132c GO after auto raw + adv" 0 $?
+
+# 132b empty raw file is not evidence
+mkproj t132b; contract t132b "- AC-1 | t | check: \`true\` | expected: exit=0"
+close_iter t132b
+d=$(bash "$GATE" --digest --project "$T/t132b")
+printf '1|%s|clear|x\n' "$d" > "$T/t132b/.goal/evidence/adversarial.rec"
+mkdir -p "$T/t132b/.goal/evidence/raw"
+: > "$T/t132b/.goal/evidence/raw/1.txt"
+out=$(bash "$GATE" --check --project "$T/t132b" 2>&1); rc=$?
+assert_rc "132b empty raw still NO-GO" 2 $rc
+assert_has "132b raw-evidence-missing" 'raw-evidence-missing' "$out"

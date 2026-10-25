@@ -33,10 +33,23 @@ bind_v(){ # $1 proj NAME under $T; $2 verdict-line with DIGEST placeholder
 }
 
 close_iter(){ # $1 proj NAME under $T, rest passed to close-iteration (--no-gate implied)
-  local p="$T/$1"; shift
+  local name="$1" p="$T/$1"; shift
   bash "$CTL" close-iteration --project "$p" --task T1 --files a.txt \
     --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
     --exit-signal yes "$@" --no-gate >/dev/null 2>&1
+  two_pass "$name"
+}
+
+# Plant claim-time two-pass artifacts for the latest iteration (adversarial
+# clear + raw dump). Tests that assert adversarial/raw-missing must rm these.
+two_pass(){
+  local p="$T/$1" it d
+  d=$(bash "$GATE" --digest --project "$p" 2>/dev/null | tail -1)
+  mkdir -p "$p/.goal/evidence/raw"
+  for it in 0 1 2 3 4 5 6 7 8; do
+    [ -s "$p/.goal/evidence/raw/${it}.txt" ] || printf 'GATE: VERIFY AC-1|PASS|exit=0\n' > "$p/.goal/evidence/raw/${it}.txt"
+    printf '%s|%s|clear|test-helper\n' "$it" "$d" >> "$p/.goal/evidence/adversarial.rec"
+  done
 }
 
 # --- suite-level globals (must exist in every shard) ---

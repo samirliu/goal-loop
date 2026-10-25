@@ -12,6 +12,7 @@
 #        [--progress yes|no] [--exit-signal yes|no] [--error-signature none]
 #        [--false-complete no] [--dry yes|no] [--no-gate]
 #        [--score N] [--judge-score N] [--strategy-delta TEXT] [--strategy TEXT]
+#        [--adversarial clear|finding] [--adversarial-note TEXT]
 #        (--dry is REQUIRED on exit: forge contracts: yes = this round's
 #         panel+critic produced no new evidence-backed finding)
 #        (--score: objective:maximize|minimize value; --strategy-delta REQUIRED when
@@ -24,7 +25,7 @@ export LC_ALL=C.UTF-8
 here=$(cd "$(dirname "$0")" && pwd)
 cmd="" project="." auto=0 no_gate=0 max_iterations=12 time_budget=""
 task="" files="" cp="" cf="" cu="" progress=yes exit_signal=no errsig=none fcomplete=no dry=""
-score="" judge_score="" strategy_delta="" strategy=""
+score="" judge_score="" strategy_delta="" strategy="" adversarial="" adv_note=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -48,6 +49,8 @@ while [ $# -gt 0 ]; do
     --judge-score) [ $# -ge 2 ] || { echo "CTL: ERROR missing-judge-score" >&2; exit 4; }; judge_score="$2"; shift ;;
     --strategy-delta) [ $# -ge 2 ] || { echo "CTL: ERROR missing-strategy-delta" >&2; exit 4; }; strategy_delta="$2"; shift ;;
     --strategy) [ $# -ge 2 ] || { echo "CTL: ERROR missing-strategy" >&2; exit 4; }; strategy="$2"; shift ;;
+    --adversarial) [ $# -ge 2 ] || { echo "CTL: ERROR missing-adversarial-verdict" >&2; exit 4; }; adversarial="$2"; shift ;;
+    --adversarial-note) [ $# -ge 2 ] || { echo "CTL: ERROR missing-adversarial-note" >&2; exit 4; }; adv_note="$2"; shift ;;
     --help|-h) sed -n '2,22p' "$0"; exit 0 ;;
     *) echo "CTL: ERROR unknown-flag:$1" >&2; exit 4 ;;
   esac
@@ -185,6 +188,26 @@ case "$cmd" in
            printf 'time_budget=%s\ndeadline=%s\n' "$time_budget" "$(( $(date +%s) + time_budget ))"
          } > "$sd/state.rec.new" && mv "$sd/state.rec.new" "$sd/state.rec" ;;
     esac
+    # Dual-encode freeze (harness engineering): pin check/probe SCRIPT bodies,
+    # not just the AC line text. goal.md hash cannot see a swapped check.sh.
+    # Sidecar file: close-iteration rewrites state.rec wholesale and would drop
+    # a state.rec key; this freeze must survive every close.
+    # NOTE: never use case patterns with ')' inside $( ) - /*) closes the sub.
+    freeze=""
+    freeze=$(
+      {
+        r < "$sd/goal.md" | sed -nE 's/.*check: *`([^`]*)`.*/\1/p'
+        r < "$sd/goal.md" | sed -nE 's/.*probe: *`([^`]*)`.*/\1/p'
+      } | tr ' \t' '\n\n' | grep -E '\.(sh|py|rb|js)$' | sort -u | while IFS= read -r scr; do
+        [ -n "$scr" ] || continue
+        f="$project/$scr"
+        [ "${scr#/}" != "$scr" ] && f="$scr"
+        [ -f "$f" ] || continue
+        h=$(gp_hash_std < "$f" | cut -c1-8)
+        printf '%s=%s;' "$scr" "$h"
+      done
+    )
+    printf '%s\n' "$freeze" > "$sd/check_freeze"
     marker=""; [ "$auto" -eq 1 ] && marker=" auto"
     gp_sed_inplace "s/^approved: .*/approved: $h $(date +%F)$marker/" "$sd/goal.md" \
       || { echo "CTL: ERROR stamp-failed: could not write the approved: line" >&2; exit 4; }
@@ -403,6 +426,20 @@ case "$cmd" in
     printf 'iteration=%s\nbreaker=%s\nfalse_completes=%s\nreplans=%s\nno_progress_streak=%s\nlast_progress_iteration=%s\nmax_iterations=%s\nno_progress_limit=%s\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=%s\ndry_limit=%s\ncheck_timeout=%s\ntime_budget=%s\ndeadline=%s\nbest_score=%s\n' \
       "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" "$best" > "$sd/state.rec"
     echo "CTL: CLOSE ok iter=$new digest=$digest"
+    # Two-pass + sensor dump (harness engineering). Raw verify output is the
+    # mechanical evidence a claim must carry; the adversarial receipt is the
+    # second pass and is written only when the controller has run one
+    # (--adversarial clear|finding). Never auto-clear.
+    mkdir -p "$sd/evidence/raw"
+    bash "$here/goal_gate.sh" --verify --project "$project" > "$sd/evidence/raw/$new.txt" 2>&1 || true
+    [ -s "$sd/evidence/raw/$new.txt" ] || printf 'CTL: WARN raw-empty (verify produced no output - claim will fail raw-evidence-missing)\n' > "$sd/evidence/raw/$new.txt"
+    if [ -n "$adversarial" ]; then
+      case "$adversarial" in
+        clear|finding) : ;;
+        *) echo "CTL: ERROR bad-adversarial:$adversarial (use clear|finding)" >&2; exit 4 ;;
+      esac
+      printf '%s|%s|%s|%s\n' "$new" "$digest" "$adversarial" "${adv_note:-none}" >> "$sd/evidence/adversarial.rec"
+    fi
     [ "$no_gate" -eq 1 ] && exit 0
     # False-complete ratchet, mechanized: a claim that the gate catches failing
     # IS a false complete - counting it used to depend on the controller
@@ -599,6 +636,9 @@ case "$cmd" in
     else
       case "$lh" in
         fix-AC)              next="dispatch a fixer scoped to the open-FAIL AC's files" ;;
+        run-adversarial)     next="run a second-pass adversarial review, then close-iteration --adversarial clear|finding --adversarial-note ..." ;;
+        fix-adversarial-finding) next="fix the finding named in adversarial.rec, re-review, close-iteration --adversarial clear" ;;
+        attach-raw)          next="re-run checks and leave the real output in .goal/evidence/raw/<iter>.txt (close-iteration writes this automatically)" ;;
         bind-seat)           next="dispatch a cold judging seat - do NOT send a coder" ;;
         fix-instrument)      next="repair the probe/verify instrument; the number is untrusted" ;;
         bind-calib-grades)   next="grade the calib fixtures and bind AC-N#good=PASS / AC-N#bad=FAIL this iteration" ;;

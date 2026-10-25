@@ -129,6 +129,10 @@ fail(){
     bad-task:*)              hint=write-ledger-block ;;
     DIVERGENCE:*)            hint=redesign-AC ;;
     contract-tampered:*)     hint=proposal-to-user ;;
+    check-script-tampered:*) hint=fix-instrument ;;
+    adversarial-missing:*)   hint=run-adversarial ;;
+    adversarial-finding:*)   hint=fix-adversarial-finding ;;
+    raw-evidence-missing:*)  hint=attach-raw ;;
     calibration-missing:*)   hint=bind-calib-grades ;;
     calibration-*)           hint=fix-calib-fixture ;;
     deferred-pending:*)      hint=wait-for-source ;;
@@ -499,6 +503,32 @@ stamp=$(r < "$sd/goal.md" | grep -E '^approved: [0-9a-f]{6,}' | tail -1 | awk '{
 body=$(ac_body_hash)
 [ "${stamp:0:8}" = "$body" ] || fail "contract-tampered:stam=$stamp recomputed=$body"
 
+# -1b. dual-encode: check/probe script bodies are frozen at stamp. goal.md
+# alone cannot pin a bash check.sh - swapping the script after stamp was a
+# silent metric edit (R3 spirit on the instrument body, not just the AC line).
+freeze_now=""
+if [ -f "$sd/goal.md" ]; then
+  freeze_now=$(
+    {
+      r < "$sd/goal.md" | sed -nE 's/.*check: *`([^`]*)`.*/\1/p'
+      r < "$sd/goal.md" | sed -nE 's/.*probe: *`([^`]*)`.*/\1/p'
+    } | tr ' \t' '\n\n' | grep -E '\.(sh|py|rb|js)$' | sort -u | while IFS= read -r scr; do
+      [ -n "$scr" ] || continue
+      f="$project/$scr"
+      [ "${scr#/}" != "$scr" ] && f="$scr"
+      [ -f "$f" ] || continue
+      h=$(gp_hash_std < "$f" | cut -c1-8)
+      printf '%s=%s;' "$scr" "$h"
+    done
+  )
+fi
+freeze_st=""
+[ -f "$sd/check_freeze" ] && freeze_st=$(r < "$sd/check_freeze")
+norm_freeze(){ printf '%s' "$1" | tr ';' '\n' | sed '/^$/d' | sort | tr '\n' ';'; }
+if [ "$(norm_freeze "$freeze_now")" != "$(norm_freeze "$freeze_st")" ]; then
+  fail "check-script-tampered:stamped=$(norm_freeze "$freeze_st") now=$(norm_freeze "$freeze_now")"
+fi
+
 # -2..-4b. breaker, budget (forge: fuse), stagnation, grind ---------------
 [ "$breaker" = OPEN ] && blocked "breaker-open"
 [ "${fc:-0}" -ge 2 ] && blocked "false-completes>=2"
@@ -547,6 +577,7 @@ done
 [ -z "$missing_lk" ] || echo "GATE: NOTE loop-log-missing-keys:${missing_lk# }" >&2
 claim=$(printf '%s\n' "$lb" | grep -E '^exit_signal=' | tail -1 | cut -d= -f2-)
 [ "$claim" = yes ] || fail "not-claimed"
+# (5c/5d two-pass + raw run immediately before GO - after mechanical ACs)
 # R12 tooth at the arbiter (v2.7): the CLAIMING block must carry a schema-valid
 # task= id. ctl enforces this at write time, but a hand-written ledger block
 # (the documented rescue path) could smuggle an id past the audit. History
@@ -818,6 +849,40 @@ if [ -n "$primary" ] && [ -f "$sd/scores.rec" ] && [ -n "$observed_score" ]; the
     END { print c+0 }')
   [ "${flat:-0}" -ge 3 ] && echo "GATE: NOTE metric-flat ($primary pinned at $observed_score for $flat rounds - if the objective demands strict improvement, the metric may be saturated (ceiling); raise its headroom or accept floor+forge)" >&2
 fi
+
+# -5c. two-pass adversarial (harness engineering): a claim needs a second
+# pass bound to THIS (iter, digest). The creator cannot mark its own homework.
+# Receipt: .goal/evidence/adversarial.rec  fields iter|digest|verdict|note
+#   verdict=clear -> allow; finding -> refuse; missing/stale -> refuse.
+# Runs after the mechanical ACs so open-FAIL/not-covered still report themselves.
+advf="$sd/evidence/adversarial.rec"
+# BIND the receipt to the CLAIMING block's iteration (loop-log header), not
+# state.rec - hand-written ledgers can have state.iteration=0 with ## iteration 1.
+claim_iter=$(r < "$sd/loop-log.md" | awk '/^## iteration /{n=$3} END{print n+0}')
+[ "$claim_iter" = 0 ] && claim_iter=$iter
+adv_ok=0; adv_note=""
+if [ -f "$advf" ]; then
+  adv_line=$(r < "$advf" | awk -F'|' -v it="$claim_iter" -v dg="$digest" '
+    $1+0==it+0 && $2==dg { row=$0 }
+    END { print row }')
+  if [ -n "$adv_line" ]; then
+    adv_v=$(printf '%s\n' "$adv_line" | cut -d'|' -f3)
+    adv_note=$(printf '%s\n' "$adv_line" | cut -d'|' -f4)
+    case "$adv_v" in
+      clear) adv_ok=1 ;;
+      finding) fail "adversarial-finding:${adv_note:-see adversarial.rec}" ;;
+      *) fail "adversarial-missing:bad-verdict:$adv_v" ;;
+    esac
+  fi
+fi
+[ "$adv_ok" = 1 ] || fail "adversarial-missing:need .goal/evidence/adversarial.rec row ${claim_iter}|${digest}|clear|<note> after a second-pass review"
+
+# -5d. raw sensor dump (harness engineering: the fix must carry mechanical
+# evidence). Claiming iteration needs a non-empty evidence/raw/<iter>.txt
+# holding the actual check output - prose "it passed" is not a sensor.
+rawf="$sd/evidence/raw/${claim_iter}.txt"
+[ -s "$rawf" ] || fail "raw-evidence-missing:need non-empty .goal/evidence/raw/${claim_iter}.txt with the real check output"
+
 if [ -n "$primary" ]; then
   echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}"
   exit 0
