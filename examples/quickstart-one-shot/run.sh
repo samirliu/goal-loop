@@ -43,9 +43,12 @@ bash "$CTL" stamp --project "$P" --auto >/dev/null
 
 # 2) one wave, one worker. close-iteration runs the gate itself and exits
 #    with the gate's code - a second --check is unnecessary ceremony.
+#    The claim carries the second-pass adversarial receipt: the producer
+#    cannot mark its own homework, so the gate refuses a claim without it.
 bash "$CTL" close-iteration --project "$P" --task T1 --files tool.sh \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 \
-  --progress yes --exit-signal yes
+  --progress yes --exit-signal yes \
+  --adversarial clear --adversarial-note "second pass: attacked the check, no new finding"
 grc=$?
 echo "quickstart: gate rc=$grc (0=GO)"
 [ "$grc" -eq 0 ] && echo "quickstart: PASS - one-AC path delivered"

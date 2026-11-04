@@ -21,7 +21,6 @@ query / CLI).
 - multi-worker domain split + interfaces.md freeze
 - NO-GO → next batch behavior (what does the controller actually do?)
 - threshold (non-maximize) metric AC with probe
-- --teams backend under a non-visual domain
 - R12 audit on a long multi-wave run
 
 ## Findings log

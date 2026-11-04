@@ -344,67 +344,20 @@ assert_has "46 status prints iteration line" 'CTL: STATUS iter=1/' "$out"
 assert_has "46 status prints last block" 'CTL: LAST task=T1\[crew:1\]' "$out"
 assert_has "46 status prints next task" 'CTL: NEXT T1 | do the thing' "$out"
 
-# 47 teams-backend wave marker survives normalization (teams wave passes through)
+# 47 wave marker survives normalization (crew wave passes through)
 mkproj t47; contract t47 "- AC-1 | f | check: \`true\` | expected: exit=0"
-bash "$CTL" close-iteration --project "$T/t47" --task 'T2[teams:3]' --files a.txt \
+bash "$CTL" close-iteration --project "$T/t47" --task 'T2[crew:3]' --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --exit-signal no --no-gate >/dev/null 2>&1
 two_pass t47
 out=$(bash "$CTL" status --project "$T/t47" 2>&1)
-assert_has "47 status echoes teams wave marker" 'CTL: LAST task=T2\[teams:3\]' "$out"
-
-# 48-52 portable team layer (goal_team.sh) — cc-haha-shaped file protocol
-mkproj t48
-out=$(bash "$TEAM" init --project "$T/t48" --team goal --description 'run' 2>&1)
-assert_rc "48 team init ok" 0 $?
-assert_has "48 init echoes team" 'TEAM: INIT ok team=goal' "$out"
-[ -f "$T/t48/.goal/team/config.json" ] && ok "48 config.json written" || no "48 config.json missing"
-[ -d "$T/t48/.goal/team/inboxes" ] && ok "48 inboxes dir" || no "48 inboxes dir missing"
-
-out=$(bash "$TEAM" init --project "$T/t48" --team goal 2>&1); assert_rc "48b double init refused" 2 $?
-
-out=$(bash "$TEAM" roster --project "$T/t48" --add --name w1 --role backend \
-  --prompt 'do X' --scope 'src/api' 2>&1)
-assert_rc "49 roster add" 0 $?
-assert_has "49 roster add echoes name" 'ROSTER add name=w1' "$out"
-out=$(bash "$TEAM" roster --project "$T/t48" --add --name w1 --role other --prompt 'x' 2>&1)
-assert_rc "49b duplicate name refused" 2 $?
-
-bash "$TEAM" roster --project "$T/t48" --add --name w2 --role frontend --prompt 'do Y' >/dev/null
-out=$(bash "$TEAM" send --project "$T/t48" --from w1 --to w2 \
-  --text 'field renamed' --summary 'rename notice' 2>&1)
-assert_rc "50 send to w2" 0 $?
-assert_has "50 send echoes to" 'SEND ok to=w2' "$out"
-grep -q 'field renamed' "$T/t48/.goal/team/inboxes/w2.jsonl" && ok "50 inbox has text" || no "50 inbox missing text"
-grep -q '"from":"w1"' "$T/t48/.goal/team/inboxes/w2.jsonl" && ok "50 message from field" || no "50 from field missing"
-grep -q '"read":false' "$T/t48/.goal/team/inboxes/w2.jsonl" && ok "50 unread flag" || no "50 read flag wrong"
-
-out=$(bash "$TEAM" send --project "$T/t48" --from controller --to '*' --text 'wave note' 2>&1)
-assert_rc "51 broadcast" 0 $?
-assert_has "51 broadcast delivered=2" 'delivered=2' "$out"
-grep -q 'wave note' "$T/t48/.goal/team/inboxes/w1.jsonl" && ok "51 w1 got broadcast" || no "51 w1 missed broadcast"
-grep -q 'wave note' "$T/t48/.goal/team/inboxes/w2.jsonl" && ok "51 w2 got broadcast" || no "51 w2 missed broadcast"
-
-out=$(bash "$TEAM" inbox --project "$T/t48" --name w2 --unread 2>&1)
-assert_has "52 unread listing" 'field renamed' "$out"
-out=$(bash "$TEAM" inbox --project "$T/t48" --name w2 --mark-read 2>&1)
-assert_rc "52 mark-read" 0 $?
-grep -q '"read":true' "$T/t48/.goal/team/inboxes/w2.jsonl" && ok "52 marked read" || no "52 not marked read"
-out=$(bash "$TEAM" status --project "$T/t48" 2>&1)
-assert_has "52 status shows roster" 'w1' "$out"
-
-bash "$TEAM" delete --project "$T/t48" >/dev/null
-[ ! -d "$T/t48/.goal/team" ] && ok "52b delete removes team dir" || no "52b team dir remains"
-
-# 52c status unread count must be a single integer (grep -c zero-match trap)
-mkproj t52c
-bash "$TEAM" init --project "$T/t52c" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t52c" --add --name w1 --role r --prompt p >/dev/null
-bash "$TEAM" send --project "$T/t52c" --from c --to w1 --text 'hello' >/dev/null
-bash "$TEAM" inbox --project "$T/t52c" --name w1 --mark-read >/dev/null
-out=$(bash "$TEAM" status --project "$T/t52c" 2>&1)
-assert_has "52c status shows unread=0" 'unread=0' "$out"
-printf '%s' "$out" | grep -qE 'w1\.jsonl: total=1 unread=0$' && ok "52c unread is single integer" || no "52c unread polluted: [$out]"
+assert_has "47 status echoes crew wave marker" 'CTL: LAST task=T2\[crew:3\]' "$out"
+# the removed teams backend marker is refused by the writer
+out=$(bash "$CTL" close-iteration --project "$T/t47" --task 'T2[teams:3]' --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate 2>&1); rc=$?
+assert_rc "47b teams marker refused" 4 $rc
+assert_has "47b names bad-task" 'bad-task:T2\[teams:3\]' "$out"
 
 # 53 maximize objective + score-regressed (R11)
 mkproj t53
@@ -556,54 +509,45 @@ grep -q '^score=none$' "$T/t62/.goal/loop-log.md" && ok "62 score=none recorded"
 # 63-65 goal_audit.sh (R12 controller self-audit)
 AUDIT="$here/scripts/goal_audit.sh"
 mkproj t63
-printf '## iteration 1\ntask=T1[teams:3]\nprogress=yes\nexit_signal=no\nscore=99.5\nstrategy_delta=none\n' > "$T/t63/.goal/loop-log.md"
+printf '## iteration 1\ntask=T1[crew:3]\nprogress=yes\nexit_signal=no\nscore=99.5\nstrategy_delta=none\n' > "$T/t63/.goal/loop-log.md"
 out=$(bash "$AUDIT" --project "$T/t63" 2>&1); rc=$?
 assert_rc "63 clean ledger rc0" 0 $rc
 assert_has "63 clean said" 'AUDIT: clean' "$out"
 
-mkproj t64
-printf '## iteration 1\ntask=T1[teams:3]\nprogress=yes\nexit_signal=no\nscore=1\nstrategy_delta=none\n## iteration 2\ntask=T2[crew:3]\nprogress=yes\nexit_signal=no\nscore=2\nstrategy_delta=none\n' > "$T/t64/.goal/loop-log.md"
-out=$(bash "$AUDIT" --project "$T/t64" 2>&1); rc=$?
-assert_rc "64 silent-downgrade rc1" 1 $rc
-assert_has "64 names silent-downgrade" 'silent-downgrade' "$out"
-
 mkproj t65
-printf '## iteration 1\ntask=T1[teams:3](fallback:evil-mode)\nprogress=no\nexit_signal=no\nscore=1.2.3\nstrategy_delta=none\n' > "$T/t65/.goal/loop-log.md"
+printf '## iteration 1\ntask=T1[crew:3](fallback:evil-mode)\nprogress=no\nexit_signal=no\nscore=1.2.3\nstrategy_delta=none\n' > "$T/t65/.goal/loop-log.md"
 out=$(bash "$AUDIT" --project "$T/t65" 2>&1); rc=$?
 assert_rc "65 bad vocab+score+delta rc1" 1 $rc
 assert_has "65 vocab" 'fallback-vocabulary' "$out"
 assert_has "65 score-format" 'score-format' "$out"
 assert_has "65 missing strategy_delta" 'progress-no-without-strategy-delta' "$out"
 
-# 65a-e A3 recovery allowlist + A4 across crew:/teams: (round-1 fix pins)
+# 65a-e A3 recovery allowlist on crew: (closed vocabulary pins)
 # 65a invented recovery token on crew: is rejected (A1 closed grammar)
 mkproj t65a
 printf '## iteration 1\ntask=T2[crew:1] (re-run:evil)\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t65a/.goal/loop-log.md"
 out=$(bash "$AUDIT" --project "$T/t65a" 2>&1); rc=$?
 assert_rc "65a crew invented recovery rc1" 1 $rc
 assert_has "65a rejected at schema gate" 'A1 task-schema' "$out"
-# 65b A4 still fires for crew+recovery inside a teams run (recovery does not
-#     explain a backend downgrade - only fallback: does)
-mkproj t65b
-printf '## iteration 1\ntask=T1[teams:3]\nprogress=yes\nexit_signal=no\nscore=1\nstrategy_delta=none\n## iteration 2\ntask=T2[crew:3] (stall-recovered)\nprogress=yes\nexit_signal=no\nscore=2\nstrategy_delta=none\n' > "$T/t65b/.goal/loop-log.md"
-out=$(bash "$AUDIT" --project "$T/t65b" 2>&1); rc=$?
-assert_rc "65b crew+recovery inside teams run rc1" 1 $rc
-assert_has "65b names silent-downgrade" 'silent-downgrade' "$out"
-# 65c crew+fallback inside a teams run stays exempt from A4
+# 65c the removed teams fallback tokens are no longer in the vocabulary
 mkproj t65c
-printf '## iteration 1\ntask=T1[teams:3]\nprogress=yes\nexit_signal=no\nscore=1\nstrategy_delta=none\n## iteration 2\ntask=T2[crew:3] (fallback:teams-unavailable)\nprogress=yes\nexit_signal=no\nscore=2\nstrategy_delta=none\n' > "$T/t65c/.goal/loop-log.md"
+printf '## iteration 1\ntask=T2[crew:3] (fallback:teams-unavailable)\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t65c/.goal/loop-log.md"
 out=$(bash "$AUDIT" --project "$T/t65c" 2>&1); rc=$?
-assert_rc "65c crew+fallback exempt from A4" 0 $rc
-assert_has "65c clean" 'AUDIT: clean' "$out"
-# 65d valid recovery suffix on teams: is A3-clean
+assert_rc "65c removed teams fallback token rc1" 1 $rc
+assert_has "65c names fallback-vocabulary" 'fallback-vocabulary' "$out"
+# 65d provider-fatal is the one legal fallback token
 mkproj t65d
-printf '## iteration 1\ntask=T2[teams:2] (re-run:death)\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t65d/.goal/loop-log.md"
+printf '## iteration 1\ntask=T2[crew:2] (fallback:provider-fatal)\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t65d/.goal/loop-log.md"
+mkdir -p "$T/t65d/.goal/evidence"
+printf 'T2[crew:2]|provider-fatal|fallback:provider-fatal|test|0\n' > "$T/t65d/.goal/evidence/faults.rec"
 out=$(bash "$AUDIT" --project "$T/t65d" 2>&1); rc=$?
-assert_rc "65d teams recovery suffix clean" 0 $rc
+assert_rc "65d provider-fatal suffix clean" 0 $rc
 assert_has "65d clean" 'AUDIT: clean' "$out"
-# 65e valid recovery suffix on crew: (no teams run) is A3-clean, no A4
+# 65e valid recovery suffix on crew: is A3-clean
 mkproj t65e
 printf '## iteration 1\ntask=T2[crew:2] (re-run:stall)\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t65e/.goal/loop-log.md"
+mkdir -p "$T/t65e/.goal/evidence"
+printf 'T2[crew:2]|stall|re-run:stall|test|0\n' > "$T/t65e/.goal/evidence/faults.rec"
 out=$(bash "$AUDIT" --project "$T/t65e" 2>&1); rc=$?
 assert_rc "65e crew recovery suffix clean" 0 $rc
 assert_has "65e clean" 'AUDIT: clean' "$out"
@@ -1607,9 +1551,9 @@ assert_has "112e tol-band flat fires" 'eval-gap:' "$(bash "$CTL" status --projec
 mkproj t113a; contract t113a "- AC-1 | t | check: \`true\` | expected: exit=0"
 hblocks t113a T1[crew:1] s T1[crew:1] s T1[crew:1] s; stall "$T/t113a"
 assert_has "113a promote after 3 waves" 'promote: T1 \(3 consecutive waves\) - consider' "$(bash "$CTL" status --project "$T/t113a" 2>&1)"
-# 113b backend/fallback suffixes are transport not identity
+# 113b fallback suffixes are transport not identity
 mkproj t113b; contract t113b "- AC-1 | t | check: \`true\` | expected: exit=0"
-hblocks t113b T1[crew:1] s 'T1[teams:2](fallback:teams-unavailable)' s T1 s; stall "$T/t113b"
+hblocks t113b T1[crew:1] s 'T1[crew:2](fallback:provider-fatal)' s T1 s; stall "$T/t113b"
 assert_has "113b normalized ids count as one domain" 'promote: T1 \(3 consecutive waves\)' "$(bash "$CTL" status --project "$T/t113b" 2>&1)"
 mkproj t113c; contract t113c "- AC-1 | t | check: \`true\` | expected: exit=0"
 hblocks t113c T1[crew:1] s T2[crew:1] s T1[crew:1] s; stall "$T/t113c"
@@ -1879,136 +1823,25 @@ out=$(bash "$CTL" close-iteration --project "$T/t121b" --task T1 --files a.txt \
   --exit-signal yes 2>&1)
 assert_has "121b real FAIL still counted" 'false-complete-counted=1' "$out"
 
-# 122 teams runtime health probe (robustness v1)
-# 122a health lists members and empty err when healthy
-mkproj t122a
-bash "$TEAM" init --project "$T/t122a" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t122a" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
-mkdir -p "$T/t122a/.goal/team/heartbeat" "$T/t122a/src"
-date -u +%Y-%m-%dT%H:%M:%SZ > "$T/t122a/.goal/team/heartbeat/w1.ts"
-echo x > "$T/t122a/src/a.txt"
-out=$(bash "$TEAM" health --project "$T/t122a" 2>&1); assert_rc "122a health rc0" 0 $?
-assert_has "122a health has w1 row" 'w1\|' "$out"
-assert_has "122a idle is numeric" 'w1\|[a-z]+\|[0-9]+' "$out"
-printf '%s' "$out" | grep -qE 'w1\|[^|]*\|[^|]*\|[^|]*\|[^|]*\|$' \
-  && ok "122a healthy has empty err_tag" || no "122a unexpected err_tag: $out"
-
-# 122b stall fires when idle_s exceeds GOAL_STALL_SEC
-# (needs open_items>0; age heartbeat + inbox + scope so last_touch stays ancient).
-# Raise GOAL_ZERO_WRITE_SEC so zero-write does not steal the tag — both
-# classes share "open work + old scope"; zsec selects which fuse speaks.
-mkproj t122b
-bash "$TEAM" init --project "$T/t122b" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t122b" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
-mkdir -p "$T/t122b/.goal/team/heartbeat" "$T/t122b/src"
-printf -- '- [ ] T1 | w1 | pending | files: a\n' > "$T/t122b/.goal/work-plan.md"
-# ancient heartbeat
-printf '2020-01-01T00:00:00Z\n' > "$T/t122b/.goal/team/heartbeat/w1.ts"
-echo old > "$T/t122b/src/a.txt"
-touch -t 202001010000 "$T/t122b/src/a.txt"
-touch -t 202001010000 "$T/t122b/.goal/team/inboxes/w1.jsonl"
-out=$(GOAL_STALL_SEC=1 bash "$TEAM" health --project "$T/t122b" 2>&1); assert_rc "122b health rc0" 0 $?
-assert_has "122b stall tag" 'stall$' "$out"
-printf '%s' "$out" | grep -qE 'w1\|.*\|stall$' && ok "122b stall named" || no "122b stall missing: $out"
-
-# 122c tool-error vocab hits
-mkproj t122c
-bash "$TEAM" init --project "$T/t122c" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t122c" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
-printf '{"from":"w1","text":"Error: command not found","timestamp":"2026-10-14T00:00:00Z","read":true}\n' \
-  > "$T/t122c/.goal/team/inboxes/w1.jsonl"
-out=$(bash "$TEAM" health --project "$T/t122c" 2>&1)
-printf '%s' "$out" | grep -q 'tool-error' && ok "122c tool-error tag" || no "122c tool-error missing: $out"
-
-# 122d tool-error vocab false friend (no hit)
-mkproj t122d
-bash "$TEAM" init --project "$T/t122d" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t122d" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
-printf '{"from":"w1","text":"no errors here, all good","timestamp":"2026-10-14T00:00:00Z","read":true}\n' \
-  > "$T/t122d/.goal/team/inboxes/w1.jsonl"
-out=$(bash "$TEAM" health --project "$T/t122d" 2>&1)
-printf '%s' "$out" | grep -q 'tool-error' && no "122d false friend hit" || ok "122d false friend clean"
-
-# 122e open_items from work-plan
-mkproj t122e
-bash "$TEAM" init --project "$T/t122e" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t122e" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
-printf -- '- [ ] T1 | w1 | first | files: a\n- [x] T2 | w1 | done | files: b\n' > "$T/t122e/.goal/work-plan.md"
-out=$(bash "$TEAM" health --project "$T/t122e" 2>&1)
-assert_has "122e open_items=1" 'w1\|[^|]*\|[^|]*\|[^|]*\|1\|' "$out"
-
-# 122f send touches heartbeat
-mkproj t122f
-bash "$TEAM" init --project "$T/t122f" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t122f" --add --name w1 --role backend --prompt 'x' >/dev/null
-bash "$TEAM" send --project "$T/t122f" --from controller --to w1 --text 'wake' >/dev/null
-[ -f "$T/t122f/.goal/team/heartbeat/w1.ts" ] && ok "122f heartbeat written on send" || no "122f heartbeat missing"
-
-# 122g no signal at all → idle_s=0 (last_s=now), never epoch-0 false stall
-mkproj t122g
-bash "$TEAM" init --project "$T/t122g" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t122g" --add --name w1 --role backend --prompt 'x' >/dev/null
-# roster --add creates an empty inbox (a real mtime signal) - remove so the
-# probe sees NO heartbeat / inbox / scope signal at all
-rm -f "$T/t122g/.goal/team/inboxes/w1.jsonl"
-printf -- '- [ ] T1 | w1 | pending | files: a\n' > "$T/t122g/.goal/work-plan.md"
-out=$(GOAL_STALL_SEC=1 bash "$TEAM" health --project "$T/t122g" 2>&1); assert_rc "122g health rc0" 0 $?
-assert_has "122g idle_s=0 when no signal" 'w1\|[^|]*\|0\|' "$out"
-printf '%s' "$out" | grep -qE '^[a-z0-9_]+\|[^|]*\|[^|]*\|[^|]*\|[^|]*\|stall$' && no "122g false stall with no signal: $out" || ok "122g no false stall when silent"
-
-# 122h garbage heartbeat ISO must not freeze last_s=0 (giant idle_s / false stall)
-mkproj t122h
-bash "$TEAM" init --project "$T/t122h" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t122h" --add --name w1 --role backend --prompt 'x' >/dev/null
-rm -f "$T/t122h/.goal/team/inboxes/w1.jsonl"
-mkdir -p "$T/t122h/.goal/team/heartbeat"
-printf 'garbage-not-iso\n' > "$T/t122h/.goal/team/heartbeat/w1.ts"
-printf -- '- [ ] T1 | w1 | pending | files: a\n' > "$T/t122h/.goal/work-plan.md"
-out=$(GOAL_STALL_SEC=1 bash "$TEAM" health --project "$T/t122h" 2>&1); assert_rc "122h health rc0" 0 $?
-assert_has "122h idle_s=0 after ISO parse fail" 'w1\|[^|]*\|0\|' "$out"
-assert_has "122h last_touch is ISO now, not garbage" 'w1\|[^|]*\|0\|[0-9]{4}-[0-9]{2}-[0-9]{2}T' "$out"
-printf '%s' "$out" | grep -qE '^[a-z0-9_]+\|[^|]*\|[^|]*\|[^|]*\|[^|]*\|stall$' && no "122h false stall after parse fail: $out" || ok "122h no false stall after parse fail"
-
-# 122i open_items = exact assignee field (w12 rows must not count for w1)
-mkproj t122i
-bash "$TEAM" init --project "$T/t122i" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t122i" --add --name w1 --role backend --prompt 'x' >/dev/null
-bash "$TEAM" roster --project "$T/t122i" --add --name w12 --role backend --prompt 'x' >/dev/null
-printf -- '- [ ] T1 | w12 | first | files: a\n- [ ] T2 | w12 | second | files: b\n- [x] T3 | w1 | done | files: c\n' > "$T/t122i/.goal/work-plan.md"
-out=$(bash "$TEAM" health --project "$T/t122i" 2>&1)
-assert_has "122i w1 open_items=0 (w12 rows are not w1)" 'w1\|[^|]*\|[^|]*\|[^|]*\|0\|' "$out"
-assert_has "122i w12 open_items=2" 'w12\|[^|]*\|[^|]*\|[^|]*\|2\|' "$out"
-
-# 122j tree digest ignores .goal/ heartbeat (R6 digest-exempt sidecar)
-mkproj t122j
-bash "$TEAM" init --project "$T/t122j" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t122j" --add --name w1 --role backend --prompt 'x' >/dev/null
-mkdir -p "$T/t122j/.goal/team/heartbeat"
-date -u +%Y-%m-%dT%H:%M:%SZ > "$T/t122j/.goal/team/heartbeat/w1.ts"
-echo x > "$T/t122j/src.txt"
-d1=$(bash "$GATE" --digest --project "$T/t122j")
-date -u +%Y-%m-%dT%H:%M:%SZ > "$T/t122j/.goal/team/heartbeat/w1.ts"
-d2=$(bash "$GATE" --digest --project "$T/t122j")
-[ "$d1" = "$d2" ] && ok "122j digest unchanged by heartbeat touch" || no "122j heartbeat moved digest (d1=$d1 d2=$d2)"
-echo y >> "$T/t122j/src.txt"
-d3=$(bash "$GATE" --digest --project "$T/t122j")
-[ "$d3" != "$d2" ] && ok "122j real source change still moves digest" || no "122j digest blind to source change"
-
 # 123 audit recovery-suffix acceptance + invented-token rejection (T123a-c).
-# 65a-e pin: re-run:evil on crew (A1), crew+recovery A4, crew+fallback exempt,
-# re-run:death on teams, re-run:stall on crew. These pin the remaining
+# 65a-e pin: re-run:evil on crew (A1), removed teams fallback token refused,
+# provider-fatal accepted, re-run:stall on crew. These pin the remaining
 # combinations end-to-end through goal_audit.sh: the BARE recovery token
-# (stall-recovered) on teams:, re-run:stall on teams:, and a wholly invented
+# (stall-recovered) on crew:, re-run:stall on crew:, and a wholly invented
 # tag SHAPE (invented:oops - neither fallback: nor a recovery token).
-# 123a bare recovery token on teams: is audit-clean
+# 123a bare recovery token on crew: is audit-clean
 mkproj t123a
-printf '## iteration 1\ntask=T2[teams:2] (stall-recovered)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t123a/.goal/loop-log.md"
+printf '## iteration 1\ntask=T2[crew:2] (stall-recovered)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t123a/.goal/loop-log.md"
+mkdir -p "$T/t123a/.goal/evidence"
+printf 'T2[crew:2]|stall|stall-recovered|test|0\n' > "$T/t123a/.goal/evidence/faults.rec"
 out=$(bash "$AUDIT" --project "$T/t123a" 2>&1); rc=$?
 assert_rc "123a recovery suffix clean" 0 $rc
 assert_has "123a clean said" 'AUDIT: clean' "$out"
-# 123b re-run:stall on teams: is audit-clean (teams x re-run:stall pairing)
+# 123b re-run:stall on crew: is audit-clean (crew x re-run:stall pairing)
 mkproj t123b
-printf '## iteration 1\ntask=T2[teams:2] (re-run:stall)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t123b/.goal/loop-log.md"
+printf '## iteration 1\ntask=T2[crew:2] (re-run:stall)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t123b/.goal/loop-log.md"
+mkdir -p "$T/t123b/.goal/evidence"
+printf 'T2[crew:2]|stall|re-run:stall|test|0\n' > "$T/t123b/.goal/evidence/faults.rec"
 out=$(bash "$AUDIT" --project "$T/t123b" 2>&1); rc=$?
 assert_rc "123b re-run suffix clean" 0 $rc
 assert_has "123b clean said" 'AUDIT: clean' "$out"
@@ -2016,7 +1849,7 @@ assert_has "123b clean said" 'AUDIT: clean' "$out"
 # pattern allows A3 recovery-vocabulary as the backstop if a looser suffix
 # pattern ever slips past gp_task_ok (brief step 3: A1 OR A3)
 mkproj t123c
-printf '## iteration 1\ntask=T2[teams:2] (invented:oops)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t123c/.goal/loop-log.md"
+printf '## iteration 1\ntask=T2[crew:2] (invented:oops)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t123c/.goal/loop-log.md"
 out=$(bash "$AUDIT" --project "$T/t123c" 2>&1); rc=$?
 assert_rc "123c invented suffix fails A1/A3" 1 $rc
 assert_has "123c rejected at schema/vocab gate" 'A1 task-schema|A3 recovery-vocabulary' "$out"
@@ -2096,55 +1929,11 @@ assert_has "124c2 contract-defect not counted" 'contract-defect-not-counted' "$o
 grep -q '^false_completes=0$' "$T/t124c2/.goal/state.rec" \
   && ok "124c2 ratchet stayed 0 on contract defect" || no "124c2 ratchet moved on contract defect: $(grep false_completes "$T/t124c2/.goal/state.rec")"
 
-# 125 team health taxonomy (SB-10/11 from 2026-10-16 Mira Teams incident).
-# 125a provider-fatal (NoRoom / stream max) must not look like a plain death
-mkproj t125a
-bash "$TEAM" init --project "$T/t125a" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t125a" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
-mkdir -p "$T/t125a/src" "$T/t125a/.goal/team/inboxes"
-printf 'idle failed API Error: NoRoom\n' > "$T/t125a/.goal/team/inboxes/w1.jsonl"
-out=$(bash "$TEAM" health --project "$T/t125a" 2>&1)
-assert_has "125a NoRoom tagged provider-fatal" 'provider-fatal' "$out"
-printf '%s' "$out" | grep -q 'w1|.*|provider-fatal' && ok "125a row is provider-fatal" || no "125a wrong tag: $out"
-
-# 125b stream-max duration is provider-fatal too
-mkproj t125b
-bash "$TEAM" init --project "$T/t125b" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t125b" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
-mkdir -p "$T/t125b/src"
-printf 'API Error: Stream max duration exceeded - thinking_delta\n' > "$T/t125b/.goal/team/inboxes/w1.jsonl"
-out=$(bash "$TEAM" health --project "$T/t125b" 2>&1)
-assert_has "125b stream-max tagged provider-fatal" 'provider-fatal' "$out"
-
-# 125c zero-write: live member (fresh heartbeat) + open work + stale scope
-# — the "thinking-only, Write=0" shape from the Mira Teams incident.
-mkproj t125c
-bash "$TEAM" init --project "$T/t125c" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t125c" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
-mkdir -p "$T/t125c/src" "$T/t125c/.goal/team/heartbeat"
-printf -- '- [ ] T1 task | w1 | files=x\n' >> "$T/t125c/.goal/work-plan.md"
-# LIVE signal: heartbeat now → idle_s < stall
-date -u +%Y-%m-%dT%H:%M:%SZ > "$T/t125c/.goal/team/heartbeat/w1.ts"
-# scope never really written (ancient file)
-printf 'x' > "$T/t125c/src/old.txt"
-touch -t 202001010000 "$T/t125c/src/old.txt"
-GOAL_ZERO_WRITE_SEC=1 GOAL_STALL_SEC=300 out=$(bash "$TEAM" health --project "$T/t125c" 2>&1)
-assert_has "125c zero-write tagged" 'zero-write' "$out"
-
-# 125d provider-fatal beats stall: dark + NoRoom => provider-fatal not stall
-mkproj t125d
-bash "$TEAM" init --project "$T/t125d" --team goal >/dev/null
-bash "$TEAM" roster --project "$T/t125d" --add --name w1 --role backend --prompt 'x' --scope 'src' >/dev/null
-mkdir -p "$T/t125d/src"
-printf -- '- [ ] T1 task | w1 | files=x\n' >> "$T/t125d/.goal/work-plan.md"
-printf 'API Error: NoRoom\n' > "$T/t125d/.goal/team/inboxes/w1.jsonl"
-GOAL_STALL_SEC=1 GOAL_ZERO_WRITE_SEC=1 out=$(bash "$TEAM" health --project "$T/t125d" 2>&1)
-assert_has "125d provider-fatal wins" 'provider-fatal' "$out"
-printf '%s' "$out" | grep -qE 'w1\|.*\|stall$' && no "125d mis-tagged stall" || ok "125d not stall"
-
 # 125e fallback:provider-fatal is a legal task suffix
 mkproj t125e
-printf '## iteration 1\ntask=T1[teams:2] (fallback:provider-fatal)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t125e/.goal/loop-log.md"
+printf '## iteration 1\ntask=T1[crew:2] (fallback:provider-fatal)\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=x\nscore=none\nstrategy_delta=none\n' > "$T/t125e/.goal/loop-log.md"
+mkdir -p "$T/t125e/.goal/evidence"
+printf 'T1[crew:2]|provider-fatal|fallback:provider-fatal|test|0\n' > "$T/t125e/.goal/evidence/faults.rec"
 out=$(bash "$AUDIT" --project "$T/t125e" 2>&1); rc=$?
 assert_rc "125e provider-fatal suffix accepted" 0 $rc
 assert_has "125e audit clean" 'AUDIT: clean' "$out"
@@ -2221,8 +2010,6 @@ grep -qE 'STRATEGY-PICK' "$here/references/packs/gradient.md" \
   && ok "126h gradient documents STRATEGY-PICK" || no "126h gradient documents STRATEGY-PICK"
 grep -qE 'STRATEGY-PICK' "$here/references/crew.md" \
   && ok "126h crew briefs cite STRATEGY-PICK" || no "126h crew briefs cite STRATEGY-PICK"
-grep -qE 'STRATEGY-PICK' "$here/references/teams.md" \
-  && ok "126h teams briefs cite STRATEGY-PICK" || no "126h teams briefs cite STRATEGY-PICK"
 
 # ---------------------------------------------------------------------------
 # 127 parse hygiene: missing goal.md is pre-stamp legal, status must stay quiet
@@ -2235,84 +2022,43 @@ printf '%s' "$out" | grep -qE 'No such file or directory' && no "127a parse spra
 printf '%s' "$out" | grep -qE 'goal_parse.sh:' && no "127a parse path leaked" || ok "127a no goal_parse.sh traceback"
 
 # ---------------------------------------------------------------------------
-# 128 wallclock vs human panel wait: deadline burned while review_pending
-# must not permanently fuse the run at iter 0. First ledger write rebases it.
+# 128 wallclock vs an expired deadline: the run must stay fused, not rescued
 # ---------------------------------------------------------------------------
-mkproj t128a; contract t128a "- AC-1 | t | check: \`true\` | expected: exit=0" TB=2
-# simulate: stamp bound a 2s budget, then a long Teams panel wait expired it
-printf 'iteration=0\n' > /dev/null
-# force deadline into the past the way a multi-hour panel wait would
-sed_in "s/^deadline=.*/deadline=1/" "$T/t128a/.goal/state.rec"
-sed_in "s/^time_budget=.*/time_budget=2/" "$T/t128a/.goal/state.rec"
-out=$(bash "$CTL" status --project "$T/t128a" 2>&1)
-assert_has "128a expired deadline visible" 'time_left=-' "$out"
-# first close-iteration at iter 0 rewrites deadline from remaining budget once
-out=$(bash "$CTL" close-iteration --project "$T/t128a" --task T1[teams:2] --files a.txt \
-  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy panel-wait \
-  --no-gate 2>&1)
-dl=$(grep -E '^deadline=' "$T/t128a/.goal/state.rec" | cut -d= -f2)
-now=$(date +%s)
-[ "$dl" -gt "$now" ] && ok "128a deadline rebased after panel wait" || no "128a deadline still past (dl=$dl now=$now)"
-assert_has "128a rebase note" 'deadline-rebased' "$out"
-# second close must NOT rebase again (budget is real)
-sleep 1
-out=$(bash "$CTL" close-iteration --project "$T/t128a" --task T2[teams:2] --files b.txt \
-  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy panel-wait \
-  --no-gate 2>&1)
-printf '%s' "$out" | grep -qE 'deadline-rebased' && no "128a rebased twice" || ok "128a rebase is one-shot"
-
-# 128b plain crew close must NOT resurrect an intentionally expired deadline
+# 128b a plain close must NOT resurrect an intentionally expired deadline
 mkproj t128b; contract t128b "- AC-1 | t | check: \`true\` | expected: exit=0" TB=2
 sed_in "s/^deadline=.*/deadline=1/" "$T/t128b/.goal/state.rec"
 out=$(bash "$CTL" close-iteration --project "$T/t128b" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy plain \
   --no-gate 2>&1)
-printf '%s' "$out" | grep -qE 'deadline-rebased' && no "128b crew must not rebase" || ok "128b crew must not rebase"
+printf '%s' "$out" | grep -qE 'deadline-rebased' && no "128b deadline was rebased" || ok "128b deadline not rebased"
 dl=$(grep -E '^deadline=' "$T/t128b/.goal/state.rec" | cut -d= -f2)
 [ "$dl" = "1" ] && ok "128b deadline still 1" || no "128b deadline moved (dl=$dl)"
 
 # ---------------------------------------------------------------------------
-# 129 live-run defects (b62e4d06 business retest): pick at n=1, PROVIDER bind,
-# bare T under teams roster
+# 129 live-run defects (b62e4d06 business retest): pick at n=1, task-marker law
 # ---------------------------------------------------------------------------
 # 129a n=1 labeled score still prints STRATEGY-PICK
 mkproj t129a; obj110 t129a ""
-hblocks t129a T1[teams:2] rule-tuning
+hblocks t129a T1[crew:2] rule-tuning
 scorefile t129a 100.0
 out=$(bash "$CTL" status --project "$T/t129a" 2>&1)
 assert_has "129a pick at n=1" 'STRATEGY-PICK prefer=rule-tuning avoid=none' "$out"
 assert_has "129a efficiency unmeasured" 'unmeasured' "$out"
 
-# 129b PROVIDER must not latch an unrelated newest team dir
-mkproj t129b; contract t129b "- AC-1 | t | check: \`true\` | expected: exit=0"
-# plant a decoy roster whose cwd is NOT this project
-decoy="$HOME/.claude/teams/t129b-decoy-$$"
-mkdir -p "$decoy"
-printf '{"name":"t129b-decoy","cwd":"/tmp/not-this-project","members":[]}\n' > "$decoy/config.json"
-# plant a matching roster
-good="$HOME/.claude/teams/t129b-good-$$"
-mkdir -p "$good"
-printf '{"name":"t129b-good","cwd":"%s","providerName":"ProvX","model":"m1","members":[]}\n' "$T/t129b" > "$good/config.json"
-out=$(bash "$CTL" status --project "$T/t129b" 2>&1)
-assert_has "129b binds matching roster" 'team=t129b-good' "$out"
-printf '%s' "$out" | grep -qE 't129b-decoy' && no "129b leaked decoy team" || ok "129b decoy ignored"
-rm -rf "$decoy" "$good"
-
-# 129c bare T under teams roster is refused (would lie as crew:1)
+# 129c bare T always normalizes to crew:1 - a leftover team roster changes nothing
 mkproj t129c; contract t129c "- AC-1 | t | check: \`true\` | expected: exit=0"
 mkdir -p "$T/t129c/.goal/team"
 printf '{"name":"t129c-team","cwd":"%s"}\n' "$T/t129c" > "$T/t129c/.goal/team/config.json"
 out=$(bash "$CTL" close-iteration --project "$T/t129c" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy x --no-gate 2>&1); rc=$?
 two_pass t129c
-assert_rc "129c bare T refused under teams" 4 $rc
-assert_has "129c names teams-missing" 'task-teams-missing' "$out"
-# explicit tag is legal
+assert_rc "129c bare T accepted" 0 $rc
+assert_has "129c ledger has crew:1" 'task=T1\[crew:1\]' "$(cat "$T/t129c/.goal/loop-log.md")"
+# a teams marker is refused outright
 out=$(bash "$CTL" close-iteration --project "$T/t129c" --task T1[teams:2] --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --strategy x --no-gate 2>&1); rc=$?
-two_pass t129c
-assert_rc "129c explicit teams tag ok" 0 $rc
-assert_has "129c ledger has teams tag" 'task=T1\[teams:2\]' "$(cat "$T/t129c/.goal/loop-log.md")"
+assert_rc "129c teams marker refused" 4 $rc
+assert_has "129c names bad-task" 'bad-task:T1\[teams:2\]' "$out"
 
 # ---------------------------------------------------------------------------
 # 130 two-pass adversarial receipt (claim needs a second pass bound to digest)
@@ -2517,3 +2263,84 @@ out=$(bash "$CTL" close-iteration --project "$T/t134f" --task T1 --files ghost.t
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --exit-signal yes 2>&1); rc=$?
 assert_rc "134f claim with ghost file refused" 4 $rc
 assert_has "134f names missing-claimed-file" 'missing-claimed-file' "$out"
+
+# ---------------------------------------------------------------------------
+# 135 worker-fault bookkeeping: the task= suffix is never self-declared
+# ---------------------------------------------------------------------------
+# 135a a declared fault derives the suffix and writes the fault row
+mkproj t135a; contract t135a "- AC-1 | t | check: \`true\` | expected: exit=0"
+out=$(bash "$CTL" close-iteration --project "$T/t135a" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --fault death --fault-outcome re-run --fault-note "worker died" --no-gate 2>&1); rc=$?
+assert_rc "135a fault close ok" 0 $rc
+assert_has "135a names the fault" 'CTL: FAULT .*class=death' "$out"
+assert_has "135a ledger carries the derived suffix" 'task=T1\[crew:1\] \(re-run:death\)' "$(cat "$T/t135a/.goal/loop-log.md")"
+grep -q '^T1\[crew:1\]|death|re-run:death|worker died|' "$T/t135a/.goal/evidence/faults.rec" \
+  && ok "135a fault row written" || no "135a fault row missing"
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t135a" 2>&1); rc=$?
+assert_rc "135a audit clean" 0 $rc
+
+# 135b a suffix with no declared fault is refused (no self-declared recovery)
+mkproj t135b; contract t135b "- AC-1 | t | check: \`true\` | expected: exit=0"
+out=$(bash "$CTL" close-iteration --project "$T/t135b" --task 'T1[crew:1] (stall-recovered)' --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate 2>&1); rc=$?
+assert_rc "135b unbacked suffix refused" 4 $rc
+assert_has "135b names unbacked-task-suffix" 'unbacked-task-suffix' "$out"
+
+# 135c an unknown class / an illegal class x outcome pair is refused
+mkproj t135c; contract t135c "- AC-1 | t | check: \`true\` | expected: exit=0"
+out=$(bash "$CTL" close-iteration --project "$T/t135c" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --fault bogus --fault-outcome re-run --no-gate 2>&1); rc=$?
+assert_rc "135c bad class refused" 4 $rc
+assert_has "135c names bad-fault-class" 'bad-fault-class' "$out"
+out=$(bash "$CTL" close-iteration --project "$T/t135c" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --fault provider-fatal --fault-outcome resume --no-gate 2>&1); rc=$?
+assert_rc "135c illegal pair refused" 4 $rc
+assert_has "135c names bad-fault-outcome" 'bad-fault-outcome' "$out"
+
+# 135d A11 catches a hand-written suffix with no fault row
+mkproj t135d; contract t135d "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf '## iteration 1\ntask=T1[crew:1] (stall-recovered)\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t135d/.goal/loop-log.md"
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t135d" 2>&1); rc=$?
+assert_rc "135d unbacked suffix fails audit" 1 $rc
+assert_has "135d names A11" 'A11 unbacked-suffix' "$out"
+
+# 135e A11 catches a fault row that never reached the ledger
+mkproj t135e; contract t135e "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf '## iteration 1\ntask=T1[crew:1]\nprogress=yes\nexit_signal=no\nscore=none\nstrategy_delta=none\n' > "$T/t135e/.goal/loop-log.md"
+mkdir -p "$T/t135e/.goal/evidence"
+printf 'T1[crew:1]|death|re-run:death|swallowed|0\n' > "$T/t135e/.goal/evidence/faults.rec"
+out=$(bash "$here/scripts/goal_audit.sh" --project "$T/t135e" 2>&1); rc=$?
+assert_rc "135e unbooked fault fails audit" 1 $rc
+assert_has "135e names A11" 'A11 unbooked-fault' "$out"
+
+# 135f a claim with an open work-plan item is refused (a dropped worker cannot
+#     be ignored): the owed work is visible, so the gate says NO-GO
+mkproj t135f; contract t135f "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf -- '- [ ] T1 | worker dropped | files=a.txt\n' > "$T/t135f/.goal/work-plan.md"
+out=$(bash "$CTL" close-iteration --project "$T/t135f" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --no-gate >/dev/null 2>&1)
+two_pass t135f
+out=$(bash "$GATE" --check --project "$T/t135f" 2>&1); rc=$?
+assert_rc "135f open item blocks the claim" 2 $rc
+assert_has "135f names open-items" 'open-items' "$out"
+assert_has "135f routes to close-open-item" 'hint=close-open-item' "$out"
+
+# 135g the same claim goes through once the item landed
+mkproj t135g; contract t135g "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf -- '- [ ] T1 | worker landed | files=a.txt\n' > "$T/t135g/.goal/work-plan.md"
+: > "$T/t135g/a.txt"
+bash "$CTL" close-iteration --project "$T/t135g" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal no --no-gate >/dev/null 2>&1
+two_pass t135g
+printf -- '- [x] T1 | worker landed | files=a.txt\n' > "$T/t135g/.goal/work-plan.md"
+out=$(bash "$CTL" close-iteration --project "$T/t135g" --task T2 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --adversarial clear --adversarial-note "second pass" 2>&1); rc=$?
+assert_rc "135g claim goes through" 0 $rc
+assert_has "135g gate GO" 'GATE: GO' "$out"

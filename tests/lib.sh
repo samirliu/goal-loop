@@ -1,5 +1,5 @@
 # tests/lib.sh - shared helpers for the scenario suite. Pure functions only.
-# The runner (run_tests.sh / shard scripts) must set: here, GATE, CTL, TEAM,
+# The runner (run_tests.sh / shard scripts) must set: here, GATE, CTL,
 # T (temp project root), pass, failn — before using these.
 
 ok(){ pass=$((pass+1)); echo "  ok   - $1"; }

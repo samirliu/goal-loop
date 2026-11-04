@@ -131,6 +131,7 @@ fail(){
     contract-tampered:*)     hint=proposal-to-user ;;
     check-script-tampered:*) hint=fix-instrument ;;
     adversarial-missing:*)   hint=run-adversarial ;;
+    open-items:*)            hint=close-open-item ;;
     adversarial-finding:*)   hint=fix-adversarial-finding ;;
     raw-evidence-missing:*)  hint=attach-raw ;;
     calibration-missing:*)   hint=bind-calib-grades ;;
@@ -587,7 +588,7 @@ lbt=$(printf '%s\n' "$lb" | grep -E '^task=' | tail -1 | cut -d= -f2-)
 if ! gp_task_ok "$lbt"; then
   # bare T<n> is a v1.x ledger form: valid but noted (ctl normalizes it at write).
   printf '%s' "$lbt" | grep -qE '^T[0-9]+$' \
-    || fail "bad-task:$lbt (claiming block needs task=T<n>[crew:N|teams:N]; see R12)"
+    || fail "bad-task:$lbt (claiming block needs task=T<n>[crew:N]; see R12)"
   echo "GATE: NOTE task-id-legacy (bare $lbt: wave backend not stated; write it as T<n>[crew:1])" >&2
 fi
 lbdigest=$(printf '%s\n' "$lb" | grep -E '^digest=' | tail -1 | cut -d= -f2-)
@@ -849,6 +850,19 @@ if [ -n "$primary" ] && [ -f "$sd/scores.rec" ] && [ -n "$observed_score" ]; the
     END { print c+0 }')
   [ "${flat:-0}" -ge 3 ] && echo "GATE: NOTE metric-flat ($primary pinned at $observed_score for $flat rounds - if the objective demands strict improvement, the metric may be saturated (ceiling); raise its headroom or accept floor+forge)" >&2
 fi
+
+# -5b2. owed work blocks the claim. An unticked work-plan item at claim time
+# means a worker died, stalled, or was never dispatched - or an item was
+# abandoned without saying so. Without this check the drop was invisible: the
+# wave closed clean and the gate said GO. Land the item, or close it out loud
+# with a recorded fault (close-iteration --fault CLASS --fault-outcome ...).
+wp_open=0
+if [ -f "$sd/work-plan.md" ]; then
+  wp_open=$(grep -cE '^- \[ \]' "$sd/work-plan.md" 2>/dev/null || echo 0)
+  case "$wp_open" in ''|*[!0-9]*) wp_open=0 ;; esac
+fi
+[ "$wp_open" -eq 0 ] \
+  || fail "open-items:$wp_open (work-plan still has unticked item(s): finish them, or close them with a recorded fault - close-iteration --fault CLASS --fault-outcome OUTCOME)"
 
 # -5c. two-pass adversarial (harness engineering): a claim needs a second
 # pass bound to THIS (iter, digest). The creator cannot mark its own homework.

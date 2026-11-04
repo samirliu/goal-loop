@@ -92,8 +92,6 @@ goal-loop 脚本面是 bash + 常见 UNIX 工具，**无 jq**。macOS 注意：
 | `find` `xargs -0` `sort` `awk` `sed` `grep` | digest / parse | 系统自带 |
 | `git` | 可选树指纹 | Xcode CLT / brew |
 
-Teams：优先原生 TeamCreate/SendMessage；无则 portable（`goal_team.sh`）。禁止静默降级。
-
 **建议安装顺序（新机）：**
 
 ```text

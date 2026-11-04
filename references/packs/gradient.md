@@ -52,7 +52,7 @@ GO requires **all** of:
 Printed by `ctl status` when optimizing or stalled. **Advisory to the gate** — never changes gate rc or hint. **STRATEGY-PICK is what the next wave uses** (brief + replan/delta NEXT text).
 
 - **EFFICIENCY** — window = same-`strategy=` runs; slope vs band; `-> exploit` / `-> prune` / `unmeasured`.
-- **STRATEGY-PICK** — `prefer=<exploit label> avoid=<prune labels>` derived from those slopes. Paste into every wave brief (crew/Teams). The controller must not re-exploit a label in `avoid`.
+- **STRATEGY-PICK** — `prefer=<exploit label> avoid=<prune labels>` derived from those slopes. Paste into every wave brief. The controller must not re-exploit a label in `avoid`.
 - **eval-gap** — objective scores flat while stalled: dispatch goal-critic to draft candidate ACs into `.goal/proposals/` (user-approved; do not self-edit the contract).
 - **promote** — same bare task id ≥3 waves + stalled: consider role-card promotion (suggestion only).
 - **attribution-unused** — objective contract that never recorded a strategy.

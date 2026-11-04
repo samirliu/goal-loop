@@ -2,16 +2,18 @@
 # goal_audit.sh - controller-behavior self-audit (run BEFORE claiming exit).
 # The gate judges the artifact; this script judges the CONTROLLER's ledger
 # hygiene - the class of bug where the protocol is documented but the
-# controller still quietly violated it (silent fallback, TeamDelete mid-run
-# cover-up, shredded strategy_delta).
+# controller still quietly violated it (silent fallback, shredded
+# strategy_delta).
 #   A1 every task= line matches the exact schema
 #   A2 progress=no must carry a real strategy_delta (R10 mirror)
 #   A3 task= suffixes come from closed vocabularies only: fallback:
-#      (teams-process-reaped|teams-unavailable) plus recovery
+#      (provider-fatal) plus recovery
 #      (stall-recovered|tool-error-fixed|re-run:stall|re-run:tool-error|re-run:death)
-#   A4 no silent backend downgrade: a crew: wave inside a teams run without
-#      a (fallback:...) suffix is a violation
 #   A6 score= is none or a decimal number
+#   A11 worker-fault bookkeeping: every task= suffix is backed by a fault row
+#      (.goal/evidence/faults.rec) and every fault row is booked by a ledger
+#      block carrying the same suffix - a self-declared recovery and a
+#      swallowed worker drop are both violations
 # Usage: bash goal_audit.sh --project DIR
 # Exit 0 = clean / 1 = violations (printed) / 4 = no ledger.
 set -u
@@ -37,8 +39,7 @@ log=$(r < "$sd/loop-log.md")
 fail=0
 bad(){ fail=1; echo "AUDIT: VIOLATION $1"; }
 
-# ---- A1 / A3 / A4 on task= lines ------------------------------------------
-teams_seen=0
+# ---- A1 / A3 on task= lines ----------------------------------------------
 while IFS= read -r line; do
   case "$line" in
     task=*) ;;
@@ -48,17 +49,13 @@ while IFS= read -r line; do
   if ! gp_task_ok "$t"; then
     bad "A1 task-schema:$t"; continue
   fi
-  case "$t" in
-    *'[teams:'*) teams_seen=1 ;;
-    *'[crew:'*) teams_seen=$teams_seen ;;
-  esac
   # A3: fallback vocabulary, then recovery vocabulary - one independent check
   # per tag class so [crew:] lines cannot skip the recovery allowlist.
   case "$t" in
     *'(fallback:'*)
       suf=$(gp_task_fallback "$t")
       case "$suf" in
-        teams-process-reaped|teams-unavailable|provider-fatal) : ;;
+        provider-fatal) : ;;
         *) bad "A3 fallback-vocabulary:$suf" ;;
       esac ;;
     *'('*)
@@ -68,15 +65,6 @@ while IFS= read -r line; do
         '' ) bad "A3 recovery-vocabulary:$t" ;;
         stall-recovered|tool-error-fixed|re-run:stall|re-run:tool-error|re-run:death) : ;;
         *) bad "A3 recovery-vocabulary:$rsuf" ;;
-      esac ;;
-  esac
-  # A4: silent backend downgrade - independent of A3 (first-match would let a
-  # recovery suffix explain away the downgrade; only fallback: is an excuse).
-  case "$t" in
-    *'[crew:'*)
-      case "$t" in
-        *'(fallback:'*) : ;;
-        *) [ "$teams_seen" = 1 ] && bad "A4 silent-downgrade:$t (teams run, crew wave without (fallback:...) suffix)"
       esac ;;
   esac
 done <<< "$log"
@@ -167,6 +155,36 @@ if [ -f "$sd/work-plan.md" ]; then
       esac
     done
   done < "$sd/work-plan.md"
+fi
+
+# ---- A11 worker-fault bookkeeping (suffix <-> fault row) -------------------
+# The task= suffix is not a free-text badge: ctl derives it from a declared
+# fault (class x outcome) and writes the fault row next to the block. This
+# check closes both directions - a suffix with no fault row is a self-declared
+# recovery, a fault row with no block is a dropped worker that was swallowed.
+faultf="$sd/evidence/faults.rec"
+lt_pairs=""
+while IFS= read -r t; do
+  s=$(gp_task_recovery "$t")
+  if [ -z "$s" ]; then fb=$(gp_task_fallback "$t"); [ -n "$fb" ] && s="fallback:$fb"; fi
+  [ -n "$s" ] || continue
+  b=$(printf '%s' "$t" | sed -E 's/ *\([^)]*\)$//')
+  lt_pairs="$lt_pairs$b|$s
+"
+done <<< "$(printf '%s\n' "$log" | grep -E '^task=' | sed -nE 's/^task=//p')"
+while IFS='|' read -r b s; do
+  [ -n "${s:-}" ] || continue
+  if [ -f "$faultf" ] && awk -F'|' -v t="$b" -v s="$s" \
+      '$1==t && $3==s {found=1} END{exit !found}' "$faultf"; then :; else
+    bad "A11 unbacked-suffix:$b($s) (no fault record backs this suffix - declare it: close-iteration --fault CLASS --fault-outcome OUTCOME)"
+  fi
+done <<< "$lt_pairs"
+if [ -f "$faultf" ]; then
+  while IFS='|' read -r ft _fc fs _fn _ftz; do
+    [ -n "${ft:-}" ] || continue
+    printf '%s\n' "$lt_pairs" | grep -qF -- "$ft|$fs" \
+      || bad "A11 unbooked-fault:$ft($fs) (a recorded worker fault never reached a ledger block)"
+  done < "$faultf"
 fi
 
 if [ "$fail" -eq 0 ]; then

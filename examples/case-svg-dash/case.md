@@ -20,7 +20,6 @@ must read as a real dashboard.
 - judged AC with calibration anchors (known-good / known-bad SVG)
 - cold-seat final verification protocol
 - mixed judged + deterministic floors (what happens when they disagree?)
-- default crew vs teams backend (pick whichever is free)
 
 ## Findings log
 

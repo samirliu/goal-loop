@@ -5,7 +5,8 @@
 #   C1 every referenced skill-internal file exists
 #   C2 the version markers agree with the VERSION file
 #   C3 every numbered TOC entry has a matching ## heading
-#   C5 teams-backend protocol markers stay wired (dual-layer rule)
+#   C5 iron-rule literals stay wired (work-queue vs court, ledger keys,
+#      closed task= suffix vocabulary)
 #   C6 case knowledge stays out of generic skill surfaces
 #   C7 rule compaction: five invariants + packs + legacy index retained
 # Run from anywhere:  bash tests/docs_consistency.sh
@@ -79,9 +80,10 @@ for f in references/*.md; do
   done
 done
 
-# C5 teams backend: dual-layer iron rule and both wave markers stay in the docs.
-# The backend is opt-in, but once documented the "team queue != court" split is
-# load-bearing - silent drift here re-opens the dual-truth hole it closed.
+# C5 iron-rule literals: the words the law depends on stay in the live docs.
+# The dispatch surface is one-shot subagents; the load-bearing literals are the
+# "work queue != court" split, the ledger-key discipline, and the closed
+# task= suffix vocabulary. Silent drift here re-opens the hole they closed.
 while IFS='|' read -r f needle; do
   [ -n "$f" ] || continue
   if grep -qF -- "$needle" "$f" 2>/dev/null; then
@@ -90,36 +92,18 @@ while IFS='|' read -r f needle; do
     bad "C5 $f missing: $needle"
   fi
 done <<'EOF'
-references/crew.md|Teams backend
 references/crew.md|NEVER a GO signal
-references/crew.md|task=T2[teams:N]
 references/crew.md|work-plan.md
 references/crew.md|No `isolation: worktree`
-references/crew.md|fallback:teams-unavailable
 references/crew.md|Do not invent new loop-log keys
 references/gate.md|never WRITE `.goal/`
 references/crew.md|INLINED
-references/teams.md|own inbox file
-references/gate.md|task=T2[teams:N]
-references/teams.md|TeammateMessage
-references/teams.md|goal_team.sh
-references/teams.md|NEVER a GO signal
-scripts/goal_team.sh|TeammateMessage
-SKILL.md|task=T<n>[teams:N]
 SKILL.md|禁止
 SKILL.md|worktree
 references/gate.md|R9
 references/gate.md|R10
 references/gate.md|R11
-references/crew.md|native first
-references/teams.md|detection, not by flag
-references/teams.md|native wins
 references/gate.md|probe:
-references/teams.md|process-backed
-references/teams.md|SendMessage
-references/crew.md|never TeamDelete
-references/crew.md|review_pending
-SKILL.md|面板批准
 references/gate.md|R12
 SKILL.md|goal_audit.sh
 references/crew.md|calibration anchors
@@ -136,9 +120,6 @@ scripts/goal_parse.sh|(exit|objective|horizon-waived):
 scripts/goal_ctl.sh|gp_ac_body_hash
 scripts/goal_gate.sh|gp_ac_body_hash
 scripts/goal_ctl.sh|gp_hash_std
-references/teams.md|5.1b After approval lands
-SKILL.md|唤醒+完整简报
-SKILL.md|不要口语化成 crew
 SKILL.md|minimize
 references/gate.md|low-water for minimize
 scripts/goal_parse.sh|minimize)  echo "minimize"
@@ -194,17 +175,30 @@ scripts/goal_ctl.sh|CTL: EFFICIENCY
 scripts/goal_ctl.sh|eval-gap:
 scripts/goal_ctl.sh|promote:
 scripts/goal_ctl.sh|attribution-unused:
-references/teams.md|goal_team.sh health
-references/teams.md|GOAL_STALL_SEC
-references/teams.md|stall-recovered
-references/teams.md|tool-error-fixed
-references/teams.md|re-run:stall
-references/teams.md|breakpoint brief
-references/teams.md|back to `[ ]` (OPEN)
-references/crew.md|Watch window
-scripts/goal_team.sh|err_tag
 scripts/goal_audit.sh|recovery-vocabulary
 scripts/goal_parse.sh|stall-recovered
+references/crew.md|stall-recovered
+references/crew.md|tool-error-fixed
+references/crew.md|re-run:stall
+references/crew.md|`[ ]` (OPEN)
+references/crew.md|fallback:provider-fatal
+scripts/goal_audit.sh|fallback-vocabulary
+SKILL.md|--fault
+references/crew.md|breakpoint brief
+references/crew.md|take-over
+references/crew.md|faults.rec
+references/crew.md|open-items
+references/gate.md|faults.rec
+references/gate.md|open-items
+scripts/goal_ctl.sh|CTL: FAULT
+scripts/goal_ctl.sh|bad-fault-class
+scripts/goal_ctl.sh|unbacked-task-suffix
+scripts/goal_audit.sh|unbacked-suffix
+scripts/goal_audit.sh|unbooked-fault
+scripts/goal_gate.sh|open-items
+scripts/goal_gate.sh|close-open-item
+scripts/goal_parse.sh|gp_fault_suffix
+examples/quickstart-one-shot/run.sh|--adversarial clear
 EOF
 
 # C6 generality: case knowledge stays in examples/. Generic skill surfaces

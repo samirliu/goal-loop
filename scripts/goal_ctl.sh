@@ -13,12 +13,18 @@
 #        [--false-complete no] [--dry yes|no] [--no-gate]
 #        [--score N] [--judge-score N] [--strategy-delta TEXT] [--strategy TEXT]
 #        [--adversarial clear|finding] [--adversarial-note TEXT]
+#        [--fault CLASS] [--fault-outcome OUTCOME] [--fault-note TEXT]
 #        (--dry is REQUIRED on exit: forge contracts: yes = this round's
 #         panel+critic produced no new evidence-backed finding)
 #        (--score: objective:maximize|minimize value; --strategy-delta REQUIRED when
 #         the new breaker is HALF_OPEN/OPEN — R10; --strategy is an optional
 #         one-word label for the attack direction this wave tried - eval-drive
 #         v2.8: status derives per-strategy score slopes from it)
+#        (--fault: a worker in this wave died/stalled/broke. CLASS is
+#         stall|tool-error|death|provider-fatal, OUTCOME is what the
+#         controller did about it: resume|re-run|take-over. The pair maps to
+#         exactly one task= suffix, which ctl writes for you - a suffix can
+#         never be self-declared, and a fault can never be silent.)
 set -u
 export LC_ALL=C.UTF-8
 
@@ -26,6 +32,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 cmd="" project="." auto=0 no_gate=0 max_iterations=12 time_budget=""
 task="" files="" cp="" cf="" cu="" progress=yes exit_signal=no errsig=none fcomplete=no dry=""
 score="" judge_score="" strategy_delta="" strategy="" adversarial="" adv_note=""
+fault="" fault_outcome="" fault_note=""
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -51,6 +58,9 @@ while [ $# -gt 0 ]; do
     --strategy) [ $# -ge 2 ] || { echo "CTL: ERROR missing-strategy" >&2; exit 4; }; strategy="$2"; shift ;;
     --adversarial) [ $# -ge 2 ] || { echo "CTL: ERROR missing-adversarial-verdict" >&2; exit 4; }; adversarial="$2"; shift ;;
     --adversarial-note) [ $# -ge 2 ] || { echo "CTL: ERROR missing-adversarial-note" >&2; exit 4; }; adv_note="$2"; shift ;;
+    --fault) [ $# -ge 2 ] || { echo "CTL: ERROR missing-fault-class" >&2; exit 4; }; fault="$2"; shift ;;
+    --fault-outcome) [ $# -ge 2 ] || { echo "CTL: ERROR missing-fault-outcome" >&2; exit 4; }; fault_outcome="$2"; shift ;;
+    --fault-note) [ $# -ge 2 ] || { echo "CTL: ERROR missing-fault-note" >&2; exit 4; }; fault_note="$2"; shift ;;
     --help|-h) sed -n '2,22p' "$0"; exit 0 ;;
     *) echo "CTL: ERROR unknown-flag:$1" >&2; exit 4 ;;
   esac
@@ -285,45 +295,6 @@ case "$cmd" in
     digest=$(bash "$here/goal_gate.sh" --digest --project "$project") || { echo "CTL: ERROR digest-unavailable" >&2; exit 4; }
     it=$(state_get iteration); [ -n "$it" ] || it=0
     new=$((it+1))
-    # Human panel wait (native TeamCreate/TeamPlan submit → approval) is not
-    # worker time. Rebase a burned wallclock once at iteration 0, and ONLY when
-    # this wave is actually on a teams backend. Detection: explicit
-    # T<n>[teams:N], portable .goal/team roster, state team_name, or a native
-    # ~/.claude/teams roster whose config cwd points at this project.
-    if [ "$it" -eq 0 ]; then
-      teams_ctx=0
-      case "$task" in *'[teams:'*) teams_ctx=1 ;; esac
-      [ -f "$sd/team/config.json" ] && teams_ctx=1
-      [ -n "$(state_get team_name)" ] && teams_ctx=1
-      if [ "$teams_ctx" = 0 ]; then
-        for td in "$HOME/.claude/teams/"*; do
-          [ -f "$td/config.json" ] || continue
-          # native roster bound to this project (cwd field) counts as teams ctx
-          if grep -q "\"cwd\": *\"$project\"" "$td/config.json" 2>/dev/null \
-            || grep -q "\"cwd\": *\"$(cd "$project" 2>/dev/null && pwd)\"" "$td/config.json" 2>/dev/null; then
-            teams_ctx=1
-            # remember the binding so later status does not guess
-            if [ -z "$(state_get team_name)" ]; then
-              tn=$(basename "$td")
-              { grep -vE '^team_name=' "$sd/state.rec"; echo "team_name=$tn"; } > "$sd/state.rec.tn" \
-                && mv -f "$sd/state.rec.tn" "$sd/state.rec"
-            fi
-            break
-          fi
-        done
-      fi
-      tb0=$(state_get time_budget); [ -n "$tb0" ] || tb0=0
-      dl0=$(state_get deadline); [ -n "$dl0" ] || dl0=0
-      now0=$(date +%s)
-      case "$tb0" in ''|*[!0-9]*) tb0=0 ;; esac
-      case "$dl0" in ''|*[!0-9]*) dl0=0 ;; esac
-      if [ "$teams_ctx" = 1 ] && [ "$tb0" -gt 0 ] && [ "$dl0" -gt 0 ] && [ "$dl0" -le "$now0" ]; then
-        dl0=$((now0 + tb0))
-        { grep -vE '^deadline=' "$sd/state.rec"; echo "deadline=$dl0"; } > "$sd/state.rec.rebase" \
-          && mv -f "$sd/state.rec.rebase" "$sd/state.rec"
-        echo "CTL: NOTE deadline-rebased (panel wait is not work time; restored ${tb0}s)" >&2
-      fi
-    fi
     # R10: any no-progress landing sets HALF_OPEN/OPEN and must carry a
     # strategy change - otherwise the loop is grinding without revising.
     if [ "$progress" != yes ]; then
@@ -388,22 +359,40 @@ case "$cmd" in
     # task= is ledger law (R12/A1): wave ids must carry their backend. A bare
     # T<n> means an ordinary one-shot subagent wave - normalize it (crew:1)
     # instead of letting the self-audit refuse the claim after the fact.
-    # Under a teams roster, bare T<n> is ambiguous (seen live: native Teams
-    # recorded as crew:1, then hand-edited). Fail closed: demand T<n>[teams:N].
     case "$task" in
       '') echo "CTL: ERROR missing-task (ledger needs --task T<n> or T<n>[backend:N])" >&2; exit 4 ;;
       T[0-9]*)
         if printf '%s' "$task" | grep -qE '^T[0-9]+$'; then
-          if [ "${teams_ctx:-0}" = 1 ]; then
-            echo "CTL: ERROR task-teams-missing (this run has a teams roster: use --task T<n>[teams:N] with N=actual concurrent workers; bare T<n> would lie as crew:1)" >&2
-            exit 4
-          fi
           task="$task[crew:1]"
         fi
         ;;
     esac
+    # Worker-fault bookkeeping. The task= suffix is NEVER self-declared: a
+    # declared fault (class x outcome) maps to exactly one suffix and ctl
+    # writes it, so "recovered" cannot be claimed without a fault behind it
+    # and a fault cannot be swallowed silently. The fault row lands in
+    # .goal/evidence/faults.rec next to the block it belongs to.
+    fsuf=$(gp_task_recovery "$task")
+    if [ -z "$fsuf" ]; then fb=$(gp_task_fallback "$task"); [ -n "$fb" ] && fsuf="fallback:$fb"; fi
+    if [ -n "$fault" ] || [ -n "$fault_outcome" ]; then
+      [ -n "$fault" ] && [ -n "$fault_outcome" ] \
+        || { echo "CTL: ERROR fault-needs-both (--fault CLASS --fault-outcome OUTCOME)" >&2; exit 4; }
+      gp_fault_class_ok "$(gp_fault_classes)" "$fault" \
+        || { echo "CTL: ERROR bad-fault-class:$fault (use one of: $(gp_fault_classes))" >&2; exit 4; }
+      fsuf2=$(gp_fault_suffix "$fault" "$fault_outcome")
+      [ -n "$fsuf2" ] \
+        || { echo "CTL: ERROR bad-fault-outcome:$fault/$fault_outcome (legal pairs: stall/resume, tool-error/resume, stall/re-run, tool-error/re-run, death/re-run, provider-fatal/take-over)" >&2; exit 4; }
+      [ -z "$fsuf" ] || [ "$fsuf" = "$fsuf2" ] \
+        || { echo "CTL: ERROR fault-suffix-mismatch (task carries ($fsuf) but $fault/$fault_outcome maps to ($fsuf2))" >&2; exit 4; }
+      fsuf="$fsuf2"
+      task=$(printf '%s' "$task" | sed -E 's/ *\((fallback:[a-z0-9-]+|stall-recovered|tool-error-fixed|re-run:(stall|tool-error|death))\)$//')
+      task="$task ($fsuf)"
+    else
+      [ -z "$fsuf" ] \
+        || { echo "CTL: ERROR unbacked-task-suffix ($fsuf) - a wave suffix must come from a declared fault: close-iteration --fault CLASS --fault-outcome OUTCOME" >&2; exit 4; }
+    fi
     gp_task_ok "$task" \
-      || { echo "CTL: ERROR bad-task:$task (schema: T<n>[crew:N] / T<n>[teams:N], bare T<n> normalizes to crew:1)" >&2; exit 4; }
+      || { echo "CTL: ERROR bad-task:$task (schema: T<n>[crew:N], bare T<n> normalizes to crew:1)" >&2; exit 4; }
     # R13 sidecar: iter|score|judge (either may be 'none'). Two comparable
     # points later let the gate refuse DIVERGENCE:score-vs-judge claims.
     # v2.8: written AFTER task validation - a refused close must not orphan a
@@ -475,6 +464,17 @@ case "$cmd" in
         *) echo "CTL: ERROR bad-adversarial:$adversarial (use clear|finding)" >&2; exit 4 ;;
       esac
       printf '%s|%s|%s|%s\n' "$new" "$digest" "$adversarial" "${adv_note:-none}" >> "$sd/evidence/adversarial.rec"
+    fi
+    # Worker-fault receipt: written in the same breath as the block it belongs
+    # to, so a fault can never outlive its bookkeeping (audit A11 checks both
+    # directions: a suffix without a fault row, and a fault row without a
+    # block). Evidence dir - exempt from both digests (R6).
+    if [ -n "$fault" ]; then
+      mkdir -p "$sd/evidence"
+      fbase=$(printf '%s' "$task" | sed -E 's/ *\([^)]*\)$//')
+      fnote=$(printf '%s' "${fault_note:-none}" | tr '|\n\r' '   ')
+      printf '%s|%s|%s|%s|%s\n' "$fbase" "$fault" "$fsuf" "$fnote" "$(date +%s)" >> "$sd/evidence/faults.rec"
+      echo "CTL: FAULT task=$fbase class=$fault suffix=($fsuf) note=$fnote"
     fi
     [ "$no_gate" -eq 1 ] && exit 0
     # False-complete ratchet, mechanized: a claim that the gate catches failing
@@ -551,36 +551,6 @@ case "$cmd" in
     echo "CTL: STEP $step (stamped=$stamped blocks=$blocks claim=$claimed)"
     printf 'CTL: STATUS iter=%s/%s breaker=%s dry_streak=%s/%s best_score=%s time_left=%s\n' \
       "$(g iteration)" "$(g max_iterations)" "$(g breaker)" "$(g dry_streak)" "$(g dry_limit)" "$(g best_score)" "$left"
-    # Provider / team surface one-liner (SB-12): when the run is under an
-    # Agent Teams roster, surface lastError/model so a NoRoom / stream-max
-    # death is visible from status without opening team config.json.
-    # Bind PROVIDER to THIS project's roster only. Guessing the newest
-    # ~/.claude/teams/* directory attributes another run's CudaFailed/NoRoom
-    # to this goal (seen live: mira-legacy-* leaked into goal-retest-biz).
-    tname=$(g team_name)
-    if [ -z "$tname" ] && [ -f "$project/.goal/team/config.json" ]; then
-      tname=$(sed -n 's/.*"name": *"\([^"]*\)".*/\1/p' "$project/.goal/team/config.json" 2>/dev/null | head -1)
-    fi
-    tdir=""
-    if [ -n "$tname" ]; then
-      tdir="$HOME/.claude/teams/$tname"
-    else
-      pw=$(cd "$project" 2>/dev/null && pwd)
-      for td in "$HOME/.claude/teams/"*; do
-        [ -f "$td/config.json" ] || continue
-        if grep -q "\"cwd\": *\"$pw\"" "$td/config.json" 2>/dev/null \
-          || grep -q "\"cwd\": *\"$project\"" "$td/config.json" 2>/dev/null; then
-          tdir="$td"; break
-        fi
-      done
-    fi
-    if [ -n "$tdir" ] && [ -f "$tdir/config.json" ]; then
-      prov=$(sed -n 's/.*"providerName": *"\([^"]*\)".*/\1/p' "$tdir/config.json" 2>/dev/null | head -1)
-      model=$(sed -n 's/.*"model": *"\([^"]*\)".*/\1/p' "$tdir/config.json" 2>/dev/null | head -1)
-      errs=$(sed -n 's/.*"lastError": *"\([^"]*\)".*/\1/p' "$tdir/config.json" 2>/dev/null | sort | uniq -c | sort -rn | head -3 | tr '\n' ';')
-      term=$(grep -c '"terminated": true' "$tdir/config.json" 2>/dev/null || echo 0)
-      echo "CTL: PROVIDER team=$(basename "$tdir") model=${model:-?} provider=${prov:-?} terminated=$term lastError=${errs:-none}"
-    fi
     lb=$(awk '
       /^## iteration/ { delete l; next }
       { line=$0; sub(/\r$/,"",line)
@@ -695,6 +665,7 @@ case "$cmd" in
       case "$lh" in
         fix-AC)              next="dispatch a fixer scoped to the open-FAIL AC's files" ;;
         run-adversarial)     next="run a second-pass adversarial review, then close-iteration --adversarial clear|finding --adversarial-note ..." ;;
+        close-open-item)     next="work-plan still has open item(s): land them, or record the worker fault - close-iteration --fault CLASS --fault-outcome OUTCOME (resume|re-run|take-over)" ;;
         fix-adversarial-finding) next="fix the finding named in adversarial.rec, re-review, close-iteration --adversarial clear" ;;
         attach-raw)          next="re-run checks and leave the real output in .goal/evidence/raw/<iter>.txt (close-iteration writes this automatically)" ;;
         bind-seat)           next="dispatch a cold judging seat - do NOT send a coder" ;;
@@ -789,7 +760,7 @@ case "$cmd" in
               prev=""; run=0
               for (q=1;q<=blk;q++) { id=TASK[q]; sub(/\[.*/,"",id)
                 if (id ~ /^T[0-9]+$/) { if (id==prev) run++; else { prev=id; run=1 }
-                  if (run==3) print "CTL: promote: " id " (3 consecutive waves) - consider a role-card/Teams promotion for this task domain" }
+                  if (run==3) print "CTL: promote: " id " (3 consecutive waves) - consider a role-card promotion for this task domain" }
                 else { prev=""; run=0 } } }
             allnone=1; if (blk<1) allnone=0
             for (q=1;q<=blk;q++) if (STRAT[q]!="none") { allnone=0; break }

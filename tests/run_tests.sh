@@ -271,7 +271,6 @@ emit_shard() {
     echo "here=$(printf '%q' "$here")"
     echo 'GATE="$here/scripts/goal_gate.sh"'
     echo 'CTL="$here/scripts/goal_ctl.sh"'
-    echo 'TEAM="$here/scripts/goal_team.sh"'
     echo 'T=$(mktemp -d)'
     echo 'trap '\''rm -rf "$T"'\'' EXIT'
     echo 'pass=0; failn=0'

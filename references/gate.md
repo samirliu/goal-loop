@@ -28,9 +28,16 @@ without tripping check-mutated-ledger (R6-fair).
 `.goal/loop-log.md` append-only blocks, exact keys:
 `## iteration N` + task files_modified checks_pass checks_fail
 checks_unverifiable error_signature progress exit_signal false_complete
-digest score strategy_delta. `task=T2[crew:N]` marks a one-shot crew wave,
-`task=T2[teams:N]` a Teams-backend wave (N = actual concurrent workers that
-wave; same gate authority either way).
+digest score strategy_delta. `task=T2[crew:N]` marks a one-shot crew wave
+(N = actual concurrent workers in that wave). The task id may carry ONE
+trailing suffix from the closed vocabulary in crew.md §3.5
+(`(fallback:provider-fatal)`, `(stall-recovered)`, `(tool-error-fixed)`,
+`(re-run:stall|tool-error|death)`); the suffix is DERIVED by ctl from a
+declared worker fault (`--fault CLASS --fault-outcome OUTCOME`) and is never
+self-declared: a suffix with no fault row is refused at write time and
+flagged by audit A11, and a fault row with no block is flagged too.
+`.goal/evidence/faults.rec` holds the fault rows — `task|class|suffix|note|ts`
+— and is exempt from both digests (evidence sidecar).
 Bare `T<n>` normalizes to `T<n>[crew:1]` at write; free-form task ids are
 refused by ctl (R12/A1 is enforced by the writer, not only by the audit).
 `score=` holds the objective value or `none`; `strategy_delta=`
@@ -152,6 +159,8 @@ digests by construction.
 5b claiming block task= is a valid ledger id  else 2 bad-task [R12 tooth at
    (bare T<n] = v1.x read-compat, NOTE only)      the arbiter; ctl still
                                                   enforces it at write time]
+5b2 work-plan has no unticked item at claim     else 2 open-items (a dropped
+   (owed work cannot be claimed away)             worker leaves its item open)
 6  block digest == current digest             else 2 verdicts-stale [R7]
    (ctl counts the false complete automatically - the ratchet is mechanical)
 6b every AC line has expected: and check:     else 4 contract-malformed
@@ -191,7 +200,7 @@ Check order (§3) is the mechanical statute; this section is the map.
 | **BIND** | Every claim binds (stamped-contract × iteration × digest × evidence-hash); unbound claims are void. | 1, 3, 5b, 6, 7b, 8, 14 | packs/instrument.md |
 | **PROVE** | An instrument must prove itself before its number or verdict is trusted. | 7 (probe), 8 (calib), 14 (measurement) | packs/instrument.md |
 | **GRADIENT** | Optimization never delivers below the water mark; blind spots are declared; waves are labeled. | 12–14; stamp `objective:` / `horizon-waived:` | packs/gradient.md |
-| **FENCE** | Ledger write-fence, honest progress, controller self-audit; out-of-tree facts settle via cache. | 5b, 11–12; `external:` / DEFERRED | packs/external.md + goal_audit.sh |
+| **FENCE** | Ledger write-fence, honest progress, controller self-audit; out-of-tree facts settle via cache. | 5b, 5b2, 11–12; `external:` / DEFERRED | packs/external.md + goal_audit.sh |
 
 ### 4.2 Legacy index (R1–R19)
 

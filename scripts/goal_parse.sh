@@ -224,9 +224,30 @@ gp_verdict_conflict(){                                 # $1 project $2 id $3 ite
 
 # ---- task= id grammar (R12/A1: ledger law, enforced by the writer) ----------
 # Optional trailing tag is either a fallback: token or a recovery token.
-# Recovery vocabulary is CLOSED (teams runtime robustness).
+# Recovery vocabulary is CLOSED (parallel-wave runtime robustness).
 gp_task_ok(){ printf '%s' "$1" | grep -qE \
-  '^T[0-9]+\[(teams|crew):[0-9]+\]( *\((fallback:[a-z0-9-]+|stall-recovered|tool-error-fixed|re-run:(stall|tool-error|death))\))?$'; }
+  '^T[0-9]+\[crew:[0-9]+\]( *\((fallback:[a-z0-9-]+|stall-recovered|tool-error-fixed|re-run:(stall|tool-error|death))\))?$'; }
 gp_task_fallback(){ printf '%s' "$1" | sed -nE 's/.*\(fallback:([a-z0-9-]+)\).*/\1/p'; }
 gp_task_recovery(){ printf '%s' "$1" | sed -nE 's/.*\((stall-recovered|tool-error-fixed|re-run:(stall|tool-error|death))\).*/\1/p'; }
-gp_task_backend(){ printf '%s' "$1" | sed -nE 's/.*\[(teams|crew):[0-9]+\].*/\1/p'; }
+
+# ---- worker-fault vocabulary (parallel-wave runtime robustness) ------------
+# A worker in a parallel wave can die, stall, hit a broken tool/env, or be
+# killed by the provider. The controller sees the failure; the ledger must
+# carry it. The class x outcome pair is CLOSED and maps to exactly one task=
+# suffix, so the suffix can never be self-declared: ctl derives it from the
+# declared fault and audit A11 checks both directions.
+gp_fault_suffix(){                                   # $1 class $2 outcome -> suffix | ""
+  case "$1/$2" in
+    stall/resume)              echo "stall-recovered" ;;
+    tool-error/resume)         echo "tool-error-fixed" ;;
+    stall/re-run)              echo "re-run:stall" ;;
+    tool-error/re-run)         echo "re-run:tool-error" ;;
+    death/re-run)              echo "re-run:death" ;;
+    provider-fatal/take-over)  echo "fallback:provider-fatal" ;;
+    *) echo "" ;;
+  esac
+}
+gp_fault_class_ok(){ case " $1 " in *" $2 "*) return 0 ;; *) return 1 ;; esac; }
+gp_fault_classes(){ echo "stall tool-error death provider-fatal"; }
+gp_fault_outcomes(){ echo "resume re-run take-over"; }
+

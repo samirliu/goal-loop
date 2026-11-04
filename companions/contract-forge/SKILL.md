@@ -11,7 +11,7 @@ description: |-
   "draft acceptance criteria", "评估指标不好定", "怎么验收", "define done
   for goal-loop", "stampable AC", "eval system hard to measure",
   "验收标准不好写", "帮我定契约". Not for trivial one-AC tasks that already
-  know their checks, or for running the loop / gate / Teams dispatch itself.
+  know their checks, or for running the loop / gate / dispatch itself.
 ---
 
 # Contract Forge
@@ -23,7 +23,7 @@ description: |-
 | 访谈评估面（done/指标/噪声/horizon） | 跑 `goal_gate.sh` / 宣完成 |
 | 写 `Status: DRAFT` 的 `.goal/goal.md` | 写 `approved:` 哈希或调 stamp |
 | 预测 stamp 拒绝项 + lint | 改已盖戳契约（R3） |
-| handoff 到 goal-loop init/stamp | 派工 / Teams / worker 工艺 |
+| handoff 到 goal-loop init/stamp | 派工 / worker 工艺 |
 
 **硬墙：** GATE/BIND 纯净。语法权威在 goal-loop `references/gate.md`。领域无关——只用 claim family，不写行业包。
 
@@ -44,7 +44,7 @@ description: |-
 
 设计树 + frontier；整轮提问；`❓ QN` + `➡️` 推荐答案；依赖题进后轮。每条 AC 过 **Goodhart 哨兵**；指标 AC **先测噪声底再定 V**。细节：`references/interview-tree.md`。
 
-**复杂 + Teams + 量化优化默认三层：** floors + `objective: max/min` + horizon（judged+calib 或 `horizon-waived:`）+ `exit: forge`。
+**复杂 + 并行派工 + 量化优化默认三层：** floors + `objective: max/min` + horizon（judged+calib 或 `horizon-waived:`）+ `exit: forge`。
 
 ## 产出物
 
@@ -70,7 +70,7 @@ bash <goal-loop>/scripts/goal_ctl.sh init --project .    # 如需
 # 冒烟每个 named check；forge 写 baseline.md（重数 >=2）
 bash <contract-forge>/scripts/lint_contract.sh .goal/goal.md --project .
 bash <goal-loop>/scripts/goal_ctl.sh stamp --project .   # 用户批准
-# 执行：/goal-loop [--teams] <objective>；objective 每波 close-iteration --strategy <label>
+# 执行：/goal-loop <objective>；objective 每波 close-iteration --strategy <label>
 ```
 
 ## 交前自检
@@ -79,4 +79,4 @@ bash <goal-loop>/scripts/goal_ctl.sh stamp --project .   # 用户批准
 
 ## Non-goals
 
-跑 gate/loop；自动 stamp；改已戳契约；Teams 协议；worker 工艺包；行业 pack；复制 goal-loop packs；无噪声测量就定 V。
+跑 gate/loop；自动 stamp；改已戳契约；worker 工艺包；行业 pack；复制 goal-loop packs；无噪声测量就定 V。

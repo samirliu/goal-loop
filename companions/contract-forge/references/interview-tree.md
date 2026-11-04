@@ -60,7 +60,7 @@ F. Confirm shared understanding → emit DRAFT
 - Done interviewing = frontier empty **and** user confirms shared understanding.
 - **Only then** write `.goal/goal.md` DRAFT (Status: DRAFT). Never write stamp hash.
 
-## Default path (complex + Teams + quantitative optimization)
+## Default path (complex + parallel dispatch + quantitative optimization)
 
 Prefer:
 
@@ -70,7 +70,7 @@ Prefer:
 - horizon: >=1 `judged` + `calib: good= bad=` on qualities the metric can chase
 - budgets: `dry_limit=` + `max_iterations=` fuse
 - explicit **Out of scope**
-- handoff: `--strategy` every close; Teams is execution only (not in the contract)
+- handoff: `--strategy` every close; dispatch is execution only (not in the contract)
 
 ## R0 negative exits (do not force goal-loop)
 

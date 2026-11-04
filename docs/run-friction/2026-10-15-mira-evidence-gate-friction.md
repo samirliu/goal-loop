@@ -7,12 +7,6 @@
 - 猜想根因: skill / harness / Mira 债 / 用户裁决
 - 证据: gate-runs 条目 / .goal/ 片段 / 错误输出
 
-## 2026-10-15T22:15:00+08:00 — 原生 TeamCreate/TeamPlan/SendMessage 不在本执行器工具面
-- 期望: 派工优先用原生 Agent Teams（用户指令 + skill teams.md native first）
-- 实际: 本会话工具列表仅有 Bash/Edit/Read/Write/Glob/Grep/Skill 等，无 TeamCreate/TeamPlan/SendMessage，也无 Agent/Task 派工工具
-- 猜想根因: harness（子代理执行器未注入 Teams/Agent 工具面）/ skill 假设 controller 有完整工具面
-- 证据: 工具面清单；teams.md §2「detection by tool list」；本条 friction 本身
-
 ## 2026-10-15T22:15:30+08:00 — migrate_evidence_log_v1_to_v1_1.py 对 6 个 legacy 包全部 skipped_non_v1
 - 期望: 优先跑迁移升 v1.1 并去掉 legacy_evidence_schema: true
 - 实际: 6/6 返回 skipped_non_v1；schema 分属 3 族（baba 近 v1 但缺列+CSV 引号破损；gold/huichuan/jcet 为 claim_id,layer,source 族；tencent/xiaomi 为 claim_id,source_tier 族）

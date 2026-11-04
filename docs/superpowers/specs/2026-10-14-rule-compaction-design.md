@@ -72,7 +72,6 @@ ON DEMAND (open when contract AC uses the capability key):
   references/packs/instrument.md   judged · probe · calib · sd/var · cold seat
   references/packs/gradient.md     objective · forge · horizon · strategy · EFFICIENCY
   references/packs/external.md     external · window · deferred
-  references/teams.md              --teams (existing)
   references/crew.md               dispatch protocol (existing; strip incident history)
   references/patterns.md           check shapes (author-side; not always-on)
 
@@ -91,7 +90,6 @@ Contract authoring is level-based. Level 0 is the entire fast path.
 | `judged` / `calib:` / `probe:` / `metric:` / `sd:` / `var:` | `packs/instrument.md` |
 | `objective:` / `exit: forge` / horizon / `--strategy` | `packs/gradient.md` |
 | `external:` / `window:` | `packs/external.md` |
-| `--teams` | `references/teams.md` |
 
 Activation rule lives in SKILL.md Step 1 and in the contract template comments.  
 `docs_consistency.sh` pins the activation words so packs cannot silently drift.

@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- **Zero behavioral change** to `scripts/goal_gate.sh`, `scripts/goal_ctl.sh`, `scripts/goal_parse.sh`, `scripts/goal_audit.sh`, `scripts/goal_team.sh`, `scripts/goal_hook.sh`, `scripts/goal_loop.sh`, `assets/goal.contract.md` stamp format, ledger schema, CLI flags.
+- **Zero behavioral change** to `scripts/goal_gate.sh`, `scripts/goal_ctl.sh`, `scripts/goal_parse.sh`, `scripts/goal_audit.sh`, `scripts/goal_hook.sh`, `scripts/goal_loop.sh`, `assets/goal.contract.md` stamp format, ledger schema, CLI flags.
 - `tests/run_tests.sh` must remain fully green (target `pass=395 fail=0`).
 - `tests/docs_consistency.sh` must print `CONSISTENT`.
 - SKILL.md target size ≤ 6,000 bytes; always-on pair (SKILL.md + gate.md) ≤ 20,000 bytes.
@@ -198,7 +198,6 @@ Target outline (write this literally; compress existing wording, do not add feat
 | judged / calib / probe / metric / sd / var | references/packs/instrument.md |
 | objective / exit: forge / horizon / --strategy | references/packs/gradient.md |
 | external / window | references/packs/external.md |
-| --teams | references/teams.md |
 ```
 
 6. **小任务快车道** — keep the four commands (no R#)

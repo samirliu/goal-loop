@@ -2,9 +2,11 @@
 
 **EN** — goal-loop combines the DRIVE of the harness /goal (never stop until done) with the CREW of /team (parallel teammates on one deliverable) plus the layer both lack: an external acceptance gate with a frozen contract. **/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
+**v4.0.0** — Agent Teams 后端整体移除：执行面只剩一档（subagent 波次），判命面仍只有门控。`--teams`（原生 TeamCreate/TeamPlan/面板 + 便携文件层）连同 `references/teams.md` / `scripts/goal_team.sh` 一并作废；账本 `task=` 语法收紧为 `T<n>[crew:N]`；teams 专属的 A4（静默降级）与 `teams-process-reaped`/`teams-unavailable` 后缀删除。并行波次的 worker 故障改为**有牙**：worker 掉线/空转由 `close-iteration --fault CLASS --fault-outcome OUTCOME` 记账（后缀由工具派生，不许自封，audit **A11** 双向核账），没勾的 work-plan 项直接让门控拒收（`open-items`）——掉线的 worker 再也藏不住。
+
 **v3.0.0** — legal-surface compaction only. The always-on law is five invariants (GATE / BIND / PROVE / GRADIENT / FENCE); depth lives in `references/packs/`. Mechanical gate checks are unchanged from 2.9.0.
 
-**v2.8.0** — two execution backends (default one-shot subagents; opt-in Agent Teams), one judge (the gate). 执行面两档、判命面一档。 v2.8 新增：评估驱动归因（`--strategy` 策略标签 + `ctl status` 的 EFFICIENCY 斜率 / eval-gap / promote advisory，纯旁路不改门控）、worker 间 peer-notes 共享发现池（claim-not-instruction 铁律）、复杂目标契约三层形状（patterns §12）。
+**v2.8.0** — evaluation-driven attribution（`--strategy` 策略标签 + `ctl status` 的 EFFICIENCY 斜率 / eval-gap / promote advisory，纯旁路不改门控）、worker 间 peer-notes 共享发现池（claim-not-instruction 铁律）、复杂目标契约三层形状（patterns §12）。
 
 **中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明交冷席终验。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。
 
@@ -38,6 +40,10 @@ cp goal-loop/agents/*.md ~/.claude/agents/
 
 # 可选：companion skill contract-forge（盖戳前访谈，不是硬依赖）
 # cp -R goal-loop/companions/contract-forge ~/.claude/skills/
+
+# 升级到 v4：清掉旧文件（Agent Teams 后端已整体移除）
+rm -f ~/.claude/skills/goal-loop/scripts/goal_team.sh \
+      ~/.claude/skills/goal-loop/references/teams.md
 ```
 
 - Windows（git-bash）路径同上：`C:\Users\<你>\.claude\skills\goal-loop\` 与 `C:\Users\<你>\.claude\agents\`。
@@ -50,10 +56,10 @@ cp goal-loop/agents/*.md ~/.claude/agents/
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check
 # 无 .goal/ 的目录里应返回 rc=4, reason=no-goal-dir —— 说明门控在岗
 bash ~/.claude/skills/goal-loop/tests/run_tests.sh
-# 场景套件应 fail=0 全绿 —— 门控语义的完整回归（当前 395 项）
+# 场景套件应 fail=0 全绿 —— 门控语义的完整回归（当前 485 项断言）
 # 默认 --jobs=8 并行分片（约 3–4 分钟）；--jobs=1 串行；--only 78-90 增量
 bash ~/.claude/skills/goal-loop/tests/docs_consistency.sh
-# 文档一致性（含 Teams 后端铁律字面量）应 CONSISTENT
+# 文档一致性（活文档字面量）应 CONSISTENT
 bash ~/.claude/skills/goal-loop/examples/quickstart-one-shot/run.sh
 # 小任务快车道：单 AC 最小契约应 GO（rc=0）—— 证明仪式的下限
 ```
@@ -62,7 +68,6 @@ bash ~/.claude/skills/goal-loop/examples/quickstart-one-shot/run.sh
 
 ```
 /goal-loop <objective>
-/goal-loop --teams <objective>          # optional Agent Teams backend
 ```
 
 Four steps, no fifth / 四步循环，没有第五步：
@@ -73,7 +78,7 @@ Four steps, no fifth / 四步循环，没有第五步：
    每条 AC = 可判定陈述 + 能让它失败的指名检测命令；你回一个字即盖章冻结。
 2. **Dispatch / 派工** — concurrent workers on disjoint file scopes (width fits the work; no default cap);
    interfaces frozen in `.goal/interfaces.md` first.
-   默认一波 subagent；`--teams` 换 Agent Teams 队友（见下）。
+   默认一波 subagent 并行 worker，共享工作区。
 3. **Join + gate** — merge review, then `bash scripts/goal_gate.sh --check`
    re-runs every deterministic check. This is the **only** completion authority.
    合并审阅后门控重跑全部确定性检查——唯一的完成判定。
@@ -88,14 +93,13 @@ claim exit — never by the producers. 判断类 AC 在 claim 前由全新冷席
 ## Flags / 参数
 
 ```
-/goal-loop [--auto] [--time-budget=N] [--teams] <objective>
+/goal-loop [--auto] [--time-budget=N] <objective>
 ```
 
 | flag | meaning / 含义 |
 |---|---|
 | `--auto` | still show the full contract summary, stamp immediately, ledger records `approval=auto` / 仍展示摘要，随即盖章记 `auto` |
 | `--time-budget=N` | whole-loop wall-clock fuse; on expiry deliver best-so-far / 墙钟保险丝，到期优雅交付 |
-| `--teams` | swap dispatch for an Agent Teams crew (see below) / 换 Agent Teams 后端 |
 
 Exit policy is a **contract field**, not a mode: `exit: threshold` (default,
 delivery/build) or `exit: forge` (maximization). No modes matrix. 退出策略写在
@@ -111,39 +115,6 @@ forge 退出 = 地板全过 ∧ dry_streak≥dry_limit ∧ critic 空答案；�
 
 In-session bookkeeping is one Bash call: `scripts/goal_ctl.sh close-iteration ...`
 (forge contracts require `--dry yes|no`). 会话内记账一条命令。
-
-## Teams backend / Teams 后端（opt-in，native first）
-
-**Native first.** `--teams` 的选择靠**工具面探测**，不靠 flag 内容：当前
-harness 有原生 TeamCreate/TeamPlan/SendMessage 就直接用原生（持久队友 +
-面板，一次 roster 审批）；没有才跑便携层。flag 只决定「要不要 team」，
-工具列表决定「用哪种」。
-
-**Native first.** Selection is by detection: if TeamCreate/TeamPlan/
-SendMessage exist in the controller's tool list this run, native wins —
-persistent teammates + panel. The **portable team layer**
-(`scripts/goal_team.sh`, cc-haha file protocol: roster, per-agent inboxes,
-`TeammateMessage`) is the fallback, guaranteeing multi-role crews work on
-any bare harness.
-
-Default = one-shot subagents. `--teams` swaps **only the execution surface**.
-
-| | Work tracking / 工作追踪 | Court / 法庭 |
-|---|---|---|
-| where | `.goal/work-plan.md` + team roster/inbox | contract + gate + verdicts |
-| says a work item is done | controller ticks work-plan | — |
-| says the GOAL is done | — | `goal_gate.sh` rc=0 only |
-
-**`TaskUpdate = completed` is NEVER a GO signal.** 任务表/工作计划标完成永远
-不是 GO 信号。Hard rules:
-
-- **No `isolation: worktree`** — digest must see every teammate edit. 禁 worktree。
-- Negotiation via inbox/`MSG:` lines; interface changes bind only as file
-  writes to `interfaces.md`. 可协商，落文件才算数。
-- Judged cold seat is never a team member. 冷席永不进 team。
-- Protocol: `references/teams.md`. CLI: `scripts/goal_team.sh --help`.
-- Unattended: controller watch window + `goal_team.sh health` (stall /
-  tool-error / death → resume-first playbook in `references/teams.md` §7).
 
 ## Unattended mode / 无人值守模式（可选）
 
@@ -268,8 +239,7 @@ its discretionary evaluator. rc=0/3/4 pass, fail-open.
 ## More docs / 更多文档
 
 - `references/gate.md` — five invariants, R1–R19 legacy index, check order, schemas（门控规格与旧规则索引）
-- `references/crew.md` — crew protocol, Teams backend, judged-seat brief（派工与 Teams 协议）
-- `references/teams.md` — portable Agent-Teams layer（便携 team 协议，零 harness 依赖）
+- `references/crew.md` — crew protocol, judged-seat brief（派工协议与冷席简报）
 - `references/patterns.md` — failable check shapes per artifact type（可失败检查形状库）
 - `references/companions.md` — companion skills + cross-machine install（组合技能与跨设备安装）
 - `assets/goal.contract.md` — contract template（契约模板）

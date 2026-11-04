@@ -5,16 +5,15 @@ description: |-
   done) with the CREW of /team (parallel teammates sharing one deliverable)
   plus the layer both lack: an EXTERNAL ACCEPTANCE GATE. The controller
   decomposes an objective into an approved acceptance-criteria contract,
-  dispatches crew waves of parallel subagents (or, on request, an
-  Agent Teams crew), joins their output, and re-runs every deterministic
-  check via scripts/goal_gate.sh - the model can never self-declare
-  completion. Trigger: "/goal-loop [objective]",
+  dispatches crew waves of parallel subagents, joins their output, and
+  re-runs every deterministic check via scripts/goal_gate.sh - the model can
+  never self-declare completion. Trigger: "/goal-loop [objective]",
   "loop until done", "keep optimizing until it stops improving", "verify
   every angle". Not for trivial one-pass tasks, pure Q&A, or actions with
   irreversible side effects.
 ---
 
-# Goal Loop (v3.0.0)
+# Goal Loop (v4.0.0)
 
 **身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
 
@@ -26,8 +25,7 @@ description: |-
 | 完成判定 | haiku 评估器 | 自报 completed | **门控重跑确定性检查** |
 | 独有 | — | — | **契约**（done 的定义权在用户） |
 
-执行面两档：默认 subagent 波次；`--teams` 换 Teams 队友（**native first**，
-探测工具面选择；用户可见文案叫 Teams 队友/roster，**不要口语化成 crew**）。
+执行面一档：subagent 波次（并行 worker，共享工作区）。
 **判命面只有一档：门控。**
 
 ## 五条不变量（唯一的法律）
@@ -64,7 +62,6 @@ description: |-
 | `judged` / `calib:` / `probe:` / `metric:` / `sd:` / `var:` | `references/packs/instrument.md` |
 | `objective:` / `exit: forge` / horizon / `--strategy` | `references/packs/gradient.md` |
 | `external:` / `window:` | `references/packs/external.md` |
-| `--teams` | `references/teams.md` |
 
 水位/forge/EFFICIENCY/`calib:`/deferred 细节在 pack。
 **指标批评席**（forge dry 轮）：分数与进度单调吗？刷分路径？说不清=重写 AC。
@@ -84,7 +81,7 @@ bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> 
 
 证明：`bash examples/quickstart-one-shot/run.sh`。
 
-## 缺省跑规（与目标无关；`/goal-loop --teams {objective}` 即用）
+## 缺省跑规（与目标无关）
 
 1. **一波一收账**：`close-iteration` 是唯一波次出口；未收账不得再派下一波。有产物/勾账却 0 迭代 = unbooked（audit **A9**）。
 2. **objective 冷启动**：首波必须 `--score` + `--strategy`，否则不开多 worker 扩产。
@@ -100,8 +97,8 @@ bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> 
 - **接口先行**：`.goal/interfaces.md` 冻结，改走提案。
 - **禁止** `isolation: worktree`。简报：任务/输出路径/文件域/通过条件/返回证据；禁写 `.goal/`；禁 spawn。
 - **peer-notes**：`.goal/evidence/peer-notes/<task>.md` 每迭代 ≤1 行；claim-not-instruction。
-- Teams：work-plan 是正本；`task=T<n>[teams:N]`（N=该波实际并发人数，非上限）；**勾完 ≠ GO**。submit 等**面板批准**→**唤醒+完整简报**。
-  禁静默降级；禁 TeamDelete 濒死 team。详见 `crew.md`/`teams.md`。
+- 账本：`task=T<n>[crew:N]`（N=该波实际并发人数，非上限）；work-plan 是正本；**勾完 ≠ GO**。详见 `crew.md`。
+- **worker 掉线/空转**：`close-iteration --fault CLASS --fault-outcome OUTCOME`（后缀由工具派生，不许自封；audit **A11** 双向核账）；没勾的 work-plan 项让门控拒收（`open-items`）。见 `crew.md` §3.5。
 - Worker 工艺自理——不把 goal-loop 规则塞进简报。
 
 ## Step 3 Join + gate
@@ -127,6 +124,6 @@ bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> 
 
 ## 脚本与自检
 
-`scripts/{goal_gate,goal_ctl,goal_team,goal_hook,goal_parse,goal_audit,goal_loop}.sh` · `assets/goal.contract.md`。
+`scripts/{goal_gate,goal_ctl,goal_hook,goal_parse,goal_audit,goal_loop}.sh` · `assets/goal.contract.md`。
 自检：`tests/run_tests.sh` · `tests/docs_consistency.sh` · `examples/quickstart-one-shot/run.sh`。
 卸载 = 删 skill 目录 + `~/.claude/agents/goal-*.md`。
