@@ -1,0 +1,14 @@
+{
+  "cwd": {
+    "expected": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-loop-cwd-probe-ttisz83c/project with spaces",
+    "actual": "/Users/m/repo/goal-loop",
+    "rc": 3,
+    "output": "GOAL_LOOP: no-go iter=1 (reason above); next round\nGATE: NO-GO reason=empty-loop-log hint=write-ledger-block\nGOAL_LOOP: BLOCKED iterations-exhausted after 1\n"
+  },
+  "lock": {
+    "check_rc": 2,
+    "lock_survives_check": false,
+    "stdout": "",
+    "stderr": "GATE: NO-GO reason=empty-loop-log hint=write-ledger-block\n"
+  }
+}

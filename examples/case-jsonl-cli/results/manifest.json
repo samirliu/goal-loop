@@ -1,0 +1,28 @@
+{
+  "hashes": {
+    "prepare.py": "96dabe505c8e9e06c236c06381dbd05d04c79090d7a927a2bc5d14a94272ac1a",
+    "evaluate.py": "e172b4e5922794901fa23bd6b439c815fb61e2cc5261df17b929a1f262e826aa",
+    "pre-reg.md": "30bd911b5ed3c4a5e9f9f13500886225fc1331c7d6295dec0d01ef4717bc730b"
+  },
+  "root": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-loop-jsonl-jqgf6wdj",
+  "plain_start": 1793768956.7168572,
+  "candidate_hashes": {
+    "SKILL.md": "de8530f09d403dc28c372c4ecc4506096ea8c6afba92b7da7b3c3a77c414c9fa",
+    "scripts/goal_ctl.sh": "3e8408af496d70192777195e622f8d63af174973227928e5f28b937699990b96",
+    "scripts/goal_loop.sh": "715859205b59492eba916a4c79e31cc22992937a509f1f02ec20ba73f6c88506",
+    "scripts/goal_strategy.awk": "d000b1e7c718e0cf5e0e73d2c6bc1ff4df7788faefedf43810b82b8813fd25e3"
+  },
+  "plain_observed_end": 1793769171.6039639,
+  "skill_start": 1793769171.6039639,
+  "skill_deadline": 1793769411.6039639,
+  "skill_snapshot_time": 1793769428.192945,
+  "repair_start": 1793769511.555856,
+  "repair_deadline": 1793769751.555856,
+  "repair_hashes": {
+    "SKILL.md": "52c7c4866dabe0c5d9347cdddb59250376fbbbb44112a410690438f77365e9f4",
+    "scripts/goal_loop.sh": "5de3a9c00194a49fa9c6ea62e9529cf4d872372cf163451f04c1d65fa27677a0"
+  },
+  "repair_observed_end": 1793769742.625293,
+  "repair_public_unchanged": true,
+  "repair_gate_rc": 0
+}

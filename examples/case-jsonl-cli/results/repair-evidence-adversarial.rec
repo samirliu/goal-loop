@@ -1,0 +1,1 @@
+3|534aa8cd8b2c|clear|Second-pass review: eager parse validates all records before filtering; bool statuses and latencies rejected; nonfinite latency rejected; physical blank lines counted; nearest-rank formulas checked at N=0,1,3,20; own public CLI tests rerun pass. No unresolved public requirement found.

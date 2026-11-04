@@ -13,7 +13,7 @@ Rules for this folder:
 - `case.md` in each case dir: objective, contract sketch, which protocol
   surfaces it is meant to stress, and a findings log (defect → fix commit).
 - Runnable project trees live OUTSIDE the skill repo (e.g.
-  `~/goal-loop-case-<name>/`); this folder only records the case.
+  `~/goal-loop-case-<name>/`); this folder records the case and may include fixture generators, graders and replay patches.
 
 | case | domain | exit | stresses |
 |---|---|---|---|
@@ -23,3 +23,4 @@ Rules for this folder:
 | case-probe-campaign | hostile contracts ×10 | mixed | rule seams: duplicate ids, verify filters, state garbage, ledger self-mutation |
 | case-probe-campaign2 | state-machine loops ×10 | mixed | sequences: breaker arcs, ratchet arcs, fuse escalation, check-order walk, audit lifecycle |
 | case-independent-repro | domain-neutral CSV tool | threshold | external-validation scaffold: multi-AC, false-complete denial then GO, zero author domain |
+| case-jsonl-cli | JSONL CLI | threshold | timed paired trial, crew startup overhead, independent outcome grading, runtime cwd/lock regressions |

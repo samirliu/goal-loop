@@ -12,6 +12,7 @@ here=$(cd "$(dirname "$0")" && pwd)
 claude_bin="${CLAUDE_BIN:-claude}"
 template="$here/../assets/goal.contract.md"
 project="." mode="" max_iterations=12 wallclock=1800 rate=5 dry=0 resume=0
+lock_owned=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -53,18 +54,31 @@ acquire_lock(){
     fi
     echo "GOAL_LOOP: NOTE reclaiming stale/overridden lock pid=$pid age=${age}s" >&2
   fi
-  mkdir -p "$sd/logs"; printf '%s\n%s\n' "$$" "$(date +%s)" > "$lf"
+  mkdir -p "$sd/logs" || exit 4
+  printf '%s\n%s\n' "$$" "$(date +%s)" > "$lf" || exit 4
+  lock_owned=1
 }
-release_lock(){ rm -f "$sd/lock" 2>/dev/null || true; }
+release_lock(){
+  # Check/init and a refused duplicate never owned this lock. An overridden
+  # runner must also leave a newer owner's lock intact when it finally exits.
+  [ "$lock_owned" -eq 1 ] || return 0
+  [ "$(head -1 "$sd/lock" 2>/dev/null)" = "$$" ] || return 0
+  rm -f "$sd/lock" 2>/dev/null || true
+}
 trap release_lock EXIT INT TERM
 
 run_claude(){
   local cmd=("$claude_bin" -p "/goal-loop --continue" --output-format json)
-  if command -v timeout >/dev/null 2>&1; then
-    timeout "$wallclock" "${cmd[@]}"
-  else
-    "${cmd[@]}"
-  fi
+  # --project binds execution as well as verification. Keep the caller's cwd
+  # outside this subshell so relative ledger/log paths retain their meaning.
+  (
+    cd "$project" || exit 4
+    if command -v timeout >/dev/null 2>&1; then
+      timeout "$wallclock" "${cmd[@]}"
+    else
+      "${cmd[@]}"
+    fi
+  )
 }
 
 case "$mode" in

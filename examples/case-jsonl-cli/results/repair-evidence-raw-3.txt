@@ -1,0 +1,2 @@
+GATE: VERIFY AC-1|PASS|exit=0
+GATE: VERIFY-OK checked=1

@@ -1,14 +1,10 @@
 # goal-loop
 
-**EN** — goal-loop combines the DRIVE of the harness /goal (never stop until done) with the CREW of /team (parallel teammates on one deliverable) plus the layer both lack: an external acceptance gate with a frozen contract. **/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
+**v4.1.1** — 用冻结的验收契约、共享工作区 subagent 波次和确定性门控推进交付；用测量反馈选择下一轮策略。
 
-**v4.0.0** — Agent Teams 后端整体移除：执行面只剩一档（subagent 波次），判命面仍只有门控。`--teams`（原生 TeamCreate/TeamPlan/面板 + 便携文件层）连同 `references/teams.md` / `scripts/goal_team.sh` 一并作废；账本 `task=` 语法收紧为 `T<n>[crew:N]`；teams 专属的 A4（静默降级）与 `teams-process-reaped`/`teams-unavailable` 后缀删除。并行波次的 worker 故障改为**有牙**：worker 掉线/空转由 `close-iteration --fault CLASS --fault-outcome OUTCOME` 记账（后缀由工具派生，不许自封，audit **A11** 双向核账），没勾的 work-plan 项直接让门控拒收（`open-items`）——掉线的 worker 再也藏不住。
+这一版只深化归因：相邻读数差属于当前波次；缺失证据断链；策略采用最新窗口；噪声信息不足时不推荐。`EFFICIENCY` 和 `STRATEGY-PICK` 共用一个计算内核，删除重复逻辑。入口比 v4.0 更短，命令和账本格式兼容。真实试跑又修正了短预算任务的派工选择，并修复无人值守执行目录及锁清理。
 
-**v3.0.0** — legal-surface compaction only. The always-on law is five invariants (GATE / BIND / PROVE / GRADIENT / FENCE); depth lives in `references/packs/`. Mechanical gate checks are unchanged from 2.9.0.
-
-**v2.8.0** — evaluation-driven attribution（`--strategy` 策略标签 + `ctl status` 的 EFFICIENCY 斜率 / eval-gap / promote advisory，纯旁路不改门控）、worker 间 peer-notes 共享发现池（claim-not-instruction 铁律）、复杂目标契约三层形状（patterns §12）。
-
-**中文** — 一个 Claude Code skill，把两个开源项目的纪律融合进一条循环：*ralph-claude-code* 的双条件退出门控 + *fable-mode* 的对抗式检查员面板。核心承诺：**模型永远不能自我宣布完成** —— 只有外部 shell 门控（`goal_gate.sh`）能发 GO，且门控**亲自重跑每条确定性检查**（信任链零模型参与）；判断类质量声明交冷席终验。对"尽可能完美"类开放目标，`forge` 退出以**验证穷尽**收尾（连续 K 轮挖不出有证据的新缺陷），而非仅凭地板达标。
+可重跑证据与设计边界见 [本次评估记录](docs/evaluation-design.md)。门控复跑证明的是契约被满足；真实效率、可迁移性必须通过固定预算下的留出任务对照证明。
 
 ```
 objective → contract (AC-1..N, each with a NAMED failable check) → user approval stamp
@@ -56,7 +52,7 @@ rm -f ~/.claude/skills/goal-loop/scripts/goal_team.sh \
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check
 # 无 .goal/ 的目录里应返回 rc=4, reason=no-goal-dir —— 说明门控在岗
 bash ~/.claude/skills/goal-loop/tests/run_tests.sh
-# 场景套件应 fail=0 全绿 —— 门控语义的完整回归（当前 485 项断言）
+# 场景套件应 fail=0 全绿 —— 门控语义的完整回归（当前 509 项断言）
 # 默认 --jobs=8 并行分片（约 3–4 分钟）；--jobs=1 串行；--only 78-90 增量
 bash ~/.claude/skills/goal-loop/tests/docs_consistency.sh
 # 文档一致性（活文档字面量）应 CONSISTENT
@@ -169,37 +165,13 @@ iterations grind on the same error signature.
 `verdicts.rec`（裁决记录，6 字段管道分隔）· `work-plan.md`（任务队列正本）·
 `interfaces.md`（crew 接口契约）· `baseline.md`（forge 基线）· `evidence/`（席与检查证据）
 
-## goal-loop vs the built-in /goal / 与内置 /goal 的对位
+## 与普通目标循环的区别
 
-Claude Code ships a harness-native `/goal` (Stop hook + prompt evaluator).
-Ground truth from the bundled sidecar JS: on **every stop** it spawns a
-tool-using evaluator agent (full tool array, structured `{ok, reason}`,
-fail-closed on evaluator error), sanitizes the denial reason (`<>&` strip,
-240-char cap) into `Goal continuing: <reason>`, and rebuilds the goal
-state from the transcript on resume. 内置 /goal 每次停顿起一个带工具的评估
-agent（结构化输出、评估器出错 fail-closed、reason 消毒回注、transcript 重建状态）。
+额外机制是冻结成功定义、可恢复账本、校准检查器、确定性重跑和策略反馈。它们针对长任务中的验收漂移、假完成和重复无效尝试；是否胜过宿主提供的 `/goal`，取决于任务、模型版本与总预算。
 
-| axis / 维度 | /goal (built-in) | goal-loop (this skill) |
-|---|---|---|
-| verification / 验证 | discretionary - a fresh agent decides each stop what to check / 裁量式，每次停顿自定查什么 | pinned - named checks frozen in the stamped contract, the gate re-runs them exactly / 钉死在契约里，门控原样重跑 |
-| regression protection / 回归保护 | none structurally / 结构性缺失 | every deterministic check re-runs at every exit / 出口全量重跑 |
-| "done" definition / 完成定义 | one sentence, interpreted post-hoc / 一句话事后解释 | AC-1..N frozen at stamping, user-owned / 盖章冻结，定义权在用户 |
-| failure semantics / 失败语义 | continue until the user kills it / 只有不结束 | BLOCKED · breakers · budget-fuse · time-budget · best-so-far |
-| cost shape / 成本形态 | pays every stop (evaluator tax), even with nothing claimed / 每次停顿都付 | pays per wave; gate reruns are bash; gate-only rounds ~free / 按波次付费，门控重跑≈0 |
-| audit / 审计 | transcript grep only | verdicts.rec + digest binding + evidence/ |
-| setup / 门槛 | zero ceremony / 零仪式 | contract + approval, one-time / 契约+审批，一次性 |
+比较时固定模型、起始工作区、验收器和总预算，用未参与调优的任务配对多次运行；报告交付率、全部尝试的总成本、交付时间与失败。不能把波数少或 shell 检查便宜等同于总成本更低，也不能把当前测试套件当作真实任务胜率。
 
-**Don't stack them / 不要叠加**：/goal 的评估器会把 goal-loop 的 BLOCKED 判成
-"未完成"强行续跑——两个外层循环打架，熔断语义被废。二选一。
-
-Rule of thumb / 经验法则: a vague one-sentence objective with a human watching
-→ `/goal` is the cheaper tool; there is no shame in it. Anything that must be
-defended later — deliverables, optimization with metric deltas, auditable
-completion — needs the pinned checks, regression re-runs and fuse semantics
-that only goal-loop has; for optimization specifically, /goal cannot pin a
-baseline or a noise floor, so "better" is judged on vibes while goal-loop
-spends its tokens on deltas against a measured baseline. 一句话模糊目标、有人
-盯着 → /goal 更省；要交付物、要指标 delta、要可审计完成 → goal-loop。
+门控是独立执行的检查程序，**不是操作系统权限边界**：控制器与检查器仍共享用户权限；脚本冻结也不等于冻结所有传递依赖。对不可信执行器需要隔离环境和外置验收器。避免叠加两个会强制续跑的外层循环，以免覆盖彼此的预算与停车语义。
 
 ## When NOT to use goal-loop / 何时不要用
 

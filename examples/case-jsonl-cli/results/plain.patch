@@ -1,0 +1,123 @@
+--- a/logtool/__main__.py
++++ b/logtool/__main__.py
+@@ -1 +1,46 @@
+-raise SystemExit("not implemented")
++"""Command-line interface: main(argv=None) returns a process exit code.
++
++All input is validated before filtering or writing to stdout.
++"""
++import argparse
++import json
++import sys
++
++from .parser import InputError, parse
++from .stats import summarize
++
++
++def main(argv=None):
++    """Run stats or query over a file path (or '-' for standard input)."""
++    cli = argparse.ArgumentParser(prog="logtool")
++    commands = cli.add_subparsers(dest="command", required=True)
++    for name in ("stats", "query"):
++        command = commands.add_parser(name)
++        command.add_argument("path")
++        command.add_argument("--service")
++        if name == "query":
++            command.add_argument("--min-status", type=int)
++    args = cli.parse_args(argv)
++    try:
++        if args.path == "-":
++            rows = parse(getattr(sys.stdin, "buffer", sys.stdin))
++        else:
++            with open(args.path, "rb") as stream:
++                rows = parse(stream)
++        if args.service is not None:
++            rows = [row for row in rows if row["service"] == args.service]
++        if args.command == "stats":
++            output = json.dumps(summarize(rows)) + "\n"
++        else:
++            if args.min_status is not None:
++                rows = [row for row in rows if row["status"] >= args.min_status]
++            output = "".join(json.dumps(row) + "\n" for row in rows)
++    except (InputError, OSError, ValueError, RecursionError) as exc:
++        print(f"logtool: {exc}", file=sys.stderr)
++        return 2
++    sys.stdout.write(output)
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- a/logtool/parser.py
++++ b/logtool/parser.py
+@@ -1,2 +1,43 @@
++"""Strict JSONL input: parse(stream) returns all validated original objects.
++
++Streams may yield UTF-8 bytes or text. Invalid input raises InputError with
++its physical (one-based) line number, before any records are returned.
++"""
++import json
++import math
++
++
++class InputError(ValueError):
++    """Invalid JSONL record or encoding."""
++
++
++def _constant(value):
++    raise ValueError(f"invalid JSON constant {value}")
++
++
+ def parse(stream):
+-    raise NotImplementedError("implement JSONL validation")
++    """Read and validate every record from a text or binary line iterable."""
++    rows = []
++    for number, line in enumerate(stream, 1):
++        try:
++            if isinstance(line, bytes):
++                line = line.decode("utf-8")
++            if not line.strip():
++                continue
++            row = json.loads(line, parse_constant=_constant)
++            if not isinstance(row, dict):
++                raise ValueError("record must be an object")
++            service = row.get("service")
++            if not isinstance(service, str) or not service:
++                raise ValueError("service must be a nonempty string")
++            status = row.get("status")
++            if type(status) is not int or not 100 <= status <= 599:
++                raise ValueError("status must be an integer from 100 to 599")
++            latency = row.get("latency_ms")
++            if (type(latency) not in (int, float) or latency < 0
++                    or (isinstance(latency, float) and not math.isfinite(latency))):
++                raise ValueError("latency_ms must be a finite nonnegative number")
++        except (ValueError, UnicodeError, RecursionError) as exc:
++            raise InputError(f"line {number}: {exc}") from exc
++        rows.append(row)
++    return rows
+--- a/logtool/stats.py
++++ b/logtool/stats.py
+@@ -1,2 +1,22 @@
++"""Statistics interface: summarize(rows) returns a JSON-serializable dict.
++
++Rows must already have been validated by logtool.parser.parse.
++"""
++
++
+ def summarize(rows):
+-    raise NotImplementedError("implement statistics")
++    """Count services and errors and compute nearest-rank p50/p95 latency."""
++    rows = list(rows)
++    values = sorted(row["latency_ms"] for row in rows)
++    count = len(rows)
++    services = {}
++    for row in rows:
++        name = row["service"]
++        services[name] = services.get(name, 0) + 1
++    return {
++        "count": count,
++        "errors": sum(row["status"] >= 500 for row in rows),
++        "p50_ms": values[(50 * count + 99) // 100 - 1] if count else None,
++        "p95_ms": values[(95 * count + 99) // 100 - 1] if count else None,
++        "services": services,
++    }

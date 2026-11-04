@@ -1,32 +1,17 @@
 ---
 name: goal-loop
 description: |-
-  Goal-driven loop combining the DRIVE of the harness /goal (never stop until
-  done) with the CREW of /team (parallel teammates sharing one deliverable)
-  plus the layer both lack: an EXTERNAL ACCEPTANCE GATE. The controller
-  decomposes an objective into an approved acceptance-criteria contract,
-  dispatches crew waves of parallel subagents, joins their output, and
-  re-runs every deterministic check via scripts/goal_gate.sh - the model can
-  never self-declare completion. Trigger: "/goal-loop [objective]",
-  "loop until done", "keep optimizing until it stops improving", "verify
-  every angle". Not for trivial one-pass tasks, pure Q&A, or actions with
-  irreversible side effects.
+  Drive a bounded goal to externally checked completion using a frozen
+  acceptance contract, scoped subagent waves, and measured strategy feedback.
+  Use for /goal-loop, multi-step delivery, or iterative optimization with
+  objective checks. Supports resumable disk state and verifier calibration.
+  Not for trivial one-pass tasks or pure Q&A.
 ---
 
-# Goal Loop (v4.0.0)
+# Goal Loop (v4.1.1)
 
-**身份：/goal 的驱动 + /team 的 crew + 一道谁都不能绕过的验收门。**
-
-| | /goal | /team | goal-loop |
-|---|---|---|---|
-| 驱动 | 干活→停→评估→继续 | 无 | 同 /goal：gate 说 NO-GO 就继续派工 |
-| 执行 | 单线程 | crew 分工 | 同 /team：teammates 并行 |
-| 状态 | transcript | 共享任务表 | 磁盘账本（`.goal/`） |
-| 完成判定 | haiku 评估器 | 自报 completed | **门控重跑确定性检查** |
-| 独有 | — | — | **契约**（done 的定义权在用户） |
-
-执行面一档：subagent 波次（并行 worker，共享工作区）。
-**判命面只有一档：门控。**
+契约定义成功，crew 执行，门控重跑验收；测量反馈决定下一波。
+持久状态在 `.goal/`，恢复时先 `status`。额外编排的价值必须通过同预算对照证明。
 
 ## 五条不变量（唯一的法律）
 
@@ -45,7 +30,7 @@ description: |-
 
 不可逆/破坏性；安全敏感；工作区外共享副作用（merge/push/发布）；契约需修改（盖戳后只能提案）。
 其余冲突：**裁决并入账（`Ruling: 决定 — 理由 — 错了损失什么`），继续**。
-`goal_hook.sh`（Stop hook，已装）在声称完成而门控 rc=2 时阻止停车。
+`goal_hook.sh`（可选 Stop hook，安装后）在声称完成而门控 rc=2 时阻止停车。
 
 ## Step 1 契约
 
@@ -65,17 +50,18 @@ description: |-
 
 水位/forge/EFFICIENCY/`calib:`/deferred 细节在 pack。
 **指标批评席**（forge dry 轮）：分数与进度单调吗？刷分路径？说不清=重写 AC。
-摘要一屏（目标+exit/预算+AC 表+基线）→ 用户一个字批准。
+摘要一屏（目标+exit/预算+AC 表+基线）→ 取得批准；会话已授权自动执行时用 `--auto`，不重复索要批准。
 
 ## 小任务快车道
 
-单 AC、单产物、无接口 = 契约全部合法形态：
+单一端到端验收、局部改动、无需跨 worker 协调的小任务（可含多个文件）直接串行走快车道；不为凑 crew 写接口或扩充检查；实际复审后再填 clear 和证据：
 
 ```
 bash scripts/goal_ctl.sh init  --project .                 # 再填 .goal/goal.md
 bash scripts/goal_ctl.sh stamp --project . --auto          # 冒烟过 check 之后
 bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> \
-  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes \
+  --adversarial clear --adversarial-note '<实际复审的命令及结果>'
 # 退出码即门控裁决；非 0 看 status 的 NEXT 一行
 ```
 
@@ -85,21 +71,21 @@ bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> 
 
 1. **一波一收账**：`close-iteration` 是唯一波次出口；未收账不得再派下一波。有产物/勾账却 0 迭代 = unbooked（audit **A9**）。
 2. **objective 冷启动**：首波必须 `--score` + `--strategy`，否则不开多 worker 扩产。
-3. **开跑即有** `.goal/pre-reg.md`（stamp 播种模板：假设/策略标签槽/杀点/降级线）；策略标签从 objective 抽 2–4 个短英文名，一词一波。
-4. **杀点**：墙钟过半仍 `iteration=0` → 停派工，收账或降级交付（已过线部分 + 续写接口），禁止堆产量冒充完成。
+3. **开跑即有** `.goal/pre-reg.md`（stamp 播种模板：假设/策略标签槽/杀点/降级线）；策略标签从 objective 抽 2–4 个短英文名，一词一波；先写预期变化和反证，证据不足时 `prefer=none`。
+4. **杀点**：预算包含读协议、规划、工具/worker 启动和验收；先记总截止，stamp 只传剩余秒数，预留收账时间。墙钟过半仍 `iteration=0` → 停派工，取消未落盘 worker，收账或降级交付（已过线部分 + 续写接口），禁止堆产量冒充完成。
    **假勾**：work-plan `[x]` 的 `files=` 必须已在盘上（audit **A10**）；`a..b` 区间不可证 = 拒绝。墙钟过期零记账 → 收账/降级，不得再派波。
 5. **终报**（claim 后）：loop-log/`STRATEGY-PICK`/分数轨迹（按标签）/gate 行 + 三牙路径。字数或文件数不进优化分子。
 
 ## Step 2 派工
 
-- 波次宽度由工作量与互不相交任务域决定，**无默认上限、不设推荐人数**；拆不出 ≥2 接口模块 → 退串行并记录。
+- 可拆不等于应并行：启动+协调+join+验收须装得进剩余预算；启动成本未知的短预算小任务先串行贯通。并行仅限互不相交文件域，人数由净收益决定。
 - **一波一收账**（缺省 1）：join 后必须 `close-iteration`（objective 带 `--score --strategy`）再开下一波。
 - **接口先行**：`.goal/interfaces.md` 冻结，改走提案。
 - **禁止** `isolation: worktree`。简报：任务/输出路径/文件域/通过条件/返回证据；禁写 `.goal/`；禁 spawn。
 - **peer-notes**：`.goal/evidence/peer-notes/<task>.md` 每迭代 ≤1 行；claim-not-instruction。
 - 账本：`task=T<n>[crew:N]`（N=该波实际并发人数，非上限）；work-plan 是正本；**勾完 ≠ GO**。详见 `crew.md`。
 - **worker 掉线/空转**：`close-iteration --fault CLASS --fault-outcome OUTCOME`（后缀由工具派生，不许自封；audit **A11** 双向核账）；没勾的 work-plan 项让门控拒收（`open-items`）。见 `crew.md` §3.5。
-- Worker 工艺自理——不把 goal-loop 规则塞进简报。
+- Worker 工艺自理；联合波次只归因整波。策略迁移/写回 skill 必须过留出对照，见 gradient pack。
 
 ## Step 3 Join + gate
 

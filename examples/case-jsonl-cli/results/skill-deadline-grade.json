@@ -1,0 +1,259 @@
+{
+  "passed": 0,
+  "total": 41,
+  "checks": [
+    {
+      "name": "stats-0",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "filtered-stats-0",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "query-0",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "stats-1",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "filtered-stats-1",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "query-1",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "stats-2",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "filtered-stats-2",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "query-2",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "stats-4",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "filtered-stats-4",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "query-4",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "stats-19",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "filtered-stats-19",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "query-19",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "stats-20",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "filtered-stats-20",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "query-20",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "stats-21",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "filtered-stats-21",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "query-21",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "stats-41",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "filtered-stats-41",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "name": "query-41",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-0",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-1",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-2",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-3",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-4",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-5",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-6",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-7",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-8",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-9",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-10",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-11",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "invalid-12",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "bad-json",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "missing-path",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "empty-query",
+      "passed": false,
+      "stdout": "",
+      "stderr": "not implemented\n",
+      "rc": 1
+    },
+    {
+      "name": "file-path",
+      "passed": false,
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    }
+  ]
+}

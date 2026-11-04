@@ -1,0 +1,50 @@
+{
+  "budget_seconds": 240,
+  "type": "one paired smoke trial plus development retest; not a statistical benchmark",
+  "plain": {
+    "accepted_checks": 41,
+    "total_checks": 41,
+    "reported_elapsed_seconds_from_dispatch": 196,
+    "mode": "serial",
+    "child_workers": 0,
+    "gate": "not applicable"
+  },
+  "skill_before": {
+    "accepted_checks": 0,
+    "total_checks": 41,
+    "at_budget_seconds": 240,
+    "mode": "two parallel workers",
+    "booked_iterations_at_cutoff": 0,
+    "gate_go": false,
+    "snapshot_delay_seconds": 16.6
+  },
+  "repair": {
+    "accepted_checks": 41,
+    "total_checks": 41,
+    "reported_elapsed_seconds_from_dispatch": 207,
+    "mode": "serial",
+    "child_workers": 0,
+    "booked_iterations": 3,
+    "implementation_waves": 1,
+    "gate_go": true,
+    "false_completes": 1,
+    "gate_digest": "534aa8cd8b2c"
+  },
+  "tokens": "unknown",
+  "monetary_cost": "unknown",
+  "runtime_regression": {
+    "before": {
+      "passed": 4,
+      "failed": 3
+    },
+    "after": {
+      "passed": 7,
+      "failed": 0
+    }
+  },
+  "documented_fast_lane_after_fix": {
+    "passed": 3,
+    "failed": 0,
+    "false_completes": 0
+  }
+}

@@ -1,0 +1,9 @@
+  ok   - 137a check-only preserves gate rc (rc=2)
+  ok   - 137a check-only preserves foreign lock
+  ok   - 137b live owner refused (rc=4)
+  ok   - 137b refusal preserves foreign lock
+  ok   - 137c normal exhausted run rc intact (rc=3)
+  ok   - 137c executor runs at project root
+  ok   - 137c owned lock cleaned
+== results: pass=7 fail=0 ==
+== total: pass=7 fail=0 shards=1 ==

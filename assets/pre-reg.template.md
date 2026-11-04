@@ -1,36 +1,44 @@
-# pre-reg.md — generated at stamp (goal-agnostic defaults)
+# pre-reg.md — generated at stamp
 
 T0 = <ISO stamp time>
 budget: max_iterations=<> wallclock=<seconds or off>
 
-## Hypotheses (fill or delete; do not wait for a perfect story)
+## Hypothesis and counterevidence
 
-1. After >=2 `close-iteration` rows, `ctl status` shows `STRATEGY-PICK` (prefer=…); if a label goes flat it appears under `avoid=`.
-2. A claim only passes with the two-pass + sensor teeth: `adversarial.rec` clear@ (iter,digest), non-empty `evidence/raw/<iter>.txt`, check/probe scripts unfrozen.
+Change <one mechanism> because <raw trace + failing reproducer>.
+Predict <metric movement>; reject if <observable failure condition>.
+First measured score anchors the trajectory; it does not prove a strategy.
 
 ## Strategy labels (objective contracts)
 
-Derive 2–4 short ASCII attack labels from THIS objective (not from the agent's mood).
-One primary label per wave via `close-iteration --strategy`.
-Changing label without `--strategy-delta` when `progress=no` is a fail line.
+Derive 2–4 short labels from this objective; one primary label per wave.
+For each: expected benefit / failure condition / scope of applicability.
+`prefer=none` means gather evidence; do not guess a winning label.
+Joint crew results belong to the wave, not to individual workers.
 
-- label_a: <what it attacks>
-- label_b: <what it attacks>
+## Kill lines
 
-## Kill lines (any hit → stop and report; do not raise budget to "try again")
+- `iteration=0` with landed work or >=50% wallclock: close books before dispatch.
+- Retry `avoid=` without a changed hypothesis and `strategy_delta`.
+- Claim without adversarial clear, raw output, or untouched check scripts.
+- Change the metric/check mid-run to raise the score.
 
-- `iteration=0` after real work product exists, or after >=50% wallclock — loop never turned; stop dispatching.
-- Repeat an `avoid=` label without `strategy_delta`.
-- Claim without adversarial clear / raw dump / untouched check scripts.
-- Self-declared complete, or gate rc disagrees with the claim.
-- Change metric/check definitions mid-run to raise a score (Goodhart).
+## Success digits
 
-## Success digits (report these; do not invent a rubric)
+Report accepted deliveries / all trials, score trajectory, and gate evidence.
+For efficiency: total elapsed time and token/cost telemetry including evals,
+joins, retries and failures; unavailable values are unknown, never zero.
+Wave count alone cannot establish cost efficiency or parallel speedup.
 
-1. loop-log rows with `strategy=` + STRATEGY-PICK lines
-2. score trajectory per label (optimize = better score / same work, not more words or more files)
-3. gate line + the three teeth paths
+## Reusable-policy promotion (only when changing the skill/strategy itself)
+
+Freeze baseline/candidate, graders, task split and equal budgets before trials.
+Keep held-out answers away from workers; use paired fresh states and repeats.
+Report acceptance rate + all-trial cost / accepted deliveries + median/p90
+time to delivery; failures are budget-censored, not excluded.
+Retain incumbent on floor regression or no held-out benefit; keep failed trials.
 
 ## Degrade line
 
-If wallclock or max_iterations is spent: deliver **what already passes** + a short continuation note (interfaces/open items). Never pad volume to look done.
+On budget expiry: report what passes + remaining evidence gaps and continuation
+paths. Only gate GO is completion; partial delivery is not GO.

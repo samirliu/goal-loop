@@ -1471,10 +1471,10 @@ obj110(){ # $1 proj NAME under $T, optional $2 = tolerance token (inserted BEFOR
   contract "$1" "- AC-1 | t | check: \`true\` |${tol} expected: maximize"
   printf 'objective: maximize AC-1\nhorizon-waived: toy slope fixture - blind spot immaterial\n' >> "$p/.goal/goal.md"
   bash "$CTL" stamp --project "$p" --auto >/dev/null 2>&1; }
-# 110a anchors over none rows: scores 10,none,11 => +0.5 /2 exploit
+# 110a missing scores break attribution: no interpolation across none
 mkproj t110a; obj110 t110a ""; hblocks t110a T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110a 10 none 11
 out=$(bash "$CTL" status --project "$T/t110a" 2>&1); assert_rc "110a rc0" 0 $?
-assert_has "110a slope +0.5 over span 2" 'strategy=A \+0.5 /2 iters -> exploit' "$out"
+assert_has "110a missing point stays unmeasured" 'strategy=A n=0 unmeasured' "$out"
 # 110b window of none scores => unmeasured (needs other numeric data)
 mkproj t110b; obj110 t110b ""; hblocks t110b T1[crew:1] A T1[crew:1] A T1[crew:1] B T1[crew:1] B; scorefile t110b none none 5 6
 out=$(bash "$CTL" status --project "$T/t110b" 2>&1)
@@ -1483,12 +1483,12 @@ assert_has "110b numeric window still slopes" 'strategy=B \+1.0 /1 iters -> expl
 # 110c single numeric point => no divide
 mkproj t110c; obj110 t110c ""; hblocks t110c T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110c none 12 none
 out=$(bash "$CTL" status --project "$T/t110c" 2>&1)
-assert_has "110c n=1 unmeasured" 'strategy=A n=1 unmeasured' "$out"
-# 110d negative scores format (maximize, negative slope => no advisory)
+assert_has "110c no comparable pair" 'strategy=A n=0 unmeasured' "$out"
+# 110d negative scores: regression is actionable
 mkproj t110d; obj110 t110d ""; hblocks t110d T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110d -5 -7 -11 -12.5
 out=$(bash "$CTL" status --project "$T/t110d" 2>&1)
-assert_has "110d negative slope format" 'strategy=A \-2.5 /3 iters$' "$out"
-printf '%s' "$out" | grep -qE '-> exploit|-> prune' && no "110d no advisory on negative maximize" || ok "110d no advisory on negative maximize"
+assert_has "110d negative slope format" 'strategy=A \-2.5 /3 iters -> prune' "$out"
+assert_has "110d negative maximize is pruned" 'STRATEGY-PICK prefer=none avoid=A' "$out"
 # 110e minimize objective flips exploit
 mkproj t110e; contract t110e "- AC-1 | t | check: \`true\` | expected: maximize" NOSTAMP=1; printf 'objective: minimize AC-1\nhorizon-waived: toy slope fixture - blind spot immaterial\n' >> "$T/t110e/.goal/goal.md"; bash "$CTL" stamp --project "$T/t110e" --auto >/dev/null 2>&1
 hblocks t110e T1[crew:1] A T1[crew:1] A; scorefile t110e 100 90
@@ -1515,7 +1515,7 @@ assert_has "110h tol-band flat prune" '-> prune \(flat 3 iters\)' "$(bash "$CTL"
 mkproj t110i; obj110 t110i "| tolerance: .01"; hblocks t110i T1[crew:1] A T1[crew:1] A T1[crew:1] A T1[crew:1] A; scorefile t110i -10.0 -10.1 -10.3 -10.4
 out=$(bash "$CTL" status --project "$T/t110i" 2>&1)
 assert_has "110i negative slope shown" 'strategy=A \-0.1 /3 iters' "$out"
-printf '%s' "$out" | grep -qE '-> prune' && no "110i abs-band keeps tight tol honest" || ok "110i abs-band keeps tight tol honest"
+assert_has "110i beyond tight band is regression" 'STRATEGY-PICK prefer=none avoid=A' "$out"
 # 111a threshold + unstalled => no EFFICIENCY section at all
 mkproj t111a; contract t111a "- AC-1 | t | check: \`true\` | expected: exit=0"
 hblocks t111a T1[crew:1] x T1[crew:1] y; scorefile t111a 1 2
@@ -1530,7 +1530,7 @@ assert_has "111b forge stall fires" 'CTL: EFFICIENCY score-data: none recorded' 
 mkproj t111c; obj110 t111c ""; hblocks t111c T1[crew:1] A T1[crew:1] A; scorefile t111c 10 none
 printf '99|7|none\n' >> "$T/t111c/.goal/scores.rec"
 out=$(bash "$CTL" status --project "$T/t111c" 2>&1); assert_rc "111c orphan row rc0" 0 $?
-assert_has "111c slope from real blocks only" 'strategy=A n=1 unmeasured' "$out"
+assert_has "111c no pair from orphan rows" 'strategy=A n=0 unmeasured' "$out"
 
 # 112 eval-gap: flat objective scores while stalled
 mkproj t112a; obj110 t112a ""; hblocks t112a T1[crew:1] f T1[crew:1] f T1[crew:1] f; scorefile t112a 50 50 50; stall "$T/t112a"
@@ -2037,12 +2037,12 @@ dl=$(grep -E '^deadline=' "$T/t128b/.goal/state.rec" | cut -d= -f2)
 # ---------------------------------------------------------------------------
 # 129 live-run defects (b62e4d06 business retest): pick at n=1, task-marker law
 # ---------------------------------------------------------------------------
-# 129a n=1 labeled score still prints STRATEGY-PICK
+# 129a n=1 prints a pick with explicitly unknown preference
 mkproj t129a; obj110 t129a ""
 hblocks t129a T1[crew:2] rule-tuning
 scorefile t129a 100.0
 out=$(bash "$CTL" status --project "$T/t129a" 2>&1)
-assert_has "129a pick at n=1" 'STRATEGY-PICK prefer=rule-tuning avoid=none' "$out"
+assert_has "129a no evidence at n=1" 'STRATEGY-PICK prefer=none avoid=none' "$out"
 assert_has "129a efficiency unmeasured" 'unmeasured' "$out"
 
 # 129c bare T always normalizes to crew:1 - a leftover team roster changes nothing
@@ -2344,3 +2344,131 @@ out=$(bash "$CTL" close-iteration --project "$T/t135g" --task T2 --files a.txt \
   --exit-signal yes --adversarial clear --adversarial-note "second pass" 2>&1); rc=$?
 assert_rc "135g claim goes through" 0 $rc
 assert_has "135g gate GO" 'GATE: GO' "$out"
+
+# 136 attribution counterexamples: local deltas, missing data, latest evidence
+mkproj t136a; obj110 t136a ""
+hblocks t136a T1 A T1 B
+scorefile t136a 0 100
+out=$(bash "$CTL" status --project "$T/t136a" 2>&1)
+assert_has "136a entry gain belongs to B" 'STRATEGY-PICK prefer=B avoid=none' "$out"
+assert_has "136a entry measured as one delta" 'strategy=B \+100.0 /1 iters -> exploit' "$out"
+
+mkproj t136b; obj110 t136b ""
+hblocks t136b T1 A
+scorefile t136b 100
+out=$(bash "$CTL" status --project "$T/t136b" 2>&1)
+assert_has "136b no unsupported last-label preference" 'STRATEGY-PICK prefer=none avoid=none' "$out"
+
+mkproj t136c; obj110 t136c ""
+hblocks t136c T1 A T1 A T1 A
+scorefile t136c 10 none 100
+out=$(bash "$CTL" status --project "$T/t136c" 2>&1)
+assert_has "136c missing measurement breaks attribution" 'STRATEGY-PICK prefer=none avoid=none' "$out"
+
+mkproj t136d; obj110 t136d ""
+hblocks t136d T1 A T1 A T1 B T1 A T1 A T1 A T1 A
+scorefile t136d 0 10 10 10 10 10 10
+out=$(bash "$CTL" status --project "$T/t136d" 2>&1)
+assert_has "136d latest A supersedes historical exploit" 'STRATEGY-PICK prefer=none avoid=A' "$out"
+printf '%s\n' "$out" | grep -q 'STRATEGY-PICK prefer=A avoid=A' && no "136d contradictory pick" || ok "136d pick disjoint"
+
+mkproj t136e; obj110 t136e ""
+hblocks t136e T1 A T1 A T1 A T1 A T1 B T1 A
+scorefile t136e 10 10 10 10 10 20
+out=$(bash "$CTL" status --project "$T/t136e" 2>&1)
+assert_has "136e retry with new evidence clears old prune" 'STRATEGY-PICK prefer=A avoid=none' "$out"
+
+mkproj t136f; obj110 t136f ""
+hblocks t136f T1 A T1 A T1 A T1 A
+scorefile t136f 10 20 0 10
+out=$(bash "$CTL" status --project "$T/t136f" 2>&1)
+assert_has "136f oscillation is not a dry plateau" 'STRATEGY-PICK prefer=none avoid=none' "$out"
+
+mkproj t136g; obj110 t136g ""
+hblocks t136g T1 base T1 bad
+scorefile t136g 100 50
+out=$(bash "$CTL" status --project "$T/t136g" 2>&1)
+assert_has "136g regression avoids strategy" 'STRATEGY-PICK prefer=none avoid=bad' "$out"
+
+mkproj t136h; obj110 t136h ""
+sed_in 's/objective: maximize AC-1/objective: minimize AC-1/' "$T/t136h/.goal/goal.md"
+hblocks t136h T1 base T1 fast
+scorefile t136h -10 -30
+out=$(bash "$CTL" status --project "$T/t136h" 2>&1)
+assert_has "136h negative minimize entry gain" 'STRATEGY-PICK prefer=fast avoid=none' "$out"
+
+mkproj t136i; obj110 t136i ""
+hblocks t136i T1 A T1 A T1 A
+scorefile t136i 10 10 none
+stall "$T/t136i"
+printf '99|10|none|A\n' >> "$T/t136i/.goal/scores.rec"
+out=$(bash "$CTL" status --project "$T/t136i" 2>&1)
+printf '%s\n' "$out" | grep -q 'eval-gap:' && no "136i orphan cannot complete plateau" || ok "136i orphan ignored for eval-gap"
+
+# No pairing across a missing ledger iteration, even with numeric scores.
+mkproj t136j; obj110 t136j ""
+hblocks t136j T1 A T1 A
+scorefile t136j 10 100
+sed_in 's/iteration 2/iteration 3/' "$T/t136j/.goal/loop-log.md"
+printf '3|200|none|A\n' >> "$T/t136j/.goal/scores.rec"
+out=$(bash "$CTL" status --project "$T/t136j" 2>&1)
+assert_has "136j ledger gap cannot earn exploit" 'STRATEGY-PICK prefer=none avoid=none' "$out"
+
+# A dispersion-declared metric needs uncertainty evidence absent from scores.rec.
+mkproj t136k; obj110 t136k ""
+sed_in 's/expected: maximize/sd: `sd=([0-9.]+)` | expected: maximize/' "$T/t136k/.goal/goal.md"
+hblocks t136k T1 A T1 A
+scorefile t136k 100 100.01
+out=$(bash "$CTL" status --project "$T/t136k" 2>&1)
+assert_has "136k spread declaration suppresses false confidence" 'STRATEGY-PICK prefer=none avoid=none' "$out"
+assert_has "136k missing spread identified" 'noise-unverified' "$out"
+
+# 137 unattended runtime: executor cwd and lock ownership must match project
+mkproj t137a; contract t137a "- AC-1 | output | check: \`true\` | expected: exit=0"
+# A read-only check must never remove an existing runner's lock.
+printf '%s\n%s\n' "$$" "$(date +%s)" > "$T/t137a/.goal/lock"
+out=$(bash "$LOOPT" --check-only --project "$T/t137a" 2>&1); rc=$?
+assert_rc "137a check-only preserves gate rc" 2 $rc
+[ -f "$T/t137a/.goal/lock" ] && ok "137a check-only preserves foreign lock" || no "137a check-only removed foreign lock"
+
+# Refusing a live lock must also leave its owner untouched.
+printf '%s\n%s\n' "$$" "$(date +%s)" > "$T/t137a/.goal/lock"
+out=$(bash "$LOOPT" --continue --max-iterations=1 --project "$T/t137a" 2>&1); rc=$?
+assert_rc "137b live owner refused" 4 $rc
+[ -f "$T/t137a/.goal/lock" ] && ok "137b refusal preserves foreign lock" || no "137b refusal removed foreign lock"
+
+# Absolute target with spaces, invoked from a different cwd. Mock replaces
+# only the model call; real controller, gate and lock lifecycle still run.
+p="$T/project with spaces"; mkdir -p "$p"
+bash "$CTL" init --project "$p" >/dev/null
+cp "$T/t137a/.goal/goal.md" "$p/.goal/goal.md"
+# Reuse the stamped contract/state from the valid fixture.
+cp "$T/t137a/.goal/state.rec" "$p/.goal/state.rec"
+cat > "$T/mock-executor" <<'EOS'
+#!/usr/bin/env bash
+pwd > "$GOAL_TEST_CWD"
+EOS
+chmod +x "$T/mock-executor"
+out=$(CLAUDE_BIN="$T/mock-executor" GOAL_TEST_CWD="$T/executor-cwd" \
+  bash "$LOOPT" --continue --max-iterations=1 --project "$p" 2>&1); rc=$?
+assert_rc "137c normal exhausted run rc intact" 3 $rc
+actual=$(cat "$T/executor-cwd")
+expected=$(cd "$p" && pwd)
+[ "$actual" = "$expected" ] && ok "137c executor runs at project root" || no "137c executor used caller cwd: $actual"
+[ ! -f "$p/.goal/lock" ] && ok "137c owned lock cleaned" || no "137c owned lock leaked"
+
+# 138 execute the documented fast lane, rather than only checking its words.
+# Init/stamp were already exercised by the fixture; run the actual claim
+# snippet against a reviewed artifact, substituting only its path placeholder.
+mkproj t138; contract t138 "- AC-1 | artifact | check: \`test -s a.txt\` | expected: exit=0"
+printf 'reviewed artifact\n' > "$T/t138/a.txt"
+awk '
+  /^## 小任务快车道/ { active=1 }
+  active && /^bash scripts\/goal_ctl.sh close-iteration/ { emit=1 }
+  emit && /^#/ { exit }
+  emit { print }
+' "$here/SKILL.md" | sed "s|bash scripts/goal_ctl.sh|bash \"$CTL\"|; s|<产物>|a.txt|" > "$T/t138-claim.sh"
+out=$(cd "$T/t138" && bash "$T/t138-claim.sh" 2>&1); rc=$?
+assert_rc "138 documented fast lane reaches GO on first claim" 0 $rc
+assert_has "138 actual gate output" 'GATE: GO' "$out"
+assert_has "138 no false complete from missing receipt" '^false_completes=0$' "$(cat "$T/t138/.goal/state.rec")"

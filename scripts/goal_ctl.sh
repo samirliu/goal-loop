@@ -573,65 +573,33 @@ case "$cmd" in
     obj_dir=$(gp_objective_dir "$project")
     tol=$( [ -n "$obj_ac" ] && gp_ac_tolerance "$project" "$obj_ac" )
     tol=${tol:-0}
-    # STRATEGY-PICK: attribution must drive the next wave. Prefer = steepest
-    # exploit window; avoid = every prune label. Advisory to the GATE (rc and
-    # hint never change) but binding for the controller's brief / NEXT text.
-    pick_prefer=""; pick_avoid=""
-    if [ -n "$obj_ac" ] && [ -s "$sd/scores.rec" ] && [ -s "$sd/loop-log.md" ]; then
-      pick_line=$(gawk -v obj="${obj_dir:-none}" -v tol="$tol" '
-        function absv(x){ return x<0 ? -x : x }
-        FILENAME==ARGV[1] {
-          line=$0; sub(/\r$/,"",line)
-          split(line,a,"|")
-          if (a[1] ~ /^[0-9]+$/ && a[2] ~ /^-?[0-9]+(\.[0-9]+)?$/) { SC[a[1]+0]=a[2]; sn++ }
-          next }
-        { line=$0; sub(/\r$/,"",line)
-          if (line ~ /^## iteration/) {
-            num=line; sub(/^[^0-9]+/,"",num); num+=0
-            if (cur>0 && ORD[cur]==num) { STRAT[cur]="none" }
-            else { cur++; STRAT[cur]="none" }
-            ORD[cur]=num; blk=cur; next }
-          p=index(line,"=")
-          if (p>1 && cur>0) { k=substr(line,1,p-1); v=substr(line,p+1)
-            sub(/^ +/,"",v); sub(/ +$/,"",v)
-            if (k=="strategy") STRAT[cur]=(v==""?"none":v) } }
-        END {
-          prefer=""; pbest=""; avoid=""; lab_any=""
-          i=1
-          while (i<=blk) {
-            j=i
-            while (j<blk && STRAT[j+1]==STRAT[i]) j++
-            lab=STRAT[i]
-            if (lab!="none") {
-              p1=0; p2=0; nk=0
-              for (q=i;q<=j;q++) { it=ORD[q]
-                if ((it in SC) && SC[it] ~ /^-?[0-9]+(\.[0-9]+)?$/) {
-                  v=SC[it]+0; nk++
-                  if (p1==0) { p1=q-i+1; v1=v }
-                  p2=q-i+1; v2=v } }
-              if (nk>=1) lab_any=lab
-              if (nk>=2) {
-                D=p2-p1; if (D<1) D=1
-                slope=(v2-v1)/D
-                band=tol*(absv(v1)>absv(v2)?absv(v1):absv(v2))
-                if (D>=3 && absv(v2-v1)<=band) {
-                  avoid = (avoid=="" ? lab : avoid "," lab)
-                } else if (obj=="minimize" ? slope < -(band/D) : slope > band/D) {
-                  better = (prefer=="") ? 1 : (obj=="minimize" ? (slope<pbest) : (slope>pbest))
-                  if (better) { prefer=lab; pbest=slope }
-                }
-              }
-            }
-            i=j+1 }
-          if (prefer!="" || avoid!="")
-            printf "prefer=%s avoid=%s\n", (prefer==""?"none":prefer), (avoid==""?"none":avoid)
-          else if (lab_any!="")
-            printf "prefer=%s avoid=none\n", lab_any
-        }' "$sd/scores.rec" "$sd/loop-log.md" 2>/dev/null || true)
-      if [ -n "${pick_line:-}" ]; then
+    # Shared kernel emits CTL: EFFICIENCY, eval-gap:, promote: and
+    # attribution-unused: together with the pick; NEXT consumes that same pick.
+    nps=$(g no_progress_streak); drys=$(g dry_streak)
+    case "${nps:-0}" in ''|*[!0-9]*) nps=0;; esac
+    case "${drys:-0}" in ''|*[!0-9]*) drys=0;; esac
+    stalled=0
+    [ "$nps" -ge 1 ] && stalled=1
+    [ "$(gp_contract_mode "$project")" = forge ] && [ "$drys" -ge 1 ] && stalled=1
+    # Dispersion is not stored in scores.rec; do not pretend the tolerance
+    # alone establishes a usable direction when sd:/var: is declared.
+    uncertain=0
+    if [ -n "$obj_ac" ]; then
+      [ -z "$(gp_ac_sd_re "$project" "$obj_ac")$(gp_ac_var_re "$project" "$obj_ac")" ] || uncertain=1
+    fi
+    strategy_advice=""; pick_prefer=""; pick_avoid=""
+    if [ -n "$obj_ac" ] || [ "$stalled" = 1 ]; then
+      sf=/dev/null; [ -s "$sd/scores.rec" ] && sf="$sd/scores.rec"
+      lf=/dev/null; [ -s "$sd/loop-log.md" ] && lf="$sd/loop-log.md"
+      strategy_advice=$(gawk -v obj="${obj_dir:-none}" -v tol="$tol" -v stalled="$stalled" -v uncertain="$uncertain" \
+        -f "$here/goal_strategy.awk" "$sf" "$lf") || {
+        echo "CTL: ERROR strategy-analysis-failed" >&2; exit 4;
+      }
+      pick_line=$(printf '%s\n' "$strategy_advice" | sed -n 's/^CTL: STRATEGY-PICK //p')
+      if [ -n "$pick_line" ]; then
         pick_prefer=$(printf '%s\n' "$pick_line" | sed -n 's/^prefer=\([^ ]*\).*/\1/p')
         pick_avoid=$(printf '%s\n' "$pick_line" | sed -n 's/^prefer=[^ ]* avoid=\(.*\)$/\1/p')
-        echo "CTL: STRATEGY-PICK prefer=${pick_prefer:-none} avoid=${pick_avoid:-none}"
+        echo "CTL: STRATEGY-PICK $pick_line"
       fi
     fi
     pick_txt=""
@@ -687,87 +655,6 @@ case "$cmd" in
       echo "CTL: NEXT reason=$lr hint=${lh:-none}"
       echo "CTL:   -> $next"
     fi
-    # ---- v2.8 eval-drive: EFFICIENCY attribution (advisory to the gate - rc
-    # and hint never change; STRATEGY-PICK above is what the next wave uses).
-    # Ledger-is-truth: reads only loop-log.md + scores.rec. Fires when an
-    # objective line exists or when the loop is stalled.
-    nps=$(g no_progress_streak); drys=$(g dry_streak)
-    case "${nps:-0}" in ''|*[!0-9]*) nps=0;; esac
-    case "${drys:-0}" in ''|*[!0-9]*) drys=0;; esac
-    stalled=0
-    [ "$nps" -ge 1 ] && stalled=1
-    [ "$(gp_contract_mode "$project")" = forge ] && [ "$drys" -ge 1 ] && stalled=1
-    if [ -n "$obj_ac" ] || [ "$stalled" = 1 ]; then
-      sf=/dev/null; [ -s "$sd/scores.rec" ] && sf="$sd/scores.rec"
-      lf=/dev/null; [ -s "$sd/loop-log.md" ] && lf="$sd/loop-log.md"
-      if [ "$sf" = /dev/null ] && [ "$lf" = /dev/null ]; then
-        echo "CTL: EFFICIENCY score-data: none recorded"
-      else
-        gawk -v obj="${obj_dir:-none}" -v tol="$tol" -v stalled="$stalled" '
-          function absv(x){ return x<0 ? -x : x }
-          FILENAME==ARGV[1] {
-            line=$0; sub(/\r$/,"",line)
-            split(line,a,"|")
-            if (a[1] ~ /^[0-9]+$/ && a[2] ~ /^-?[0-9]+(\.[0-9]+)?$/) { SC[a[1]+0]=a[2]; sn++ }
-            next }
-          { line=$0; sub(/\r$/,"",line)
-            if (line ~ /^## iteration/) {
-              num=line; sub(/^[^0-9]+/,"",num); num+=0
-              if (cur>0 && ORD[cur]==num) { STRAT[cur]="none"; TASK[cur]="" }
-              else { cur++; STRAT[cur]="none"; TASK[cur]="" }
-              ORD[cur]=num; blk=cur; next }
-            p=index(line,"=")
-            if (p>1 && cur>0) { k=substr(line,1,p-1); v=substr(line,p+1)
-              sub(/^ +/,"",v); sub(/ +$/,"",v)
-              if (k=="strategy") STRAT[cur]=(v==""?"none":v)
-              else if (k=="task") TASK[cur]=v } }
-          END {
-            if (blk==0) { if (sn==0) print "CTL: EFFICIENCY score-data: none recorded" }
-            else if (sn==0) print "CTL: EFFICIENCY score-data: none recorded"
-            else {
-              i=1
-              while (i<=blk) { j=i
-                while (j<blk && STRAT[j+1]==STRAT[i]) j++
-                lab=STRAT[i]
-                if (lab!="none") {
-                  p1=0; p2=0; nk=0
-                  for (q=i;q<=j;q++) { it=ORD[q]
-                    if ((it in SC) && SC[it] ~ /^-?[0-9]+(\.[0-9]+)?$/) {
-                      v=SC[it]+0; nk++
-                      if (p1==0) { p1=q-i+1; v1=v }
-                      p2=q-i+1; v2=v } }
-                  if (nk<2) printf "CTL: EFFICIENCY strategy=%s n=%d unmeasured\n", lab, nk
-                  else {
-                    D=p2-p1; slope=(v2-v1)/D
-                    band=tol*(absv(v1)>absv(v2)?absv(v1):absv(v2))
-                    adv=""
-                    if (D>=3 && absv(v2-v1)<=band) adv=sprintf(" -> prune (flat %d iters)", D)
-                    else if (obj=="minimize" ? slope < -(band/D) : slope > band/D) adv=" -> exploit"
-                    printf "CTL: EFFICIENCY strategy=%s %+.1f /%d iters%s\n", lab, slope, D, adv } }
-                i=j+1 } }
-            if (stalled+0) {
-              if (obj!="none") {
-                n2=0; for (k in SC) { n2++; kk[n2]=k+0; kv[n2]=SC[k]+0 }
-                for (x=2;x<=n2;x++){ kx=kk[x]; vx=kv[x]; y=x-1
-                  while (y>=1 && kk[y]>kx) { kk[y+1]=kk[y]; kv[y+1]=kv[y]; y-- }
-                  kk[y+1]=kx; kv[y+1]=vx }
-                if (n2>=3) { v1=kv[n2-2]; v2=kv[n2-1]; v3=kv[n2]
-                  mn=v1; mx=v1; if (v2<mn) mn=v2; if (v2>mx) mx=v2
-                  if (v3<mn) mn=v3; if (v3>mx) mx=v3
-                  b3=absv(mx)>absv(mn)?absv(mx):absv(mn)
-                  if (mx-mn <= tol*b3)
-                    print "CTL: eval-gap: objective scores flat while stalled - the eval plane may miss the progress dimension: dispatch goal-critic to draft candidate AC proposals into .goal/proposals/ (user-approved, not applied)" } }
-              prev=""; run=0
-              for (q=1;q<=blk;q++) { id=TASK[q]; sub(/\[.*/,"",id)
-                if (id ~ /^T[0-9]+$/) { if (id==prev) run++; else { prev=id; run=1 }
-                  if (run==3) print "CTL: promote: " id " (3 consecutive waves) - consider a role-card promotion for this task domain" }
-                else { prev=""; run=0 } } }
-            allnone=1; if (blk<1) allnone=0
-            for (q=1;q<=blk;q++) if (STRAT[q]!="none") { allnone=0; break }
-            if (obj!="none" && allnone)
-              print "CTL: attribution-unused: no --strategy labels recorded - per-strategy attribution is empty (optional: label each wave with its attack direction)"
-          }' "$sf" "$lf" 2>/dev/null || true
-      fi
-    fi
+    [ -z "$strategy_advice" ] || printf '%s\n' "$strategy_advice" | sed '/^CTL: STRATEGY-PICK /d'
     exit 0 ;;
 esac

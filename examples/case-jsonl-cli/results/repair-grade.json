@@ -1,0 +1,293 @@
+{
+  "passed": 41,
+  "total": 41,
+  "checks": [
+    {
+      "name": "stats-0",
+      "passed": true,
+      "stdout": "{\"count\": 0, \"errors\": 0, \"p50_ms\": null, \"p95_ms\": null, \"services\": {}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "filtered-stats-0",
+      "passed": true,
+      "stdout": "{\"count\": 0, \"errors\": 0, \"p50_ms\": null, \"p95_ms\": null, \"services\": {}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "query-0",
+      "passed": true,
+      "stdout": "",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "stats-1",
+      "passed": true,
+      "stdout": "{\"count\": 1, \"errors\": 0, \"p50_ms\": 0, \"p95_ms\": 0, \"services\": {\"web\": 1}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "filtered-stats-1",
+      "passed": true,
+      "stdout": "{\"count\": 0, \"errors\": 0, \"p50_ms\": null, \"p95_ms\": null, \"services\": {}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "query-1",
+      "passed": true,
+      "stdout": "",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "stats-2",
+      "passed": true,
+      "stdout": "{\"count\": 2, \"errors\": 1, \"p50_ms\": 0, \"p95_ms\": 0.125, \"services\": {\"\\u4f60\\u597d\": 1, \"api\": 1}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "filtered-stats-2",
+      "passed": true,
+      "stdout": "{\"count\": 1, \"errors\": 1, \"p50_ms\": 0, \"p95_ms\": 0, \"services\": {\"\\u4f60\\u597d\": 1}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "query-2",
+      "passed": true,
+      "stdout": "",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "stats-4",
+      "passed": true,
+      "stdout": "{\"count\": 4, \"errors\": 1, \"p50_ms\": 0.125, \"p95_ms\": 20.5, \"services\": {\"web\": 1, \"api\": 2, \"\\u4f60\\u597d\": 1}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "filtered-stats-4",
+      "passed": true,
+      "stdout": "{\"count\": 1, \"errors\": 1, \"p50_ms\": 0, \"p95_ms\": 0, \"services\": {\"\\u4f60\\u597d\": 1}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "query-4",
+      "passed": true,
+      "stdout": "",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "stats-19",
+      "passed": true,
+      "stdout": "{\"count\": 19, \"errors\": 6, \"p50_ms\": 0.125, \"p95_ms\": 999, \"services\": {\"web\": 6, \"api\": 6, \"\\u4f60\\u597d\": 7}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "filtered-stats-19",
+      "passed": true,
+      "stdout": "{\"count\": 7, \"errors\": 1, \"p50_ms\": 0.125, \"p95_ms\": 999, \"services\": {\"\\u4f60\\u597d\": 7}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "query-19",
+      "passed": true,
+      "stdout": "{\"service\": \"api\", \"status\": 500, \"latency_ms\": 0.125, \"extra\": {\"i\": 5}}\n{\"service\": \"api\", \"status\": 500, \"latency_ms\": 0, \"extra\": {\"i\": 14}}\n{\"service\": \"api\", \"status\": 599, \"latency_ms\": 0, \"extra\": {\"i\": 15}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "stats-20",
+      "passed": true,
+      "stdout": "{\"count\": 20, \"errors\": 4, \"p50_ms\": 0.125, \"p95_ms\": 999, \"services\": {\"api\": 9, \"\\u4f60\\u597d\": 7, \"web\": 4}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "filtered-stats-20",
+      "passed": true,
+      "stdout": "{\"count\": 7, \"errors\": 3, \"p50_ms\": 0.125, \"p95_ms\": 999, \"services\": {\"\\u4f60\\u597d\": 7}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "query-20",
+      "passed": true,
+      "stdout": "",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "stats-21",
+      "passed": true,
+      "stdout": "{\"count\": 21, \"errors\": 8, \"p50_ms\": 0.125, \"p95_ms\": 999, \"services\": {\"web\": 6, \"api\": 8, \"\\u4f60\\u597d\": 7}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "filtered-stats-21",
+      "passed": true,
+      "stdout": "{\"count\": 7, \"errors\": 3, \"p50_ms\": 0.125, \"p95_ms\": 999, \"services\": {\"\\u4f60\\u597d\": 7}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "query-21",
+      "passed": true,
+      "stdout": "{\"service\": \"api\", \"status\": 599, \"latency_ms\": 0.125, \"extra\": {\"i\": 1}}\n{\"service\": \"api\", \"status\": 599, \"latency_ms\": 0.125, \"extra\": {\"i\": 9}}\n{\"service\": \"api\", \"status\": 599, \"latency_ms\": 0.125, \"extra\": {\"i\": 12}}\n{\"service\": \"api\", \"status\": 599, \"latency_ms\": 0, \"extra\": {\"i\": 13}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "stats-41",
+      "passed": true,
+      "stdout": "{\"count\": 41, \"errors\": 25, \"p50_ms\": 10, \"p95_ms\": 999, \"services\": {\"\\u4f60\\u597d\": 11, \"api\": 13, \"web\": 17}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "filtered-stats-41",
+      "passed": true,
+      "stdout": "{\"count\": 11, \"errors\": 6, \"p50_ms\": 20.5, \"p95_ms\": 999, \"services\": {\"\\u4f60\\u597d\": 11}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "query-41",
+      "passed": true,
+      "stdout": "{\"service\": \"api\", \"status\": 500, \"latency_ms\": 20.5, \"extra\": {\"i\": 1}}\n{\"service\": \"api\", \"status\": 500, \"latency_ms\": 0, \"extra\": {\"i\": 7}}\n{\"service\": \"api\", \"status\": 599, \"latency_ms\": 20.5, \"extra\": {\"i\": 9}}\n{\"service\": \"api\", \"status\": 500, \"latency_ms\": 0.125, \"extra\": {\"i\": 11}}\n{\"service\": \"api\", \"status\": 599, \"latency_ms\": 0, \"extra\": {\"i\": 14}}\n{\"service\": \"api\", \"status\": 500, \"latency_ms\": 10, \"extra\": {\"i\": 19}}\n{\"service\": \"api\", \"status\": 599, \"latency_ms\": 20.5, \"extra\": {\"i\": 20}}\n{\"service\": \"api\", \"status\": 599, \"latency_ms\": 999, \"extra\": {\"i\": 27}}\n{\"service\": \"api\", \"status\": 599, \"latency_ms\": 999, \"extra\": {\"i\": 30}}\n{\"service\": \"api\", \"status\": 599, \"latency_ms\": 10, \"extra\": {\"i\": 35}}\n",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "invalid-0",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: record must be an object\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-1",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: record must be an object\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-2",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: service must be a nonempty string\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-3",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: service must be a nonempty string\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-4",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: service must be a nonempty string\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-5",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: status must be an integer from 100 to 599\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-6",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: status must be an integer from 100 to 599\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-7",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: status must be an integer from 100 to 599\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-8",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: status must be an integer from 100 to 599\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-9",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: latency_ms must be a finite nonnegative number\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-10",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: latency_ms must be a finite nonnegative number\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-11",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: latency_ms must be a finite nonnegative number\n",
+      "rc": 2
+    },
+    {
+      "name": "invalid-12",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 3: latency_ms must be a finite nonnegative number\n",
+      "rc": 2
+    },
+    {
+      "name": "bad-json",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: line 2: invalid JSON: Expecting property name enclosed in double quotes: line 2 column 1 (char 2)\n",
+      "rc": 2
+    },
+    {
+      "name": "missing-path",
+      "passed": true,
+      "stdout": "",
+      "stderr": "logtool: [Errno 2] No such file or directory: 'does-not-exist.jsonl'\n",
+      "rc": 2
+    },
+    {
+      "name": "empty-query",
+      "passed": true,
+      "stdout": "",
+      "stderr": "",
+      "rc": 0
+    },
+    {
+      "name": "file-path",
+      "passed": true,
+      "stdout": "{\"count\": 1, \"errors\": 0, \"p50_ms\": 0, \"p95_ms\": 0, \"services\": {\"ok\": 1}}\n",
+      "stderr": "",
+      "rc": 0
+    }
+  ]
+}

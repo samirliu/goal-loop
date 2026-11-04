@@ -1,0 +1,42 @@
+## iteration 1
+task=T1[crew:1]
+files_modified=logtool/parser.py,logtool/stats.py,logtool/__main__.py,tests/test_public.py
+checks_pass=1
+checks_fail=0
+checks_unverifiable=0
+error_signature=none
+progress=yes
+exit_signal=no
+false_complete=no
+digest=534aa8cd8b2c
+score=none
+strategy_delta=none
+strategy=none
+## iteration 2
+task=T2[crew:1]
+files_modified=logtool/parser.py,logtool/stats.py,logtool/__main__.py,tests/test_public.py
+checks_pass=1
+checks_fail=0
+checks_unverifiable=0
+error_signature=none
+progress=yes
+exit_signal=yes
+false_complete=no
+digest=534aa8cd8b2c
+score=none
+strategy_delta=none
+strategy=none
+## iteration 3
+task=T3[crew:1]
+files_modified=logtool/parser.py,logtool/stats.py,logtool/__main__.py,tests/test_public.py
+checks_pass=1
+checks_fail=0
+checks_unverifiable=0
+error_signature=none
+progress=yes
+exit_signal=yes
+false_complete=no
+digest=534aa8cd8b2c
+score=none
+strategy_delta=none
+strategy=none

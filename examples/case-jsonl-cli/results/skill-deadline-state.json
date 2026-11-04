@@ -1,0 +1,6 @@
+{
+  "goal.md": "# Goal contract - logtool JSONL CLI\nStatus: DRAFT\n\n## Objective\nImplement TASK.md using the Python standard library.\n\n## Exit policy\nexit: threshold\n\n## Acceptance criteria\n- AC-1 | Public CLI examples pass | check: `PYTHONDONTWRITEBYTECODE=1 python3 verify/public.py` | expected: exit=0\n- AC-2 | Validation, filtering, quantiles and file handling match TASK.md | check: `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v` | expected: exit=0\n\n## Out of scope\nDependencies, changes to TASK.md or verify/, unrelated features.\n\n## Budget knobs\nmax_iterations=3 no_progress_limit=2 max_replans=1\nper_check_fail_cap=3 panel_max=2 dry_limit=2 check_timeout=30\nwallclock=240\n\n## Approval\nApproval mode: auto\n\napproved: bd65da95 2026-11-04 auto\n",
+  "state.rec": "iteration=0\nbreaker=CLOSED\nfalse_completes=0\nreplans=0\nno_progress_streak=0\nlast_progress_iteration=0\ndry_streak=0\nmax_iterations=3\nno_progress_limit=2\nmax_replans=1\nper_check_fail_cap=3\npanel_max=2\ndry_limit=2\ncheck_timeout=30\ntime_budget=130\ndeadline=1793769413\n",
+  "loop-log.md": "",
+  "work-plan.md": "# Work plan\n- [ ] T1 Validate JSONL input files=logtool/parser.py\n- [ ] T2 Implement statistics and CLI files=logtool/stats.py,logtool/__main__.py,logtool/__init__.py\n- [ ] T3 Verify requirements files=tests/test_logtool.py\n"
+}

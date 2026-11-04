@@ -1,0 +1,119 @@
+--- a/logtool/__main__.py
++++ b/logtool/__main__.py
+@@ -1 +1,47 @@
+-raise SystemExit("not implemented")
++"""CLI interface: main(argv=None) parses arguments and returns an exit code.
++
++Input is validated in full before filtering or writing output. PATH '-' uses
++stdin; named files are opened as UTF-8. Input failures print stderr and return 2.
++"""
++import argparse
++import json
++import sys
++
++from .parser import ParseError, parse
++from .stats import summarize
++
++
++def main(argv=None):
++    """Run stats/query with optional service and inclusive status filtering."""
++    parser = argparse.ArgumentParser(prog='logtool')
++    commands = parser.add_subparsers(dest='command', required=True)
++    for command in ('stats', 'query'):
++        sub = commands.add_parser(command)
++        sub.add_argument('path')
++        sub.add_argument('--service')
++        if command == 'query':
++            sub.add_argument('--min-status', type=int)
++    args = parser.parse_args(argv)
++    try:
++        if args.path == '-':
++            rows = parse(sys.stdin)
++        else:
++            with open(args.path, encoding='utf-8') as stream:
++                rows = parse(stream)
++    except (OSError, UnicodeError, ParseError) as exc:
++        print(f'logtool: {exc}', file=sys.stderr)
++        return 2
++    if args.service is not None:
++        rows = [row for row in rows if row['service'] == args.service]
++    if args.command == 'stats':
++        print(json.dumps(summarize(rows)))
++    else:
++        if args.min_status is not None:
++            rows = [row for row in rows if row['status'] >= args.min_status]
++        output = ''.join(json.dumps(row) + '\n' for row in rows)
++        sys.stdout.write(output)
++    return 0
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+--- a/logtool/parser.py
++++ b/logtool/parser.py
+@@ -1,2 +1,40 @@
++"""JSONL validation. parse(stream) returns all validated original dictionaries.
++
++stream is an iterable of text lines. Invalid records raise ParseError with the
++physical line number. The eager result lets callers validate before emitting.
++"""
++import json
++import math
++
++
++class ParseError(ValueError):
++    """Invalid input, with its physical line number in the message."""
++
++
+ def parse(stream):
+-    raise NotImplementedError("implement JSONL validation")
++    """Read every nonblank line and return validated objects in input order."""
++    rows = []
++    for line_number, line in enumerate(stream, 1):
++        if not line.strip():
++            continue
++        try:
++            row = json.loads(line)
++        except (ValueError, RecursionError) as exc:
++            raise ParseError(f'line {line_number}: invalid JSON: {exc}') from exc
++        reason = None
++        if not isinstance(row, dict):
++            reason = 'record must be an object'
++        elif not isinstance(row.get('service'), str) or not row['service']:
++            reason = 'service must be a nonempty string'
++        elif type(row.get('status')) is not int or not 100 <= row['status'] <= 599:
++            reason = 'status must be an integer from 100 to 599'
++        else:
++            latency = row.get('latency_ms')
++            if type(latency) not in (int, float) or latency < 0:
++                reason = 'latency_ms must be a finite nonnegative number'
++            elif isinstance(latency, float) and not math.isfinite(latency):
++                reason = 'latency_ms must be a finite nonnegative number'
++        if reason:
++            raise ParseError(f'line {line_number}: {reason}')
++        rows.append(row)
++    return rows
+--- a/logtool/stats.py
++++ b/logtool/stats.py
+@@ -1,2 +1,20 @@
++"""Statistics for validated log records.
++
++summarize(rows) accepts an iterable of validated dictionaries and returns a
++JSON-ready dictionary. Quantiles use one-based nearest ranks, or None if empty.
++"""
++from collections import Counter
++
++
+ def summarize(rows):
+-    raise NotImplementedError("implement statistics")
++    """Return count, server errors, nearest-rank p50/p95 and service counts."""
++    rows = list(rows)
++    values = sorted(row['latency_ms'] for row in rows)
++    count = len(values)
++    return {
++        'count': count,
++        'errors': sum(row['status'] >= 500 for row in rows),
++        'p50_ms': values[(count + 1) // 2 - 1] if count else None,
++        'p95_ms': values[(95 * count + 99) // 100 - 1] if count else None,
++        'services': dict(Counter(row['service'] for row in rows)),
++    }

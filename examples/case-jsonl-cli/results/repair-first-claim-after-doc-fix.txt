@@ -1,0 +1,7 @@
+CTL: INIT ok - fill /var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-loop-cli-first-claim-7f2iq8ag/project/.goal/goal.md, then: goal_ctl.sh stamp --project /var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-loop-cli-first-claim-7f2iq8ag/project
+41/41
+approved: 61ffb0c4 2026-11-04 auto
+AUDIT: clean (controller ledger hygiene OK)
+CTL: CLOSE ok iter=1 digest=d22ea5cf5060
+GATE: GO digest=d22ea5cf5060 iter=1 ac=1 pass=1 unverified=0 mode=threshold
+first actual CLI claim: GO; false_completes=0

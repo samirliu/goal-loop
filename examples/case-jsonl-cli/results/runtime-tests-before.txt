@@ -1,0 +1,9 @@
+  ok   - 137a check-only preserves gate rc (rc=2)
+  FAIL - 137a check-only removed foreign lock
+  ok   - 137b live owner refused (rc=4)
+  FAIL - 137b refusal removed foreign lock
+  ok   - 137c normal exhausted run rc intact (rc=3)
+  FAIL - 137c executor used caller cwd: /Users/m/repo/goal-loop
+  ok   - 137c owned lock cleaned
+== results: pass=4 fail=3 ==
+== total: pass=4 fail=3 shards=1 ==

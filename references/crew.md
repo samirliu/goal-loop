@@ -4,10 +4,13 @@
 
 ## 1 When crew applies
 
-Decompose the objective; crew applies when the split yields ≥2 task domains
-with DISJOINT file scopes and stateable interfaces. Interfaces you cannot
-state -> serial single-task (log the reason). Crew composition is
-controller-elected (no flag). The execution surface is one-shot subagents
+Crew needs both a useful split (≥2 DISJOINT file scopes and stateable
+interfaces) and enough remaining budget for startup, coordination, join and
+verification. A split alone is not a reason to spawn. For a short-budget small
+task with unknown worker startup cost, first deliver a serial end-to-end slice;
+measure before widening. Multiple files do not require multiple workers. Start
+the wall clock before reading/planning; reserve time to close the ledger. Crew
+composition is controller-elected (no flag). The execution surface is one-shot subagents
 (Agent tool): parallel workers, one shared workspace, one brief contract.
 
 ## 2 Interface first
@@ -113,7 +116,9 @@ Join is bookkeeping. It is not GO - only the gate decides that.
 
 If `ctl status` printed `CTL: STRATEGY-PICK prefer=… avoid=…`, that line goes
 verbatim into every wave brief. Prefer is the
-attack direction with a live slope; avoid is flat/exhausted. Workers report
+direction with measured local gain; avoid is regressing/flat. `prefer=none`
+means evidence is insufficient, so test a falsifiable hypothesis. A crew
+wave yields one joint delta: disjoint writes do not isolate worker effects. Workers report
 which label they followed; the next `close-iteration --strategy` must not
 repeat an `avoid` label without a `strategy_delta` explaining the retry.
 
