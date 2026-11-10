@@ -12,9 +12,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-      - name: Install shellcheck (macOS)
+      - name: Install shellcheck and gawk (macOS)
         if: runner.os == 'macOS'
-        run: brew install shellcheck
+        run: brew install shellcheck gawk  # macOS ships BSD awk; the scripts require gawk (see README)
       - name: Shellcheck the shipped scripts
         run: shellcheck --severity=warning scripts/*.sh  # info-level style hints stay in logs; warnings+errors block (parity with tests/run_tests.sh #33)
       - name: Bash syntax check (bash -n)
