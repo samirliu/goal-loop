@@ -66,6 +66,10 @@ exit: threshold
        it (ANSI-stripped first) instead of guessing the last line - use it
        when output carries other numbers. `tolerance:` (optional): relative
        noise band for the water-mark comparison of an objective score.
+     - `watch:` followed by a backtick-quoted project-relative path (before
+       expected:) explicitly binds a file or directory omitted by Git ignore
+       or non-Git pruning. Directories are recursive; symlinks bind only the
+       link itself. The AC and watch declaration are frozen by the stamp.
      - baseline: delta (default for metric ACs) requires a .goal/baseline.md
        row `AC-N | observed=<v> | repeats=<N>=2 | cmd=<check verbatim>` -
        the pre-stamp smoke run IS the measurement; abs = new capability,

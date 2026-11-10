@@ -1288,7 +1288,7 @@ assert_has "102 hint routes" 'hint=fix-calib-fixture' "$out"
 # 99d empty project still digests (rc=0, well-formed) - the xargs-empty path
 mkdir -p "$T/t98e"; g1=$(bash "$GATE" --digest --project "$T/t98e"); rc=$?
 assert_rc "99d empty project digest rc0" 0 $rc
-assert_has "99d empty digest well-formed" '^[0-9a-f]{12}$' "$g1"
+assert_has "99d empty digest well-formed" '^v2-[0-9a-f]{64}$' "$g1"
 
 # 103b? no - 103 done. 105: ledger task= is normalized/validated at WRITE time
 # so R12 never surprises the controller after the fact (caught by self-audit)
@@ -2472,3 +2472,414 @@ out=$(cd "$T/t138" && bash "$T/t138-claim.sh" 2>&1); rc=$?
 assert_rc "138 documented fast lane reaches GO on first claim" 0 $rc
 assert_has "138 actual gate output" 'GATE: GO' "$out"
 assert_has "138 no false complete from missing receipt" '^false_completes=0$' "$(cat "$T/t138/.goal/state.rec")"
+
+# 139 Invalid receipt arguments must not commit any state or evidence.
+mkproj t139; contract t139 "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf 'artifact\n' > "$T/t139/a.txt"
+before=$(find "$T/t139/.goal" -type f -exec cksum {} \; | sort)
+out=$(bash "$CTL" close-iteration --project "$T/t139" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --adversarial invalid-value --no-gate 2>&1); rc=$?
+after=$(find "$T/t139/.goal" -type f -exec cksum {} \; | sort)
+assert_rc "139 invalid receipt rejected" 4 $rc
+assert_has "139 reason names bad receipt" 'bad-adversarial' "$out"
+[ "$before" = "$after" ] && ok "139 refusal leaves all state unchanged" || no "139 refusal changed state"
+
+# 140 Git worktree identity must follow bytes, not merely porcelain status.
+mkproj t140
+p="$T/t140"
+git -C "$p" init -q
+git -C "$p" -c user.name=test -c user.email=test@example.invalid commit --allow-empty -qm fixture
+printf 'original\n' > "$p/a.txt"
+git -C "$p" add a.txt
+git -C "$p" -c user.name=test -c user.email=test@example.invalid commit -qm base
+printf 'first\n' > "$p/a.txt"
+d1=$(bash "$GATE" --digest --project "$p")
+printf 'second\n' > "$p/a.txt"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "140 dirty tracked bytes change digest" || no "140 dirty tracked bytes ignored"
+mkdir -p "$p/new directory"
+printf 'first\n' > "$p/new directory/a file"
+d1=$(bash "$GATE" --digest --project "$p")
+printf 'second\n' > "$p/new directory/a file"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "140 untracked nested bytes change digest" || no "140 untracked nested bytes ignored"
+ln -s 'first target' "$p/link"
+d1=$(bash "$GATE" --digest --project "$p")
+rm "$p/link"
+ln -s 'second target' "$p/link"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "140 symlink target changes digest" || no "140 symlink target ignored"
+chmod +x "$p/a.txt"
+d1=$(bash "$GATE" --digest --project "$p")
+chmod -x "$p/a.txt"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "140 executable mode changes digest" || no "140 executable mode ignored"
+# An actual gate verification catches mutation of an already dirty file.
+cat > "$p/mutate.sh" <<'EOS'
+#!/usr/bin/env bash
+printf 'third version\n' > a.txt
+EOS
+contract t140 "- AC-1 | no mutation | check: \`bash mutate.sh\` | expected: exit=0"
+out=$(bash "$GATE" --verify --project "$p" 2>&1); rc=$?
+assert_rc "140 verify refuses dirty-file mutation" 2 $rc
+assert_has "140 names mutation" 'check-mutated-tree' "$out"
+# Git projects must be able to claim with the new versioned digest, and a
+# later edit to the same dirty file must invalidate that claim.
+contract t140 "- AC-1 | exists | check: \`test -s a.txt\` | expected: exit=0"
+printf 'valid candidate\n' > "$p/a.txt"
+out=$(bash "$CTL" close-iteration --project "$p" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --adversarial clear --adversarial-note reviewed 2>&1); rc=$?
+assert_rc "140 Git candidate claims GO" 0 $rc
+printf 'changed candidate\n' > "$p/a.txt"
+out=$(bash "$GATE" --check --project "$p" 2>&1); rc=$?
+assert_rc "140 dirty edit stales prior claim" 2 $rc
+assert_has "140 stale claim named" 'verdicts-stale' "$out"
+
+# 141 Preflight rejects malformed fields before measurement or mutation.
+mkproj t141; contract t141 "- AC-1 | t | check: \`true\` | expected: exit=0"
+printf 'artifact\n' > "$T/t141/a.txt"
+for field in progress exit-signal false-complete dry checks-pass checks-fail checks-unverifiable; do
+  before=$(find "$T/t141/.goal" -type f -exec cksum {} \; | sort)
+  out=$(bash "$CTL" close-iteration --project "$T/t141" --task T1 --files a.txt \
+    --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+    "--$field" invalid --strategy-delta retry --no-gate 2>&1); rc=$?
+  after=$(find "$T/t141/.goal" -type f -exec cksum {} \; | sort)
+  [ "$rc" = 4 ] && [ "$before" = "$after" ] && ok "141 $field rejected without mutation" || no "141 $field not rejected before mutation (rc=$rc)"
+done
+mkproj t141b
+{ printf '# Goal\n\n## Objective\n\nobjective: maximize AC-1\nhorizon-waived: fixture\n\n## Acceptance criteria\n\n'
+  printf '%s\n' '- AC-1 | score | check: `echo touched > .goal/evidence/measured; echo 5` | expected: maximize'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t141b/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t141b" --auto >/dev/null
+printf 'artifact\n' > "$T/t141b/a.txt"
+out=$(bash "$CTL" close-iteration --project "$T/t141b" --task BAD --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --score 5 --strategy x --no-gate 2>&1); rc=$?
+[ "$rc" = 4 ] && [ ! -e "$T/t141b/.goal/evidence/measured" ] && ok "141 invalid task rejected before measurement" || no "141 invalid task executed measurement (rc=$rc)"
+
+# 142 Non-Git worktrees bind symlinks, modes and unusual names too.
+mkproj t142; p="$T/t142"
+printf 'content\n' > "$p/file with spaces"
+ln -s 'first target' "$p/link"
+d1=$(bash "$GATE" --digest --project "$p")
+rm "$p/link"; ln -s 'second target' "$p/link"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "142 symlink target changes non-Git digest" || no "142 non-Git symlink ignored"
+chmod +x "$p/file with spaces"
+d1=$(bash "$GATE" --digest --project "$p")
+chmod -x "$p/file with spaces"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "142 mode changes non-Git digest" || no "142 non-Git mode ignored"
+printf 'first\n' > "$p/"$'line\nbreak'
+d1=$(bash "$GATE" --digest --project "$p")
+printf 'second\n' > "$p/"$'line\nbreak'
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "142 newline path remains content-bound" || no "142 newline path ignored"
+printf 'one\n' > "$p/-option-like-name"
+d1=$(bash "$GATE" --digest --project "$p")
+printf 'two\n' > "$p/-option-like-name"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "142 option-like path remains content-bound" || no "142 option-like path ignored"
+
+# 143 A judged verdict in a Git worktree becomes stale after a dirty edit.
+mkproj t143; p="$T/t143"
+git -C "$p" init -q
+printf 'base\n' > "$p/a.txt"
+printf 'review subject\n' > "$p/judged.txt"
+git -C "$p" add a.txt judged.txt
+git -C "$p" -c user.name=test -c user.email=test@example.invalid commit -qm base
+contract t143 "- AC-1 | reviewed | check: \`true\` | expected: judged"
+close_iter t143
+sum=$(sha256sum "$p/judged.txt" | cut -c1-64)
+bind_v t143 "AC-1|PASS|1|DIGEST|cmd|reviewed artifact: judged.txt digest: $sum"
+out=$(bash "$GATE" --check --project "$p" 2>&1); rc=$?
+assert_rc "143 judged Git candidate GO" 0 $rc
+printf 'changed after review\n' > "$p/a.txt"
+out=$(bash "$GATE" --check --project "$p" 2>&1); rc=$?
+assert_rc "143 changed dirty file refuses prior verdict" 2 $rc
+assert_has "143 refusal identifies staleness" 'verdicts-stale' "$out"
+
+# 144 Explicit contract watch paths bind ignored/pruned deliverables.
+mkproj t144; p="$T/t144"
+git -C "$p" init -q
+git -C "$p" -c user.name=test -c user.email=test@example.invalid commit --allow-empty -qm base
+printf 'build/\n' > "$p/.gitignore"
+mkdir -p "$p/build"
+printf 'first\n' > "$p/build/out file"
+contract t144 "- AC-1 | output | check: \`test -s 'build/out file'\` | watch: \`build/out file\` | expected: exit=0"
+d1=$(bash "$GATE" --digest --project "$p")
+printf 'second\n' > "$p/build/out file"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "144 explicitly watched Git-ignored artifact bound" || no "144 Git-ignored artifact invisible"
+mkproj t144b; p="$T/t144b"; mkdir -p "$p/build"
+printf 'first\n' > "$p/build/out file"
+contract t144b "- AC-1 | output | check: \`test -s 'build/out file'\` | watch: \`build/out file\` | expected: exit=0"
+d1=$(bash "$GATE" --digest --project "$p")
+printf 'second\n' > "$p/build/out file"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "144 explicitly watched pruned artifact bound" || no "144 pruned artifact invisible"
+# A GO bound to the explicit artifact is revoked when only that ignored
+# artifact changes, even if its acceptance test would still pass.
+p="$T/t144"
+out=$(bash "$CTL" close-iteration --project "$p" --task T1 --files build/out\ file \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --adversarial clear --adversarial-note reviewed 2>&1); rc=$?
+assert_rc "144 watched ignored artifact may claim GO" 0 $rc
+printf 'third\n' > "$p/build/out file"
+out=$(bash "$GATE" --check --project "$p" 2>&1); rc=$?
+assert_rc "144 ignored artifact change revokes GO" 2 $rc
+assert_has "144 ignored change names stale digest" 'verdicts-stale' "$out"
+
+# 145 Explicit scope rejects escapes and preserves quoted check contents.
+mkproj t145; p="$T/t145"
+for unsafe in '../outside' '/tmp/outside' '.goal/state.rec' 'build/../outside'; do
+  NOSTAMP=1 contract t145 "- AC-1 | t | check: \`true\` | watch: \`$unsafe\` | expected: exit=0"
+  out=$(bash "$CTL" stamp --project "$p" --auto 2>&1); rc=$?
+  [ "$rc" = 2 ] && ok "145 unsafe path rejected: $unsafe" || no "145 unsafe path accepted: $unsafe rc=$rc"
+done
+mkdir -p "$T/t145external"; ln -s "$T/t145external" "$p/escape"
+NOSTAMP=1 contract t145 "- AC-1 | t | check: \`true\` | watch: \`escape/file\` | expected: exit=0"
+out=$(bash "$CTL" stamp --project "$p" --auto 2>&1); rc=$?
+assert_rc "145 symlink parent rejected" 2 $rc
+NOSTAMP=1 contract t145 '- AC-1 | t | check: `printf "| watch: fake"` | expected: exit=0'
+out=$(bash "$CTL" stamp --project "$p" --auto 2>&1); rc=$?
+assert_rc "145 watch decoy inside command ignored" 0 $rc
+
+# 146 Watch a pruned directory, including nested names and empty directories.
+mkproj t146; p="$T/t146"; mkdir -p "$p/build/empty"
+printf 'one\n' > "$p/build/a"
+contract t146 "- AC-1 | output | check: \`true\` | watch: \`build\` | expected: exit=0"
+d1=$(bash "$GATE" --digest --project "$p")
+printf 'two\n' > "$p/build/a"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "146 watched directory content" || no "146 watched directory content ignored"
+d1=$d2; mkdir "$p/build/new-empty"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "146 watched empty directory" || no "146 watched empty directory ignored"
+# The watch field is part of the approved AC, not an editable runtime filter.
+sed_in 's/watch: `build`/watch: `other`/' "$p/.goal/goal.md"
+out=$(bash "$GATE" --check --project "$p" 2>&1); rc=$?
+assert_rc "146 changing watched scope refuses claim" 2 $rc
+assert_has "146 scope change is contract tampering" 'contract-tampered' "$out"
+
+# 147 A not-yet-created watched artifact changes identity when it appears.
+mkproj t147; p="$T/t147"
+contract t147 "- AC-1 | output | check: \`true\` | watch: \`build/new file\` | expected: exit=0"
+d1=$(bash "$GATE" --digest --project "$p")
+mkdir -p "$p/build"; printf 'created\n' > "$p/build/new file"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "147 newly created watched artifact changes digest" || no "147 creation invisible"
+
+# 148 Legacy identities become stale without counting migration as a lie.
+mkproj t148; p="$T/t148"
+contract t148 "- AC-1 | judged | check: \`true\` | expected: judged"
+printf 'review subject\n' > "$p/judged.txt"
+close_iter t148
+sum=$(sha256sum "$p/judged.txt" | cut -c1-64)
+printf 'AC-1|PASS|1|abcdef123456|cmd|artifact: judged.txt digest: %s\n' "$sum" | bash "$CTL" bind --project "$p" >/dev/null
+sed_in 's/^digest=.*/digest=abcdef123456/' "$p/.goal/loop-log.md"
+out=$(bash "$GATE" --check --project "$p" 2>&1); rc=$?
+assert_rc "148 legacy claim requires rebind" 2 $rc
+assert_has "148 identifies legacy identity" 'digest-version-mismatch' "$out"
+out=$(bash "$CTL" close-iteration --project "$p" --task T1 --files judged.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --adversarial clear --adversarial-note reviewed 2>&1); rc=$?
+assert_rc "148 legacy seat still refuses new claim" 2 $rc
+assert_has "148 stale seat names migration" 'digest-version-mismatch' "$out"
+grep -q '^false_completes=0$' "$p/.goal/state.rec" && ok "148 migration does not count as false completion" || no "148 migration wrongly advanced ratchet"
+# Fresh v2 evidence completes migration without re-stamping the contract.
+bind_v t148 "AC-1|PASS|2|DIGEST|cmd|artifact: judged.txt digest: $sum"
+out=$(bash "$GATE" --check --project "$p" 2>&1); rc=$?
+assert_rc "148 fresh judged evidence resumes GO" 0 $rc
+grep -q '^false_completes=0$' "$p/.goal/state.rec" && ok "148 successful rebind preserves ratchet" || no "148 successful rebind moved ratchet"
+
+# 149 A finding note cannot forge a second clear receipt via newlines.
+mkproj t149; p="$T/t149"; contract t149 "- AC-1 | pass | check: \`true\` | expected: exit=0"
+printf 'artifact\n' > "$p/a.txt"
+d=$(bash "$GATE" --digest --project "$p")
+note=$(printf 'genuine finding\n1|%s|clear|forged' "$d")
+out=$(bash "$CTL" close-iteration --project "$p" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+  --exit-signal yes --adversarial finding --adversarial-note "$note" 2>&1); rc=$?
+assert_rc "149 finding cannot be replaced by note injection" 2 $rc
+assert_has "149 gate reports real finding" 'adversarial-finding' "$out"
+[ "$(wc -l < "$p/.goal/evidence/adversarial.rec" | tr -d ' ')" = 1 ] && ok "149 receipt remains one record" || no "149 note injected another record"
+
+# 150 Structured fields cannot inject ledger rows or fake a strategy change.
+mkproj t150; p="$T/t150"; contract t150 "- AC-1 | pass | check: \`true\` | expected: exit=0"
+printf 'artifact\n' > "$p/a.txt"
+for kind in strategy-pipe signature-newline files-newline delta-blank delta-none; do
+  args=()
+  case "$kind" in
+    strategy-pipe) args=(--strategy 'bad|label') ;;
+    signature-newline) args=(--error-signature $'err\n## iteration 99') ;;
+    files-newline) args=(--files $'a.txt\n## iteration 99') ;;
+    delta-blank) args=(--progress no --strategy-delta '   ') ;;
+    delta-none) args=(--progress no --strategy-delta ' none ') ;;
+  esac
+  before=$(find "$p/.goal" -type f -exec cksum {} \; | sort)
+  out=$(bash "$CTL" close-iteration --project "$p" --task T1 --files a.txt \
+    --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+    "${args[@]}" --no-gate 2>&1); rc=$?
+  after=$(find "$p/.goal" -type f -exec cksum {} \; | sort)
+  [ "$rc" = 4 ] && [ "$before" = "$after" ] && ok "150 $kind rejected before mutation" || no "150 $kind accepted or mutated state (rc=$rc)"
+done
+
+# Objective labels that normalize to none are invalid before measurement.
+mkproj t150b
+{ printf '# Goal\n\n## Objective\n\nobjective: maximize AC-1\nhorizon-waived: fixture\n\n## Acceptance criteria\n\n'
+  printf '%s\n' '- AC-1 | score | check: `echo touched > .goal/evidence/measured; echo 5` | expected: maximize'
+  printf '\n## Approval\n\napproved: PENDING\n'; } > "$T/t150b/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t150b" --auto >/dev/null
+printf 'artifact\n' > "$T/t150b/a.txt"
+out=$(bash "$CTL" close-iteration --project "$T/t150b" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --score 5 --strategy '  ' --no-gate 2>&1); rc=$?
+[ "$rc" = 4 ] && [ ! -e "$T/t150b/.goal/evidence/measured" ] && ok "150 whitespace objective label rejected before measurement" || no "150 whitespace objective label accepted or measured"
+# A multiword objective label cannot be faithfully parsed from STRATEGY-PICK.
+rm -f "$T/t150b/.goal/evidence/measured"
+out=$(bash "$CTL" close-iteration --project "$T/t150b" --task T1 --files a.txt \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --score 5 --strategy 'alpha beta' --no-gate 2>&1); rc=$?
+[ "$rc" = 4 ] && [ ! -e "$T/t150b/.goal/evidence/measured" ] && ok "150 multiword objective label rejected before measurement" || no "150 multiword objective label accepted or measured"
+
+# 151 Scope parsing and identity failures are fail-closed.
+mkproj t151; p="$T/t151"
+NOSTAMP=1 contract t151 '- AC-1 | t | check: `true` | watch: unquoted | expected: exit=0'
+out=$(bash "$CTL" stamp --project "$p" --auto 2>&1); rc=$?
+assert_rc "151 malformed watch refused at stamp" 2 $rc
+assert_has "151 malformed watch named" 'malformed-watch' "$out"
+NOSTAMP=1 contract t151 "- AC-1 | t | check: \`true\` | watch: \`build/a\` | watch: \`build/b\` | expected: exit=0"
+out=$(bash "$CTL" stamp --project "$p" --auto 2>&1); rc=$?
+assert_rc "151 multiple watch fields accepted" 0 $rc
+mkdir -p "$p/build"; printf 'a\n' > "$p/build/a"; printf 'b\n' > "$p/build/b"
+d1=$(bash "$GATE" --digest --project "$p")
+printf 'changed\n' > "$p/build/b"
+d2=$(bash "$GATE" --digest --project "$p")
+[ "$d1" != "$d2" ] && ok "151 second watched path is bound" || no "151 second watched path ignored"
+
+# Simulate an enumeration/sort/hash failure without changing real tools.
+mkdir -p "$T/t151bin"
+for tool in sort sha256sum; do
+  cat > "$T/t151bin/$tool" <<'EOS'
+#!/usr/bin/env bash
+exit 1
+EOS
+  chmod +x "$T/t151bin/$tool"
+  out=$(PATH="$T/t151bin:$PATH" bash "$GATE" --digest --project "$p" 2>&1); rc=$?
+  assert_rc "151 $tool failure refuses digest" 4 $rc
+  rm "$T/t151bin/$tool"
+done
+
+# 152 A successful-but-broken hash utility must not silently bind every file
+# to an empty or constant digest. The sensor must pass known-answer checks.
+mkproj t152; p="$T/t152"; printf 'artifact\n' > "$p/a.txt"
+mkdir -p "$T/t152bin"
+for mode in empty constant; do
+  if [ "$mode" = empty ]; then
+    printf '#!/usr/bin/env bash\nexit 0\n' > "$T/t152bin/sha256sum"
+  else
+    printf '#!/usr/bin/env bash\nprintf "%%064d  -\\n" 0\n' > "$T/t152bin/sha256sum"
+  fi
+  chmod +x "$T/t152bin/sha256sum"
+  out=$(PATH="$T/t152bin:$PATH" bash "$GATE" --digest --project "$p" 2>&1); rc=$?
+  assert_rc "152 $mode hash sensor refuses identity" 4 $rc
+done
+
+# 153 A vanished untracked entry is an incomplete enumeration, not a
+# legitimate tracked deletion. Simulate the race with an isolated Git stub.
+mkproj t153; p="$T/t153"; printf 'live\n' > "$p/vanish.txt"
+mkdir -p "$T/t153bin"
+cat > "$T/t153bin/git" <<'EOS'
+#!/usr/bin/env bash
+case "$1" in
+  rev-parse) exit 0 ;;
+  ls-files)
+    case " $* " in *' --deleted '*) exit 0 ;; esac
+    printf 'vanish.txt\0'
+    rm -f "$GOAL_TEST_VICTIM"
+    exit 0 ;;
+esac
+exit 1
+EOS
+chmod +x "$T/t153bin/git"
+out=$(PATH="$T/t153bin:$PATH" GOAL_TEST_VICTIM="$p/vanish.txt" bash "$GATE" --digest --project "$p" 2>&1); rc=$?
+assert_rc "153 vanished untracked file refuses digest" 4 $rc
+
+# 154 A genuinely tracked deletion remains a valid, changed identity.
+mkproj t154; p="$T/t154"; git -C "$p" init -q
+printf 'tracked\n' > "$p/a.txt"; git -C "$p" add a.txt
+git -C "$p" -c user.name=test -c user.email=test@example.invalid commit -qm base
+d1=$(bash "$GATE" --digest --project "$p")
+rm "$p/a.txt"
+d2=$(bash "$GATE" --digest --project "$p"); rc=$?
+assert_rc "154 tracked deletion is digestible" 0 $rc
+[ "$d1" != "$d2" ] && ok "154 tracked deletion changes identity" || no "154 deletion invisible"
+
+# 155 Python accelerator and shell fallback must bind identical bytes,
+# including explicit pruned directories and awkward POSIX names.
+mkproj t155; p="$T/t155"; mkdir -p "$p/build/empty"
+printf 'content\n' > "$p/"$'line\nbreak'
+printf 'artifact\n' > "$p/build/out file"
+ln -s $'target\nwith newline' "$p/link"
+contract t155 "- AC-1 | output | check: \`true\` | watch: \`build\` | expected: exit=0"
+mkdir -p "$T/t155bin"
+printf '#!/usr/bin/env bash\nexit 1\n' > "$T/t155bin/python3"; chmod +x "$T/t155bin/python3"
+fast=$(bash "$GATE" --digest --project "$p"); rc1=$?
+slow=$(PATH="$T/t155bin:$PATH" bash "$GATE" --digest --project "$p"); rc2=$?
+[ "$rc1" = 0 ] && [ "$rc2" = 0 ] && [ "$fast" = "$slow" ] && ok "155 accelerator and fallback identities match" || no "155 accelerator/fallback mismatch"
+printf 'changed\n' > "$p/build/out file"
+fast2=$(bash "$GATE" --digest --project "$p"); rc1=$?
+slow2=$(PATH="$T/t155bin:$PATH" bash "$GATE" --digest --project "$p"); rc2=$?
+[ "$rc1" = 0 ] && [ "$rc2" = 0 ] && [ "$fast2" = "$slow2" ] && [ "$fast" != "$fast2" ] && ok "155 both backends detect watched mutation" || no "155 backend mutation mismatch"
+
+# 156 A Git-tracked path must not traverse a substituted symlink parent.
+mkproj t156; p="$T/t156"; git -C "$p" init -q
+mkdir -p "$p/dir" "$T/t156external"
+printf 'inside\n' > "$p/dir/file"; printf 'outside\n' > "$T/t156external/file"
+git -C "$p" add dir/file
+git -C "$p" -c user.name=test -c user.email=test@example.invalid commit -qm base
+rm "$p/dir/file"; rmdir "$p/dir"; ln -s "$T/t156external" "$p/dir"
+out=$(bash "$GATE" --digest --project "$p" 2>&1); rc=$?
+assert_rc "156 tracked entry under symlink parent refuses digest" 4 $rc
+mkdir -p "$T/t156bin"; printf '#!/usr/bin/env bash\nexit 1\n' > "$T/t156bin/python3"; chmod +x "$T/t156bin/python3"
+out=$(PATH="$T/t156bin:$PATH" bash "$GATE" --digest --project "$p" 2>&1); rc=$?
+assert_rc "156 shell fallback refuses symlink parent" 4 $rc
+
+# 157 Backend parity in Git includes tracked deletions and ignored watch paths.
+mkproj t157; p="$T/t157"; git -C "$p" init -q
+printf 'tracked\n' > "$p/"$'tracked\nfile'
+git -C "$p" add -- $'tracked\nfile'
+git -C "$p" -c user.name=test -c user.email=test@example.invalid commit -qm base
+rm "$p/"$'tracked\nfile'
+printf 'build/\n' > "$p/.gitignore"; mkdir "$p/build"; printf 'out\n' > "$p/build/a"
+contract t157 "- AC-1 | output | check: \`true\` | watch: \`build\` | expected: exit=0"
+mkdir -p "$T/t157bin"; printf '#!/usr/bin/env bash\nexit 1\n' > "$T/t157bin/python3"; chmod +x "$T/t157bin/python3"
+fast=$(bash "$GATE" --digest --project "$p"); rc1=$?
+slow=$(PATH="$T/t157bin:$PATH" bash "$GATE" --digest --project "$p"); rc2=$?
+[ "$rc1" = 0 ] && [ "$rc2" = 0 ] && [ "$fast" = "$slow" ] && ok "157 Git accelerator matches fallback" || no "157 Git backend mismatch"
+printf 'changed\n' > "$p/build/a"
+fast2=$(bash "$GATE" --digest --project "$p"); slow2=$(PATH="$T/t157bin:$PATH" bash "$GATE" --digest --project "$p")
+[ "$fast2" = "$slow2" ] && [ "$fast2" != "$fast" ] && ok "157 Git backends detect ignored artifact change" || no "157 Git watched artifact mismatch"
+
+# 158 The optional Python sensor ignores ambient PYTHONPATH hooks.
+mkproj t158; p="$T/t158"; printf 'artifact\n' > "$p/a.txt"
+mkdir -p "$T/t158mods"
+cat > "$T/t158mods/sitecustomize.py" <<'EOS'
+import os
+with open(os.environ['GOAL_SITE_MARKER'], 'w') as stream:
+    stream.write('loaded')
+EOS
+out=$(PYTHONPATH="$T/t158mods" GOAL_SITE_MARKER="$T/t158-loaded" bash "$GATE" --digest --project "$p" 2>&1); rc=$?
+assert_rc "158 isolated Python digest succeeds" 0 $rc
+[ ! -e "$T/t158-loaded" ] && ok "158 ambient Python startup hook not executed" || no "158 ambient startup hook executed"
+
+# 159 Budget sidecars are controller state; checks cannot silently rewrite them.
+mkproj t159; p="$T/t159"
+contract t159 "- AC-1 | t | check: \`echo 9999999999 > .goal/runner.deadline\` | expected: exit=0"
+out=$(bash "$GATE" --verify --project "$p" 2>&1); rc=$?
+assert_rc "159 deadline mutation refuses verification" 2 $rc
+assert_has "159 deadline mutation names ledger guard" 'check-mutated-ledger' "$out"
+contract t159 "- AC-1 | t | check: \`echo 1 > .goal/runner.clock\` | expected: exit=0"
+out=$(bash "$GATE" --verify --project "$p" 2>&1); rc=$?
+assert_rc "159 clock mutation refuses verification" 2 $rc
+assert_has "159 clock mutation names ledger guard" 'check-mutated-ledger' "$out"

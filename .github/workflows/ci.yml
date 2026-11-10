@@ -26,6 +26,7 @@ jobs:
       - name: Scenario test suite (gate semantics, no API needed)
         run: |
           bash tests/run_tests.sh
-          bash tests/run_tests.sh 2>/dev/null | grep -E '^== results'
       - name: Companion contract-forge lint fixtures
         run: bash companions/contract-forge/tests/run_fixtures.sh
+      - name: Budget, ledger access, commit and recovery tests
+        run: python3 -B -m unittest discover -s tests -p 'test_*.py' -v

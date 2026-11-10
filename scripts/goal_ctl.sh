@@ -14,6 +14,7 @@
 #        [--score N] [--judge-score N] [--strategy-delta TEXT] [--strategy TEXT]
 #        [--adversarial clear|finding] [--adversarial-note TEXT]
 #        [--fault CLASS] [--fault-outcome OUTCOME] [--fault-note TEXT]
+#        [--operation-id ID]  # stable identity when retrying the same close
 #        (--dry is REQUIRED on exit: forge contracts: yes = this round's
 #         panel+critic produced no new evidence-backed finding)
 #        (--score: objective:maximize|minimize value; --strategy-delta REQUIRED when
@@ -29,14 +30,16 @@ set -u
 export LC_ALL=C.UTF-8
 
 here=$(cd "$(dirname "$0")" && pwd)
+_goal_ctl_args=("$@")
 cmd="" project="." auto=0 no_gate=0 max_iterations=12 time_budget=""
 task="" files="" cp="" cf="" cu="" progress=yes exit_signal=no errsig=none fcomplete=no dry=""
 score="" judge_score="" strategy_delta="" strategy="" adversarial="" adv_note=""
 fault="" fault_outcome="" fault_note=""
+operation_id="" operation_id_seen=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    init|stamp|bind|close-iteration|status) cmd="$1" ;;
+    init|stamp|bind|close-iteration|status|recover) cmd="$1" ;;
     --project) [ $# -ge 2 ] || { echo "CTL: ERROR missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
     --auto) auto=1 ;;
     --time-budget=*) time_budget="${1#*=}" ;;
@@ -61,6 +64,7 @@ while [ $# -gt 0 ]; do
     --fault) [ $# -ge 2 ] || { echo "CTL: ERROR missing-fault-class" >&2; exit 4; }; fault="$2"; shift ;;
     --fault-outcome) [ $# -ge 2 ] || { echo "CTL: ERROR missing-fault-outcome" >&2; exit 4; }; fault_outcome="$2"; shift ;;
     --fault-note) [ $# -ge 2 ] || { echo "CTL: ERROR missing-fault-note" >&2; exit 4; }; fault_note="$2"; shift ;;
+    --operation-id) [ $# -ge 2 ] || { echo 'CTL: ERROR missing-operation-id' >&2; exit 4; }; operation_id="$2"; operation_id_seen=1; shift ;;
     --help|-h) sed -n '2,22p' "$0"; exit 0 ;;
     *) echo "CTL: ERROR unknown-flag:$1" >&2; exit 4 ;;
   esac
@@ -69,19 +73,55 @@ done
 [ -n "$cmd" ] || { echo "CTL: ERROR no-command (init|stamp|bind|close-iteration|status)" >&2; exit 4; }
 
 sd="$project/.goal"
+if [ "$cmd" = init ]; then
+  gp_init_max="$max_iterations"
+  case "$gp_init_max" in ''|*[!0-9]*) echo 'CTL: ERROR bad-max-iterations' >&2; exit 4 ;; esac
+fi
+if [ "$cmd" = init ] && [ ! -d "$sd" ]; then
+  mkdir -p "$sd" || exit 4
+fi
+if [ -d "$sd" ] && [ "${GOAL_ACCESS_EXEC_PID:-}" != "$$" ]; then
+  access_mode=write; [ "$cmd" != status ] || access_mode=read
+  exec python3 -I "$here/goal_store.py" access-exec "$sd" "$access_mode" "$here/goal_ctl.sh" "${_goal_ctl_args[@]}"
+fi
+if [ "$cmd" != recover ] && [ -e "$sd/store/pending" ]; then
+  echo 'CTL: ERROR recovery-required (run recover before further ledger operations)' >&2
+  exit 4
+fi
 # shellcheck source=goal_parse.sh
 . "$here/goal_parse.sh"       # one grammar, one home (v2.7) - shared with goal_gate.sh
 r(){ gp_r; }
 # MUST match goal_gate.sh hash_std - stamp and verify share one digest rule
 hash_std(){ gp_hash_std; }
 state_get(){ gp_state_get "$project" "$1"; }
+if [ "$operation_id_seen" -eq 1 ]; then
+  case "$cmd" in init|stamp|bind|close-iteration) : ;; *) echo 'CTL: ERROR operation-id-needs-writer-command' >&2; exit 4 ;; esac
+  printf '%s' "$operation_id" | grep -qE '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$' \
+    || { echo 'CTL: ERROR invalid-operation-id (1-128 ASCII letters/digits/._-, start with letter/digit)' >&2; exit 4; }
+fi
+if [ -n "$operation_id" ] && { [ "$cmd" = init ] || [ "$cmd" = stamp ]; }; then
+  python3 -I "$here/goal_store.py" mutation-retry "$sd" "$cmd" "${_goal_ctl_args[@]}"; replay_rc=$?
+  [ "$replay_rc" -eq 100 ] || exit "$replay_rc"
+fi
+if [ "$cmd" = stamp ] && [ -n "$time_budget" ]; then
+  gp_is_natural "$time_budget" || { echo "CTL: ERROR bad-time-budget:$time_budget" >&2; exit 4; }
+  time_budget=$(printf '%s' "$time_budget" | sed 's/^0*//')
+  [ -n "$time_budget" ] || time_budget=0
+fi
 
 case "$cmd" in
+  recover)
+    python3 -I "$here/goal_store.py" close-journal "$sd" recover || exit 4
+    echo 'CTL: RECOVER ok (ledger only; checks were not replayed)'
+    exit 0 ;;
   init)
     [ -d "$sd" ] || mkdir -p "$sd/logs"
     if [ -f "$sd/goal.md" ]; then echo "CTL: ERROR already-initialized ($sd/goal.md)" >&2; exit 2; fi
-    printf 'iteration=0\nbreaker=CLOSED\nfalse_completes=0\nreplans=0\nno_progress_streak=0\nlast_progress_iteration=0\nmax_iterations=%s\nno_progress_limit=2\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=0\ndry_limit=3\ncheck_timeout=120\ntime_budget=0\ndeadline=0\n' "$max_iterations" > "$sd/state.rec"
-    : > "$sd/loop-log.md"; : > "$sd/verdicts.rec"; mkdir -p "$sd/evidence"
+    mutation_id=$(python3 -I "$here/goal_store.py" mutation-journal "$sd" begin init "${_goal_ctl_args[@]}") || exit 4
+    printf 'iteration=0\nbreaker=CLOSED\nfalse_completes=0\nreplans=0\nno_progress_streak=0\nlast_progress_iteration=0\nmax_iterations=%s\nno_progress_limit=2\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=0\ndry_limit=3\ncheck_timeout=120\ntime_budget=0\ndeadline=0\n' "$max_iterations" > "$sd/state.rec" || exit 4
+    : > "$sd/loop-log.md" || exit 4
+    : > "$sd/verdicts.rec" || exit 4
+    mkdir -p "$sd/evidence" || exit 4
     # work-plan skeleton (SB-8): an empty file is a trap - Write/Edit tools
     # refuse to overwrite unread empty files and controllers waste a turn
     # inventing the format. The schema is fixed; seed it once.
@@ -89,14 +129,18 @@ case "$cmd" in
       printf '# work-plan (controller ticks; NEVER a GO signal)\n\n'
       printf '# format: - [ ] T1 <scope> | owner=<name> | files=<paths>\n'
       printf '# done:   - [x] T1 ...\n'
-    } > "$sd/work-plan.md"
-    echo "CTL: INIT ok - fill $sd/goal.md, then: goal_ctl.sh stamp --project $project" ;;
+    } > "$sd/work-plan.md" || exit 4
+    python3 -I "$here/goal_store.py" mutation-journal "$sd" finish || exit 4
+    echo "CTL: INIT ok operation=$mutation_id - fill $sd/goal.md, then: goal_ctl.sh stamp --project $project" ;;
 
   stamp)
     [ -f "$sd/goal.md" ] || { echo "CTL: ERROR no-goal-md" >&2; exit 4; }
     if grep -qE '^approved: [0-9a-f]{6,}' "$sd/goal.md"; then
       echo "CTL: ERROR already-stamped (R3: one stamp; amendments go to the user)" >&2; exit 2
     fi
+    [ "$(grep -c '^approved: ' "$sd/goal.md")" = 1 ] \
+      || { echo "CTL: ERROR stamp-refused: goal.md needs one 'approved: <placeholder>' line" >&2; exit 4; }
+    gp_watch_validate "$project" || { echo "CTL: ERROR stamp-refused: invalid watch path" >&2; exit 2; }
     # AC grammar at t=0 (SB-1): one AC = one line carrying check: AND expected:.
     # Multi-line check commands push expected: onto a continuation the parser
     # never sees, and the loop only learns contract-malformed mid-wave - after
@@ -174,6 +218,7 @@ case "$cmd" in
       fi
     fi
     h=$(gp_ac_body_hash "$project")
+    mutation_id=$(python3 -I "$here/goal_store.py" mutation-journal "$sd" begin stamp "${_goal_ctl_args[@]}") || exit 4
     # Budget knobs written in goal.md BIND at stamp. They used to be
     # decorative (contract said max_iterations=10, state.rec kept 12) -
     # that is a silent contract lie. Parse key=value tokens; CLI --time-budget
@@ -181,13 +226,15 @@ case "$cmd" in
     for key in max_iterations no_progress_limit max_replans per_check_fail_cap panel_max dry_limit check_timeout wallclock; do
       val=$(r < "$sd/goal.md" | sed -nE "s/.*(^|[[:space:]])${key}=([0-9]+).*/\2/p" | tail -1)
       [ -n "$val" ] || continue
+      val=$(printf '%s' "$val" | sed 's/^0*//')
+      [ -n "$val" ] || val=0
       case "$key" in
         wallclock)
           [ -n "${time_budget:-}" ] || time_budget=$val
           ;;
         *)
           { grep -vE "^${key}=" "$sd/state.rec"; printf '%s=%s\n' "$key" "$val"; } > "$sd/state.rec.new" \
-            && mv "$sd/state.rec.new" "$sd/state.rec"
+            && mv "$sd/state.rec.new" "$sd/state.rec" || exit 4
           ;;
       esac
     done
@@ -196,7 +243,7 @@ case "$cmd" in
       *) gp_is_natural "$time_budget" || { echo "CTL: ERROR bad-time-budget:$time_budget" >&2; exit 4; }
          { grep -vE '^(time_budget|deadline)=' "$sd/state.rec"
            printf 'time_budget=%s\ndeadline=%s\n' "$time_budget" "$(( $(date +%s) + time_budget ))"
-         } > "$sd/state.rec.new" && mv "$sd/state.rec.new" "$sd/state.rec" ;;
+         } > "$sd/state.rec.new" && mv "$sd/state.rec.new" "$sd/state.rec" || exit 4 ;;
     esac
     # Dual-encode freeze (harness engineering): pin check/probe SCRIPT bodies,
     # not just the AC line text. goal.md hash cannot see a swapped check.sh.
@@ -217,7 +264,7 @@ case "$cmd" in
         printf '%s=%s;' "$scr" "$h"
       done
     )
-    printf '%s\n' "$freeze" > "$sd/check_freeze"
+    printf '%s\n' "$freeze" > "$sd/check_freeze" || exit 4
     marker=""; [ "$auto" -eq 1 ] && marker=" auto"
     gp_sed_inplace "s/^approved: .*/approved: $h $(date +%F)$marker/" "$sd/goal.md" \
       || { echo "CTL: ERROR stamp-failed: could not write the approved: line" >&2; exit 4; }
@@ -234,29 +281,41 @@ case "$cmd" in
         echo "# pre-reg.md — seeded at stamp $(date +%F)"
         echo
         sed "s/^T0 = .*/T0 = $(date +%FT%T)/" "$here/../assets/pre-reg.template.md"
-      } > "$sd/pre-reg.md"
+      } > "$sd/pre-reg.md" || exit 4
     fi
+    python3 -I "$here/goal_store.py" mutation-journal "$sd" finish || exit 4
     grep -E '^approved:' "$sd/goal.md" | head -1 ;;
 
   bind)
-    [ -f "$sd/verdicts.rec" ] || { echo "CTL: ERROR no-verdicts-rec" >&2; exit 4; }
-    n=0; bad=0
-    while IFS= read -r line; do
-      line=$(printf '%s' "$line" | r)
-      [ -n "$line" ] || continue
-      nf=$(printf '%s' "$line" | awk -F'|' '{print NF}')
-      v=$(printf '%s' "$line" | cut -d'|' -f2)
-      if [ "$nf" -ne 6 ] || ! printf '%s' "$v" | grep -qE '^(PASS|FAIL|UNVERIFIABLE)$'; then
-        echo "CTL: WARN skipped-malformed: $line" >&2; bad=$((bad+1)); continue
-      fi
-      printf '%s\n' "$line" >> "$sd/verdicts.rec"; n=$((n+1))
-    done
-    echo "CTL: BIND ok appended=$n skipped=$bad" ;;
+    python3 -I "$here/goal_store.py" bind-mutation "$sd" "${_goal_ctl_args[@]}" || exit 4 ;;
 
   close-iteration)
+    if [ -n "$operation_id" ]; then
+      python3 -I "$here/goal_store.py" close-retry "$sd" "${_goal_ctl_args[@]}"; replay_rc=$?
+      [ "$replay_rc" -eq 100 ] || exit "$replay_rc"
+    fi
+    # Reject malformed receipts before any ledger or evidence mutation.
+    case "$adversarial" in
+      ''|clear|finding) : ;;
+      *) echo "CTL: ERROR bad-adversarial:$adversarial (use clear|finding)" >&2; exit 4 ;;
+    esac
     for v in "$task" "$files" "$cp" "$cf" "$cu"; do
       [ -n "$v" ] || { echo "CTL: ERROR close-iteration needs --task --files --checks-pass --checks-fail --checks-unverifiable" >&2; exit 4; }
     done
+    for v in "$cp" "$cf" "$cu"; do
+      gp_is_natural "$v" || { echo "CTL: ERROR bad-check-count:$v" >&2; exit 4; }
+    done
+    case "$progress" in yes|no) : ;; *) echo "CTL: ERROR bad-progress:$progress" >&2; exit 4 ;; esac
+    case "$exit_signal" in yes|no) : ;; *) echo "CTL: ERROR bad-exit-signal:$exit_signal" >&2; exit 4 ;; esac
+    case "$fcomplete" in yes|no) : ;; *) echo "CTL: ERROR bad-false-complete:$fcomplete" >&2; exit 4 ;; esac
+    case "$dry" in ''|yes|no) : ;; *) echo "CTL: ERROR bad-dry:$dry" >&2; exit 4 ;; esac
+    case "$strategy" in *'|'*) echo 'CTL: ERROR bad-strategy-label' >&2; exit 4 ;; esac
+    case "$errsig" in *$'\n'*|*$'\r'*) echo 'CTL: ERROR bad-error-signature' >&2; exit 4 ;; esac
+    case "$files" in *$'\n'*|*$'\r'*) echo 'CTL: ERROR bad-files-list' >&2; exit 4 ;; esac
+    if [ "$progress" = no ]; then
+      delta_check=$(printf '%s' "$strategy_delta" | tr '\n\r\t' '   ' | sed 's/^ *//;s/ *$//')
+      case "$delta_check" in ''|none) echo 'CTL: ERROR missing-strategy-delta' >&2; exit 4 ;; esac
+    fi
     [ -f "$sd/loop-log.md" ] || { echo "CTL: ERROR no-loop-log" >&2; exit 4; }
     # --files is evidence of what landed (SB-6). A missing path is usually a
     # typo or a scope lie; warn loud but do not refuse the bookkeeping write -
@@ -292,70 +351,6 @@ case "$cmd" in
     if [ "$dry" = yes ] && [ "${cf:-0}" != 0 ]; then
       echo "CTL: ERROR inconsistent-dry (--dry yes with checks-fail=$cf)" >&2; exit 4
     fi
-    digest=$(bash "$here/goal_gate.sh" --digest --project "$project") || { echo "CTL: ERROR digest-unavailable" >&2; exit 4; }
-    it=$(state_get iteration); [ -n "$it" ] || it=0
-    new=$((it+1))
-    # R10: any no-progress landing sets HALF_OPEN/OPEN and must carry a
-    # strategy change - otherwise the loop is grinding without revising.
-    if [ "$progress" != yes ]; then
-      case "$strategy_delta" in
-        ''|none) echo "CTL: ERROR missing-strategy-delta (progress=no needs --strategy-delta 'what you are changing')" >&2; exit 4 ;;
-      esac
-    fi
-    # score bookkeeping (objective: maximize|minimize) - validator in goal_parse.sh
-    if [ -n "$score" ]; then
-      gp_is_score "$score" || { echo "CTL: ERROR bad-score:$score" >&2; exit 4; }
-    fi
-    if [ -n "$judge_score" ]; then
-      gp_is_score "$judge_score" || { echo "CTL: ERROR bad-judge-score:$judge_score" >&2; exit 4; }
-    fi
-    # Attribution writer tooth (v2.9): an objective loop is a search - every
-    # wave must say which direction it attacks, or the eval plane can never
-    # attribute slope to strategy and the EFFICIENCY advisories run blind.
-    # Mechanical (writer-side), so the advisory always has data when it fires.
-    if [ -n "$(gp_objective_ac "$project")" ]; then
-      case "$strategy" in
-        ''|none) echo "CTL: ERROR missing-strategy-label (objective contracts must label every wave: close-iteration --strategy <attack direction>)" >&2; exit 4 ;;
-      esac
-      # Cold-start baseline: the FIRST score row turns the eval loop on.
-      # Without it there is no slope, no STRATEGY-PICK, and multi-worker
-      # expansion is just file generation.
-      if [ ! -s "$sd/scores.rec" ]; then
-        case "$score" in
-          ''|none) echo "CTL: ERROR missing-score (objective cold-start: first close-iteration must pass --score N so scores.rec has a baseline before further waves)" >&2; exit 4 ;;
-        esac
-      fi
-    fi
-    # The score is MEASURED, never self-reported: ctl reruns the objective AC
-    # (gate --verify, stateless) and records the observed value. A mismatch
-    # from the controller is noted; an unmeasurable instrument records none
-    # and the gate refuses any claim lacking a score.
-    obj_ac=$(gp_objective_ac "$project")
-    obj_dir=$(gp_objective_dir "$project")
-    [ -n "$obj_dir" ] || obj_dir=maximize
-    if [ -n "$obj_ac" ] && [ -n "$score" ]; then
-      vline=$(bash "$here/goal_gate.sh" --verify "$obj_ac" --project "$project" 2>/dev/null \
-              | grep -E "^GATE: VERIFY $obj_ac\|" | tail -1)
-      mobs=$(printf '%s' "$vline" | sed -nE 's/.*observed=([0-9.\-]+).*/\1/p')
-      if [ -n "$mobs" ]; then
-        [ "$mobs" = "$score" ] || echo "CTL: NOTE score-measured-override (claimed=$score measured=$mobs)" >&2
-        score="$mobs"
-      else
-        echo "CTL: WARN objective-unmeasurable:$obj_ac (recording score=none)" >&2
-        score=""
-      fi
-    fi
-    # R10 value must be single-line or it shreds the key=value block
-    sdelta_show=$(printf '%s' "${strategy_delta:-none}" | tr '\n\r\t' '   ')
-    case "$sdelta_show" in ''|*[![:print:]]*) sdelta_show=none ;; esac
-    [ -n "$sdelta_show" ] || sdelta_show=none
-    # v2.8 eval-drive: optional strategy label (attack direction of this wave).
-    # Same fold law as strategy_delta; a label never splits on '=' so block
-    # readers stay correct. Not in the gate's advisory key list - optional key.
-    strat_show=$(printf '%s' "${strategy:-none}" | tr '\n\r\t' '   ')
-    case "$strat_show" in ''|*[![:print:]]*) strat_show=none ;; esac
-    strat_show=$(printf '%s' "$strat_show" | sed -E 's/^ +//; s/ +$//')
-    [ -n "$strat_show" ] || strat_show=none
     # task= is ledger law (R12/A1): wave ids must carry their backend. A bare
     # T<n> means an ordinary one-shot subagent wave - normalize it (crew:1)
     # instead of letting the self-audit refuse the claim after the fact.
@@ -393,18 +388,88 @@ case "$cmd" in
     fi
     gp_task_ok "$task" \
       || { echo "CTL: ERROR bad-task:$task (schema: T<n>[crew:N], bare T<n> normalizes to crew:1)" >&2; exit 4; }
+    # R10: any no-progress landing sets HALF_OPEN/OPEN and must carry a
+    # strategy change - otherwise the loop is grinding without revising.
+    if [ "$progress" != yes ]; then
+      case "$strategy_delta" in
+        ''|none) echo "CTL: ERROR missing-strategy-delta (progress=no needs --strategy-delta 'what you are changing')" >&2; exit 4 ;;
+      esac
+    fi
+    # score bookkeeping (objective: maximize|minimize) - validator in goal_parse.sh
+    if [ -n "$score" ]; then
+      gp_is_score "$score" || { echo "CTL: ERROR bad-score:$score" >&2; exit 4; }
+    fi
+    if [ -n "$judge_score" ]; then
+      gp_is_score "$judge_score" || { echo "CTL: ERROR bad-judge-score:$judge_score" >&2; exit 4; }
+    fi
+    # Normalize before validation so whitespace cannot masquerade as a label.
+    strat_show=$(printf '%s' "${strategy:-none}" | tr '\n\r\t' '   ')
+    case "$strat_show" in ''|*[![:print:]]*) strat_show=none ;; esac
+    strat_show=$(printf '%s' "$strat_show" | sed -E 's/^ +//; s/ +$//')
+    [ -n "$strat_show" ] || strat_show=none
+    # Attribution writer tooth (v2.9): an objective loop is a search - every
+    # wave must say which direction it attacks, or the eval plane can never
+    # attribute slope to strategy and the EFFICIENCY advisories run blind.
+    # Mechanical (writer-side), so the advisory always has data when it fires.
+    if [ -n "$(gp_objective_ac "$project")" ]; then
+      case "$strat_show" in
+        ''|none) echo "CTL: ERROR missing-strategy-label (objective contracts must label every wave: close-iteration --strategy <attack direction>)" >&2; exit 4 ;;
+      esac
+      printf '%s' "$strat_show" | grep -qE '^[A-Za-z0-9][A-Za-z0-9._-]*$' \
+        || { echo 'CTL: ERROR bad-strategy-label (objective labels must be single ASCII tokens)' >&2; exit 4; }
+      # Cold-start baseline: the FIRST score row turns the eval loop on.
+      # Without it there is no slope, no STRATEGY-PICK, and multi-worker
+      # expansion is just file generation.
+      if [ ! -s "$sd/scores.rec" ]; then
+        case "$score" in
+          ''|none) echo "CTL: ERROR missing-score (objective cold-start: first close-iteration must pass --score N so scores.rec has a baseline before further waves)" >&2; exit 4 ;;
+        esac
+      fi
+    fi
+    # Serialize real controller writers. Re-run preflight under the lock so
+    # state-dependent checks and iteration allocation observe the same writer.
+    if [ "${GOAL_CLOSE_EXEC_PID:-}" != "$$" ]; then
+      exec python3 -I "$here/goal_store.py" writer-exec "$sd" "$here/goal_ctl.sh" "${_goal_ctl_args[@]}"
+    fi
+    digest=$(bash "$here/goal_gate.sh" --digest --project "$project") || { echo "CTL: ERROR digest-unavailable" >&2; exit 4; }
+    it=$(state_get iteration); [ -n "$it" ] || it=0
+    new=$((it+1))
+    # The score is MEASURED, never self-reported: ctl reruns the objective AC
+    # (gate --verify, stateless) and records the observed value. A mismatch
+    # from the controller is noted; an unmeasurable instrument records none
+    # and the gate refuses any claim lacking a score.
+    obj_ac=$(gp_objective_ac "$project")
+    obj_dir=$(gp_objective_dir "$project")
+    [ -n "$obj_dir" ] || obj_dir=maximize
+    if [ -n "$obj_ac" ] && [ -n "$score" ]; then
+      vline=$(bash "$here/goal_gate.sh" --verify "$obj_ac" --project "$project" 2>/dev/null \
+              | grep -E "^GATE: VERIFY $obj_ac\|" | tail -1)
+      mobs=$(printf '%s' "$vline" | sed -nE 's/.*observed=([0-9.\-]+).*/\1/p')
+      if [ -n "$mobs" ]; then
+        [ "$mobs" = "$score" ] || echo "CTL: NOTE score-measured-override (claimed=$score measured=$mobs)" >&2
+        score="$mobs"
+      else
+        echo "CTL: WARN objective-unmeasurable:$obj_ac (recording score=none)" >&2
+        score=""
+      fi
+    fi
+    # R10 value must be single-line or it shreds the key=value block
+    sdelta_show=$(printf '%s' "${strategy_delta:-none}" | tr '\n\r\t' '   ')
+    case "$sdelta_show" in ''|*[![:print:]]*) sdelta_show=none ;; esac
+    [ -n "$sdelta_show" ] || sdelta_show=none
     # R13 sidecar: iter|score|judge (either may be 'none'). Two comparable
     # points later let the gate refuse DIVERGENCE:score-vs-judge claims.
     # v2.8: written AFTER task validation - a refused close must not orphan a
     # score row with no iteration block behind it.
     # v2.9: 4th field = strategy label (empty rows = legacy 3-field, readers
     # stay field-indexed so both shapes parse). Attribution: slope per label.
-    printf '%s|%s|%s|%s\n' "$new" "${score:-none}" "${judge_score:-none}" "$strat_show" >> "$sd/scores.rec"
+    python3 -I "$here/goal_store.py" close-journal "$sd" begin || exit 4
+    printf '%s|%s|%s|%s\n' "$new" "${score:-none}" "${judge_score:-none}" "$strat_show" >> "$sd/scores.rec" || exit 4
     printf '%s\n' "## iteration $new" "task=$task" "files_modified=$files" \
       "checks_pass=$cp" "checks_fail=$cf" "checks_unverifiable=$cu" \
       "error_signature=$errsig" "progress=$progress" "exit_signal=$exit_signal" \
       "false_complete=$fcomplete" "digest=$digest" \
-      "score=${score:-none}" "strategy_delta=$sdelta_show" "strategy=$strat_show" >> "$sd/loop-log.md"
+      "score=${score:-none}" "strategy_delta=$sdelta_show" "strategy=$strat_show" >> "$sd/loop-log.md" || exit 4
     if [ "$progress" = yes ]; then
       streak=0; breaker=CLOSED; lpi=$new
     else
@@ -449,34 +514,39 @@ case "$cmd" in
     tb=$(state_get time_budget); [ -n "$tb" ] || tb=0
     dl=$(state_get deadline); [ -n "$dl" ] || dl=0
     printf 'iteration=%s\nbreaker=%s\nfalse_completes=%s\nreplans=%s\nno_progress_streak=%s\nlast_progress_iteration=%s\nmax_iterations=%s\nno_progress_limit=%s\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=%s\ndry_limit=%s\ncheck_timeout=%s\ntime_budget=%s\ndeadline=%s\nbest_score=%s\n' \
-      "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" "$best" > "$sd/state.rec"
-    echo "CTL: CLOSE ok iter=$new digest=$digest"
+      "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" "$best" > "$sd/state.rec" || exit 4
     # Two-pass + sensor dump (harness engineering). Raw verify output is the
     # mechanical evidence a claim must carry; the adversarial receipt is the
     # second pass and is written only when the controller has run one
     # (--adversarial clear|finding). Never auto-clear.
-    mkdir -p "$sd/evidence/raw"
+    mkdir -p "$sd/evidence/raw" || exit 4
     bash "$here/goal_gate.sh" --verify --project "$project" > "$sd/evidence/raw/$new.txt" 2>&1 || true
-    [ -s "$sd/evidence/raw/$new.txt" ] || printf 'CTL: WARN raw-empty (verify produced no output - claim will fail raw-evidence-missing)\n' > "$sd/evidence/raw/$new.txt"
+    [ -s "$sd/evidence/raw/$new.txt" ] || { printf 'CTL: WARN raw-empty (verify produced no output - claim will fail raw-evidence-missing)\n' > "$sd/evidence/raw/$new.txt" || exit 4; }
     if [ -n "$adversarial" ]; then
       case "$adversarial" in
         clear|finding) : ;;
         *) echo "CTL: ERROR bad-adversarial:$adversarial (use clear|finding)" >&2; exit 4 ;;
       esac
-      printf '%s|%s|%s|%s\n' "$new" "$digest" "$adversarial" "${adv_note:-none}" >> "$sd/evidence/adversarial.rec"
+      # Notes are untrusted text, not additional pipe-delimited receipts.
+      adv_note_show=$(printf '%s' "${adv_note:-none}" | tr '|\n\r' '   ')
+      printf '%s|%s|%s|%s\n' "$new" "$digest" "$adversarial" "$adv_note_show" >> "$sd/evidence/adversarial.rec" || exit 4
     fi
     # Worker-fault receipt: written in the same breath as the block it belongs
     # to, so a fault can never outlive its bookkeeping (audit A11 checks both
     # directions: a suffix without a fault row, and a fault row without a
     # block). Evidence dir - exempt from both digests (R6).
     if [ -n "$fault" ]; then
-      mkdir -p "$sd/evidence"
+      mkdir -p "$sd/evidence" || exit 4
       fbase=$(printf '%s' "$task" | sed -E 's/ *\([^)]*\)$//')
       fnote=$(printf '%s' "${fault_note:-none}" | tr '|\n\r' '   ')
-      printf '%s|%s|%s|%s|%s\n' "$fbase" "$fault" "$fsuf" "$fnote" "$(date +%s)" >> "$sd/evidence/faults.rec"
+      printf '%s|%s|%s|%s|%s\n' "$fbase" "$fault" "$fsuf" "$fnote" "$(date +%s)" >> "$sd/evidence/faults.rec" || exit 4
       echo "CTL: FAULT task=$fbase class=$fault suffix=($fsuf) note=$fnote"
     fi
-    [ "$no_gate" -eq 1 ] && exit 0
+    if [ "$no_gate" -eq 1 ]; then
+      python3 -I "$here/goal_store.py" close-journal "$sd" finish 0 || exit 4
+      echo "CTL: CLOSE ok iter=$new digest=$digest operation=$GOAL_CLOSE_OPERATION"
+      exit 0
+    fi
     # False-complete ratchet, mechanized: a claim that the gate catches failing
     # IS a false complete - counting it used to depend on the controller
     # obeying the NOTE and appending false_complete=yes by hand. Two catches
@@ -496,7 +566,7 @@ case "$cmd" in
     last_hint=$(printf '%s\n' "$gate_out" | grep -E '^GATE: NO-GO' | tail -1 | sed -nE 's/.*hint=([^ ]*).*/\1/p')
     { grep -vE '^last_(reason|hint)=' "$sd/state.rec" 2>/dev/null
       printf 'last_reason=%s\nlast_hint=%s\n' "${last_reason:-ok}" "${last_hint:-}"; } > "$sd/state.rec.new" \
-      && mv "$sd/state.rec.new" "$sd/state.rec"
+      && mv "$sd/state.rec.new" "$sd/state.rec" || exit 4
     # deferred-pending never counts: the gate said "in-tree settled, one
     # out-of-tree fact is still pending" (R18) - waiting honestly on a slow
     # source is not a false complete. Counting waits would BLOCK a loop whose
@@ -504,6 +574,7 @@ case "$cmd" in
     if [ "$grc" -eq 2 ] && [ "$exit_signal" = yes ]; then
       case "$last_reason" in
         deferred-pending:*) echo "CTL: NOTE deferred-wait-not-counted ($last_reason) - patience is not a false complete" >&2 ;;
+        digest-version-mismatch:*) echo "CTL: NOTE digest-migration-not-counted ($last_reason) - rebind evidence using the current digest" >&2 ;;
         # contract-malformed is a drafting defect, not a lying claim (SB-2).
         # Counting it toward the false-complete ratchet BLOCKs a loop whose
         # author wrapped a check command across lines - the ratchet exists to
@@ -512,14 +583,17 @@ case "$cmd" in
         *)
         fc=$(( $(state_get false_completes) + 1 ))
         { grep -vE '^false_completes=' "$sd/state.rec"; printf 'false_completes=%s\n' "$fc"; } > "$sd/state.rec.new" \
-          && mv "$sd/state.rec.new" "$sd/state.rec"
+          && mv "$sd/state.rec.new" "$sd/state.rec" || exit 4
         echo "CTL: NOTE false-complete-counted=$fc (gate caught a failing claim; two catches BLOCK the loop - fix the artifact, do not re-claim)" >&2
         ;;
       esac
     fi
+    python3 -I "$here/goal_store.py" close-journal "$sd" finish "$grc" || exit 4
+    echo "CTL: CLOSE ok iter=$new digest=$digest operation=$GOAL_CLOSE_OPERATION"
     exit "$grc" ;;
 
   status)
+    [ ! -e "$sd/store/pending" ] || { echo 'CTL: ERROR recovery-required' >&2; exit 4; }
     [ -f "$sd/state.rec" ] || { echo "CTL: STATUS no active goal-loop ledger ($sd/state.rec missing)" >&2; exit 4; }
     g(){ state_get "$1"; }
     left="off"

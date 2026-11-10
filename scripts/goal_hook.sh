@@ -23,6 +23,13 @@ here=$(cd "$(dirname "$0")" && pwd)
 sd=".goal"
 
 [ -d "$sd" ] || exit 0
+if [ "${GOAL_ACCESS_EXEC_PID:-}" != "$$" ]; then
+  # Preserve the Stop hook's documented fail-open policy on state/lock errors.
+  python3 -I "$here/goal_store.py" access-exec "$sd" gate "$here/goal_hook.sh" "$@"
+  hook_rc=$?
+  [ "$hook_rc" -ne 2 ] || exit 2
+  exit 0
+fi
 [ -f "$sd/loop-log.md" ] && [ -f "$sd/state.rec" ] && [ -f "$sd/goal.md" ] || exit 0
 
 # claimed exit? (last loop-log block's exit_signal; absent -> no claim)

@@ -28,6 +28,7 @@ Legacy aliases: `R10 R11 R13 R17b R19` → GRADIENT / FENCE.
 ## 3 Attribution (label the wave)
 
 - On objective contracts, every `close-iteration` must carry `--strategy <label>` (writer tooth). Unlabeled waves are refused (`rc=4`).
+- Objective labels are single ASCII tokens (`[A-Za-z0-9][A-Za-z0-9._-]*`), so `STRATEGY-PICK` can round-trip them without truncation or delimiter ambiguity. Legacy threshold-only labels retain their existing folding behavior.
 - `scores.rec` 4th column is the strategy label; `ctl status` derives local evidence from measured adjacent rounds. A joint crew wave is one treatment, not independent evidence for each worker.
 - `strategy_delta=` remains mandatory when `progress=no` (what changes next). Grinding without revising is make-work.
 

@@ -8,7 +8,7 @@
 # digest-bound). The gate remains the only authority on "done".
 # Usage:
 #   bash goal_gate.sh --check  [--project DIR]              # 0 GO / 2 NO-GO / 3 BLOCKED / 4 state error
-#   bash goal_gate.sh --digest [--project DIR]              # print 12-hex tree digest
+#   bash goal_gate.sh --digest [--project DIR]              # print tree digest
 #   bash goal_gate.sh --verify [--project DIR] [AC-ID ...]  # rerun deterministic checks; 0 all-pass / 2 FAIL-or-broken / 4 state error
 #   bash goal_gate.sh --baseline-check [--project DIR]      # forge contracts: baseline.md covers every delta metric AC; 0 ok / 2 problem
 set -u
@@ -17,6 +17,7 @@ export LC_ALL=C.UTF-8
 usage(){ sed -n '2,13p' "$0"; }
 
 project="." mode="" positional=""
+_goal_gate_args=("$@")
 while [ $# -gt 0 ]; do
   case "$1" in
     --check)  mode=check ;;
@@ -36,42 +37,33 @@ done
 
 sd="$project/.goal"
 here=$(cd "$(dirname "$0")" && pwd)
+if [ "$mode" != digest ] && [ -d "$sd" ] && [ "${GOAL_ACCESS_EXEC_PID:-}" != "$$" ]; then
+  exec python3 -I "$here/goal_store.py" access-exec "$sd" gate "$here/goal_gate.sh" "${_goal_gate_args[@]}"
+fi
+# The parent owns the ledger lock throughout measurement. User commands must
+# not inherit its descriptor: background grandchildren otherwise retain it
+# after the owner dies. Keep owner metadata so nested writes fail closed.
+# Every call below is already in a command substitution or explicit subshell.
+# Do not add another subshell here: its waiting parent would retain the lock.
+drop_check_locks(){
+  for check_fd in "${GOAL_ACCESS_FD:-}" "${GOAL_CLOSE_LOCK_FD:-}"; do
+    case "$check_fd" in ''|*[!0-9]*) continue ;; esac
+    [ "$check_fd" -ge 3 ] || continue
+    eval "exec ${check_fd}<&-"
+  done
+}
+check_run(){ drop_check_locks; exec "$@"; }
+if [ "$mode" != digest ] && [ -e "$sd/store/pending" ] && [ "${GOAL_ACCESS_MODE:-}" != write ]; then
+  echo 'GATE: ERROR reason=recovery-required' >&2
+  exit 4
+fi
 # shellcheck source=goal_parse.sh
 . "$here/goal_parse.sh"                            # one grammar, one home (v2.7)
 r(){ gp_r; }                                       # CR scrubber for every read
 hash_std(){ gp_hash_std; }
 
-# Heavy third-party dirs skipped by the non-git tree walk (v2.6). Their bytes
-# are not what an AC measures; including them made the digest O(whole-repo)
-# per gate call. Override with GOAL_PRUNE="name name ...". .goalignore at the
-# project root adds more prune names (one basename/dir per line). Semantics:
-# skipped trees are invisible to the digest - that is the explicit trade, same
-# spirit as .gitignore for a git digest.
-prune_names(){ printf '%s\n' node_modules venv .venv __pycache__ dist build target out vendor .mypy_cache .pytest_cache; }
-tree_digest(){                                         # 12 hex, deterministic
-  ( cd "$project" 2>/dev/null || exit 4
-    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      { git rev-parse HEAD 2>/dev/null || echo none; git status --porcelain 2>/dev/null | r | sort; } | hash_std | cut -c1-12
-    else
-      prune=${GOAL_PRUNE:-}
-      [ -z "$prune" ] && prune=$(prune_names | tr '\n' ' ')
-      [ -f .goalignore ] && prune="$prune $(r < .goalignore | grep -vE '^[[:space:]]*(#|$)' | tr '\n' ' ')"
-      args=(); i=0
-      for p in $prune; do
-        [ "$i" -gt 0 ] && args+=( -o )
-        args+=( -name "$p" ); i=$((i+1))
-      done
-      # one xargs-fed sha1sum replaces a per-file bash spawn (the real cost);
-      # paths stay in the hash so any content/rename change moves the digest.
-      [ "$i" -gt 0 ] && set -- \( "${args[@]}" \) -prune -o
-      # sort -z then one xargs-fed sha1sum replaces the per-file bash spawn
-      # that used to dominate the digest (O(files) subshells -> O(batches)).
-      find . \( "$@" -type f ! -path './.goal*' ! -path './.git*' -print0 \) 2>/dev/null |
-      sort -z |
-      xargs -0 -r sha1sum 2>/dev/null |
-      sed -E 's/^([0-9a-f]{40})  (.*)$/\2 \1/' | sort | hash_std | cut -c1-12
-    fi )
-}
+# Shared, versioned content identity; failure is never a partial digest.
+tree_digest(){ gp_tree_digest "$project"; }
 
 ac_body_hash(){ gp_ac_body_hash "$project"; }       # R3 frozen surface - single definition
 state_get(){ gp_state_get "$project" "$1"; }
@@ -81,7 +73,7 @@ ledger_digest(){                                       # 8 hex over the LEDGER s
   # .goal/ (R6). The tree digest is blind to .goal, so the ledger gets its
   # own before/after guard - a check editing goal.md/state/verdicts mid-run
   # would otherwise measure one state and report another.
-  { for f in goal.md state.rec loop-log.md verdicts.rec scores.rec work-plan.md baseline.md interfaces.md; do
+  { for f in goal.md state.rec loop-log.md verdicts.rec scores.rec work-plan.md baseline.md interfaces.md runner.deadline runner.clock; do
       [ -f "$sd/$f" ] && { printf '%s\n' "$f"; r < "$sd/$f"; }
     done
   } | hash_std | cut -c1-8
@@ -120,6 +112,7 @@ fail(){
     not-dry:*)               hint=continue-forge ;;
     missing-strategy-delta*) hint=write-strategy-delta ;;
     verdicts-stale:*)        hint=rebind-judged ;;
+    digest-version-mismatch:*) hint=rebind-judged ;;
     verdict-conflict:*)      hint=rebind-judged ;;
     score-missing:*)         hint=objective-not-metric ;;
     judge-score-missing:*)   hint=bind-seat ;;
@@ -227,6 +220,9 @@ baseline_validate(){                                   # fail-fast via fail(); f
 classify_expected(){ gp_classify_expected "$1"; }       # grammar in goal_parse.sh
 
 run_one_check(){                                       # $1 id $2 class $3 op $4 num -> "id|VERDICT|detail"
+  # Both call sites use line=$(run_one_check ...). Drop locks in that outer
+  # waiting shell too; the main gate retains ownership until it terminates.
+  drop_check_locks
   id="$1"; cls="$2"; m_op="${3:-}"; m_num="${4:-}"
   cmd=$(ac_check_cmd "$id")
   if [ -z "$cmd" ]; then printf '%s|BROKEN|no check command in AC line\n' "$id"; return; fi
@@ -260,9 +256,9 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
     else
       ec_err=$(mktemp "${TMPDIR:-/tmp}/goal-ecmd-err.XXXXXX" 2>/dev/null) || ec_err=/tmp/ecmd-err.$$
       if command -v timeout >/dev/null 2>&1; then
-        ec_out=$(cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$ecmd" 2>"$ec_err"); ec_rc=$?
+        ec_out=$(cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$ecmd" 2>"$ec_err"); ec_rc=$?
       else
-        ec_out=$(cd "$project" 2>/dev/null && bash -c "$ecmd" 2>"$ec_err"); ec_rc=$?
+        ec_out=$(cd "$project" 2>/dev/null && check_run bash -c "$ecmd" 2>"$ec_err"); ec_rc=$?
       fi
       ec_tail=$(r < "$ec_err" | tail -3 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-160)
       rm -f "$ec_err"
@@ -272,7 +268,8 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
         124|127)   ext_state=BROKEN; ext_note="external cmd rc=$ec_rc $ec_tail" ;;
         *)         ext_state=FAIL; ext_note="external rc=$ec_rc $ec_tail" ;;
       esac
-      printf '%s|%s|%s|%s\n' "$id" "$ext_state" "$now" "$ext_note" >> "$(gp_defer_path "$project")"
+      printf '%s|%s|%s|%s\n' "$id" "$ext_state" "$now" "$ext_note" >> "$(gp_defer_path "$project")" \
+        || { printf '%s|BROKEN|external receipt write failed\n' "$id"; return; }
     fi
     [ "$ext_state" = FAIL ]   && { printf '%s|FAIL|external (out-of-tree claim): %s\n' "$id" "$ext_note"; return; }
     [ "$ext_state" = BROKEN ] && { printf '%s|BROKEN|external: %s\n' "$id" "$ext_note"; return; }
@@ -285,9 +282,9 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
     if [ -n "$pcmd" ]; then
       perr=$(mktemp "${TMPDIR:-/tmp}/goal-probe-err.XXXXXX" 2>/dev/null) || perr=/tmp/probe-err.$$
       if command -v timeout >/dev/null 2>&1; then
-        ( cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$pcmd" >/dev/null 2>"$perr" )
+        ( cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$pcmd" >/dev/null 2>"$perr" )
       else
-        ( cd "$project" 2>/dev/null && bash -c "$pcmd" >/dev/null 2>"$perr" )
+        ( cd "$project" 2>/dev/null && check_run bash -c "$pcmd" >/dev/null 2>"$perr" )
       fi
       prc=$?
       perr_tail=$(r < "$perr" | tail -2 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-120)
@@ -303,9 +300,9 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   # with no reason violates fail-loud). Streams stay separated on purpose.
   gate_err=$(mktemp "${TMPDIR:-/tmp}/goal-gate-err.XXXXXX" 2>/dev/null) || gate_err=/tmp/gate-err.$$
   if command -v timeout >/dev/null 2>&1; then
-    out=$(cd "$project" 2>/dev/null && timeout "$tmo" bash -c "$cmd" 2>"$gate_err"); rc=$?
+    out=$(cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$cmd" 2>"$gate_err"); rc=$?
   else
-    out=$(cd "$project" 2>/dev/null && bash -c "$cmd" 2>"$gate_err"); rc=$?   # without coreutils timeout a hang hangs; documented
+    out=$(cd "$project" 2>/dev/null && check_run bash -c "$cmd" 2>"$gate_err"); rc=$?   # without coreutils timeout a hang hangs; documented
   fi
   err_tail=$(r < "$gate_err" | tail -3 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-160)
   rm -f "$gate_err"
@@ -592,6 +589,11 @@ if ! gp_task_ok "$lbt"; then
   echo "GATE: NOTE task-id-legacy (bare $lbt: wave backend not stated; write it as T<n>[crew:1])" >&2
 fi
 lbdigest=$(printf '%s\n' "$lb" | grep -E '^digest=' | tail -1 | cut -d= -f2-)
+# Old worktree identities cannot be compared with v2. Migration requires fresh
+# bookkeeping and judging, but is not evidence that the controller lied.
+if [[ "$digest" == v2-* ]] && printf '%s' "$lbdigest" | grep -qE '^[0-9a-f]{1,12}$'; then
+  fail "digest-version-mismatch:block (close a fresh iteration and rebind judged evidence)"
+fi
 # A stale claim IS a false complete; the ratchet (ctl close-iteration) counts
 # it automatically - no manual bookkeeping asked of the controller anymore.
 [ "$lbdigest" = "$digest" ] || { echo "GATE: NOTE false-complete suspected; already counted by the ratchet - fix the artifact and let the claim pass, do not re-claim unchanged" >&2; fail "verdicts-stale:block=$lbdigest current=$digest"; }
@@ -652,6 +654,9 @@ for id in $ac_ids; do
   vd=$(printf '%s' "$rec" | cut -d'|' -f4)
   ev=$(printf '%s' "$rec" | cut -d'|' -f5-)
   [ -n "$v" ] || fail "not-covered:$id"
+  if [[ "$digest" == v2-* ]] && printf '%s' "$vd" | grep -qE '^[0-9a-f]{1,12}$'; then
+    fail "digest-version-mismatch:$id (rebind judged evidence against current content)"
+  fi
   [ "$vi" = "$iter" ] && [ "$vd" = "$digest" ] || fail "not-covered:$id (verdict bound to iter=$vi digest=$vd)"
   [ "$v" != FAIL ] || fail "open-FAIL:$id"
   total=$((total+1))

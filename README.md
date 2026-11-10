@@ -42,8 +42,8 @@ rm -f ~/.claude/skills/goal-loop/scripts/goal_team.sh \
       ~/.claude/skills/goal-loop/references/teams.md
 ```
 
-- Windows（git-bash）路径同上：`C:\Users\<你>\.claude\skills\goal-loop\` 与 `C:\Users\<你>\.claude\agents\`。
-- 依赖：`grep / sed / gawk / sha1sum|cksum`，**无 jq**；CR 与 `LC_ALL` 已内置处理。有 coreutils `timeout` 时每条门控重跑检查限时（默认 120s）。
+- Windows（git-bash）路径同上：`C:\Users\<你>\.claude\skills\goal-loop\` 与 `C:\Users\<你>\.claude\agents\`。当前收账锁需要支持 `fcntl.flock` 的 POSIX Python 3；原生 Windows Python 不支持，Windows 下的完整运行尚未验证。
+- 依赖：`grep / sed / gawk / sha1sum|cksum`，工作树内容指纹还需 `sha256sum`、`shasum` 或 `openssl` 中之一；**无 jq**。控制器及门控/审计读取需要 POSIX Python 3 的目录锁，无人值守运行器还需要进程组监督；缺少时拒绝执行。独立 `--digest` 保留 shell 后备路径，有 Python 时加速。CR 与 `LC_ALL` 已内置处理。有 coreutils `timeout` 时每条门控重跑检查限时（默认 120s）。
   - **macOS**：系统 `bash` 是 3.2，系统 `awk` 是 BSD —— 脚本已兼容 bash 3.2；`gawk` 必装且会自动发现 `~/.local/bin/gawk`、Homebrew 路径。`brew install gawk`（可选 `coreutils` 提供 `timeout`/`gtimeout`）。
   - **Linux**：`apt install gawk`（通常已带）。
 - Smoke test / 冒烟验证（不耗 API）：
@@ -52,7 +52,7 @@ rm -f ~/.claude/skills/goal-loop/scripts/goal_team.sh \
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check
 # 无 .goal/ 的目录里应返回 rc=4, reason=no-goal-dir —— 说明门控在岗
 bash ~/.claude/skills/goal-loop/tests/run_tests.sh
-# 场景套件应 fail=0 全绿 —— 门控语义的完整回归（当前 509 项断言）
+# 场景套件应 fail=0 全绿 —— 门控语义的回归
 # 默认 --jobs=8 并行分片（约 3–4 分钟）；--jobs=1 串行；--only 78-90 增量
 bash ~/.claude/skills/goal-loop/tests/docs_consistency.sh
 # 文档一致性（活文档字面量）应 CONSISTENT
@@ -61,6 +61,14 @@ bash ~/.claude/skills/goal-loop/examples/quickstart-one-shot/run.sh
 ```
 
 ## Quick start — in-session / 快速开始 — 会话内
+
+如果收账进程中断，`.goal/store/pending` 会保留写入前的账本与本轮原始证据文件快照。此时外部 gate、status 及后续控制器操作返回 `recovery-required`。先执行：
+
+```bash
+bash scripts/goal_ctl.sh recover --project /path/to/project
+```
+
+恢复会核对提交指针：提交前中断则回滚，提交后中断则按已提交快照补全；不会重新运行测量或外部工具。可重试的收账调用应提前选定并复用 `--operation-id ID`，避免丢失成功确认时重复消费轮号。历史重试会明确输出 `REPLAY`，不代表当前产物通过验收。日志损坏时拒绝恢复；`CLOSE ok` 只在提交完成后输出。这些测试覆盖进程中断和注入的 I/O 故障，尚未验证真实断电。控制器写入及门控/status/audit/Stop hook 的读取共用目录锁，冲突时报告 `ledger-busy`；带外部缓存的门控独占访问。完整事务仍有待完成项，具体保护范围、重试及恢复边界见 [事务状态说明](docs/transaction-state.md)。
 
 ```
 /goal-loop <objective>

@@ -15,6 +15,7 @@
 #     prose or empty expectations.
 #   - unit tests: tests/test_parse.sh; end-to-end: tests/run_tests.sh
 
+_gp_parse_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 gp_r(){ tr -d '\r'; }
 
 # ---- GNU awk resolution (macOS / BSD) --------------------------------------
@@ -34,6 +35,186 @@ fi
 gp_hash_std(){                                           # one stable content hash
   if command -v sha1sum >/dev/null 2>&1; then sha1sum | cut -c1-40
   else cksum | awk '{print $1}'; fi
+}
+
+# Content-bound worktree identity. The v2 prefix deliberately invalidates
+# verdicts written against the former porcelain-only identity. Paths are
+# NUL-delimited throughout, including names containing newlines or spaces.
+gp_tree_hash_stream(){
+  (
+    set -o pipefail
+    local output
+    if command -v sha256sum >/dev/null 2>&1; then output=$(sha256sum | awk '{print $1}') || exit 4
+    elif command -v shasum >/dev/null 2>&1; then output=$(shasum -a 256 | awk '{print $1}') || exit 4
+    elif command -v openssl >/dev/null 2>&1; then output=$(openssl dgst -sha256 | awk '{print $NF}') || exit 4
+    else echo 'GATE: ERROR sha256-unavailable' >&2; exit 4; fi
+    case "$output" in ''|*[!0-9a-f]*) echo 'GATE: ERROR invalid-sha256-output' >&2; exit 4 ;; esac
+    [ "${#output}" -eq 64 ] || { echo 'GATE: ERROR invalid-sha256-output' >&2; exit 4; }
+    printf '%s\n' "$output"
+  )
+}
+
+# Parse only watch fields outside backtick-quoted commands on AC lines.
+# Values are emitted NUL-delimited; malformed declarations fail closed.
+gp_watch_paths(){
+  [ -f "$1/.goal/goal.md" ] || return 0
+  gawk '
+    /^## Acceptance criteria[[:space:]]*$/ { inside=1; next }
+    inside && /^## / { inside=0 }
+    inside && /^- AC-[0-9]+[ |]/ {
+      line=$0; quoted=0
+      for (i=1; i<=length(line); i++) {
+        c=substr(line,i,1)
+        if (c=="`") { quoted=!quoted; continue }
+        if (!quoted && c=="|") {
+          rest=substr(line,i)
+          if (match(rest,/^\|[[:space:]]*watch[[:space:]]*:/)) {
+            pos=i+RLENGTH; rest=substr(line,pos)
+            sub(/^[[:space:]]*/,"",rest)
+            if (substr(rest,1,1)!="`") { print "CTL: ERROR malformed-watch" > "/dev/stderr"; exit 4 }
+            rest=substr(rest,2); end=index(rest,"`")
+            if (end<2) { print "CTL: ERROR malformed-watch" > "/dev/stderr"; exit 4 }
+            printf "%s%c", substr(rest,1,end-1), 0
+            # Seek past the value without interpreting its contents as fields.
+            while (i<=length(line) && substr(line,i,1)!="`") i++
+            i++; while (i<=length(line) && substr(line,i,1)!="`") i++
+          }
+        }
+      }
+    }
+  ' "$1/.goal/goal.md"
+}
+
+gp_tree_parent_ok(){
+  local rest="$1" part prefix
+  prefix=""
+  while [ "${rest#*/}" != "$rest" ]; do
+    part=${rest%%/*}; rest=${rest#*/}
+    prefix="${prefix:+$prefix/}$part"
+    [ ! -L "./$prefix" ] || return 4
+  done
+}
+
+gp_watch_path_ok(){
+  local path="$1" rest part prefix
+  case "$path" in
+    ''|/*|.|..|../*|*/..|*/../*|./*|*/.|*/./*|*//*|.goal|.goal/*|*/.goal|*/.goal/*|.git|.git/*|*/.git|*/.git/*) return 4 ;;
+  esac
+  rest="$path"; prefix=""
+  while [ "${rest#*/}" != "$rest" ]; do
+    part=${rest%%/*}; rest=${rest#*/}
+    prefix="${prefix:+$prefix/}$part"
+    [ ! -L "./$prefix" ] || return 4
+    [ ! -e "./$prefix" ] || [ -d "./$prefix" ] || return 4
+  done
+}
+
+gp_watch_validate(){
+  (
+    cd "$1" || exit 4
+    local tmp path
+    tmp=$(mktemp "${TMPDIR:-/tmp}/goal-watch.XXXXXX") || exit 4
+    trap "rm -f -- $(printf '%q' "$tmp")" EXIT
+    gp_watch_paths . > "$tmp" || exit 4
+    while IFS= read -r -d '' path; do
+      gp_watch_path_ok "$path" || { echo 'CTL: ERROR unsafe-watch-path' >&2; exit 4; }
+    done < "$tmp"
+  )
+}
+
+gp_tree_digest(){
+  (
+    set -o pipefail
+    cd "$1" || exit 4
+    local tmp path file mode content prune p i missing_ok watched
+    local -a args
+    tmp=$(mktemp -d "${TMPDIR:-/tmp}/goal-tree.XXXXXX") || exit 4
+    trap "rm -rf -- $(printf '%q' "$tmp")" EXIT
+    # A command can exit successfully while returning empty or constant data.
+    # Known-answer checks detect common dead/misconfigured hash instruments.
+    content=$(printf '' | gp_tree_hash_stream) || exit 4
+    [ "$content" = e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 ] || { echo 'GATE: ERROR sha256-self-test-failed' >&2; exit 4; }
+    content=$(printf 'abc' | gp_tree_hash_stream) || exit 4
+    [ "$content" = ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad ] || { echo 'GATE: ERROR sha256-self-test-failed' >&2; exit 4; }
+    if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      git ls-files --cached --others --exclude-standard -z > "$tmp/paths" || exit 4
+      git ls-files --deleted -z > "$tmp/deleted" || exit 4
+    else
+      : > "$tmp/deleted" || exit 4
+      prune=${GOAL_PRUNE:-}
+      [ -n "$prune" ] || prune='node_modules venv .venv __pycache__ dist build target out vendor .mypy_cache .pytest_cache'
+      [ ! -f .goalignore ] || prune="$prune $(grep -vE '^[[:space:]]*(#|$)' .goalignore | tr '\n' ' ')"
+      args=(); i=0
+      for p in $prune; do
+        [ "$i" -eq 0 ] || args+=( -o )
+        args+=( -name "$p" ); i=$((i+1))
+      done
+      find . \( -path './.goal' -o -path './.git' -o \( "${args[@]}" \) \) -prune -o \
+        \( -type f -o -type l \) -print0 > "$tmp/paths" || exit 4
+    fi
+    gp_watch_paths . > "$tmp/watch" || exit 4
+    : > "$tmp/watch-missing" || exit 4
+    while IFS= read -r -d '' path; do
+      gp_watch_path_ok "$path" || { echo 'GATE: ERROR unsafe-watch-path' >&2; exit 4; }
+      if [ -d "./$path" ] && [ ! -L "./$path" ]; then
+        find "./$path" \( -name .git -o -name .goal \) -prune -o \
+          \( -type f -o -type l -o -type d \) -print0 >> "$tmp/paths" || exit 4
+      else
+        printf '%s\0' "$path" >> "$tmp/paths" || exit 4
+        if [ ! -e "./$path" ] && [ ! -L "./$path" ]; then
+          printf '%s\0' "$path" >> "$tmp/watch-missing" || exit 4
+        fi
+      fi
+    done < "$tmp/watch"
+    : > "$tmp/normalized" || exit 4
+    while IFS= read -r -d '' path; do printf '%s\0' "${path#./}" >> "$tmp/normalized" || exit 4; done < "$tmp/paths"
+    LC_ALL=C sort -zu "$tmp/normalized" > "$tmp/sorted" || exit 4
+    : > "$tmp/records" || exit 4
+    # Prefer a single-process accelerator where Python supports safe POSIX
+    # opens. The shell path remains the portability fallback; both emit the
+    # same versioned records. A runtime hashing error never falls back.
+    if command -v python3 >/dev/null 2>&1 && [ -f "$_gp_parse_dir/goal_tree_digest.py" ] && \
+       python3 -I -c 'import os,sys; sys.exit(0 if os.name == "posix" and hasattr(os,"O_NOFOLLOW") else 1)' 2>/dev/null; then
+      python3 -I "$_gp_parse_dir/goal_tree_digest.py" "$tmp/sorted" "$tmp/watch-missing" "$tmp/deleted"
+      exit $?
+    fi
+    while IFS= read -r -d '' path; do
+      path=${path#./}
+      case "$path" in .goal|.goal/*|.git|.git/*) continue ;; esac
+      gp_tree_parent_ok "$path" || { echo 'GATE: ERROR symlink-parent' >&2; exit 4; }
+      file="./$path" # leading '-' in a legal filename is never an option
+      if [ -L "$file" ]; then
+        mode=$(stat -c '%a' "$file" 2>/dev/null || stat -f '%Lp' "$file" 2>/dev/null) || exit 4
+        content=$(readlink "$file" | gp_tree_hash_stream) || exit 4
+        printf 'link\0%s\0%s\0%s\0' "$path" "$mode" "$content" >> "$tmp/records" || exit 4
+      elif [ -f "$file" ]; then
+        [ -r "$file" ] || exit 4
+        mode=$(stat -c '%a' "$file" 2>/dev/null || stat -f '%Lp' "$file" 2>/dev/null) || exit 4
+        content=$(gp_tree_hash_stream < "$file") || exit 4
+        printf 'file\0%s\0%s\0%s\0' "$path" "$mode" "$content" >> "$tmp/records" || exit 4
+      elif [ -d "$file" ]; then
+        mode=$(stat -c '%a' "$file" 2>/dev/null || stat -f '%Lp' "$file" 2>/dev/null) || exit 4
+        printf 'dir\0%s\0%s\0' "$path" "$mode" >> "$tmp/records" || exit 4
+      elif [ ! -e "$file" ]; then
+        # Only an explicitly watched missing path or a tracked deletion is a
+        # legitimate tombstone. A listed untracked/discovered file vanishing
+        # during hashing is an incomplete snapshot and must fail closed.
+        missing_ok=0
+        for p in "$tmp/watch-missing" "$tmp/deleted"; do
+          while IFS= read -r -d '' watched; do
+            if [ "${watched#./}" = "$path" ]; then missing_ok=1; break; fi
+          done < "$p"
+          [ "$missing_ok" -eq 0 ] || break
+        done
+        [ "$missing_ok" -eq 1 ] || { echo 'GATE: ERROR worktree-entry-vanished' >&2; exit 4; }
+        printf 'deleted\0%s\0' "$path" >> "$tmp/records" || exit 4
+      else
+        echo "GATE: ERROR unsupported-worktree-entry" >&2; exit 4
+      fi
+    done < "$tmp/sorted"
+    content=$(gp_tree_hash_stream < "$tmp/records") || exit 4
+    printf 'v2-%s\n' "$content"
+  )
 }
 
 gp_sha256_std(){                                         # one file -> 64 hex

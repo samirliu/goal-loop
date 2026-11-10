@@ -20,6 +20,7 @@ set -u
 export LC_ALL=C.UTF-8
 
 project="."
+_goal_audit_args=("$@")
 while [ $# -gt 0 ]; do
   case "$1" in
     --project) [ $# -ge 2 ] || { echo "AUDIT: ERROR missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
@@ -33,6 +34,10 @@ here=$(cd "$(dirname "$0")" && pwd)
 # shellcheck source=goal_parse.sh
 . "$here/goal_parse.sh"       # task grammar + score validator shared (v2.7)
 sd="$project/.goal"
+if [ -d "$sd" ] && [ "${GOAL_ACCESS_EXEC_PID:-}" != "$$" ]; then
+  exec python3 -I "$here/goal_store.py" access-exec "$sd" read "$here/goal_audit.sh" "${_goal_audit_args[@]}"
+fi
+[ ! -e "$sd/store/pending" ] || { echo 'AUDIT: ERROR recovery-required' >&2; exit 4; }
 [ -d "$sd" ] || { echo "AUDIT: ERROR no-goal-dir" >&2; exit 4; }
 [ -f "$sd/loop-log.md" ] || { echo "AUDIT: ERROR no-loop-log" >&2; exit 4; }
 log=$(r < "$sd/loop-log.md")

@@ -4,6 +4,22 @@ Read before every gate decision. The gate decides; the controller
 bookkeeps via goal_ctl.sh. Scripts: `scripts/goal_gate.sh` (`--check`,
 `--digest`, `--verify [AC-ID]`, `--baseline-check`).
 
+For a retryable close, choose and record `--operation-id ID` before the first
+call. Reuse the ID and original arguments on retry; IDs are project-local
+ASCII tokens, 1–128 characters, starting with a letter/digit and containing
+letters/digits/`._-`. Omitting it generates a new ID for each call. A repeated
+committed ID returns its historical result without rerunning checks or
+consuming another iteration; changed arguments are refused. `CTL: REPLAY`
+does not establish current GO: run the gate again before delivery. Argument
+order and explicit defaults count as request changes (project and ID are
+excluded from the request hash).
+
+If `recovery-required` appears, run `goal_ctl.sh recover --project DIR` first.
+It rolls back a close interrupted before its atomic commit pointer, or restores
+the committed snapshot after that point, without replaying tools. A journal
+whose baseline/operation conflicts with the current commit is refused. Keep
+the journal for diagnosis; never clear it merely to make a gate run.
+
 ## 1 Schemas
 
 `.goal/state.rec` keys: iteration breaker(CLOSED|HALF_OPEN|OPEN)
@@ -127,13 +143,32 @@ contract, not the ledger).
 
 ## 2 Digest + mutation guard
 
-12-hex over git HEAD+porcelain (or cksum list outside git), excluding
-`.goal/ .git/`. Evidence dir `.goal/evidence/` is digest-excluded. The gate
+Worktrees use a `v2-` SHA-256 digest over NUL-delimited path, type, mode and
+content records. Existing verdicts bound to the old identity become stale and
+must be rechecked. Git includes tracked and non-ignored untracked files; ignored
+untracked files are excluded. Non-Git projects retain `.goalignore` and
+`GOAL_PRUNE` directory pruning. To bind an excluded deliverable, put
+``| watch: `build/output file` `` before `expected:` on its AC line. Multiple
+watch fields are allowed. A watched directory is recursive, including empty
+directories; a missing path is bound as missing. Paths are project-relative,
+cannot escape or pass through symlink parents, and cannot name `.goal`/`.git`.
+Symlinks bind the link itself, not the target contents. Explicit scopes are
+part of the frozen AC; the author must identify all excluded deliverables.
+Both modes exclude `.goal/` and `.git/`.
+On supported POSIX systems Python 3 provides an optional single-process digest
+accelerator; otherwise the shell implementation is used. The two backends use
+the same records and identity. A runtime hashing failure is never retried as a
+successful fallback. `tests/benchmark_tree_digest.py` compares both paths; it
+is a local diagnostic, not a task-level efficiency benchmark.
+Legacy digest migration reports `digest-version-mismatch` and routes to fresh
+bookkeeping/evidence; the controller does not count this version change as a
+false completion. The approved AC itself is not re-stamped.
+Evidence dir `.goal/evidence/` is digest-excluded. The gate
 fingerprints before/after every rerun batch: a moved digest = a check
 mutated the tree -> NO-GO.
 The tree digest is blind to `.goal/`, so the ledger gets its own before/after
 digest (`ledger_digest`, over goal.md/state.rec/loop-log.md/verdicts.rec/
-scores.rec/work-plan.md/baseline.md/interfaces.md) - a check that rewrites
+scores.rec/work-plan.md/baseline.md/interfaces.md/runner.deadline/runner.clock) - a check that rewrites
 the contract or a state file mid-rerun trips `check-mutated-ledger`; only
 `.goal/evidence/` is fair game for checks (R6). Peer-notes (v2.8 protocol,
 see crew.md §4) live under `.goal/evidence/peer-notes/` - invisible to both

@@ -37,6 +37,7 @@ description: |-
 - Level 0 AC：`- AC-N | <yes/no 陈述> | check: \`<命令>\` | expected: <spec>`
 - spec：`exit=0|exit=N` / 数值（`>=60`）/ `maximize`|`minimize` / `judged`
 - **Goodhart 哨兵**：不推进目标也能满足 = 代理指标，重写或删。
+- 验收依赖 Git 忽略或默认剪枝的交付物时，在对应 AC 的 `expected:` 前加 `| watch: \`项目相对路径\``；目录递归绑定，符号链接仅绑定链接本身。
 - 盖章前冒烟；优化类冒烟即基线。预算 knobs **盖戳时绑定**进 state.rec。
 - `--auto` 仍展示摘要。`--time-budget=N` 墙钟到期**不没收已通过的交付**（绿 claim GO+NOTE）。
 
@@ -59,17 +60,17 @@ description: |-
 ```
 bash scripts/goal_ctl.sh init  --project .                 # 再填 .goal/goal.md
 bash scripts/goal_ctl.sh stamp --project . --auto          # 冒烟过 check 之后
-bash scripts/goal_ctl.sh close-iteration --project . --task T1 --files <产物> \
+bash scripts/goal_ctl.sh close-iteration --project . --operation-id wave-T1-001 --task T1 --files <产物> \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes \
   --adversarial clear --adversarial-note '<实际复审的命令及结果>'
-# 退出码即门控裁决；非 0 看 status 的 NEXT 一行
+# 首次收账退出码为门控裁决；REPLAY 只确认历史收账，交付前重跑 gate
 ```
 
 证明：`bash examples/quickstart-one-shot/run.sh`。
 
 ## 缺省跑规（与目标无关）
 
-1. **一波一收账**：`close-iteration` 是唯一波次出口；未收账不得再派下一波。有产物/勾账却 0 迭代 = unbooked（audit **A9**）。
+1. **一波一收账**：`close-iteration` 是唯一波次出口；调用前记录本轮固定 `--operation-id`，中断先恢复，再以同 ID 和原参数重试（见 `gate.md`）。未收账不得再派下一波。有产物/勾账却 0 迭代 = unbooked（audit **A9**）。
 2. **objective 冷启动**：首波必须 `--score` + `--strategy`，否则不开多 worker 扩产。
 3. **开跑即有** `.goal/pre-reg.md`（stamp 播种模板：假设/策略标签槽/杀点/降级线）；策略标签从 objective 抽 2–4 个短英文名，一词一波；先写预期变化和反证，证据不足时 `prefer=none`。
 4. **杀点**：预算包含读协议、规划、工具/worker 启动和验收；先记总截止，stamp 只传剩余秒数，预留收账时间。墙钟过半仍 `iteration=0` → 停派工，取消未落盘 worker，收账或降级交付（已过线部分 + 续写接口），禁止堆产量冒充完成。
