@@ -81,7 +81,7 @@ if [ "$cmd" = init ] && [ ! -d "$sd" ]; then
   mkdir -p "$sd" || exit 4
 fi
 if [ -d "$sd" ] && [ "${GOAL_ACCESS_EXEC_PID:-}" != "$$" ]; then
-  access_mode=write; [ "$cmd" != status ] || access_mode=read
+  access_mode="write"; [ "$cmd" != status ] || access_mode="read"
   exec python3 -I "$here/goal_store.py" access-exec "$sd" "$access_mode" "$here/goal_ctl.sh" "${_goal_ctl_args[@]}"
 fi
 if [ "$cmd" != recover ] && [ -e "$sd/store/pending" ]; then
@@ -358,7 +358,7 @@ case "$cmd" in
       '') echo "CTL: ERROR missing-task (ledger needs --task T<n> or T<n>[backend:N])" >&2; exit 4 ;;
       T[0-9]*)
         if printf '%s' "$task" | grep -qE '^T[0-9]+$'; then
-          task="$task[crew:1]"
+          task="${task}[crew:1]"
         fi
         ;;
     esac
@@ -698,7 +698,7 @@ case "$cmd" in
     elif [ "$expired" = 1 ] && [ "${blocks:-0}" -eq 0 ]; then
       echo "CTL: NEXT reason=deadline-expired hint=close-iteration"
       echo "CTL:   -> wallclock expired with zero books: close-iteration on what landed (or degrade-deliver) - do NOT dispatch another wave"
-    elif [ "$expired" = 1 ] && [ -z "$lr" -o "$lr" = ok ]; then
+    elif [ "$expired" = 1 ] && { [ -z "$lr" ] || [ "$lr" = ok ]; }; then
       echo "CTL: NEXT reason=deadline-expired hint=graceful-deliver"
       echo "CTL:   -> wallclock expired: claim what passes (GO+NOTE) or fix and claim - do not expand scope"
     elif [ -z "$lr" ] || [ "$lr" = ok ]; then

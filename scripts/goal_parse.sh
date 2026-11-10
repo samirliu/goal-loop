@@ -114,7 +114,7 @@ gp_watch_validate(){
     cd "$1" || exit 4
     local tmp path
     tmp=$(mktemp "${TMPDIR:-/tmp}/goal-watch.XXXXXX") || exit 4
-    trap "rm -f -- $(printf '%q' "$tmp")" EXIT
+    trap 'rm -f -- "$tmp"' EXIT
     gp_watch_paths . > "$tmp" || exit 4
     while IFS= read -r -d '' path; do
       gp_watch_path_ok "$path" || { echo 'CTL: ERROR unsafe-watch-path' >&2; exit 4; }
@@ -129,7 +129,7 @@ gp_tree_digest(){
     local tmp path file mode content prune p i missing_ok watched
     local -a args
     tmp=$(mktemp -d "${TMPDIR:-/tmp}/goal-tree.XXXXXX") || exit 4
-    trap "rm -rf -- $(printf '%q' "$tmp")" EXIT
+    trap 'rm -rf -- "$tmp"' EXIT
     # A command can exit successfully while returning empty or constant data.
     # Known-answer checks detect common dead/misconfigured hash instruments.
     content=$(printf '' | gp_tree_hash_stream) || exit 4

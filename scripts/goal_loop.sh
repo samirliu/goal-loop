@@ -12,7 +12,7 @@ started_at=$(date +%s)
 here=$(cd "$(dirname "$0")" && pwd)
 claude_bin="${CLAUDE_BIN:-claude}"
 template="$here/../assets/goal.contract.md"
-project="." mode="" max_iterations=12 wallclock=1800 rate=5 dry=0 resume=0
+project="." mode="" max_iterations=12 wallclock=1800 rate=5 dry=0
 lock_owned=0
 
 while [ $# -gt 0 ]; do
@@ -23,7 +23,8 @@ while [ $# -gt 0 ]; do
     --max-iterations=*) max_iterations="${1#*=}" ;;
     --wallclock=*) wallclock="${1#*=}" ;;
     --dry-run) dry=1 ;;
-    --resume) resume=1 ;;
+    # Accepted for CLI parity: --continue already resumes the persisted budget.
+    --resume) ;;
     --project) [ $# -ge 2 ] || { echo "GOAL_LOOP: ERROR missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
     --help|-h) sed -n '4,8p' "$0"; exit 0 ;;
     *) echo "GOAL_LOOP: ERROR unknown-flag:$1" >&2; exit 4 ;;

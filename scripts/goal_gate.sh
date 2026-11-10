@@ -256,9 +256,9 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
     else
       ec_err=$(mktemp "${TMPDIR:-/tmp}/goal-ecmd-err.XXXXXX" 2>/dev/null) || ec_err=/tmp/ecmd-err.$$
       if command -v timeout >/dev/null 2>&1; then
-        ec_out=$(cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$ecmd" 2>"$ec_err"); ec_rc=$?
+        (cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$ecmd" >/dev/null 2>"$ec_err"); ec_rc=$?
       else
-        ec_out=$(cd "$project" 2>/dev/null && check_run bash -c "$ecmd" 2>"$ec_err"); ec_rc=$?
+        (cd "$project" 2>/dev/null && check_run bash -c "$ecmd" >/dev/null 2>"$ec_err"); ec_rc=$?
       fi
       ec_tail=$(r < "$ec_err" | tail -3 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-160)
       rm -f "$ec_err"

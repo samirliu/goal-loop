@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Install shellcheck (macOS)
+        if: runner.os == 'macOS'
+        run: brew install shellcheck
       - name: Shellcheck the shipped scripts
         run: shellcheck --severity=warning scripts/*.sh  # info-level style hints stay in logs; warnings+errors block (parity with tests/run_tests.sh #33)
       - name: Bash syntax check (bash -n)
