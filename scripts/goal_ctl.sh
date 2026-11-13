@@ -78,6 +78,12 @@ if [ "$operation_id_seen" -eq 1 ]; then
 fi
 
 sd="$project/.goal"
+if [ "$cmd" = context ]; then
+  # The read-only compiler owns its directory lock and can describe recovery
+  # while a transaction is pending. Normal controller readers still refuse it.
+  [ "$auto" -ne 1 ] || exec python3 -I "$here/goal_context.py" show "$project" --auto
+  exec python3 -I "$here/goal_context.py" show "$project"
+fi
 if [ "$cmd" = init ]; then
   gp_init_max="$max_iterations"
   case "$gp_init_max" in ''|*[!0-9]*) echo 'CTL: ERROR bad-max-iterations' >&2; exit 4 ;; esac
@@ -111,9 +117,6 @@ if [ "$cmd" = stamp ] && [ -n "$time_budget" ]; then
 fi
 
 case "$cmd" in
-  context)
-    [ "$auto" -ne 1 ] || exec python3 -I "$here/goal_context.py" show "$project" --auto
-    exec python3 -I "$here/goal_context.py" show "$project" ;;
   migrate)
     python3 -I "$here/goal_store.py" migrate-views "$sd" || exit 4
     if [ "$(gp_contract_mode "$project")" = forge ]; then

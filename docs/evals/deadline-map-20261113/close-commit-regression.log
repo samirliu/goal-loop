@@ -1,0 +1,11 @@
+test_crash_after_pointer_rolls_forward_and_retry_does_not_rerun (test_close_commit.CloseCommit.test_crash_after_pointer_rolls_forward_and_retry_does_not_rerun) ... ok
+test_crash_before_pointer_rolls_back_then_same_id_can_retry (test_close_commit.CloseCommit.test_crash_before_pointer_rolls_back_then_same_id_can_retry) ... ok
+test_default_id_is_unique_and_invalid_id_does_not_write (test_close_commit.CloseCommit.test_default_id_is_unique_and_invalid_id_does_not_write) ... ok
+test_lost_acknowledgement_does_not_consume_a_second_iteration (test_close_commit.CloseCommit.test_lost_acknowledgement_does_not_consume_a_second_iteration) ... ok
+test_retry_is_read_only_even_after_newer_commit (test_close_commit.CloseCommit.test_retry_is_read_only_even_after_newer_commit) ... ok
+test_uncommitted_old_journal_cannot_rollback_newer_version (test_close_commit.CloseCommit.test_uncommitted_old_journal_cannot_rollback_newer_version) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 21.086s
+
+OK

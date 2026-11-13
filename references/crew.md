@@ -57,6 +57,13 @@ time. Source wave and unit identity remain explicit. Changed input/interface/
 checker/policy invalidates reuse. A changed adopted producer also blocks v1
 successors before dispatch.
 
+New wave observations also record `book_iteration`, read under the original
+ledger lock at begin. The context map uses it to identify a finished wave that
+still needs bookkeeping, including later waves. It grants no acceptance and
+does not change Gate or the work-plan's authority. Plan/begin and native
+lifecycle actions are available through context when their bound graph and
+actual host inputs are known; missing receipts never produce a guessed command.
+
 Failed dispatches accumulate by contract and owned file scope, independently of
 task/strategy names. Three failures stop that unit. An unchanged retry requires
 a different `--retry-note` describing the revised breakpoint brief; merely

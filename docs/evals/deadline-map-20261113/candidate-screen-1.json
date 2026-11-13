@@ -1,0 +1,78 @@
+{
+  "baseline": {
+    "budget_fit": "unknown",
+    "choice": "serial",
+    "condition": "14cbe508490119d51f196039215880fd06d88eeace1d9a248dda408dae88ff7c",
+    "crew_upper": null,
+    "effective_dependencies": {
+      "T1": [],
+      "T2": []
+    },
+    "failures": null,
+    "money": null,
+    "observations": null,
+    "pending": null,
+    "reason": "insufficient-observed-costs",
+    "serial_lower": null,
+    "tokens": null
+  },
+  "behavior_difference": false,
+  "candidate": "2fece5c96df63e69a1ad247f4e5965608bc816422520794351676f86ee23444f",
+  "candidate_decision": {
+    "choice": "serial",
+    "match": true,
+    "reason": "scoped startup-cost hypothesis"
+  },
+  "controlled_mechanisms": "Separate unittest fixtures cover plan/begin/prepare/terminal validation/adoption, mismatch, holdout regression, switch recovery and stale withdrawal.",
+  "costs": {
+    "baseline_execution_and_gate_seconds": 2.2669080831110477,
+    "baseline_plan_seconds": 0.0020941670518368483,
+    "candidate_screen_seconds": 0.08083662507124245,
+    "development_trials": 0,
+    "enabled_followup_trials": 0,
+    "failures": 0,
+    "holdout_trials": 0,
+    "measured_screen_total_seconds": 2.8088884169701487,
+    "money": null,
+    "proposal_artifact_read_seconds": 0.009101333795115352,
+    "proposal_model_seconds": null,
+    "timeouts": 0,
+    "tokens": null
+  },
+  "disposition": "retain-baseline",
+  "eligibility": "rejected-duplicate-baseline",
+  "falsifier": "A matched independent task has a different baseline action and lower accepted-delivery cost under this candidate.",
+  "frozen_archive": {
+    "final_selection": {
+      "policy": "c1da8d7bd49aeba77e6bffd3ef9d33152ba98490072ddd0f3ae5979f0190eacd",
+      "program": "policies/c1da8d7bd49aeba77e6bffd3ef9d33152ba98490072ddd0f3ae5979f0190eacd.py",
+      "protocol": "62c98c5a5bc27065dd8590521fdc2247bccd076d5a42b5da919971d5ebf9ede0",
+      "run": "e30049450f4b450baedc065384fdb9e6",
+      "version": 1
+    },
+    "history_changed": false,
+    "path": "docs/evals/learning-edge-20261113/mechanism-run.tar.xz",
+    "sha256": "cbc680793f64be42d3023671ebcd1745994de0e63dc788b70375593685320e5a",
+    "statistical_budget": {
+      "evaluations": 1,
+      "version": 1
+    }
+  },
+  "hypothesis": "Avoid startup/coordination for two small independent copy jobs",
+  "kind": "one-candidate eligibility screen, not a paired utility trial",
+  "new_model_calls": 0,
+  "real_utility_rows": [],
+  "scope": "two-copies with two jobs and no comparable observed costs",
+  "trigger": {
+    "path": "docs/evals/native-host/claude-haha/w5-headless-v3/report.json",
+    "sha256": "f4def7535752de2279ebb4a34a319bee8714f179dcdc426e11ac09c9f7cf5626"
+  },
+  "utility": {
+    "estimated_break_even_tasks": null,
+    "incremental_gain": null,
+    "paired_real_deliveries": 0,
+    "qualified_candidate": false,
+    "reason": "No incremental action or proven positive saving; no finite payback established."
+  },
+  "withdrawal": "Any verified floor/horizon regression or held-out cost regression; use the existing state and testing budget."
+}

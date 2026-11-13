@@ -326,6 +326,8 @@ def _writer_exec(argv):
     operation, intent = _close_request(argv[2:])
     env['GOAL_CLOSE_OPERATION'] = operation or uuid.uuid4().hex
     env['GOAL_CLOSE_INTENT'] = intent
+    arguments = argv[2:] if operation is not None else [*argv[2:], '--operation-id', env['GOAL_CLOSE_OPERATION']]
+    env['GOAL_CLOSE_ARGUMENTS'] = json.dumps(arguments)
     os.execvpe('bash', ['bash', controller] + argv[2:], env)
 
 
@@ -404,7 +406,7 @@ def _access_exec(argv):
         env['GOAL_ACCESS_MODE'] = actual_mode
         if inherited is None:
             for key in ('GOAL_GATE_SUPERVISED', 'GOAL_GATE_MONOTONIC_START', 'GOAL_WRITER_OWNER_PID', 'GOAL_CLOSE_EXEC_PID', 'GOAL_CLOSE_LOCK_FD',
-                        'GOAL_CLOSE_OPERATION', 'GOAL_CLOSE_INTENT'):
+                        'GOAL_CLOSE_OPERATION', 'GOAL_CLOSE_INTENT', 'GOAL_CLOSE_ARGUMENTS'):
                 env.pop(key, None)
         if mode == 'gate' and 'GOAL_GATE_MONOTONIC_START' not in env:
             # Fresh access owns this origin; caller environment cannot grant
@@ -496,14 +498,17 @@ def _close_committed(state, operation, intent, require_current=False):
         raise StoreError('pending operation is not the current committed version')
     try:
         meta = json.loads(snapshot[_CLOSE_META])
-        if (not isinstance(meta, dict) or set(meta) != {'version', 'operation', 'intent', 'result', 'iteration', 'missing'}
-                or type(meta['version']) is not int or meta['version'] != 1
+        if (not isinstance(meta, dict) or set(meta) != {'version', 'operation', 'intent', 'result', 'iteration', 'missing'} | (
+                    {'arguments'} if meta.get('version') == 2 else set())
+                or type(meta['version']) is not int or meta['version'] not in (1, 2)
                 or meta['operation'] != operation or not isinstance(meta['intent'], str)
                 or not _SHA256.fullmatch(meta['intent']) or type(meta['result']) is not int
                 or meta['result'] not in (0, 2, 3, 4) or type(meta['iteration']) is not int
                 or not isinstance(meta['missing'], list) or any(not isinstance(n, str) for n in meta['missing'])
                 or len(set(meta['missing'])) != len(meta['missing'])):
             raise StoreError('invalid close commit metadata')
+        if meta['version'] == 2:
+            _validate_close_arguments(meta)
         scope = set(_CLOSE_FILES) | {'evidence/raw/%s.txt' % meta['iteration']}
         files = {name: data for name, data in snapshot.items() if name in scope}
         if not set(meta['missing']).issubset(scope):
@@ -542,19 +547,22 @@ def _close_record(pending):
         raise StoreError('invalid close journal envelope')
     payload = obj['payload']
     if (not isinstance(payload, dict) or type(payload.get('version')) is not int
-            or payload['version'] not in (1, 2, 3)
+            or payload['version'] not in (1, 2, 3, 6)
             or set(payload) != ({'version', 'files'} if payload['version'] == 1 else
                                 {'version', 'files', 'operation', 'intent'} if payload['version'] == 2 else
-                                {'version', 'files', 'operation', 'intent', 'base_head'})
+                                {'version', 'files', 'operation', 'intent', 'base_head'} | (
+                                    {'arguments'} if payload['version'] == 6 else set()))
             or obj.get('sha256') != _hash(_encode(payload))):
         raise StoreError('corrupt close journal')
     if payload['version'] >= 2 and (not isinstance(payload['operation'], str)
             or not _OPERATION.fullmatch(payload['operation']) or not isinstance(payload['intent'], str)
             or not _SHA256.fullmatch(payload['intent'])):
         raise StoreError('invalid journal operation identity')
-    if payload['version'] == 3 and payload['base_head'] is not None and (
+    if payload['version'] in (3, 6) and payload['base_head'] is not None and (
             not isinstance(payload['base_head'], str) or not _SHA256.fullmatch(payload['base_head'])):
         raise StoreError('invalid journal base version')
+    if payload['version'] == 6:
+        _validate_close_arguments(payload)
     files = payload.get('files')
     _close_file_set(files)
     for value in files.values():
@@ -563,6 +571,13 @@ def _close_record(pending):
                 raise StoreError('invalid journal file contents')
             base64.b64decode(value, validate=True)
     return payload
+
+
+def _validate_close_arguments(record):
+    args = record['arguments']
+    if (not isinstance(args, list) or not args or any(not isinstance(s, str) or '\0' in s for s in args)
+            or _close_request(args) != (record['operation'], record['intent'])):
+        raise StoreError('close arguments do not match operation intent')
 
 
 def _close_payload(pending):
@@ -796,10 +811,14 @@ def migrate_views(state):
                 if meta_name in files:
                     meta = json.loads(files[meta_name])
                     if (not isinstance(meta, dict) or type(meta.get('version')) is not int
-                            or meta['version'] != 1 or not isinstance(meta.get('missing'), list)):
+                            or meta['version'] not in ((1, 2) if meta_name == _CLOSE_META else (1,))
+                            or not isinstance(meta.get('missing'), list)):
                         raise StoreError('invalid legacy commit metadata')
                     common = {'version', 'operation', 'intent', 'missing'}
                     expected = common | ({'kind'} if meta_name == _MUTATION_META else {'result', 'iteration'})
+                    if meta_name == _CLOSE_META and meta['version'] == 2:
+                        expected.add('arguments')
+                        _validate_close_arguments(meta)
                     if (set(meta) != expected or not isinstance(meta.get('operation'), str)
                             or not _OPERATION.fullmatch(meta['operation']) or not isinstance(meta.get('intent'), str)
                             or not _SHA256.fullmatch(meta['intent'])):
@@ -1349,6 +1368,10 @@ def close_journal(state, action, result=0):
                 raise StoreError('invalid close operation identity')
             base_head, _ = Store(state / 'store/commits').read()
             payload.update(version=3, operation=operation, intent=intent, base_head=base_head)
+            arguments = os.environ.get('GOAL_CLOSE_ARGUMENTS')
+            if arguments is not None:
+                payload.update(version=6, arguments=json.loads(arguments))
+                _validate_close_arguments(payload)
         _atomic(pending, _encode({'payload': payload, 'sha256': _hash(_encode(payload))}))
         _fsync_dir(state)
     elif action == 'finish':
@@ -1376,12 +1399,14 @@ def close_journal(state, action, result=0):
             if iterations != [str(iteration)] or not snapshot[raw]:
                 raise StoreError('inconsistent close iteration or evidence')
             _validate_close_append(record, snapshot, iteration)
-            snapshot[_CLOSE_META] = _encode({'version': 1, 'operation': record['operation'],
-                                            'intent': record['intent'], 'result': result,
-                                            'iteration': iteration, 'missing': sorted(missing)})
+            meta = {'version': 1, 'operation': record['operation'], 'intent': record['intent'],
+                    'result': result, 'iteration': iteration, 'missing': sorted(missing)}
+            if record['version'] == 6:
+                meta.update(version=2, arguments=record['arguments'])
+            snapshot[_CLOSE_META] = _encode(meta)
             commits = Store(state / 'store/commits')
             head, previous = commits.read()
-            if record['version'] == 3 and head != record['base_head']:
+            if record['version'] in (3, 6) and head != record['base_head']:
                 raise Conflict('close baseline committed version changed')
             if _VIEW_META in previous:
                 expected = _committed_views(previous)
@@ -1405,7 +1430,7 @@ def close_journal(state, action, result=0):
                          if record['version'] >= 2 else None)
             if committed is None:
                 head, _ = Store(state / 'store/commits').read()
-                if record['version'] == 3:
+                if record['version'] in (3, 6):
                     if head != record['base_head']:
                         raise StoreError('pending baseline is not the current committed version')
                 elif head is not None:

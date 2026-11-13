@@ -1,0 +1,20 @@
+{
+  "kind": "all observed screening costs; not utility trials",
+  "candidate": "2fece5c96df63e69a1ad247f4e5965608bc816422520794351676f86ee23444f",
+  "attempts": 2,
+  "known_screen_seconds_lower_bound": 5.616088166832924,
+  "candidate_program_seconds": 0.1570688330102712,
+  "failures": 0,
+  "timeouts": 0,
+  "development_trials": 0,
+  "holdout_trials": 0,
+  "enabled_followup_trials": 0,
+  "candidate_accepted_deliveries": 0,
+  "paired_real_utility_rows": 0,
+  "proposal_model_seconds": null,
+  "tokens": null,
+  "money": null,
+  "candidate_cost_per_accepted_delivery": null,
+  "break_even_tasks": null,
+  "disposition": "retain-baseline: duplicate action; no proven positive saving; unknown proposal costs are not zero"
+}

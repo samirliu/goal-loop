@@ -104,6 +104,11 @@ For a reusable strategy/skill change, use the existing `.goal/proposals/` channe
 
 ## 7 Breaker (direction honesty)
 
+Before trials, compare the proposed action with the current baseline at the
+same condition. A rule that repeats the baseline has no incremental action;
+retain the baseline instead of counting repeated advice as learning benefit.
+Controlled telemetry tests qualification and consumption, never real utility.
+
 `CLOSED → HALF_OPEN (progress=no) → OPEN → BLOCKED`. Progress=yes resets. Every HALF_OPEN landing owes a `strategy_delta`. Two gate-caught false claims → BLOCKED (see GATE / ratchet in `gate.md`).
 
 ## 8 Executable local policy experiments

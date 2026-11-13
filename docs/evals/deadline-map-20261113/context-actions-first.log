@@ -1,0 +1,50 @@
+test_changed_product_request_and_evidence_reject_old_actions (test_context_actions.ContextActions.test_changed_product_request_and_evidence_reject_old_actions) ... ok
+test_claims_without_evidence_or_with_bad_product_cannot_go (test_context_actions.ContextActions.test_claims_without_evidence_or_with_bad_product_cannot_go) ... ok
+test_expiry_cannot_consume_an_old_work_or_close_map (test_context_actions.ContextActions.test_expiry_cannot_consume_an_old_work_or_close_map) ... FAIL
+test_interruption_after_commit_replays_original_id_and_arguments (test_context_actions.ContextActions.test_interruption_after_commit_replays_original_id_and_arguments) ... FAIL
+test_interruption_before_commit_recovers_original_request (test_context_actions.ContextActions.test_interruption_before_commit_recovers_original_request) ... FAIL
+test_single_task_from_empty_project_through_fresh_final_receipt (test_context_actions.ContextActions.test_single_task_from_empty_project_through_fresh_final_receipt) ... ok
+
+======================================================================
+FAIL: test_expiry_cannot_consume_an_old_work_or_close_map (test_context_actions.ContextActions.test_expiry_cannot_consume_an_old_work_or_close_map)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 154, in test_expiry_cannot_consume_an_old_work_or_close_map
+    self.assertIn('stale-context', self.execute(view, 'close', expected=4, env=env).stderr)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'stale-context' not found in 'CONTEXT: ERROR time-budget-exhausted\n'
+
+======================================================================
+FAIL: test_interruption_after_commit_replays_original_id_and_arguments (test_context_actions.ContextActions.test_interruption_after_commit_replays_original_id_and_arguments)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 148, in test_interruption_after_commit_replays_original_id_and_arguments
+    self.recover_case('pointer-published', True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 125, in recover_case
+    self.assertEqual(recovery['next'], 'recover-ledger')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'close-unbooked-wave' != 'recover-ledger'
+- close-unbooked-wave
++ recover-ledger
+
+
+======================================================================
+FAIL: test_interruption_before_commit_recovers_original_request (test_context_actions.ContextActions.test_interruption_before_commit_recovers_original_request)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 145, in test_interruption_before_commit_recovers_original_request
+    self.recover_case('generation-published', False)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 125, in recover_case
+    self.assertEqual(recovery['next'], 'recover-ledger')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'close-unbooked-wave' != 'recover-ledger'
+- close-unbooked-wave
++ recover-ledger
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 36.126s
+
+FAILED (failures=3)

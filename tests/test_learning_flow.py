@@ -181,10 +181,12 @@ class LearningFlow(unittest.TestCase):
 
     def test_expired_context_offers_no_dispatch_and_receipt_does_not_invent_go(self):
         f = self.fixture
-        with mock.patch.object(context.budget, 'gate_limit', return_value=(time.monotonic()-1, True)):
+        with mock.patch.object(context.budget, 'gate_limit', side_effect=lambda state, settlement=True:
+                               (time.monotonic()+(3 if settlement else -1), True)):
             value = context.show(f.project)
         self.assertTrue(value['expired'])
-        self.assertEqual(set(value['actions']), {'status'})
+        self.assertEqual(set(value['actions']), {'status', 'close', 'receipt'})
+        self.assertIsNone(value['actions']['close']['command'], 'missing evidence acquired a command at expiry')
         report = context.receipt(f.project)
         self.assertFalse(report['completion_verified'])
         self.assertNotEqual(report['checks']['gate']['result'], 0)
@@ -306,6 +308,45 @@ class LearningFlow(unittest.TestCase):
         other = crew.Wave(f.project, crew.begin(f.project, f.graph, 'crew', 'outside', p.state))
         self.assertFalse(crew.load(other.path)['policy']['decision']['match'])
         self.assertEqual(crew.load(other.path)['mode'], 'crew')
+
+    def test_controlled_policy_is_consumed_through_prepare_but_duplicates_serial_baseline(self):
+        """Mechanism coverage only; qualification telemetry remains controlled."""
+        f = self.fixture
+        p, _, qualified = self.qualified_policy()
+        value = f.write_graph(); value['context']['profile'] = 'small'; f.graph.write_text(json.dumps(value))
+        value['version'] = 2
+        for job in value['jobs']:
+            job['inputs'] = []
+        f.graph.write_text(json.dumps(value))
+        native = host.crew
+        host.begin(f.project, 'codex', 'controlled-policy-consumption', 90)
+        off = native.plan(f.project, f.graph)
+        self.assertEqual(off['choice'], 'serial')
+        modes, observations = [], []
+        for label, policy in [('baseline', None), ('candidate', p.state)]:
+            report = native.plan(f.project, f.graph, policy_state=policy)
+            wave = native.begin(f.project, f.graph, 'inline' if report['choice'] == 'serial' else 'crew', label, policy)
+            row = native.load(native.Wave(f.project, wave).path)
+            modes.append(row['mode'])
+            if policy:
+                self.assertEqual(row['policy']['selection']['policy'], qualified['enabled'])
+            for task, name, content in [('T1', 'a.out', 'A'), ('T2', 'b.out', 'B')]:
+                item = host.prepare(f.project, wave, task)
+                if policy:
+                    self.assertIn(qualified['enabled'], item['worker_prefix'])
+                agent = '/root/controlled-policy-fixture/'+label+'/'+task
+                host.attach(f.project, item['ticket'], {'task_name': agent})
+                host.ready(f.project, item['ticket'])
+                (f.project/name).write_text(content)
+                host.reconcile(f.project, {'agents':[{'agent_name':agent, 'agent_status':{'completed':'fixture'}}]})
+                self.assertEqual(host.validate(f.project, item['ticket']), 0)
+                host.adopt(f.project, item['ticket'])
+            self.assertTrue(native.Wave(f.project, wave).finish()['quality'])
+            observations.append(dict(variant=label, plan=report, begin_mode=row['mode'],
+                                     consumed=row.get('policy'), prepared=True, independent_checks_passed=True))
+        self.assertEqual(modes, ['inline', 'inline'], 'a repeated baseline rule was counted as different execution')
+        print('CONTROLLED_POLICY_CONSUMPTION '+json.dumps(dict(kind='mechanism-only; controlled qualification and native receipts',
+                                                              observations=observations, behavior_difference=False)), flush=True)
 
     def test_withdrawal_and_pending_transition_block_stale_dispatch(self):
         f = self.fixture

@@ -1,0 +1,41 @@
+test_changed_product_request_and_evidence_reject_old_actions (test_context_actions.ContextActions.test_changed_product_request_and_evidence_reject_old_actions) ... ok
+test_claims_without_evidence_or_with_bad_product_cannot_go (test_context_actions.ContextActions.test_claims_without_evidence_or_with_bad_product_cannot_go) ... ok
+test_expiry_cannot_consume_an_old_work_or_close_map (test_context_actions.ContextActions.test_expiry_cannot_consume_an_old_work_or_close_map) ... ok
+test_interruption_after_commit_replays_original_id_and_arguments (test_context_actions.ContextActions.test_interruption_after_commit_replays_original_id_and_arguments) ... FAIL
+test_interruption_before_commit_recovers_original_request (test_context_actions.ContextActions.test_interruption_before_commit_recovers_original_request) ... FAIL
+test_single_task_from_empty_project_through_fresh_final_receipt (test_context_actions.ContextActions.test_single_task_from_empty_project_through_fresh_final_receipt) ... ok
+
+======================================================================
+FAIL: test_interruption_after_commit_replays_original_id_and_arguments (test_context_actions.ContextActions.test_interruption_after_commit_replays_original_id_and_arguments)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 150, in test_interruption_after_commit_replays_original_id_and_arguments
+    self.recover_case('pointer-published', True)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 126, in recover_case
+    recovery = self.view()
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 27, in view
+    self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4 != 0 : CTL: ERROR writer-lock: recovery-required
+
+
+======================================================================
+FAIL: test_interruption_before_commit_recovers_original_request (test_context_actions.ContextActions.test_interruption_before_commit_recovers_original_request)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 147, in test_interruption_before_commit_recovers_original_request
+    self.recover_case('generation-published', False)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 126, in recover_case
+    recovery = self.view()
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 27, in view
+    self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4 != 0 : CTL: ERROR writer-lock: recovery-required
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 42.434s
+
+FAILED (failures=2)

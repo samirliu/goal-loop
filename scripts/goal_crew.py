@@ -306,6 +306,8 @@ def load(path):
     require(isinstance(value.get('id'), str) and ID.fullmatch(value['id']) and path.stem == value['id'], 'observation identity/path mismatch')
     require(value.get('mode') in ('inline', 'crew') and isinstance(value.get('trial'), str) and value['trial'], 'invalid observation mode/trial')
     complete = value.get('finished') is not None
+    if 'book_iteration' in value:
+        require(type(value['book_iteration']) is int and value['book_iteration'] >= 0, 'invalid wave book iteration')
     finite = lambda n: type(n) in (int, float) and math.isfinite(n) and n >= 0
     require(finite(value.get('started')) and finite(value.get('origin')) and isinstance(value.get('jobs'), dict), 'invalid observation clock/jobs')
     if complete:
@@ -347,6 +349,8 @@ def begin(project, graph_path, mode, trial, policy_state=None, retry_note=None):
         transport = 'cli' if __name__ == '__main__' else 'python-api'
         key = condition_key(graph, baseline, inputs, state, transport, policy)
         whole = batch_key(graph, baseline, inputs, state, transport, policy)
+        book_iteration = budget.natural(next(line.split('=', 1)[1] for line in (state/'state.rec').read_text().splitlines()
+                                             if line.startswith('iteration=')), 'wave-book-iteration')
     identity = uuid.uuid4().hex
     value = dict(version=1, id=identity, mode=mode, trial=trial, graph=graph, edges={k: sorted(v) for k, v in edges.items()},
                  condition=key, batch_condition=whole, baseline=baseline, inputs=inputs,
@@ -357,6 +361,7 @@ def begin(project, graph_path, mode, trial, policy_state=None, retry_note=None):
                                      validations=[], first_valid=None, adopted=None, adopted_digest=None,
                                      adoption_version=None) for j in ordered},
                  stages=[], finished=None, elapsed=None, quality=None, final_validation=None, tokens=None, money=None)
+    value['book_iteration'] = book_iteration
     if policy is not None:
         value['policy'] = policy
     path = folder(project, create=True) / (identity + '.json')

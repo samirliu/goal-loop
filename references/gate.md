@@ -14,6 +14,13 @@ does not establish current GO: run the gate again before delivery. Argument
 order and explicit defaults count as request changes (project and ID are
 excluded from the request hash).
 
+The context map can compile this exact call from authored JSON inputs. New
+close journals (version 6; existing mutation/checkpoint versions unchanged)
+and close commit metadata (version 2) retain the original argv and verify it
+against the same operation/intent hash. Legacy journals remain readable; they
+cannot invent missing original arguments. Recovery and REPLAY keep their
+existing semantics and never replace a fresh Gate decision.
+
 If `recovery-required` appears, run `goal_ctl.sh recover --project DIR` first.
 It rolls back a close interrupted before its atomic commit pointer, or restores
 the committed snapshot after that point, without replaying tools. A journal
