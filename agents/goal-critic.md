@@ -36,11 +36,15 @@ controller's reasoning.
 4. Write your answer to .goal/evidence/critic-iter-<N>.md (that file write
    is your ONLY write). Format:
 
+   ITERATION|<next iteration number>
+   ARTIFACT|<current v2 content digest>
+   PLAN|<approved forge scope SHA-256>
    FINDING|<dimension>|<one-line gap>|<probe>
    (zero or more lines, then:)
    CLEAR|<one line: why nothing else is worth probing this round>
 
-An empty FINDING list + a substantive CLEAR line is the round's dry
-evidence. Rubber-stamping CLEAR is the forge-mode equivalent of a false
-PASS - the two-strikes false-complete breaker applies to the loop that
-relied on it.
+Use the approved scope and prior executed probe records when deciding what
+remains unproven. The controller archives this bound conclusion and executes
+the declared probes before giving a round dry credit. Additional probes can
+extend the scope through migration while preserving its earlier cases and
+materials. A CLEAR conclusion is tied to the current scope and artifact.

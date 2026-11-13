@@ -1,0 +1,33 @@
+{
+  "scope": "Controlled telemetry branch test through production experiment and real archived run-enabled; not a new utility trial or model run",
+  "before_test_sha256": "be23b98a69cd8de4684487f9103c94c2117f72818ec5b3b2345be70663b3be32",
+  "after_test_sha256": "3ee988fb804527001d5a9d943ce82af58fb40313e9690607a71413b2ab36b82b",
+  "unchanged_production_sha256": "e6ff794567ce37409a8cd7cca0efc2efa93b35a0bf968b3d22411ccd908d0ae7",
+  "files": [
+    {
+      "path": "after-targeted.log",
+      "bytes": 460,
+      "sha256": "5efe7954ae775897196d2a342e3d4b83dc05b6c37a7c3a4551d3868128e8c451"
+    },
+    {
+      "path": "after-test_evolve.py.txt",
+      "bytes": 14793,
+      "sha256": "3ee988fb804527001d5a9d943ce82af58fb40313e9690607a71413b2ab36b82b"
+    },
+    {
+      "path": "before-test_evolve.py.txt",
+      "bytes": 10673,
+      "sha256": "be23b98a69cd8de4684487f9103c94c2117f72818ec5b3b2345be70663b3be32"
+    },
+    {
+      "path": "initial-test-tool-receipt-summary.json",
+      "bytes": 797,
+      "sha256": "3d5bae061c3b5c68c969d13a7d9c1225633922675431e467f1feb5dde7c1c6d8"
+    },
+    {
+      "path": "test.patch",
+      "bytes": 4823,
+      "sha256": "58851ec20689c10fee7c6299bee23f2d274eb5970bc4c020766a63c4d20aa0f3"
+    }
+  ]
+}

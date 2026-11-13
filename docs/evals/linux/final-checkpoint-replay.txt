@@ -1,0 +1,13 @@
+test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch (__main__.Incumbent.test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch) ... ok
+test_failed_gate_or_unsafe_scope_cannot_be_saved_as_incumbent (__main__.Incumbent.test_failed_gate_or_unsafe_scope_cannot_be_saved_as_incumbent) ... ok
+test_interrupted_restore_blocks_gate_and_recovery_preserves_conflicts (__main__.Incumbent.test_interrupted_restore_blocks_gate_and_recovery_preserves_conflicts) ... ok
+test_owned_user_edit_refuses_all_writes_unowned_edit_survives (__main__.Incumbent.test_owned_user_edit_refuses_all_writes_unowned_edit_survives) ... ok
+test_restored_bytes_and_permissions_reproduce_original_go (__main__.Incumbent.test_restored_bytes_and_permissions_reproduce_original_go) ... ok
+test_checkpoint_refuses_missing_uncalibrated_and_unverifiable_horizon (__main__.IntermediateCheckpoint.test_checkpoint_refuses_missing_uncalibrated_and_unverifiable_horizon) ... ok
+test_checkpoint_reruns_floor_and_honors_inherited_deadline (__main__.IntermediateCheckpoint.test_checkpoint_reruns_floor_and_honors_inherited_deadline) ... ok
+test_intermediate_restore_requalifies_without_claiming_completion (__main__.IntermediateCheckpoint.test_intermediate_restore_requalifies_without_claiming_completion) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 37.779s
+
+OK

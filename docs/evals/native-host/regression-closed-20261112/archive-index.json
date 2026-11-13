@@ -1,0 +1,23 @@
+{
+  "all_recorded_checks_exit_zero": true,
+  "archives": [
+    {
+      "archive_manifest_sha256": "244f4aabd9cb1a02019e888f8f563083281a97335ac764434b49a980ee7b0615",
+      "bytes": 6099072,
+      "path": "source139.tar.xz",
+      "payload_files": 142,
+      "sha256": "4cb94060ae40ff262fdd2a0ff8a4590def2ffd2f1aed451cff1f01b504bc586f"
+    },
+    {
+      "archive_manifest_sha256": "a34e15a1295f3bc65c3558c16eb065ff21691172305bea0cc8967133be948155",
+      "bytes": 23784,
+      "path": "full-results.tar.xz",
+      "payload_files": 18,
+      "sha256": "b810360ee4767d9c13612a5c614170ba1ad065bccd35cc3fb6ef3ab6f704fb35"
+    }
+  ],
+  "captured_utc": "2026-11-12T12:35:41.450308+00:00",
+  "current_changed_from_snapshot": [],
+  "original_files_unchanged": true,
+  "source_manifest_sha256": "db9793740d657e25a1c95b62ce4c38e326ef3e7b6ed6a7100ef0675546b7ebcc"
+}

@@ -1,0 +1,43 @@
+{
+  "developer-help": {
+    "command": [
+      "python3",
+      "-B",
+      "devtools/evaluate_entry.py",
+      "--help"
+    ],
+    "log": "developer-help.log",
+    "result": 0,
+    "sha256": "0e6d872d261ea1407cd83fa1133d323e2893f8f29f3d4865f43444f58bae6781"
+  },
+  "diff-check": {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "log": "diff-check.log",
+    "result": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "docs-delivery": {
+    "command": [
+      "bash",
+      "tests/docs_consistency.sh"
+    ],
+    "log": "docs-delivery.log",
+    "result": 0,
+    "sha256": "bd3d582709cc6a78a799f0492ef0f575ea2eaa47ff98c017b7846537cc9b191a"
+  },
+  "skill-validation": {
+    "command": [
+      "/opt/homebrew/bin/python3.12",
+      "-B",
+      "/Users/m/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+      "."
+    ],
+    "log": "skill-validation.log",
+    "result": 0,
+    "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+  }
+}

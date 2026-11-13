@@ -1,0 +1,5 @@
+{
+  "scripts/goal_crew.py": "110cbecc1de97c112f537280cabd6716459deeb64746cc0be599b442eb411cc2",
+  "examples/crew-cost/run.py": "281c4aafa165ec61728371f589ce034045fac390acf95604f40633bbd686ab5d",
+  "examples/crew-cost/task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+}

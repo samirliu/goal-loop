@@ -91,8 +91,9 @@ echo x > "$T/t13/a.txt"; close_iter t13 --dry yes
 out=$(bash "$GATE" --check --project "$T/t13" 2>&1); assert_rc "13 forge not-dry -> rc2" 2 $?
 assert_has "13 reason not-dry" 'not-dry' "$out"
 
-# 14 forge GO at dry_streak >= limit
-sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/t13/.goal/state.rec"
+# 14 forge GO after three executed dry rounds.
+close_iter t13 --dry yes
+close_iter t13 --dry yes
 out=$(bash "$GATE" --check --project "$T/t13" 2>&1); assert_rc "14 forge GO -> rc0" 0 $?
 assert_has "14 GO line says mode=forge" 'mode=forge' "$out"
 
@@ -241,7 +242,7 @@ assert_rc "32 docs consistency" 0 $?
 # Severity parity with CI: warnings and errors block; info-level style hints
 # stay visible in CI logs but do not fail (single definition of green).
 if command -v shellcheck >/dev/null 2>&1; then
-  shellcheck --severity=warning "$here/scripts/goal_gate.sh" "$here/scripts/goal_loop.sh" "$here/scripts/goal_ctl.sh" "$here/scripts/goal_hook.sh" \
+  shellcheck --severity=warning "$here/scripts/goal_gate.sh" "$here/devtools/goal_loop.sh" "$here/scripts/goal_ctl.sh" "$here/scripts/goal_hook.sh" \
     && ok "33 shellcheck clean" || no "33 shellcheck findings"
 else
   ok "33 shellcheck skipped (not installed)"
@@ -297,12 +298,13 @@ bash "$CTL" stamp --project "$T/h40" --auto >/dev/null 2>&1
 assert_rc "40 stamp without baseline refused rc2" 2 $?
 grep -qE '^approved: [0-9a-f]{6,}' "$T/h40/.goal/goal.md" && no "40 stamped despite refusal" || ok "40 goal.md left unstamped"
 
-# 41 valid baseline -> stamp ok -> forge GO (dry_streak forced to limit)
+# 41 valid baseline -> stamp ok -> forge GO after executed dry rounds.
 printf 'AC-1 | observed=7 | repeats=3 | cmd=echo 7\n' > "$T/h40/.goal/baseline.md"
 bash "$CTL" stamp --project "$T/h40" --auto >/dev/null 2>&1
 assert_rc "41 stamp with baseline ok" 0 $?
 echo x > "$T/h40/a.txt"; close_iter h40 --dry yes
-sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/h40/.goal/state.rec"
+close_iter h40 --dry yes
+close_iter h40 --dry yes
 bash "$GATE" --check --project "$T/h40" >/dev/null 2>&1
 assert_rc "41 forge GO with baseline satisfied" 0 $?
 
@@ -317,7 +319,9 @@ bash "$GATE" --baseline-check --project "$T/h42" 2>&1 | grep -q baseline-cmd-mis
 NOSTAMP=1 mkproj h43 >/dev/null; FORGE=1 NOSTAMP=1 contract h43 "- AC-1 | m | check: \`echo 7\` | baseline: abs | expected: >=5"
 bash "$CTL" stamp --project "$T/h43" --auto >/dev/null 2>&1
 assert_rc "43 abs stamp ok without baseline" 0 $?
-close_iter h43 --dry yes; sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/h43/.goal/state.rec"
+close_iter h43 --dry yes
+close_iter h43 --dry yes
+close_iter h43 --dry yes
 bash "$GATE" --check --project "$T/h43" >/dev/null 2>&1
 assert_rc "43 abs forge GO" 0 $?
 
@@ -674,6 +678,10 @@ bash "$CTL" close-iteration --project "$T/t71" --task T2 --files a.txt \
   --exit-signal yes --no-gate --judge-score 3 --strategy probe-first >/dev/null 2>&1
 # score improved (20->10, lower=better) but judge fell (8->3) -> DIVERGENCE
 printf '1|20|8\n2|10|3\n' >> "$T/t71/.goal/scores.rec"
+# This semantic fixture supplies a previously qualified comparison point;
+# raw attempted scores alone no longer grant objective qualification.
+sed_in 's/^last_quality_score=.*/last_quality_score=20/' "$T/t71/.goal/state.rec"
+sed_in 's/^last_quality_judge=.*/last_quality_judge=8/' "$T/t71/.goal/state.rec"
 out=$(bash "$GATE" --check --project "$T/t71" 2>&1); assert_rc "71 minimize divergence -> rc2" 2 $?
 assert_has "71 DIVERGENCE token" 'DIVERGENCE:score-vs-judge' "$out"
 assert_has "71 dir named" 'dir=minimize' "$out"
@@ -696,6 +704,8 @@ bash "$CTL" close-iteration --project "$T/t72" --task T2 --files a.txt \
   --exit-signal yes --no-gate --judge-score 8 --strategy probe-first >/dev/null 2>&1
 two_pass t72
 printf '1|20|3\n2|10|8\n' >> "$T/t72/.goal/scores.rec"
+sed_in 's/^last_quality_score=.*/last_quality_score=20/' "$T/t72/.goal/state.rec"
+sed_in 's/^last_quality_judge=.*/last_quality_judge=3/' "$T/t72/.goal/state.rec"
 out=$(bash "$GATE" --check --project "$T/t72" 2>&1); assert_rc "72 minimize agree -> GO" 0 $?
 printf '%s' "$out" | grep -q 'DIVERGENCE' && no "72 unexpected DIVERGENCE" || ok "72 no DIVERGENCE"
 
@@ -969,6 +979,9 @@ bash "$CTL" stamp --project "$T/t89" --auto >/dev/null
 close_iter t89
 out=$(bash "$GATE" --check --project "$T/t89" 2>&1); rc89=$?
 [ "$rc89" -ne 0 ] && ok "89 ledger-mutating check never ends GO (rc=$rc89)" || no "89 ledger-mutating check ended GO"
+# A refused mutation now leaves a rollback journal. Recover that transaction
+# before exercising the next independent checker defect.
+if [ -f "$T/t89/.goal/store/pending" ]; then bash "$CTL" recover --project "$T/t89" >/dev/null; fi
 # --verify mode must also refuse a self-rewriting check in-run
 printf '# Goal contract - test\n\n## Objective\n\nt\n\n## Exit policy\n\nexit: threshold\n\n## Acceptance criteria\n\n- AC-1 | mutates | check: `sed "s/PENDING/PENX/" .goal/goal.md > .goal/goal.md.mt && mv .goal/goal.md.mt .goal/goal.md` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n' > "$T/t89/.goal/goal.md"
 out=$(bash "$GATE" --verify --project "$T/t89" 2>&1); assert_rc "89b verify self-rewrite caught" 2 $?
@@ -1094,6 +1107,7 @@ printf 'x' > "$T/t96/a.txt"
 close_iter t96 --dry yes          # dry_streak 1
 close_iter t96 --dry yes          # dry_streak 2
 two_pass t96
+forge_critic t96
 out=$(bash "$CTL" close-iteration --project "$T/t96" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --dry yes --exit-signal yes 2>&1); rc96=$?
@@ -1104,6 +1118,7 @@ grep -q '^dry_streak=3$' "$T/t96/.goal/state.rec" && ok "96a dry_streak reached 
 # reset with a fix round, then claim too early (dry=1 < 3)
 close_iter t96 --dry no           # dry_streak 0
 close_iter t96 --dry yes          # dry_streak 1
+forge_critic t96
 out=$(bash "$CTL" close-iteration --project "$T/t96" --task T1 --files a.txt \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
   --dry yes --exit-signal yes 2>&1); rc96=$?
@@ -1306,7 +1321,7 @@ grep -q 'task=SELF-AUDIT' "$T/t105/.goal/loop-log.md" && no "105c junk task must
 
 # 104 goal_loop.sh unattended outer loop: README promises --dry-run rehearses
 # without API and the loop trusts ONLY gate rc. Pin the three exits here.
-LOOPT="$here/scripts/goal_loop.sh"
+LOOPT="$here/devtools/goal_loop.sh"
 # init seeds the template; second init refuses (contract editing = re-approval)
 mkproj t104i
 out=$(bash "$LOOPT" --init --project "$T/t104i" 2>&1); assert_rc "104a init seeds contract" 0 $?
@@ -1413,7 +1428,7 @@ stall(){ printf 'no_progress_streak=1\n' >> "$1/.goal/state.rec"; }
 hblocks(){ local p="$T/$1/.goal/loop-log.md" n=1; : > "$p"
   shift
   while [ $# -ge 2 ]; do
-    printf '## iteration %d\ntask=%s\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=deadbeefcafe\nscore=none\nstrategy_delta=none\nstrategy=%s\n' "$n" "$1" "$2" >> "$p"; n=$((n+1)); shift 2 || break
+    printf '## iteration %d\ntask=%s\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=v2-%064d\nscore=none\nstrategy_delta=none\nstrategy=%s\n' "$n" "$1" "$n" "$2" >> "$p"; n=$((n+1)); shift 2 || break
   done; }
 scorefile(){ local f="$T/$1/.goal/scores.rec"; : > "$f"; shift; local n=1 kv
   for kv in "$@"; do printf '%s|%s|none\n' "$n" "$kv" >> "$f"; n=$((n+1)); done; }
@@ -2883,3 +2898,48 @@ contract t159 "- AC-1 | t | check: \`echo 1 > .goal/runner.clock\` | expected: e
 out=$(bash "$GATE" --verify --project "$p" 2>&1); rc=$?
 assert_rc "159 clock mutation refuses verification" 2 $rc
 assert_has "159 clock mutation names ledger guard" 'check-mutated-ledger' "$out"
+
+# 160 A metric must finish successfully and yield a valid numeric value.
+mkproj t160
+contract t160 "- AC-1 | score | check: \`printf '10\\n'; exit 7\` | expected: >=1"
+close_iter t160
+out=$(bash "$GATE" --check --project "$T/t160" 2>&1); rc=$?
+assert_rc "160 a numeric line from a failed command cannot deliver GO" 2 $rc
+assert_has "160 nonzero metric exit is broken" 'check-broken:AC-1.*rc=7' "$out"
+
+mkproj t160b
+contract t160b "- AC-1 | score | check: \`printf '1.2.3\\n'\` | expected: maximize"
+out=$(bash "$GATE" --verify --project "$T/t160b" 2>&1); rc=$?
+assert_rc "160 malformed objective reading is refused" 2 $rc
+assert_has "160 malformed decimal is broken" 'AC-1\|BROKEN\|no number' "$out"
+
+mkproj t160c
+NOSTAMP=1 contract t160c "- AC-1 | score | check: \`printf '10\\n'; sleep 3\` | expected: >=1"
+printf '\ncheck_timeout=1\n' >> "$T/t160c/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t160c" --auto >/dev/null
+out=$(bash "$GATE" --verify --project "$T/t160c" 2>&1); rc=$?
+assert_rc "160 per-check timeout refuses partial numeric output" 2 $rc
+assert_has "160 timed out measurement is broken" 'AC-1\|BROKEN\|.*rc=124' "$out"
+
+mkproj t160d
+contract t160d "- AC-1 | score | check: \`printf '%s\\n' '-.5'\` | expected: minimize" \
+  "- AC-2 | error contract | check: \`exit 7\` | expected: exit=7"
+out=$(bash "$GATE" --verify --project "$T/t160d" 2>&1); rc=$?
+assert_rc "160 signed decimal and explicit expected nonzero still pass" 0 $rc
+assert_has "160 signed decimal is recorded in score grammar" 'AC-1\|PASS\|observed=-0[.]5' "$out"
+
+mkproj t160e
+NOSTAMP=1 contract t160e "- AC-1 | score | check: \`printf 'observed=123\\n' >&2; exit 7\` | expected: maximize"
+printf '\nobjective: maximize AC-1\nhorizon-waived: synthetic metric fixture\n' >> "$T/t160e/.goal/goal.md"
+bash "$CTL" stamp --project "$T/t160e" --auto >/dev/null
+close_iter t160e --strategy verify --score 123
+assert_has "160 broken sensor stderr does not set a water mark" '^best_score=none$' "$(cat "$T/t160e/.goal/state.rec")"
+
+# 161 The dry counter alone cannot manufacture executed coverage.
+mkproj t161
+FORGE=1 contract t161 "- AC-1 | ready | check: \`test -f a.txt\` | expected: exit=0"
+close_iter t161 --dry yes
+sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/t161/.goal/state.rec"
+out=$(bash "$GATE" --check --project "$T/t161" 2>&1); rc=$?
+assert_rc "161 inflated dry count without recorded rounds refuses GO" 2 $rc
+assert_has "161 missing executed coverage named" 'forge-coverage-unverified' "$out"

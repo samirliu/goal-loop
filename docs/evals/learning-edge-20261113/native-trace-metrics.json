@@ -1,0 +1,202 @@
+{
+  "definitions": {
+    "coordination": "native Agent calls only; no claim to isolate every planning or coordination interval",
+    "protocol_lookups": "Read/Grep/Glob whose JSON arguments contain the frozen plugin path; Bash source reads excluded",
+    "repeated_read_calls": "Read calls after the first call to the same path; /private/tmp normalized to /tmp",
+    "repeated_same_projection": "Read calls with the same normalized path, offset and limit after the first",
+    "sdk_usage": "unverified SDK estimates, missing on the timeout; actual billed totals remain unknown"
+  },
+  "scope": "descriptive trace counts; no model calls or billing verification",
+  "trials": [
+    {
+      "accepted": true,
+      "checked_seconds": 265.90010520792566,
+      "cli_result": 0,
+      "cli_seconds": 264.7485039578751,
+      "human_interventions": 0,
+      "money": null,
+      "native_agent_calls": 0,
+      "normal_final_delivery": true,
+      "position": "1-before",
+      "protocol_lookups": 12,
+      "read_calls": 22,
+      "repeated_paths": {
+        "/tmp/goal-deepening-entry-pilot-ready-20261112/sources/before/goal-loop/scripts/goal_ctl.sh": 2,
+        "/tmp/goal-deepening-entry-pilot-ready-20261112/sources/before/goal-loop/scripts/goal_gate.sh": 2,
+        "/tmp/goal-deepening-entry-pilot-ready-20261112/sources/before/goal-loop/scripts/goal_host.py": 2
+      },
+      "repeated_read_calls": 3,
+      "repeated_same_projection": 0,
+      "sdk_reported_api_ms": 245011,
+      "sdk_reported_model_usage": {
+        "MiniMax-M3.1-Flash": {
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 2854400,
+          "contextWindow": 200000,
+          "costUSD": 2.8065700000000002,
+          "inputTokens": 100694,
+          "maxOutputTokens": 32000,
+          "outputTokens": 35036,
+          "webSearchRequests": 0
+        }
+      },
+      "sdk_reported_models": [
+        "MiniMax-M3.1-Flash"
+      ],
+      "sdk_reported_usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 2854400,
+        "inference_geo": "",
+        "input_tokens": 100694,
+        "iterations": [],
+        "output_tokens": 35036,
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "standard",
+        "speed": "standard"
+      },
+      "tokens": null,
+      "tool_errors": 2,
+      "tools": 68
+    },
+    {
+      "accepted": true,
+      "checked_seconds": 317.4127533750143,
+      "cli_result": 0,
+      "cli_seconds": 316.1428164578974,
+      "human_interventions": 0,
+      "money": null,
+      "native_agent_calls": 0,
+      "normal_final_delivery": true,
+      "position": "2-after",
+      "protocol_lookups": 4,
+      "read_calls": 11,
+      "repeated_paths": {},
+      "repeated_read_calls": 0,
+      "repeated_same_projection": 0,
+      "sdk_reported_api_ms": 299766,
+      "sdk_reported_model_usage": {
+        "MiniMax-M3.1-Flash": {
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 1673535,
+          "contextWindow": 200000,
+          "costUSD": 1.7177974999999996,
+          "inputTokens": 65176,
+          "maxOutputTokens": 32000,
+          "outputTokens": 22206,
+          "webSearchRequests": 0
+        }
+      },
+      "sdk_reported_models": [
+        "MiniMax-M3.1-Flash"
+      ],
+      "sdk_reported_usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 1673535,
+        "inference_geo": "",
+        "input_tokens": 65176,
+        "iterations": [],
+        "output_tokens": 22206,
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "standard",
+        "speed": "standard"
+      },
+      "tokens": null,
+      "tool_errors": 1,
+      "tools": 47
+    },
+    {
+      "accepted": false,
+      "checked_seconds": 345.2358201669995,
+      "cli_result": 124,
+      "cli_seconds": 345.0205893749371,
+      "human_interventions": 0,
+      "money": null,
+      "native_agent_calls": 0,
+      "normal_final_delivery": false,
+      "position": "3-after",
+      "protocol_lookups": 6,
+      "read_calls": 10,
+      "repeated_paths": {},
+      "repeated_read_calls": 0,
+      "repeated_same_projection": 0,
+      "sdk_reported_api_ms": null,
+      "sdk_reported_model_usage": null,
+      "sdk_reported_models": [
+        "MiniMax-M3.1-Flash"
+      ],
+      "sdk_reported_usage": null,
+      "tokens": null,
+      "tool_errors": 1,
+      "tools": 25
+    },
+    {
+      "accepted": true,
+      "checked_seconds": 299.83130908291787,
+      "cli_result": 0,
+      "cli_seconds": 298.71048204111867,
+      "human_interventions": 0,
+      "money": null,
+      "native_agent_calls": 0,
+      "normal_final_delivery": true,
+      "position": "4-before",
+      "protocol_lookups": 5,
+      "read_calls": 12,
+      "repeated_paths": {
+        "/tmp/goal-deepening-entry-pilot-ready-20261112/trials/4-before/work/public.py": 2
+      },
+      "repeated_read_calls": 1,
+      "repeated_same_projection": 1,
+      "sdk_reported_api_ms": 284583,
+      "sdk_reported_model_usage": {
+        "MiniMax-M3.1-Flash": {
+          "cacheCreationInputTokens": 0,
+          "cacheReadInputTokens": 1319217,
+          "contextWindow": 200000,
+          "costUSD": 1.4891285,
+          "inputTokens": 56604,
+          "maxOutputTokens": 32000,
+          "outputTokens": 21860,
+          "webSearchRequests": 0
+        }
+      },
+      "sdk_reported_models": [
+        "MiniMax-M3.1-Flash"
+      ],
+      "sdk_reported_usage": {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 1319217,
+        "inference_geo": "",
+        "input_tokens": 56604,
+        "iterations": [],
+        "output_tokens": 21860,
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "standard",
+        "speed": "standard"
+      },
+      "tokens": null,
+      "tool_errors": 1,
+      "tools": 52
+    }
+  ]
+}

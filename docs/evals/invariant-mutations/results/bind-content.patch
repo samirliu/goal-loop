@@ -1,0 +1,11 @@
+--- a/scripts/goal_tree_digest.py
++++ b/scripts/goal_tree_digest.py
+@@ -62,7 +62,7 @@
+                     raise ValueError('worktree entry changed while opening')
+                 value = hashlib.sha256()
+                 for chunk in iter(lambda: stream.read(1024 * 1024), b''):
+-                    value.update(chunk)
++                    value.update(b'')
+                 after = os.fstat(stream.fileno())
+                 if (after.st_size, after.st_mtime_ns, after.st_ctime_ns) != (opened.st_size, opened.st_mtime_ns, opened.st_ctime_ns):
+                     raise ValueError('worktree entry changed while hashing')

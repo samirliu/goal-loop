@@ -1,0 +1,616 @@
+  ok   - 01 help exits 0 (rc=0)
+  ok   - 01 help mentions --verify
+  ok   - 09 contract-tampered -> rc2 (rc=2)
+  ok   - 17a forge close w/o --dry -> rc4 (rc=4)
+  ok   - 17a refusal leaves no orphan loop-log block
+  ok   - 24 exit=1 negative GO -> rc0 (rc=0)
+  ok   - 24 --verify PASS on rc match
+  ok   - 31a cache hit replays metric 42
+  ok   - 31b command ran once for unchanged input
+  ok   - 31c stdout archived under .goal/evidence
+  ok   - 31d rerun after input change
+  ok   - 47 status echoes crew wave marker
+  ok   - 47b teams marker refused (rc=4)
+  ok   - 47b names bad-task
+  ok   - 61 mismatch noted
+  ok   - 61 measured score recorded
+  ok   - 61 best_score from measurement
+  ok   - 72 minimize agree -> GO (rc=0)
+  ok   - 72 no DIVERGENCE
+  ok   - 81 unbound PASS -> rc2 (rc=2)
+  ok   - 81 verdict-unbound named
+  ok   - 82 bound artifact GO -> rc0 (rc=0)
+  ok   - 82b stale artifact hash -> rc2 (rc=2)
+  ok   - 82b mismatch named
+  ok   - 91 objective-on-judged refused (rc=2)
+  ok   - 91 stamp refusal names the AC
+  ok   - 92 stamp without placeholder rc4 (rc=4)
+  ok   - 92 placeholder refusal named
+  ok   - 103a status prints NEXT
+  ok   - 103a NEXT names the hint
+  ok   - 103a NEXT is one actionable sentence
+  ok   - 103b clean claim => nothing pending
+  ok   - 106a disagreeing same-binding pair -> rc2 (rc=2)
+  ok   - 106a reason verdict-conflict
+  ok   - 106a hint routes rebind
+  ok   - 106b identical double-bind is NOT a conflict (rc=0)
+  ok   - 106c conflict cleared by fresh binding on new state (rc=0)
+  ok   - 113a promote after 3 waves
+  ok   - 113b normalized ids count as one domain
+  ok   - 113c interleaved stays silent
+  ok   - 113d run of two stays silent
+  ok   - 113e promote wording is consider
+  ok   - 113f unstalled promote silent
+  ok   - 118a drift inside z-band -> GO (rc=0)
+  ok   - 118b drift beyond z-band -> rc2 (rc=2)
+  ok   - 118b band source named
+  ok   - 118c silent sd -> BROKEN
+  ok   - 127a status rc0 without goal.md (rc=0)
+  ok   - 127a STEP says fill contract
+  ok   - 127a parse silent on missing goal.md
+  ok   - 127a no goal_parse.sh traceback
+  ok   - 130c finding refuses claim (rc=2)
+  ok   - 130c reason adversarial-finding
+  ok   - 130c clear receipt GO (rc=0)
+  ok   - 133c audit fails on ticked-but-unbooked (rc=1)
+  ok   - 133c A9 named
+  ok   - 133f audit clean after close (rc=0)
+  ok   - 135b unbacked suffix refused (rc=4)
+  ok   - 135b names unbacked-task-suffix
+  ok   - 137a check-only preserves gate rc (rc=2)
+  ok   - 137a check-only preserves foreign lock
+  ok   - 137b live owner refused (rc=4)
+  ok   - 137b refusal preserves foreign lock
+  ok   - 137c normal exhausted run rc intact (rc=3)
+  ok   - 137c executor runs at project root
+  ok   - 137c owned lock cleaned
+  ok   - 150 strategy-pipe rejected before mutation
+  ok   - 150 signature-newline rejected before mutation
+  ok   - 150 files-newline rejected before mutation
+  ok   - 150 delta-blank rejected before mutation
+  ok   - 150 delta-none rejected before mutation
+  ok   - 150 whitespace objective label rejected before measurement
+  ok   - 150 multiword objective label rejected before measurement
+== results: pass=73 fail=0 ==
+  ok   - 02 no-goal-dir -> rc4 (rc=4)
+  ok   - 10 metric FAIL -> rc2 (rc=2)
+  ok   - 10 reason open-FAIL w/ gate rerun
+  ok   - 16 prose->judged GO -> rc0 (rc=0)
+  ok   - 23a exit flip after stamp -> rc2 (rc=2)
+  ok   - 23a reason contract-tampered
+  ok   - 23b exit line smuggled -> rc2 (rc=2)
+  ok   - 23b reason contract-tampered
+  ok   - 36 hook claimed+NO-GO blocks (rc2) (rc=2)
+  ok   - 36 block reason carries GOAL_LOOP_GATE prefix
+  ok   - 36 gate reason preserved in block message
+  ok   - 45 single-run baseline refused rc2 (rc=2)
+  ok   - 55b probe-ok GO (rc=0)
+  ok   - 65a crew invented recovery rc1 (rc=1)
+  ok   - 65a rejected at schema gate
+  ok   - 65e crew recovery suffix clean (rc=0)
+  ok   - 65e clean
+  ok   - 73 max_iterations bound
+  ok   - 73 check_timeout bound
+  ok   - 73 wallclock bound
+  ok   - 73 deadline seeded
+  ok   - 78 metric regex extracts through ANSI
+  ok   - 78b regex miss -> BROKEN named
+  ok   - 86 verify unknown id -> rc4 (rc=4)
+  ok   - 86 unknown id named
+  ok   - 88 negative score extracted with sign
+  ok   - 88 negative band holds -> GO (rc=0)
+  ok   - 97 A8 warns (stdout)
+  ok   - 97 no stderr noise for missing scores.rec
+  ok   - 101e calib literal inside check -> stamps clean (rc=0)
+  ok   - 101e gate must not invent calibration
+  ok   - 99d empty project digest rc0 (rc=0)
+  ok   - 99d empty digest well-formed
+  ok   - 107a unstamped => step 1
+  ok   - 107b stamped, no work => step 2
+  ok   - 107c work unclaimed => step 3
+  ok   - 107d claimed => step 4
+  ok   - 109f audit clean w/ strategy (rc=0)
+  ok   - 109f audit says clean
+  ok   - 110d negative slope format
+  ok   - 110d negative maximize is pruned
+  ok   - 111a healthy loop prints no efficiency block
+  ok   - 115c NEXT routes fix-AC
+  ok   - 115c NEXT sentence present
+  ok   - 117c rc75 -> deferred rc2 (rc=2)
+  ok   - 117c deferred routing
+  ok   - 117c wait hint
+  ok   - 120a legacy rows parse, claim GO (rc=0)
+  ok   - 120b status survives mixed-field ledger
+  ok   - 123c invented suffix fails A1/A3 (rc=1)
+  ok   - 123c rejected at schema/vocab gate
+  ok   - 126c exploit-only pick
+  ok   - 128b deadline not rebased
+  ok   - 128b deadline still 1
+  ok   - 131b builtin check still GO (rc=0)
+  ok   - 133a pre-reg seeded at stamp
+  ok   - 133a has kill lines
+  ok   - 133a has strategy slot
+  ok   - 133e NEXT forces close-iteration
+  ok   - 133e not soft-claim NEXT
+  ok   - 134f claim with ghost file refused (rc=4)
+  ok   - 134f names missing-claimed-file
+  ok   - 136a entry gain belongs to B
+  ok   - 136a entry measured as one delta
+  ok   - 136b no unsupported last-label preference
+  ok   - 136c missing measurement breaks attribution
+  ok   - 136d latest A supersedes historical exploit
+  ok   - 136d pick disjoint
+  ok   - 136e retry with new evidence clears old prune
+  ok   - 136f oscillation is not a dry plateau
+  ok   - 136g regression avoids strategy
+  ok   - 136h negative minimize entry gain
+  ok   - 136i orphan ignored for eval-gap
+  ok   - 136j ledger gap cannot earn exploit
+  ok   - 136k spread declaration suppresses false confidence
+  ok   - 136k missing spread identified
+== results: pass=76 fail=0 ==
+  ok   - 03 threshold GO deterministic (rc=0)
+  ok   - 03 GO line says mode=threshold
+  ok   - 15 budget-fuse -> rc3 (rc=3)
+  ok   - 15 reason budget-fuse
+  ok   - 22 state seeds dry_streak
+  ok   - 22 state seeds dry_limit
+  ok   - 22 state seeds check_timeout
+  ok   - 30 close preserves time_budget
+  ok   - 30 close preserves deadline
+  ok   - 37 hook unclaimed allows stop (rc=0)
+  ok   - 46 status prints iteration line
+  ok   - 46 status prints last block
+  ok   - 46 status prints next task
+  ok   - 58 strategy_delta single line
+  ok   - 58 loop-log block intact
+  ok   - 60 status best_score
+  ok   - 71 minimize divergence -> rc2 (rc=2)
+  ok   - 71 DIVERGENCE token
+  ok   - 71 dir named
+  ok   - 83 catch1 auto-counted
+  ok   - 83 catch2 auto-counted
+  ok   - 83 third claim frozen -> rc3 (rc=3)
+  ok   - 83 state holds count
+  ok   - 90 manual flag noted not double-counted
+  ok   - 90 fc counted exactly 1
+  ok   - 98a pruned dir change invisible
+  ok   - 98b real source change still detected
+  ok   - 98c digest deterministic
+  ok   - 99a .goalignore prunes named dir
+  ok   - 99b GOAL_PRUNE override deterministic
+  ok   - 99c GOAL_PRUNE drops src from watch
+  ok   - 108a claim with illegal task id -> rc2 (rc=2)
+  ok   - 108a names bad-task
+  ok   - 108a hint routes the fix
+  ok   - 108b bare legacy id still claims (rc=0)
+  ok   - 108b legacy NOTE emitted
+  ok   - 115a status rc0 (rc=0)
+  ok   - 115a iteration line intact
+  ok   - 115a last block intact
+  ok   - 115a work-plan NEXT intact
+  ok   - 116a horizon-less objective -> rc2 (rc=2)
+  ok   - 116a refusal names horizon
+  ok   - 116b waived stamps -> rc0 (rc=0)
+  ok   - 116d waiver strip -> rc2 (rc=2)
+  ok   - 116d tamper named
+  ok   - 123b re-run suffix clean (rc=0)
+  ok   - 123b clean said
+  ok   - 126a rc0 (rc=0)
+  ok   - 126a STRATEGY-PICK prefer=B avoid=A
+  ok   - 126d NEXT carries pick
+  ok   - 126d NEXT hint intact
+  ok   - 130b stale receipt refuses claim (rc=2)
+  ok   - 130b still adversarial-missing
+  ok   - 132b empty raw still NO-GO (rc=2)
+  ok   - 132b raw-evidence-missing
+  ok   - 134a false-tick fails audit (rc=1)
+  ok   - 134a A10 named
+  ok   - 134a names missing path
+  ok   - 135c bad class refused (rc=4)
+  ok   - 135c names bad-fault-class
+  ok   - 135c illegal pair refused (rc=4)
+  ok   - 135c names bad-fault-outcome
+  ok   - 141 progress rejected without mutation
+  ok   - 141 exit-signal rejected without mutation
+  ok   - 141 false-complete rejected without mutation
+  ok   - 141 dry rejected without mutation
+  ok   - 141 checks-pass rejected without mutation
+  ok   - 141 checks-fail rejected without mutation
+  ok   - 141 checks-unverifiable rejected without mutation
+  ok   - 141 invalid task rejected before measurement
+  ok   - 146 watched directory content
+  ok   - 146 watched empty directory
+  ok   - 146 changing watched scope refuses claim (rc=2)
+  ok   - 146 scope change is contract tampering
+  ok   - 152 empty hash sensor refuses identity (rc=4)
+  ok   - 152 constant hash sensor refuses identity (rc=4)
+  ok   - 158 isolated Python digest succeeds (rc=0)
+  ok   - 158 ambient Python startup hook not executed
+== results: pass=78 fail=0 ==
+  ok   - 04 not-claimed -> rc2 (rc=2)
+  ok   - 11a check-broken rc127 -> rc2 (rc=2)
+  ok   - 11a reason check-broken
+  ok   - 17b --dry yes + fail -> rc4 (rc=4)
+  ok   - 17b refusal leaves no orphan loop-log block
+  ok   - 25 exit=3 vs rc1 -> rc2 (rc=2)
+  ok   - 25 reason open-FAIL w/ expect
+  ok   - 32 docs consistency (rc=0)
+  ok   - 34 hook no-goal allows stop (rc=0)
+  ok   - 39 hook rc4 fail-open allows stop (rc=0)
+  ok   - 53 maximize GO at score 7 (rc=0)
+  ok   - 53 GO line carries score
+  ok   - 53 best_score stored
+  ok   - 54 score-regressed -> rc2 (rc=2)
+  ok   - 54 reason score-regressed
+  ok   - 69 minimize classified deterministic
+  ok   - 69 not judged
+  ok   - 69 minimize GO at score 7 (rc=0)
+  ok   - 69 best_score stored
+  ok   - 70 score-regressed (minimize 7>5) -> rc2 (rc=2)
+  ok   - 70 reason score-regressed
+  ok   - 70 direction named
+  ok   - 79 noise-band holds -> GO (rc=0)
+  ok   - 80 below band -> rc2 (rc=2)
+  ok   - 80 regressed names tol
+  ok   - 93a no-progress alone refused (R10) (rc=4)
+  ok   - 93b no-progress+delta -> HALF_OPEN
+  ok   - 93c HALF_OPEN claim w/o strategy -> rc2 (rc=2)
+  ok   - 93c R10 duty named
+  ok   - 93d progress reset + claim GO (rc=0)
+  ok   - 93d breaker back CLOSED
+  ok   - 93e streak 3>2 -> OPEN
+  ok   - 93f claim at OPEN -> rc3 (rc=3)
+  ok   - 93f breaker-open named
+  ok   - 104a init seeds contract (rc=0)
+  ok   - 104a goal.md seeded from template
+  ok   - 104a re-init -> rc2 (rc=2)
+  ok   - 104a re-init points at R3
+  ok   - 104b unclaimed -> iterations-exhausted (rc=3)
+  ok   - 104b loops without API (dry-run plan line)
+  ok   - 104b fuse reason
+  ok   - 104c claim verified -> DELIVERED (rc=0)
+  ok   - 104c delivery line
+  ok   - 104d continue without contract -> rc4 (rc=4)
+  ok   - 110a rc0 (rc=0)
+  ok   - 110a missing point stays unmeasured
+  ok   - 110f two A windows + one B window
+  ok   - 110f window order follows file order
+  ok   - 115e garbage row skipped rc0 (rc=0)
+  ok   - 115e slope still computed
+  ok   - 116c judged+calib horizon stamps (rc=0)
+  ok   - 117d window cache: one query per window
+  ok   - 117e expired window re-queries
+  ok   - 124b missing expected refused (rc=2)
+  ok   - 124b names expected
+  ok   - 126e NEXT carries pick
+  ok   - 126e NEXT hint intact
+  ok   - 129a no evidence at n=1
+  ok   - 129a efficiency unmeasured
+  ok   - 132a claim without raw dump is NO-GO (rc=2)
+  ok   - 132a reason raw-evidence-missing
+  ok   - 132a GO with raw dump (rc=0)
+  ok   - 132c close auto-writes raw
+  ok   - 132c GO after auto raw + adv (rc=0)
+  ok   - 135a fault close ok (rc=0)
+  ok   - 135a names the fault
+  ok   - 135a ledger carries the derived suffix
+  ok   - 135a fault row written
+  ok   - 135a audit clean (rc=0)
+  ok   - 139 invalid receipt rejected (rc=4)
+  ok   - 139 reason names bad receipt
+  ok   - 139 refusal leaves all state unchanged
+  ok   - 144 explicitly watched Git-ignored artifact bound
+  ok   - 144 explicitly watched pruned artifact bound
+  ok   - 144 watched ignored artifact may claim GO (rc=0)
+  ok   - 144 ignored artifact change revokes GO (rc=2)
+  ok   - 144 ignored change names stale digest
+  ok   - 154 tracked deletion is digestible (rc=0)
+  ok   - 154 tracked deletion changes identity
+GATE: ERROR reason=unreadable-ledger
+  FAIL - 157 Git backend mismatch
+GATE: ERROR reason=unreadable-ledger
+  FAIL - 157 Git watched artifact mismatch
+== results: pass=79 fail=2 ==
+  ok   - 05 stale -> rc2 (rc=2)
+  ok   - 05 reason verdicts-stale
+  ok   - 13 forge not-dry -> rc2 (rc=2)
+  ok   - 13 reason not-dry
+  ok   - 14 forge GO -> rc0 (rc=0)
+  ok   - 14 GO line says mode=forge
+  ok   - 29 future deadline GO -> rc0 (rc=0)
+  ok   - 33 shellcheck skipped (not installed)
+  ok   - 40 stamp without baseline refused rc2 (rc=2)
+  ok   - 40 goal.md left unstamped
+  ok   - 41 stamp with baseline ok (rc=0)
+  ok   - 41 forge GO with baseline satisfied (rc=0)
+  ok   - 59 bad-score refused (rc=4)
+  ok   - 63 clean ledger rc0 (rc=0)
+  ok   - 63 clean said
+  ok   - 65 bad vocab+score+delta rc1 (rc=1)
+  ok   - 65 vocab
+  ok   - 65 score-format
+  ok   - 65 missing strategy_delta
+  ok   - 74 not-covered -> rc2 (rc=2)
+  ok   - 74 reason not-covered
+  ok   - 74 hint bind-seat
+  ok   - 75 status shows T1
+  ok   - 75 status shows T2
+  ok   - 75 status counts 2 open
+  ok   - 75 status drops ticked T1
+  ok   - 75 ticked item hidden
+  ok   - 84b artifact with spaces -> GO (rc=0)
+  ok   - 89 ledger-mutating check never ends GO (rc=4)
+  FAIL - 89b verify self-rewrite caught (want rc=2 got rc=4)
+  FAIL - 89b ledger mutation named
+  ok   - 100a calib declared, no grades -> rc2 (rc=2)
+  ok   - 100a reason calibration-missing
+  ok   - 100a hint routes the controller
+  ok   - 100b lenient seat -> rc2 (rc=2)
+  ok   - 100b names the bad fixture
+  ok   - 100c calibrated claim -> GO (rc=0)
+  ok   - 100e unbound grade -> rc2 (rc=2)
+  ok   - 100e reason good side
+  ok   - 100d stale grades voided -> rc2 (rc=2)
+  ok   - 100d stale calibration flagged
+  ok   - 109b default strategy none
+  ok   - 109e legacy block status rc0 (rc=0)
+  ok   - 109e attribution-unused fires
+  ok   - 110b unmeasured window
+  ok   - 110b numeric window still slopes
+  ok   - 110g flat prune
+  ok   - 111b forge stall fires
+  ok   - 115b step line intact
+  ok   - 115f golden STEP present
+  ok   - 115f golden NEXT present
+  ok   - 115f no v2.8 lines on legacy ledger
+  ok   - 117f window-without-external -> rc2 (rc=2)
+  ok   - 117f refusal names window/external
+  ok   - 121a deferred claim -> rc2 (rc=2)
+  ok   - 121a waits, not counted
+  ok   - 121a ratchet stayed at 0
+  ok   - 125e provider-fatal suffix accepted (rc=0)
+  ok   - 125e audit clean
+  ok   - 126f pick present while stalled
+  ok   - 126f2 gate GO untouched by pick work (rc=0)
+  ok   - 126f2 gate silent on pick
+  ok   - 131a check-script mutation refuses claim (rc=2)
+  ok   - 131a reason check-script-tampered
+  ok   - 134b range files= refused (rc=1)
+  ok   - 134b A10 or unverifiable
+  ok   - 135d unbacked suffix fails audit (rc=1)
+  ok   - 135d names A11
+  ok   - 138 documented fast lane reaches GO on first claim (rc=0)
+  ok   - 138 actual gate output
+  ok   - 138 no false complete from missing receipt
+  ok   - 145 unsafe path rejected: ../outside
+  ok   - 145 unsafe path rejected: /tmp/outside
+  ok   - 145 unsafe path rejected: .goal/state.rec
+  ok   - 145 unsafe path rejected: build/../outside
+  ok   - 145 symlink parent rejected (rc=2)
+  ok   - 145 watch decoy inside command ignored (rc=0)
+  ok   - 148 legacy claim requires rebind (rc=2)
+  ok   - 148 identifies legacy identity
+  ok   - 148 legacy seat still refuses new claim (rc=2)
+  ok   - 148 stale seat names migration
+  ok   - 148 migration does not count as false completion
+  ok   - 148 fresh judged evidence resumes GO (rc=0)
+  ok   - 148 successful rebind preserves ratchet
+GATE: ERROR reason=unreadable-ledger
+  FAIL - 155 accelerator/fallback mismatch
+GATE: ERROR reason=unreadable-ledger
+  FAIL - 155 backend mutation mismatch
+== results: pass=82 fail=4 ==
+  ok   - 06 judged open-FAIL -> rc2 (rc=2)
+  ok   - 11b non-numeric metric -> rc2 (rc=2)
+  ok   - 11b reason check-broken
+  ok   - 18 missing dry_streak -> rc4 (rc=4)
+  ok   - 26 carry-forward GO -> rc0 (rc=0)
+  ok   - 27 stale re-bind -> rc2 (rc=2)
+  ok   - 27 reason not-covered
+  ok   - 42 cmd mismatch rc2 (rc=2)
+  ok   - 42 reason baseline-cmd-mismatch
+  ok   - 55 probe-failed -> rc2 (rc=2)
+  ok   - 55 reason check-broken probe
+  ok   - 62 unmeasurable records ok rc0 (rc=0)
+  ok   - 62 warns unmeasurable
+  ok   - 62 score=none recorded
+  ok   - 76 expired wallclock green claim -> GO (rc=0)
+  ok   - 76 NOTE fuse
+  ok   - 76 still GO
+  ok   - 84 notes never block -> GO (rc=0)
+  ok   - 84 tautology suspect named
+  ok   - 87 alpha numeric-key -> rc4 (rc=4)
+  ok   - 87 offending key named
+  ok   - 95a regression -> rc2 (rc=2)
+  ok   - 95a hint restore-best
+  ok   - 95b tampered -> rc2 (rc=2)
+  ok   - 95b hint proposal-to-user
+  ok   - 102 dead fixture -> rc2 (rc=2)
+  ok   - 102 reason calibration-broken
+  ok   - 102 hint routes
+  ok   - 109a strategy written
+  ok   - 109d label trimmed
+  ok   - 109g strategy label does not excuse R10 (rc=4)
+  ok   - 110c no comparable pair
+  ok   - 110i negative slope shown
+  ok   - 110i beyond tight band is regression
+  ok   - 114a gate still GO with peer-note present (rc=0)
+  ok   - 114a tree digest blind to peer-notes
+  ok   - 114a rc stable across peer-note
+  ok   - 114c gate.md documents peer-notes
+  ok   - 114c crew.md documents peer-notes
+  ok   - 114c R6 never-WRITE clause intact
+  ok   - 114d docs consistency green (rc=0)
+  ok   - 114e patterns C3 for section 12
+  ok   - 117g floor FAIL beats DEFERRED (rc=2)
+  ok   - 117g in-tree FAIL surfaced not masked
+  ok   - 123a recovery suffix clean (rc=0)
+  ok   - 123a clean said
+  ok   - 124a multi-line AC stamp refused (rc=2)
+  ok   - 124a refusal names single-line
+  ok   - 124a left unstamped
+  ok   - 126g threshold without objective prints no pick
+  ok   - 129c bare T accepted (rc=0)
+  ok   - 129c ledger has crew:1
+  ok   - 129c teams marker refused (rc=4)
+  ok   - 129c names bad-task
+  ok   - 133d audit fails on zero-bookkeeping under clock (rc=1)
+  ok   - 133d A9 clock named
+  ok   - 134c clean when files exist (rc=0)
+  ok   - 134c no A10
+  ok   - 135g claim goes through (rc=0)
+  ok   - 135g gate GO
+  ok   - 143 judged Git candidate GO (rc=0)
+  ok   - 143 changed dirty file refuses prior verdict (rc=2)
+  ok   - 143 refusal identifies staleness
+  ok   - 147 newly created watched artifact changes digest
+  ok   - 151 malformed watch refused at stamp (rc=2)
+  ok   - 151 malformed watch named
+  ok   - 151 multiple watch fields accepted (rc=0)
+  ok   - 151 second watched path is bound
+  ok   - 151 sort failure refuses digest (rc=4)
+  ok   - 151 sha256sum failure refuses digest (rc=4)
+  ok   - 160 a numeric line from a failed command cannot deliver GO (rc=2)
+  ok   - 160 nonzero metric exit is broken
+  ok   - 160 malformed objective reading is refused (rc=2)
+  ok   - 160 malformed decimal is broken
+  ok   - 160 per-check timeout refuses partial numeric output (rc=2)
+  ok   - 160 timed out measurement is broken
+  ok   - 160 signed decimal and explicit expected nonzero still pass (rc=0)
+  ok   - 160 signed decimal is recorded in score grammar
+  ok   - 160 broken sensor stderr does not set a water mark
+== results: pass=79 fail=0 ==
+  ok   - 07 evidence-missing -> rc2 (rc=2)
+  ok   - 12 --verify mutated-tree -> rc2 (rc=2)
+  ok   - 12 reason check-mutated-tree
+  ok   - 19 dry_streak=2 after two dry rounds
+  ok   - 28 expired green claim -> GO (rc=0)
+  ok   - 28 NOTE fuse
+  ok   - 28 still GO
+  ok   - 38 hook rc3 state allows stop (rc=0)
+  ok   - 44 baseline-check not-forge ok (rc=0)
+  ok   - 44 threshold GO without baseline (rc=0)
+  ok   - 56 progress=no without strategy_delta refused (rc=4)
+  ok   - 56 error names strategy-delta
+  ok   - 56 strategy_delta recorded
+  ok   - 65c removed teams fallback token rc1 (rc=1)
+  ok   - 65c names fallback-vocabulary
+  ok   - 66 divergence refuses claim rc2 (rc=2)
+  ok   - 66 names DIVERGENCE
+  ok   - 67 no DIVERGENCE on same-direction
+  ok   - 67 no DIVERGENCE token
+  ok   - 68 A8 warn does not block rc0 (rc=0)
+  ok   - 68 A8 warns judge-score-unrecorded
+  ok   - 96a claim at dry=limit (3>=3) GO (rc=0)
+  ok   - 96a forge GO line
+  ok   - 96a dry_streak reached limit
+  ok   - 96b premature forge claim (dry 2<3) rc2 (rc=2)
+  ok   - 96b not-dry named
+  ok   - 96b counted by ratchet
+  ok   - 105a bare T1 normalizes to crew:1
+  ok   - 105b free-form task -> write refused (rc=4)
+  ok   - 105b names the task schema
+  ok   - 105c junk task kept out of ledger
+  ok   - 109c folded to one line
+  ok   - 109c no block shred
+  ok   - 109c gate still GO with folded label (rc=0)
+  ok   - 110h tol-band flat prune
+  ok   - 111c orphan row rc0 (rc=0)
+  ok   - 111c no pair from orphan rows
+  ok   - 115d empty-score status rc0 (rc=0)
+  ok   - 115d score-data none
+  ok   - 115g advisory order deterministic
+  ok   - 115g promote present too
+  ok   - 119a objective unlabeled wave refused (rc=4)
+  ok   - 119a names the strategy duty
+  ok   - 119b scores.rec carries the strategy column
+  ok   - 126b prune-only pick
+  ok   - 126h gradient documents STRATEGY-PICK
+  ok   - 126h crew briefs cite STRATEGY-PICK
+  ok   - 130a claim without adversarial is NO-GO (rc=2)
+  ok   - 130a reason adversarial-missing
+  ok   - 130a GO with bound adversarial receipt (rc=0)
+  ok   - 130a GO line
+  ok   - 133b first close without --score refused (rc=4)
+  ok   - 133b names missing-score
+  ok   - 133b first close with --score ok (rc=0)
+  ok   - 134d open item missing files allowed (rc=0)
+  ok   - 135e unbooked fault fails audit (rc=1)
+  ok   - 135e names A11
+  ok   - 140 dirty tracked bytes change digest
+  ok   - 140 untracked nested bytes change digest
+  ok   - 140 symlink target changes digest
+  ok   - 140 executable mode changes digest
+  ok   - 140 verify refuses dirty-file mutation (rc=2)
+  ok   - 140 names mutation
+  ok   - 140 Git candidate claims GO (rc=0)
+  ok   - 140 dirty edit stales prior claim (rc=2)
+  ok   - 140 stale claim named
+  ok   - 156 tracked entry under symlink parent refuses digest (rc=4)
+  ok   - 156 shell fallback refuses symlink parent (rc=4)
+  ok   - 161 inflated dry count without recorded rounds refuses GO (rc=2)
+  ok   - 161 missing executed coverage named
+== results: pass=70 fail=0 ==
+  ok   - 08 unverifiable-excessive -> rc2 (rc=2)
+  ok   - 20 --verify OK -> rc0 (rc=0)
+  ok   - 20 --verify skips judged
+  ok   - 20 --verify reruns deterministic
+  ok   - 21 --verify AC-1 only -> rc0 (rc=0)
+  ok   - 21 filtered run omitted AC-2
+  ok   - 35 hook claimed+GO allows stop (rc=0)
+  ok   - 43 abs stamp ok without baseline (rc=0)
+  ok   - 43 abs forge GO (rc=0)
+  ok   - 57 tampered objective -> rc2 (rc=2)
+  ok   - 57 reason contract-tampered
+  ok   - 65d provider-fatal suffix clean (rc=0)
+  ok   - 65d clean
+  ok   - 70b minimize GO at improved score 3 (rc=0)
+  ok   - 77 expired+fail -> BLOCKED rc3 (rc=3)
+  ok   - 77 BLOCKED fuse
+  ok   - 85 duplicate AC id -> rc2 (rc=2)
+  ok   - 85 duplicate named
+  ok   - 94 two same error_signature -> rc3 (rc=3)
+  ok   - 94 grind detector named
+  ok   - 94b none signatures never trip (rc=0)
+  ok   - 101a calib on non-judged AC -> stamp refused (rc=2)
+  ok   - 101a reason named
+  ok   - 101b missing bad fixture -> stamp refused (rc=2)
+  ok   - 101b names the fixture
+  ok   - 101c one-sided calib -> stamp refused (rc=2)
+  ok   - 101c needs both
+  ok   - 101d one ruler both ends -> stamp refused (rc=2)
+  ok   - 101d names the single-ruler problem
+  ok   - 110e minimize direction exploit
+  ok   - 112a eval-gap fires
+  ok   - 112a names goal-critic
+  ok   - 112b two points stay silent
+  ok   - 112c unstalled stays silent
+  ok   - 112d no objective stays silent
+  ok   - 112e tol-band flat fires
+  ok   - 117a external PASS -> GO (rc=0)
+  ok   - 117b external FAIL -> rc2 (rc=2)
+  ok   - 117b external fail named
+  ok   - 121b real FAIL still counted
+  ok   - 124c real FAIL counted
+  ok   - 124c2 contract-defect not counted
+  ok   - 124c2 ratchet stayed 0 on contract defect
+  ok   - 134e no soft claim NEXT
+  ok   - 134e routes close or degrade
+  ok   - 135f open item blocks the claim (rc=2)
+  ok   - 135f names open-items
+  ok   - 135f routes to close-open-item
+  ok   - 142 symlink target changes non-Git digest
+  ok   - 142 mode changes non-Git digest
+  ok   - 142 newline path remains content-bound
+  ok   - 142 option-like path remains content-bound
+  ok   - 149 finding cannot be replaced by note injection (rc=2)
+  ok   - 149 gate reports real finding
+  ok   - 149 receipt remains one record
+  ok   - 153 vanished untracked file refuses digest (rc=4)
+  ok   - 159 deadline mutation refuses verification (rc=2)
+  ok   - 159 deadline mutation names ledger guard
+  ok   - 159 clock mutation refuses verification (rc=2)
+  ok   - 159 clock mutation names ledger guard
+== results: pass=60 fail=0 ==
+== total: pass=597 fail=6 shards=8 ==

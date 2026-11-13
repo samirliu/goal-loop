@@ -1,0 +1,2 @@
+Error: Invalid MCP configuration:
+MCP config file not found: /private/tmp/goal-host-claude-followup-n5xxr_mu/Print exactly READY and stop.

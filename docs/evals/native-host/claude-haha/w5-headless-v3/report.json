@@ -1,0 +1,2320 @@
+{
+  "all_planned_positions_retained": true,
+  "backend": "claude",
+  "baseline_restored": true,
+  "batch_identities": [
+    "fce785a538a51c98c006a665c39f06466a46478f879ae82f538b856d6345c149"
+  ],
+  "boot_captured_at": {
+    "backend": "claude",
+    "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+    "epoch": 1794486822.926754,
+    "kind": "tool",
+    "monotonic": 1672397.583638208,
+    "session": "6c9ec416-e289-4973-9a2f-4a0285cc950f"
+  },
+  "cli_entrypoint_sha256": "1acd6aef485ab28117e7445b47110e4cfeccd9f94068d596f84b54d0a03dd7ce",
+  "client_source_hashes": {
+    "bin/claude-haha": "1acd6aef485ab28117e7445b47110e4cfeccd9f94068d596f84b54d0a03dd7ce",
+    "package.json": "5bf14cafadfbd8db91adeb2f7e36ecc00252ad228748fc5b50b03fed7ecdb696",
+    "preload.ts": "48d29857c7b744c79f169acdd077a53b910cff13844b34c3225b941be7151de7",
+    "src/QueryEngine.ts": "7df34a6a6d106927403d49e3405dfaf70da37cae5b644b658ebaf0b877988af6",
+    "src/bootstrap/state.ts": "fc7e797a2ccd5fd3edcadb52cde552f848ebf96e2385a48d223084ba5d6a26e9",
+    "src/cost-tracker.ts": "f202eef3702a02e0909f6a038a9ffa8e5736219dcdab60c489d00359d39ceee2",
+    "src/entrypoints/cli.tsx": "73af326dd7e7bd8def502ed6ba004d44c806dd9d6d2913d7acef014d17e9fdfc",
+    "src/skills/loadSkillsDir.ts": "d66e37fd2db4404b75330223831c5fd7f278afef58a92bc660fb86d002833744",
+    "src/tools/AgentTool/AgentTool.tsx": "322e8d097352d61d42bc2aa30b7e2509c3a9782d8d77434f960f7f650143401a",
+    "src/tools/AgentTool/agentToolUtils.ts": "e4d03cba78d0e6df66fb279206d3b6b1d0998dc7978727270b5aea45118f8f90",
+    "src/tools/AgentTool/constants.ts": "d2da1c4ab62404ccc09186704994fccb6559ecb0342563fee14adce8e4d51866",
+    "src/utils/messages/mappers.ts": "f52688a7d3c0c9b5825270ea4cf4de1e038e814aa6069eb9f62c3b9e5c8b1174",
+    "src/utils/modelCost.ts": "68ca4492fd5eb4d8f056c91ca9fe970274e2c724373f46271a5c3f1d5134532d",
+    "src/utils/plugins/loadPluginAgents.ts": "8e3a4de1fbaeb3a841f7b6b86592c8303ecc7b83e0590f64cb393b68381e28a0",
+    "src/utils/plugins/loadPluginCommands.ts": "019d56133c75b3e5ac967bbc7b45e0be10a679ae27887ae5fcd5d9e6e74936c2",
+    "src/utils/plugins/loadPluginHooks.ts": "85e228a2df7783ed982587f735b30ea9f2916e0d9e64c9ac4a95347ef92b8bfb",
+    "src/utils/plugins/schemas.ts": "ef9c84eadb613d3fc03d24ab519e0597405246ac1cac6725d5cbc9b1a23c0273",
+    "src/utils/tokens.ts": "0f229cdd7ed4fe117a67bebc4c79140d5e851b7fce381395e8c760940b287d90"
+  },
+  "cohort": "6c9ec416-e289-4973-9a2f-4a0285cc950f",
+  "condition_identity": {
+    "crew": [
+      "5cfa4cf14ab0f6fab3c7a93d1f810291391c2cd864063be8de91d91aa358e6e2"
+    ],
+    "fused": [
+      "6126be43340ca0d190c9aa49533f91356f75572129df79543808ea88c8b2759c"
+    ]
+  },
+  "deadline_epoch": 1794488616,
+  "deadline_extended": false,
+  "deadline_monotonic": 1674190.6611964374,
+  "draft_preregistration": "/tmp/goal-w5-headless-v3-prereg-20261112.md",
+  "driver_sha256": "aa6db26266ab956a5613a4e31c831b660e990df949e517f93d81ff7c41057a98",
+  "f5_ready": {
+    "evidence": "/Users/m/repo/goal-loop/docs/evals/native-host/claude-haha/f5-owner-guard/manifest.json",
+    "full_suites_all_green": true,
+    "full_suites_terminal": true,
+    "host_sha256": "6cd50115f5e0ac78e89b9287a2475026a6aa9a3db7a2245a4efe9e9d8c2eb060",
+    "linux": {
+      "docs": "0",
+      "forge": "0",
+      "parser": "0",
+      "python": "0",
+      "shell": "0",
+      "shellcheck": "0"
+    },
+    "macos": {
+      "docs": {
+        "command": [
+          "bash",
+          "tests/docs_consistency.sh"
+        ],
+        "returncode": 0,
+        "seconds": 0.5235130831133574
+      },
+      "forge": {
+        "command": [
+          "bash",
+          "companions/contract-forge/tests/run_fixtures.sh"
+        ],
+        "returncode": 0,
+        "seconds": 1.143548916094005
+      },
+      "parser": {
+        "command": [
+          "bash",
+          "tests/test_parse.sh"
+        ],
+        "returncode": 0,
+        "seconds": 0.3093224579934031
+      },
+      "python": {
+        "command": [
+          "/opt/homebrew/opt/python@3.14/bin/python3.14",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests",
+          "-p",
+          "test_*.py",
+          "-v"
+        ],
+        "returncode": 0,
+        "seconds": 632.7336739590392
+      },
+      "shell": {
+        "command": [
+          "bash",
+          "tests/run_tests.sh"
+        ],
+        "returncode": 0,
+        "seconds": 111.55913450010121
+      }
+    },
+    "matched_source_files": 139,
+    "owner_watch_sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+    "scope": "New v3 cohort only; old v1/v2 failed runs remain stopped",
+    "source_manifest": "/tmp/goal-p1-final-20261112-closed/source-manifest.json",
+    "source_manifest_sha256": "db9793740d657e25a1c95b62ce4c38e326ef3e7b6ed6a7100ef0675546b7ebcc",
+    "status": "ready"
+  },
+  "finished_epoch": 1794488229.6432772,
+  "goal_gate_go_claimed": false,
+  "money": null,
+  "old_backend_samples_pooled": false,
+  "order": [
+    "single-1",
+    "crew-1",
+    "crew-2",
+    "single-2",
+    "single-3",
+    "crew-3"
+  ],
+  "origin": {
+    "backend": "claude",
+    "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+    "epoch": 1794486822.8657348,
+    "kind": "tool",
+    "monotonic": 1672397.522619166,
+    "session": "6c9ec416-e289-4973-9a2f-4a0285cc950f"
+  },
+  "planner": {
+    "budget_fit": "yes",
+    "choice": "serial",
+    "condition": "5cfa4cf14ab0f6fab3c7a93d1f810291391c2cd864063be8de91d91aa358e6e2",
+    "crew_upper": 458.2238892498426,
+    "crew_worker_seconds_upper": 510.2923377091065,
+    "effective_dependencies": {
+      "T1": [],
+      "T2": []
+    },
+    "failures": 0,
+    "money": null,
+    "observations": 6,
+    "observer_transport": "python-api",
+    "pending": 0,
+    "reason": "startup-coordination-or-dependency-cost",
+    "serial_basis": "single-worker",
+    "serial_lower": 152.65992137487046,
+    "serial_worker_seconds_lower": 150.3640145829413,
+    "single_observations": 3,
+    "single_worker_lower": 152.65992137487046,
+    "tokens": null,
+    "uncertainty": "observed-range; not a confidence interval"
+  },
+  "planner_applicable": true,
+  "project": "/private/tmp/goal-w5-claude-auditlog-v3/project/work",
+  "requested_seconds": 1800,
+  "runtime": {
+    "client_package_version": "999.0.0-local",
+    "executable": "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "platform": "darwin",
+    "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]"
+  },
+  "samples": [
+    {
+      "actual_concurrency_observed": true,
+      "assistant_models": [
+        {
+          "message_id": "0744e529997ebb52127d56b654984280",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e52b87801bc333ccc28b75c87e44",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e52b87801bc333ccc28b75c87e44",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e52e46c915377db7a7189bb429ab",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e52e46c915377db7a7189bb429ab",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e531fe72442ffa85648133f27c2f",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e531fe72442ffa85648133f27c2f",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e531fe72442ffa85648133f27c2f",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5331de4586625a713fe35bbc60f",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5331de4586625a713fe35bbc60f",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5331de4586625a713fe35bbc60f",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e534c1e91d428303023a4748055a",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e534c1e91d428303023a4748055a",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e580dd9d4b78921151adb521d351",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e580dd9d4b78921151adb521d351",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5863e8e84c4dc395bc91fc65e23",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5863e8e84c4dc395bc91fc65e23",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5883a0119be4d95f40303545d1d",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5883a0119be4d95f40303545d1d",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e58ccb136aa51b9bcce92b19a19a",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e58e40125de8487153a21ef3374d",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5914d039ed8d3f5d2781a835223",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5914d039ed8d3f5d2781a835223",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e595198be54ac07f0ad807d83973",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5a1199b542cc264d084cf25bcdc",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5ab288d27331a8174b921033023",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5b22973725b78c644b5fe4bcc6b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5b22973725b78c644b5fe4bcc6b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfbffbf172dbb9bca1e4"
+        },
+        {
+          "message_id": "0744e5be229f06b56d97f04c78d53c2b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        }
+      ],
+      "batch_condition": "fce785a538a51c98c006a665c39f06466a46478f879ae82f538b856d6345c149",
+      "case": "single-1",
+      "cli_phase": "done",
+      "cli_reported_results": [
+        {
+          "duration_api_ms": 1857,
+          "duration_ms": 2074,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 128,
+              "contextWindow": 200000,
+              "costUSD": 0.075444,
+              "inputTokens": 15061,
+              "maxOutputTokens": 32000,
+              "outputTokens": 3,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 1,
+          "result_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+          "session_id": "f5e22e6c-5f12-46d8-b067-f1f606561ff9",
+          "subtype": "success",
+          "total_cost_usd": 0.075444,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 128,
+            "inference_geo": "",
+            "input_tokens": 15061,
+            "iterations": [],
+            "output_tokens": 3,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        },
+        {
+          "duration_api_ms": 144507,
+          "duration_ms": 148847,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 327870,
+              "contextWindow": 200000,
+              "costUSD": 0.92914,
+              "inputTokens": 35691,
+              "maxOutputTokens": 32000,
+              "outputTokens": 23470,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 2,
+          "result_sha256": "894981ff0205d540b0d3ce075782cc12e0d5fb559f98c625e2ffec22540120e8",
+          "session_id": "f5e22e6c-5f12-46d8-b067-f1f606561ff9",
+          "subtype": "success",
+          "total_cost_usd": 0.92914,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 31166,
+            "inference_geo": "",
+            "input_tokens": 2318,
+            "iterations": [],
+            "output_tokens": 771,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        }
+      ],
+      "cli_returncode": 0,
+      "cli_supervisor_pid": 76931,
+      "condition": "6126be43340ca0d190c9aa49533f91356f75572129df79543808ea88c8b2759c",
+      "dispatch_protocol_ok": true,
+      "elapsed": 152.65992137487046,
+      "error": null,
+      "latest_cli_reported_total_cost_usd": 0.92914,
+      "lifecycle_point_unknown_is_not_worker_failure": true,
+      "mode": "fused",
+      "money": null,
+      "native_phases": [
+        "returned"
+      ],
+      "protocol_ok": true,
+      "quality": true,
+      "ready_interval_overlap_seconds": null,
+      "round_started": {
+        "epoch": 1794486823.363976,
+        "monotonic": 1672398.020860041
+      },
+      "round_wall": 152.67661058390513,
+      "session": "f5e22e6c-5f12-46d8-b067-f1f606561ff9",
+      "session_end_receipt_present": true,
+      "stage_seconds": {
+        "conflict": 0.0,
+        "coordination": 8.857577208196744,
+        "join": 143.3779604160227,
+        "recovery": 0.0,
+        "revalidation": 0.24594733398407698
+      },
+      "status": "sealed",
+      "task_result_metadata": [
+        {
+          "metadata": {
+            "agentId": "a59874220c21452c4",
+            "agentType": "goal-loop-host:goal-worker",
+            "status": "completed",
+            "totalDurationMs": 143267,
+            "totalTokens": 32994,
+            "totalToolUseCount": 25,
+            "usage": {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 0,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 31744,
+              "inference_geo": "",
+              "input_tokens": 424,
+              "iterations": [],
+              "output_tokens": 826,
+              "server_tool_use": {
+                "web_fetch_requests": 0,
+                "web_search_requests": 0
+              },
+              "service_tier": "standard",
+              "speed": "standard"
+            }
+          },
+          "tool_use_ids": [
+            "call_01a1cfbffbf172dbb9bca1e4"
+          ]
+        }
+      ],
+      "timely": true,
+      "tokens": null,
+      "validations": {
+        "T1": 0
+      },
+      "wave": "dab97a90ce1942699aaebe7a94636abe",
+      "worker_seconds": 150.3640145829413
+    },
+    {
+      "actual_concurrency_observed": true,
+      "assistant_models": [
+        {
+          "message_id": "0744e5c12fee632da137860204124e48",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e5c3e29b9c6007ecba8427bada3b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e5c3e29b9c6007ecba8427bada3b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e5c3e29b9c6007ecba8427bada3b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e5c99c268af8b52f9f129df4fbd3",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5c965e905435f4523af4a781f02",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5c99c268af8b52f9f129df4fbd3",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5cb4d331e7cc1cccf177f58eeb0",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5cb4d331e7cc1cccf177f58eeb0",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5cb569f4a560fa5784e6687e55a",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5ce1300eb9019a72051f63fa543",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5cdec82309a8f56f658e1a1a03b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5ce1300eb9019a72051f63fa543",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5cfaee8f86857dea2acd257080b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5cfc076b73ef6827af857926030",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5cfc076b73ef6827af857926030",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5cfc076b73ef6827af857926030",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5cfc076b73ef6827af857926030",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5d138385310bf58e462b884ad31",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5d138385310bf58e462b884ad31",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5d138385310bf58e462b884ad31",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5d3e64de82dbc5226b867122096",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5e3f320f57ea212d18efe57abca",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5d2687ea324193c816a54dff603",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5e53be296e4232718e3c717a1d7",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc255f57703943c24c6"
+        },
+        {
+          "message_id": "0744e5eb39c0890b85ca11dd5c39c5f6",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e5eb39c0890b85ca11dd5c39c5f6",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e63727a0d5a1a196cd8ed1ad89a5",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e6398fccf637e62ba045d9b10797",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e6398fccf637e62ba045d9b10797",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e6413840e1fba6b34d59197acc7d",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e6451be2742ac69b637ff0f94b89",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e649fc9370a7aef2b4056b38dfd1",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e656aa0cd77334a576bda60c85c3",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e65f40a4a8f2bf13b476904ed23f",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e66b95369e87cab68cb1003eebc0",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e66dcbf80bc176ffaa2d36a31f8d",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e678a9835c7df3acbe9124556672",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e6842d012d9d969451f626372725",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e6842d012d9d969451f626372725",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e688ce4c248a8dbe65670e1c14f7",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e688ce4c248a8dbe65670e1c14f7",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e68d0623d96fc35dd99ec66426b1",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e6979886892e1982bf11773ad182",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc24cdc77c28b26ec0f"
+        },
+        {
+          "message_id": "0744e6a0cadc3752c8e61791818accb2",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        }
+      ],
+      "batch_condition": "fce785a538a51c98c006a665c39f06466a46478f879ae82f538b856d6345c149",
+      "case": "crew-1",
+      "cli_phase": "done",
+      "cli_reported_results": [
+        {
+          "duration_api_ms": 1474,
+          "duration_ms": 1688,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 197,
+              "contextWindow": 200000,
+              "costUSD": 0.0751335,
+              "inputTokens": 14992,
+              "maxOutputTokens": 32000,
+              "outputTokens": 3,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 1,
+          "result_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+          "session_id": "6af9d5ca-c450-47b1-a680-76b293a7aa80",
+          "subtype": "success",
+          "total_cost_usd": 0.0751335,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 197,
+            "inference_geo": "",
+            "input_tokens": 14992,
+            "iterations": [],
+            "output_tokens": 3,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        },
+        {
+          "duration_api_ms": 255629,
+          "duration_ms": 222122,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 625858,
+              "contextWindow": 200000,
+              "costUSD": 1.6509340000000003,
+              "inputTokens": 74451,
+              "maxOutputTokens": 32000,
+              "outputTokens": 38630,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 3,
+          "result_sha256": "894981ff0205d540b0d3ce075782cc12e0d5fb559f98c625e2ffec22540120e8",
+          "session_id": "6af9d5ca-c450-47b1-a680-76b293a7aa80",
+          "subtype": "success",
+          "total_cost_usd": 1.6509340000000003,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 31909,
+            "inference_geo": "",
+            "input_tokens": 4497,
+            "iterations": [],
+            "output_tokens": 1541,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        }
+      ],
+      "cli_returncode": 0,
+      "cli_supervisor_pid": 78221,
+      "condition": "5cfa4cf14ab0f6fab3c7a93d1f810291391c2cd864063be8de91d91aa358e6e2",
+      "dispatch_protocol_ok": true,
+      "elapsed": 225.23737808293663,
+      "error": null,
+      "latest_cli_reported_total_cost_usd": 1.6509340000000003,
+      "lifecycle_point_unknown_is_not_worker_failure": true,
+      "mode": "crew",
+      "money": null,
+      "native_phases": [
+        "returned",
+        "returned"
+      ],
+      "protocol_ok": true,
+      "quality": true,
+      "ready_interval_overlap_seconds": 40.9059819157701,
+      "round_started": {
+        "epoch": 1794486976.0493708,
+        "monotonic": 1672550.706427958
+      },
+      "round_wall": 225.25370883289725,
+      "session": "6af9d5ca-c450-47b1-a680-76b293a7aa80",
+      "session_end_receipt_present": true,
+      "stage_seconds": {
+        "conflict": 0.0,
+        "coordination": 10.708499499829486,
+        "join": 214.06668920908123,
+        "recovery": 0.0,
+        "revalidation": 0.2553116250783205
+      },
+      "status": "sealed",
+      "task_result_metadata": [
+        {
+          "metadata": {
+            "agentId": "a957a52693116677d",
+            "agentType": "goal-loop-host:goal-worker",
+            "status": "completed",
+            "totalDurationMs": 42759,
+            "totalTokens": 14462,
+            "totalToolUseCount": 11,
+            "usage": {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 0,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 12508,
+              "inference_geo": "",
+              "input_tokens": 1255,
+              "iterations": [],
+              "output_tokens": 699,
+              "server_tool_use": {
+                "web_fetch_requests": 0,
+                "web_search_requests": 0
+              },
+              "service_tier": "standard",
+              "speed": "standard"
+            }
+          },
+          "tool_use_ids": [
+            "call_01a1cfc255f57703943c24c6"
+          ]
+        },
+        {
+          "metadata": {
+            "agentId": "a4902cb926283f502",
+            "agentType": "goal-loop-host:goal-worker",
+            "status": "completed",
+            "totalDurationMs": 214417,
+            "totalTokens": 42445,
+            "totalToolUseCount": 29,
+            "usage": {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 0,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 41408,
+              "inference_geo": "",
+              "input_tokens": 147,
+              "iterations": [],
+              "output_tokens": 890,
+              "server_tool_use": {
+                "web_fetch_requests": 0,
+                "web_search_requests": 0
+              },
+              "service_tier": "standard",
+              "speed": "standard"
+            }
+          },
+          "tool_use_ids": [
+            "call_01a1cfc24cdc77c28b26ec0f"
+          ]
+        }
+      ],
+      "timely": true,
+      "tokens": null,
+      "validations": {
+        "T1": 0,
+        "T2": 0
+      },
+      "wave": "4223868665804f0095e5452397297680",
+      "worker_seconds": 275.23410670785233
+    },
+    {
+      "actual_concurrency_observed": true,
+      "assistant_models": [
+        {
+          "message_id": "0744e6a23c6f894e3e6614974165549c",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e6a4007dc1a23d55cc422f49ced5",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e6a4007dc1a23d55cc422f49ced5",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e6a4007dc1a23d55cc422f49ced5",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e6a90bbf4b077da82a929cd3a6ca",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e6abcad318cbd25180ffab5df108",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e6abcad318cbd25180ffab5df108",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e6ad112e4ae9f8e8190e507360a0",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e6ad112e4ae9f8e8190e507360a0",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e6af79ccd8e47a4ce2293b18d275",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e6a986ef56aa47970d1eeb7248c2",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5c3a2710c9f5a98eb"
+        },
+        {
+          "message_id": "0744e6b1801a4584b8ff232ffe06367e",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5c3a2710c9f5a98eb"
+        },
+        {
+          "message_id": "0744e6b1801a4584b8ff232ffe06367e",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5c3a2710c9f5a98eb"
+        },
+        {
+          "message_id": "0744e6b5c1629799fc705cf0de4ed5ff",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5c3a2710c9f5a98eb"
+        },
+        {
+          "message_id": "0744e6b5c1629799fc705cf0de4ed5ff",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5c3a2710c9f5a98eb"
+        },
+        {
+          "message_id": "0744e6b5c1629799fc705cf0de4ed5ff",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5c3a2710c9f5a98eb"
+        },
+        {
+          "message_id": "0744e6b5c1629799fc705cf0de4ed5ff",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5c3a2710c9f5a98eb"
+        },
+        {
+          "message_id": "0744e6b18c998c396cb5502da8584658",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e6b9648c45ba08a14b1d5bb3ac23",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5c3a2710c9f5a98eb"
+        },
+        {
+          "message_id": "0744e6c6d4e9a3c84b85747f7f0ebb93",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5c3a2710c9f5a98eb"
+        },
+        {
+          "message_id": "0744e6c2b4c5dd0a0d67b85f9cda4238",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e6c2b4c5dd0a0d67b85f9cda4238",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e77175348b0f86e5add2562e6309",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e77175348b0f86e5add2562e6309",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e77175348b0f86e5add2562e6309",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e77301c4f0793ede8ca3cfd855a4",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e7776ca9d3f8b1e58aa3603da2ce",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e77beb7199ede4e1bed9db926ecd",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e781c9166d5690c37adb0d966a13",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e7851fd13b59c7353d1bb7b8e2a1",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e78e83eb103e184c227f9b961265",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e79b7b5cac3464455170034beed4",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e7b3992192b63b28b0971b79a2fa",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e7b58a2cffbeaa227ab915900343",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e7b8b09058012cd7025a8efe6f06",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e7bce683af0ba416e1f33b46c31b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e7d07b78ad5b484d0de800c181ef",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e7d6fcae124ad11b4aac02d19a0f",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e7fb2883e2494a4b5f565b192b19",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e80dd24d61f7d59d351cf70a4770",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e82707efdf50c9746cf4db1125eb",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e82f73c4963d906e98108643aa25",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e8348a9d6001b78b869be4f8949d",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e835dbbccbca3d502144f02aa816",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e841c7464127eaf6392b212da5df",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e847f5ba730e9e3a31ccc6b63fdb",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e84f63e6bf221f5b5d8454eb6fbc",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e853f0d57aa3f7e6e1649ea70806",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e858728c022c13473f363c4347bc",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e85b6cf8192f413d8c255b5509eb",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfc5bbe07646bf6745cb"
+        },
+        {
+          "message_id": "0744e869eafa36098e88c51198d59416",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        }
+      ],
+      "batch_condition": "fce785a538a51c98c006a665c39f06466a46478f879ae82f538b856d6345c149",
+      "case": "crew-2",
+      "cli_phase": "done",
+      "cli_reported_results": [
+        {
+          "duration_api_ms": 1392,
+          "duration_ms": 1617,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 128,
+              "contextWindow": 200000,
+              "costUSD": 0.075444,
+              "inputTokens": 15061,
+              "maxOutputTokens": 32000,
+              "outputTokens": 3,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 1,
+          "result_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+          "session_id": "3bcf1c39-eac8-43a1-812b-090aaa86d1ee",
+          "subtype": "success",
+          "total_cost_usd": 0.075444,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 128,
+            "inference_geo": "",
+            "input_tokens": 15061,
+            "iterations": [],
+            "output_tokens": 3,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        },
+        {
+          "duration_api_ms": 490807,
+          "duration_ms": 455154,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 1584280,
+              "contextWindow": 200000,
+              "costUSD": 3.027629999999999,
+              "inputTokens": 106188,
+              "maxOutputTokens": 32000,
+              "outputTokens": 68182,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 3,
+          "result_sha256": "894981ff0205d540b0d3ce075782cc12e0d5fb559f98c625e2ffec22540120e8",
+          "session_id": "3bcf1c39-eac8-43a1-812b-090aaa86d1ee",
+          "subtype": "success",
+          "total_cost_usd": 3.027629999999999,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 31894,
+            "inference_geo": "",
+            "input_tokens": 4439,
+            "iterations": [],
+            "output_tokens": 1527,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        }
+      ],
+      "cli_returncode": 0,
+      "cli_supervisor_pid": 81344,
+      "condition": "5cfa4cf14ab0f6fab3c7a93d1f810291391c2cd864063be8de91d91aa358e6e2",
+      "dispatch_protocol_ok": true,
+      "elapsed": 458.2238892498426,
+      "error": null,
+      "latest_cli_reported_total_cost_usd": 3.027629999999999,
+      "lifecycle_point_unknown_is_not_worker_failure": true,
+      "mode": "crew",
+      "money": null,
+      "native_phases": [
+        "returned",
+        "returned"
+      ],
+      "protocol_ok": true,
+      "quality": true,
+      "ready_interval_overlap_seconds": 38.35538541711867,
+      "round_started": {
+        "epoch": 1794487201.310522,
+        "monotonic": 1672775.969053958
+      },
+      "round_wall": 458.2410399999935,
+      "session": "3bcf1c39-eac8-43a1-812b-090aaa86d1ee",
+      "session_end_receipt_present": true,
+      "stage_seconds": {
+        "conflict": 0.0,
+        "coordination": 15.730435125064105,
+        "join": 441.9931329579558,
+        "recovery": 0.0,
+        "revalidation": 0.2642051668372005
+      },
+      "status": "sealed",
+      "task_result_metadata": [
+        {
+          "metadata": {
+            "agentId": "a99b6f8942adab377",
+            "agentType": "goal-loop-host:goal-worker",
+            "status": "completed",
+            "totalDurationMs": 46422,
+            "totalTokens": 12162,
+            "totalToolUseCount": 9,
+            "usage": {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 0,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 11008,
+              "inference_geo": "",
+              "input_tokens": 117,
+              "iterations": [],
+              "output_tokens": 1037,
+              "server_tool_use": {
+                "web_fetch_requests": 0,
+                "web_search_requests": 0
+              },
+              "service_tier": "standard",
+              "speed": "standard"
+            }
+          },
+          "tool_use_ids": [
+            "call_01a1cfc5c3a2710c9f5a98eb"
+          ]
+        },
+        {
+          "metadata": {
+            "agentId": "a6cabbd595c02ffbc",
+            "agentType": "goal-loop-host:goal-worker",
+            "status": "completed",
+            "totalDurationMs": 448203,
+            "totalTokens": 77092,
+            "totalToolUseCount": 37,
+            "usage": {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 0,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 74955,
+              "inference_geo": "",
+              "input_tokens": 1132,
+              "iterations": [],
+              "output_tokens": 1005,
+              "server_tool_use": {
+                "web_fetch_requests": 0,
+                "web_search_requests": 0
+              },
+              "service_tier": "standard",
+              "speed": "standard"
+            }
+          },
+          "tool_use_ids": [
+            "call_01a1cfc5bbe07646bf6745cb"
+          ]
+        }
+      ],
+      "timely": true,
+      "tokens": null,
+      "validations": {
+        "T1": 0,
+        "T2": 0
+      },
+      "wave": "e30f8853db3a41ebb78f96eb97b0272b",
+      "worker_seconds": 510.2923377091065
+    },
+    {
+      "actual_concurrency_observed": true,
+      "assistant_models": [
+        {
+          "message_id": "0744e86d8d9c9644b3a6d7cdbd1f77fd",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e86e7fcdbeca494103c10ee7f458",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e86e7fcdbeca494103c10ee7f458",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e871574a0de0c250ab2fbf51f81c",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e874af7e55157ac31d126952e2e9",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e874af7e55157ac31d126952e2e9",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e876ce150a09a84924d6930db3b0",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e876ce150a09a84924d6930db3b0",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e876ce150a09a84924d6930db3b0",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e87e8406d6adaf2ac2ea082e0f66",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e87e8406d6adaf2ac2ea082e0f66",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e880a8093d26036cf2e65ecd316a",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e880a8093d26036cf2e65ecd316a",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e8fa4a8da2fc62863ae84bf9c788",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e8fa4a8da2fc62863ae84bf9c788",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e90c43a8ed707377d188257c3aa6",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e90e7008f72f832cfc28fffd6a1b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e91b2bf6af52037aabb956d214c5",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e928c3cf7dc1feeffe3ce8453d3b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e92e55f8a2a8a014b581dc8d7660",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e93176907c22c91193f36da049b3",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfccb9dc70a49d25ff89"
+        },
+        {
+          "message_id": "0744e93bd8e2f04aab9c463ad197cc7e",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        }
+      ],
+      "batch_condition": "fce785a538a51c98c006a665c39f06466a46478f879ae82f538b856d6345c149",
+      "case": "single-2",
+      "cli_phase": "done",
+      "cli_reported_results": [
+        {
+          "duration_api_ms": 1236,
+          "duration_ms": 1472,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 197,
+              "contextWindow": 200000,
+              "costUSD": 0.0751335,
+              "inputTokens": 14992,
+              "maxOutputTokens": 32000,
+              "outputTokens": 3,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 1,
+          "result_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+          "session_id": "a72f1805-79ec-4ee0-ada3-6d5ccb2d8c5d",
+          "subtype": "success",
+          "total_cost_usd": 0.0751335,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 197,
+            "inference_geo": "",
+            "input_tokens": 14992,
+            "iterations": [],
+            "output_tokens": 3,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        },
+        {
+          "duration_api_ms": 202152,
+          "duration_ms": 205778,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 290608,
+              "contextWindow": 200000,
+              "costUSD": 0.8857740000000001,
+              "inputTokens": 27449,
+              "maxOutputTokens": 32000,
+              "outputTokens": 24129,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 2,
+          "result_sha256": "894981ff0205d540b0d3ce075782cc12e0d5fb559f98c625e2ffec22540120e8",
+          "session_id": "a72f1805-79ec-4ee0-ada3-6d5ccb2d8c5d",
+          "subtype": "success",
+          "total_cost_usd": 0.8857740000000001,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 31211,
+            "inference_geo": "",
+            "input_tokens": 2522,
+            "iterations": [],
+            "output_tokens": 810,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        }
+      ],
+      "cli_returncode": 0,
+      "cli_supervisor_pid": 87004,
+      "condition": "6126be43340ca0d190c9aa49533f91356f75572129df79543808ea88c8b2759c",
+      "dispatch_protocol_ok": true,
+      "elapsed": 208.92011870793067,
+      "error": null,
+      "latest_cli_reported_total_cost_usd": 0.8857740000000001,
+      "lifecycle_point_unknown_is_not_worker_failure": true,
+      "mode": "fused",
+      "money": null,
+      "native_phases": [
+        "returned"
+      ],
+      "protocol_ok": true,
+      "quality": true,
+      "ready_interval_overlap_seconds": null,
+      "round_started": {
+        "epoch": 1794487659.5649369,
+        "monotonic": 1673234.223995208
+      },
+      "round_wall": 208.93809449998662,
+      "session": "a72f1805-79ec-4ee0-ada3-6d5ccb2d8c5d",
+      "session_end_receipt_present": true,
+      "stage_seconds": {
+        "conflict": 0.0,
+        "coordination": 8.595857625128701,
+        "join": 199.86154800001532,
+        "recovery": 0.0,
+        "revalidation": 0.2685061669908464
+      },
+      "status": "sealed",
+      "task_result_metadata": [
+        {
+          "metadata": {
+            "agentId": "ab7b9d14a13d27a99",
+            "agentType": "goal-loop-host:goal-worker",
+            "status": "completed",
+            "totalDurationMs": 201780,
+            "totalTokens": 32626,
+            "totalToolUseCount": 18,
+            "usage": {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 0,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 31360,
+              "inference_geo": "",
+              "input_tokens": 404,
+              "iterations": [],
+              "output_tokens": 862,
+              "server_tool_use": {
+                "web_fetch_requests": 0,
+                "web_search_requests": 0
+              },
+              "service_tier": "standard",
+              "speed": "standard"
+            }
+          },
+          "tool_use_ids": [
+            "call_01a1cfccb9dc70a49d25ff89"
+          ]
+        }
+      ],
+      "timely": true,
+      "tokens": null,
+      "validations": {
+        "T1": 0
+      },
+      "wave": "7b6964fc765a43b69f93282442df3f8c",
+      "worker_seconds": 207.21643975004554
+    },
+    {
+      "actual_concurrency_observed": true,
+      "assistant_models": [
+        {
+          "message_id": "0744e93dc33d275b3b8d1cf6363c2c9c",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e93f52b2706a861a5d04d52e4f24",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e93f52b2706a861a5d04d52e4f24",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744e9471e8beba863e3965c306fa4eb",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e949b94a6170df0bfda7ba14e1ac",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e949b94a6170df0bfda7ba14e1ac",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e94cbfbc58fb8d7bbbcef4e4aed3",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e94e2e23c2f2011f340fcf0d7fcb",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e94e2e23c2f2011f340fcf0d7fcb",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e94f0c92de9c3233aa3f457895e1",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e957220cafa013e03a922709b234",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e957220cafa013e03a922709b234",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e957220cafa013e03a922709b234",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e957220cafa013e03a922709b234",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e95af02bcae10507d7adb7849e71",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e9b8448da68c78ff0374786f4469",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e9bca3cbfeee15e151f84ce5feeb",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e9c4284192f81226f38f6999c303",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e9c66ae1551293f9f28f7b7158a1",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744e9c80ae4fa3708496a7611a05c4a",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744ea004eb853ca3ffe03baa751d7a5",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744ea087a296a43dba7219a27f9d621",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744ea1e33cf3b3608a35ed26844a851",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744ea22e559e54d1cee9abf0ef0631a",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744ea246be718993902127919dd0aa6",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+        },
+        {
+          "message_id": "0744ea2e60e1f882035fc94bd64ee7b0",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        }
+      ],
+      "batch_condition": "fce785a538a51c98c006a665c39f06466a46478f879ae82f538b856d6345c149",
+      "case": "single-3",
+      "cli_phase": "done",
+      "cli_reported_results": [
+        {
+          "duration_api_ms": 1408,
+          "duration_ms": 1629,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 128,
+              "contextWindow": 200000,
+              "costUSD": 0.075444,
+              "inputTokens": 15061,
+              "maxOutputTokens": 32000,
+              "outputTokens": 3,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 1,
+          "result_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+          "session_id": "0beaf0a3-8c38-446b-96e5-b874c39bc0f9",
+          "subtype": "success",
+          "total_cost_usd": 0.075444,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 128,
+            "inference_geo": "",
+            "input_tokens": 15061,
+            "iterations": [],
+            "output_tokens": 3,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        },
+        {
+          "duration_api_ms": 235845,
+          "duration_ms": 240755,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 396331,
+              "contextWindow": 200000,
+              "costUSD": 1.1723305,
+              "inputTokens": 53553,
+              "maxOutputTokens": 32000,
+              "outputTokens": 28256,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 2,
+          "result_sha256": "894981ff0205d540b0d3ce075782cc12e0d5fb559f98c625e2ffec22540120e8",
+          "session_id": "0beaf0a3-8c38-446b-96e5-b874c39bc0f9",
+          "subtype": "success",
+          "total_cost_usd": 1.1723305,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 31872,
+            "inference_geo": "",
+            "input_tokens": 2020,
+            "iterations": [],
+            "output_tokens": 786,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        }
+      ],
+      "cli_returncode": 0,
+      "cli_supervisor_pid": 89610,
+      "condition": "6126be43340ca0d190c9aa49533f91356f75572129df79543808ea88c8b2759c",
+      "dispatch_protocol_ok": true,
+      "elapsed": 243.81659591710195,
+      "error": null,
+      "latest_cli_reported_total_cost_usd": 1.1723305,
+      "lifecycle_point_unknown_is_not_worker_failure": true,
+      "mode": "fused",
+      "money": null,
+      "native_phases": [
+        "returned"
+      ],
+      "protocol_ok": true,
+      "quality": true,
+      "ready_interval_overlap_seconds": null,
+      "round_started": {
+        "epoch": 1794487868.5109189,
+        "monotonic": 1673443.171831208
+      },
+      "round_wall": 243.83592866687104,
+      "session": "0beaf0a3-8c38-446b-96e5-b874c39bc0f9",
+      "session_end_receipt_present": true,
+      "stage_seconds": {
+        "conflict": 0.0,
+        "coordination": 12.595684334170073,
+        "join": 230.76048312499188,
+        "recovery": 0.0,
+        "revalidation": 0.2643909999169409
+      },
+      "status": "sealed",
+      "task_result_metadata": [
+        {
+          "metadata": {
+            "agentId": "a7a3c60a567da3100",
+            "agentType": "goal-loop-host:goal-worker",
+            "status": "completed",
+            "totalDurationMs": 231044,
+            "totalTokens": 37638,
+            "totalToolUseCount": 22,
+            "usage": {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 0,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 36231,
+              "inference_geo": "",
+              "input_tokens": 369,
+              "iterations": [],
+              "output_tokens": 1038,
+              "server_tool_use": {
+                "web_fetch_requests": 0,
+                "web_search_requests": 0
+              },
+              "service_tier": "standard",
+              "speed": "standard"
+            }
+          },
+          "tool_use_ids": [
+            "call-1b514e7a-a7f8-4fe0-b42d-3786a6aab328"
+          ]
+        }
+      ],
+      "timely": true,
+      "tokens": null,
+      "validations": {
+        "T1": 0
+      },
+      "wave": "90d664b382e54a7f92442ecabdd92731",
+      "worker_seconds": 242.03597491700202
+    },
+    {
+      "actual_concurrency_observed": true,
+      "assistant_models": [
+        {
+          "message_id": "0744ea31ac6ada273b31f4b3e69404df",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744ea33d4a12e0e468589f1543e0e00",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744ea33d4a12e0e468589f1543e0e00",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744ea33d4a12e0e468589f1543e0e00",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        },
+        {
+          "message_id": "0744ea38b64f9b1e5ba6ac9c3aa1d408",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3ab35750dba8656a9"
+        },
+        {
+          "message_id": "0744ea381a046c965f593a44087e5e23",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea3aa114377b74c1bf4f32e56804",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea3acfd29f4631572e4d8390a468",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3ab35750dba8656a9"
+        },
+        {
+          "message_id": "0744ea3aa114377b74c1bf4f32e56804",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea3c8d8ae502a1163b417ef81682",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3ab35750dba8656a9"
+        },
+        {
+          "message_id": "0744ea3c8d8ae502a1163b417ef81682",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3ab35750dba8656a9"
+        },
+        {
+          "message_id": "0744ea3de059e8cd2985416469034d24",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea3de059e8cd2985416469034d24",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea3eaee94b5dbbae0da071b5d6be",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3ab35750dba8656a9"
+        },
+        {
+          "message_id": "0744ea3eaee94b5dbbae0da071b5d6be",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3ab35750dba8656a9"
+        },
+        {
+          "message_id": "0744ea3eaee94b5dbbae0da071b5d6be",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3ab35750dba8656a9"
+        },
+        {
+          "message_id": "0744ea3ead956729f4f152cf4511f97b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea3ead956729f4f152cf4511f97b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea3ead956729f4f152cf4511f97b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea3ead956729f4f152cf4511f97b",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea4061e79dc6f5c7703a5b1416e6",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3ab35750dba8656a9"
+        },
+        {
+          "message_id": "0744ea5027ba5dd97bfe354a40c6d050",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3ab35750dba8656a9"
+        },
+        {
+          "message_id": "0744ea55faa607e3c14b258a1b7a7a0c",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3ab35750dba8656a9"
+        },
+        {
+          "message_id": "0744ea420aa6434b61434d1373e0403c",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea420aa6434b61434d1373e0403c",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea87d1cb7337bbceb77f01954dcb",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea8917b0793f846261c57a130ac2",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea8917b0793f846261c57a130ac2",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea927ebeab77ea1302a6ecb90e1e",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744ea9642895f698abeec5a7ca93985",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": "call_01a1cfd3a29a7614b47facdb"
+        },
+        {
+          "message_id": "0744eaa44c9a058c3b242c229ec0b74e",
+          "model": "MiniMax-M3.1-Flash",
+          "parent_tool_use_id": null
+        }
+      ],
+      "batch_condition": "fce785a538a51c98c006a665c39f06466a46478f879ae82f538b856d6345c149",
+      "case": "crew-3",
+      "cli_phase": "done",
+      "cli_reported_results": [
+        {
+          "duration_api_ms": 1371,
+          "duration_ms": 1586,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 128,
+              "contextWindow": 200000,
+              "costUSD": 0.075444,
+              "inputTokens": 15061,
+              "maxOutputTokens": 32000,
+              "outputTokens": 3,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 1,
+          "result_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+          "session_id": "02beb978-0b00-4eba-a88d-860256ab61c0",
+          "subtype": "success",
+          "total_cost_usd": 0.075444,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 128,
+            "inference_geo": "",
+            "input_tokens": 15061,
+            "iterations": [],
+            "output_tokens": 3,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        },
+        {
+          "duration_api_ms": 143968,
+          "duration_ms": 114191,
+          "is_error": false,
+          "modelUsage": {
+            "MiniMax-M3.1-Flash": {
+              "cacheCreationInputTokens": 0,
+              "cacheReadInputTokens": 235239,
+              "contextWindow": 200000,
+              "costUSD": 0.9946945,
+              "inputTokens": 58520,
+              "maxOutputTokens": 32000,
+              "outputTokens": 23379,
+              "webSearchRequests": 0
+            }
+          },
+          "num_turns": 3,
+          "result_sha256": "894981ff0205d540b0d3ce075782cc12e0d5fb559f98c625e2ffec22540120e8",
+          "session_id": "02beb978-0b00-4eba-a88d-860256ab61c0",
+          "subtype": "success",
+          "total_cost_usd": 0.9946945,
+          "type": "result",
+          "usage": {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 0,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 31925,
+            "inference_geo": "",
+            "input_tokens": 4500,
+            "iterations": [],
+            "output_tokens": 1558,
+            "server_tool_use": {
+              "web_fetch_requests": 0,
+              "web_search_requests": 0
+            },
+            "service_tier": "standard",
+            "speed": "standard"
+          }
+        }
+      ],
+      "cli_returncode": 0,
+      "cli_supervisor_pid": 92692,
+      "condition": "5cfa4cf14ab0f6fab3c7a93d1f810291391c2cd864063be8de91d91aa358e6e2",
+      "dispatch_protocol_ok": true,
+      "elapsed": 117.2485704999417,
+      "error": null,
+      "latest_cli_reported_total_cost_usd": 0.9946945,
+      "lifecycle_point_unknown_is_not_worker_failure": true,
+      "mode": "crew",
+      "money": null,
+      "native_phases": [
+        "returned",
+        "returned"
+      ],
+      "protocol_ok": true,
+      "quality": true,
+      "ready_interval_overlap_seconds": 32.93383354204707,
+      "round_started": {
+        "epoch": 1794488112.355538,
+        "monotonic": 1673687.016734208
+      },
+      "round_wall": 117.26723562506959,
+      "session": "02beb978-0b00-4eba-a88d-860256ab61c0",
+      "session_end_receipt_present": true,
+      "stage_seconds": {
+        "conflict": 0.0,
+        "coordination": 9.629400749923661,
+        "join": 107.133157416014,
+        "recovery": 0.0,
+        "revalidation": 0.27431687503121793
+      },
+      "status": "sealed",
+      "task_result_metadata": [
+        {
+          "metadata": {
+            "agentId": "a041a824c99cb7ff7",
+            "agentType": "goal-loop-host:goal-worker",
+            "status": "completed",
+            "totalDurationMs": 34591,
+            "totalTokens": 13984,
+            "totalToolUseCount": 10,
+            "usage": {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 0,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 13238,
+              "inference_geo": "",
+              "input_tokens": 155,
+              "iterations": [],
+              "output_tokens": 591,
+              "server_tool_use": {
+                "web_fetch_requests": 0,
+                "web_search_requests": 0
+              },
+              "service_tier": "standard",
+              "speed": "standard"
+            }
+          },
+          "tool_use_ids": [
+            "call_01a1cfd3ab35750dba8656a9"
+          ]
+        },
+        {
+          "metadata": {
+            "agentId": "a90d9782c32eb49d6",
+            "agentType": "goal-loop-host:goal-worker",
+            "status": "completed",
+            "totalDurationMs": 107199,
+            "totalTokens": 26879,
+            "totalToolUseCount": 16,
+            "usage": {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 0,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 0,
+              "cache_read_input_tokens": 24936,
+              "inference_geo": "",
+              "input_tokens": 955,
+              "iterations": [],
+              "output_tokens": 988,
+              "server_tool_use": {
+                "web_fetch_requests": 0,
+                "web_search_requests": 0
+              },
+              "service_tier": "standard",
+              "speed": "standard"
+            }
+          },
+          "tool_use_ids": [
+            "call_01a1cfd3a29a7614b47facdb"
+          ]
+        }
+      ],
+      "timely": true,
+      "tokens": null,
+      "validations": {
+        "T1": 0,
+        "T2": 0
+      },
+      "wave": "83c95bc030c34ff7a762c344d36eec14",
+      "worker_seconds": 158.27548850001767
+    }
+  ],
+  "source_hashes": {
+    ".claude-plugin/plugin.json": "e36378fbc9c44db142d171ceb4303e5614cef87f2ee030040a61dfeda7b98dde",
+    "SKILL.md": "ec03584de0cfbeb69dec7ee011178fb6b5126ac273b0f47a38f5ae40a1ceb840",
+    "agents/goal-adjudicator.md": "f7ede0b8f73573a4e6c416d1282fda5d8340226611b2c68c0603ba2b803d73f3",
+    "agents/goal-checker-req.md": "407a8d9d2e85261bfb09b2a0c2ee5d6864a4abb572b4adc25ffeab3cb7c7c73d",
+    "agents/goal-critic.md": "d3034a768937c08f2766bbcdccb2b276df669d950f0f143bca40188a378b5544",
+    "agents/goal-mech-worker.md": "cf95458067dee6950a6fc73d8641bd381519eaeafc1396c6c7e1da37f0ead7d6",
+    "agents/goal-worker.md": "93fc6d5de4e0b3c03d31c5e62b250b277017fe3ebdd3e18667203e1e5e7cfd06",
+    "examples/agent-evals/grade.py": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19",
+    "examples/agent-evals/tasks.py": "5441b4ad2aeab3558f31f26f4a0c117e10dfa3f439f86d3ad6aa29ece5416e38",
+    "examples/crew-cost/native.py": "622966f00364eb4a8a404cc6d5b20420cadd6cea7b98c1cc28fc6032f46ee039",
+    "examples/crew-cost/native_checks.py": "b72826bd3c9ccee97731943f97f5a96469f48dbc014e18f3adb56e2528e78f84",
+    "hooks/hooks.json": "9343223f6d4a673d7dfa84d38ee095702ef3ff652d07e558c325b4ce0e3da44f",
+    "references/companions.md": "f004518887cfd11d0e599bd3dc4f0ed8fc91ef73237ddc5aaa7f3906fd2c8fa3",
+    "references/crew.md": "5c776149323657ba9e215fac646fbc37490186e9cc6c75120951f6c3f6fa798a",
+    "references/gate.md": "934894c986d6c97e1d6360aa6e5e83c140ad442ab0562dd14ebb1033cf5f9f58",
+    "references/host.md": "aca33ff4a8c403f71e50282f3c8950de87c7bafd8a2cd835574b763f6a1dc179",
+    "references/packs/README.md": "4c0b959ea7644cccc65055d8b3b4471767a43b3ae58e6b47c24e2568819a04fd",
+    "references/packs/external.md": "25f77d3591b44f9c77a6213897659f3883acd55e0cfda71691cab46000c08d78",
+    "references/packs/gradient.md": "be89ba286423a5b1c1247ac2196876bd789a3b234705db8135518e9bd82c5ed9",
+    "references/packs/instrument.md": "9ba9e8591472c1d0afe30ad1dc1711e4d4d744f8beef47f36759e8a9f2b569c1",
+    "references/patterns.md": "2dfb30a03ea84b946c93d8c656ba05b212f81fd58695267323e73b1c8e65320d",
+    "scripts/goal_audit.sh": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb",
+    "scripts/goal_bounded.py": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c",
+    "scripts/goal_crew.py": "f0bf48438a6c2d4eecbc7a1be03c9d6b990da94a686dbde1e251c58a7c23bae9",
+    "scripts/goal_ctl.sh": "2bb2ad319b73da9ce8d9927a7e0c4f7e2ccc424ae4efdeee65ab70cd0c745a64",
+    "scripts/goal_evolve.py": "e6ff794567ce37409a8cd7cca0efc2efa93b35a0bf968b3d22411ccd908d0ae7",
+    "scripts/goal_forge.py": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb",
+    "scripts/goal_gate.sh": "4fbedbde2f524d69e3b3ca16e2f150a7aee7cf62b789e5a8abdbf8bb01cc6c8c",
+    "scripts/goal_hook.sh": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87",
+    "scripts/goal_host.py": "6cd50115f5e0ac78e89b9287a2475026a6aa9a3db7a2245a4efe9e9d8c2eb060",
+    "scripts/goal_host_command.py": "4331b9672bb9e3b658a2fe0320411da08721995126b71690ab535ebcbaa600e5",
+    "scripts/goal_host_config.py": "fcb9118c8ce1b9a940bfeed1cc289155f4366c301ff2acaa926cb5c0d494f1f5",
+    "scripts/goal_loop.sh": "d5481f38bdbba6ae781479979985b4d415acb6be688d5e227914f0458948f05a",
+    "scripts/goal_owner_watch.py": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+    "scripts/goal_parse.sh": "368fdcbb5838c8a8d64570f409b1ea713ec3ce24938825a8dc5f9f2ed1a85bdb",
+    "scripts/goal_runner.py": "09c14fe4f348bc768ee66605353df80267017caf494b046b37f0fb8716ff39aa",
+    "scripts/goal_store.py": "13d4250e70d406d030eace9d7c2b12c6fc0a0dd4cff11fcd536671ae4d0ee8f3",
+    "scripts/goal_strategy.awk": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+    "scripts/goal_trace.py": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb",
+    "scripts/goal_tree_digest.py": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d"
+  },
+  "status": "finished",
+  "suite_elapsed": 1406.781991166994,
+  "tokens": null,
+  "user_env_sha256": "57aed201addfefd3aa16fb68da38dd65b4e67e418574d49cb456dc47d3442ad8",
+  "version": 3
+}

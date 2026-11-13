@@ -1,0 +1,242 @@
+{
+  "version": 1,
+  "arm": "skill",
+  "family": "small",
+  "seed": 9137,
+  "terminal": "returned",
+  "returned_seconds": 290.5973342079669,
+  "independent_finished_seconds": 291.7149452078156,
+  "first_observed_public_pass": 205.2303442079574,
+  "quality": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "finite-union-0",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-1",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-2",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-3",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-4",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-5",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-6",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-7",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-8",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-9",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-10",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-11",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-12",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-13",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-14",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-15",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-16",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-17",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-18",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-19",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-20",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-21",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-22",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-23",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-24",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-25",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-26",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-27",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-28",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-29",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-30",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-31",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-32",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-33",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-34",
+        "pass_": true
+      },
+      {
+        "name": "finite-union-35",
+        "pass_": true
+      },
+      {
+        "name": "invalid-0",
+        "pass_": true
+      },
+      {
+        "name": "invalid-1",
+        "pass_": true
+      },
+      {
+        "name": "invalid-2",
+        "pass_": true
+      },
+      {
+        "name": "invalid-3",
+        "pass_": true
+      },
+      {
+        "name": "invalid-4",
+        "pass_": true
+      },
+      {
+        "name": "large-bounds",
+        "pass_": true
+      }
+    ],
+    "error": null,
+    "elapsed": 0.001480459002777934
+  },
+  "grader": {
+    "result": 0,
+    "stdout": "{\"ok\": true, \"checks\": [{\"name\": \"finite-union-0\", \"pass_\": true}, {\"name\": \"finite-union-1\", \"pass_\": true}, {\"name\": \"finite-union-2\", \"pass_\": true}, {\"name\": \"finite-union-3\", \"pass_\": true}, {\"name\": \"finite-union-4\", \"pass_\": true}, {\"name\": \"finite-union-5\", \"pass_\": true}, {\"name\": \"finite-union-6\", \"pass_\": true}, {\"name\": \"finite-union-7\", \"pass_\": true}, {\"name\": \"finite-union-8\", \"pass_\": true}, {\"name\": \"finite-union-9\", \"pass_\": true}, {\"name\": \"finite-union-10\", \"pass_\": true}, {\"name\": \"finite-union-11\", \"pass_\": true}, {\"name\": \"finite-union-12\", \"pass_\": true}, {\"name\": \"finite-union-13\", \"pass_\": true}, {\"name\": \"finite-union-14\", \"pass_\": true}, {\"name\": \"finite-union-15\", \"pass_\": true}, {\"name\": \"finite-union-16\", \"pass_\": true}, {\"name\": \"finite-union-17\", \"pass_\": true}, {\"name\": \"finite-union-18\", \"pass_\": true}, {\"name\": \"finite-union-19\", \"pass_\": true}, {\"name\": \"finite-union-20\", \"pass_\": true}, {\"name\": \"finite-union-21\", \"pass_\": true}, {\"name\": \"finite-union-22\", \"pass_\": true}, {\"name\": \"finite-union-23\", \"pass_\": true}, {\"name\": \"finite-union-24\", \"pass_\": true}, {\"name\": \"finite-union-25\", \"pass_\": true}, {\"name\": \"finite-union-26\", \"pass_\": true}, {\"name\": \"finite-union-27\", \"pass_\": true}, {\"name\": \"finite-union-28\", \"pass_\": true}, {\"name\": \"finite-union-29\", \"pass_\": true}, {\"name\": \"finite-union-30\", \"pass_\": true}, {\"name\": \"finite-union-31\", \"pass_\": true}, {\"name\": \"finite-union-32\", \"pass_\": true}, {\"name\": \"finite-union-33\", \"pass_\": true}, {\"name\": \"finite-union-34\", \"pass_\": true}, {\"name\": \"finite-union-35\", \"pass_\": true}, {\"name\": \"invalid-0\", \"pass_\": true}, {\"name\": \"invalid-1\", \"pass_\": true}, {\"name\": \"invalid-2\", \"pass_\": true}, {\"name\": \"invalid-3\", \"pass_\": true}, {\"name\": \"invalid-4\", \"pass_\": true}, {\"name\": \"large-bounds\", \"pass_\": true}], \"error\": null, \"elapsed\": 0.001480459002777934}\n",
+    "stderr": ""
+  },
+  "gate": {
+    "result": 0,
+    "stdout": "GATE: GO digest=v2-0c89e4a0a856025201fc58d65256f8aa70e8bf7d6662675757bb462d2cbd62e8 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n",
+    "stderr": ""
+  },
+  "frozen": true,
+  "protected": true,
+  "edits_in_scope": true,
+  "extra_files": [
+    ".goal/check_freeze",
+    ".goal/evidence/adversarial-review.txt",
+    ".goal/evidence/adversarial.rec",
+    ".goal/evidence/close-iteration.txt",
+    ".goal/evidence/final-audit.txt",
+    ".goal/evidence/final-gate.txt",
+    ".goal/evidence/final-status.txt",
+    ".goal/evidence/operation-id.txt",
+    ".goal/evidence/pre-claim-audit.txt",
+    ".goal/evidence/raw/1.txt",
+    ".goal/evidence/runtime/43448f1726294839a2a591a303ff9c3c.json",
+    ".goal/evidence/runtime/67d6900052b54e8bbeb6d159c9822b59.json",
+    ".goal/evidence/runtime/9724afbf738c45aaab5a00facfd8a343.json",
+    ".goal/evidence/runtime/a0c17be0198a482a9f8d555ac63e3a60.json",
+    ".goal/evidence/runtime/a3c2c43147d748b3bec80de76d7fe43e.json",
+    ".goal/evidence/runtime/eb10e0e0ba0047f882105169df06a14e.json",
+    ".goal/evidence/runtime/ec25d52b56504bca9cf23327a039831b.json",
+    ".goal/evidence/runtime/ee10ab28d139491ca0656c7798c56c37.json",
+    ".goal/evidence/tests-run.txt",
+    ".goal/goal.md",
+    ".goal/loop-log.md",
+    ".goal/pre-reg.md",
+    ".goal/scores.rec",
+    ".goal/state.rec",
+    ".goal/store/commits/current",
+    ".goal/store/commits/generations/226f52146436b01e51cb339ea633fd5938a75664e2c164b3a1b9587fa0578835",
+    ".goal/store/commits/generations/46de55c4d244591bb8a5f3aa3630054e483f2141da56567f30fd4c942b24d3c7",
+    ".goal/store/commits/generations/6a53ce68ff34fb28a70cbda66632e0b3c465a252977e9ffe497d1800cb5439d0",
+    ".goal/store/commits/writer.lock",
+    ".goal/store/writer.lock",
+    ".goal/verdicts.rec",
+    ".goal/work-plan.md",
+    "test_solution.py"
+  ],
+  "native_goal": null,
+  "tokens": null,
+  "money": null,
+  "protocol_compliant": true,
+  "accepted": true,
+  "timely": true,
+  "budget_seconds": 600,
+  "agent_message": "{\n  \"status\": \"complete\",\n  \"completed\": true,\n  \"tests_passed\": true,\n  \"gate_result\": \"GO\",\n  \"gate_exit_code\": 0,\n  \"audit_exit_code\": 0,\n  \"iteration\": 1,\n  \"operation_id\": \"wave-T1-001\",\n  \"files_changed\": [\n    \"solution.py\",\n    \"test_solution.py\"\n  ],\n  \"tests\": {\n    \"public\": \"python3 public.py: PUBLIC PASS (exit 0)\",\n    \"unit\": \"python3 test_solution.py: 8 tests pass, including 500 random integer-coverage cases\",\n    \"adversarial\": \"21952 exhaustive interval triples pass coverage, ordering, nonempty output, and input preservation checks; malformed empty bounds rejected\",\n    \"initial_smoke\": \"exit 1 from the starting NotImplementedError; retained honestly\"\n  },\n  \"evidence\": {\n    \"tests_run\": \".goal/evidence/tests-run.txt\",\n    \"close\": \".goal/evidence/close-iteration.txt\",\n    \"audit\": \".goal/evidence/final-audit.txt\",\n    \"gate\": \".goal/evidence/final-gate.txt\",\n    \"status\": \".goal/evidence/final-status.txt\",\n    \"ledger\": \".goal/loop-log.md\",\n    \"contract\": \".goal/goal.md\"\n  },\n  \"native_goal_tools_used\": false,\n  \"finished_at_epoch\": 1794373008.065758,\n  \"deadline_epoch\": 1794373317.671077,\n  \"remaining_seconds\": 309.6053190231323\n}\n",
+  "accepted_within_budget": true
+}

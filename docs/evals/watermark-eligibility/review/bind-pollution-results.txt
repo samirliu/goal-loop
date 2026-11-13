@@ -1,0 +1,7 @@
+command: python3 -B -u /var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-watermark-review-qpo4yiv8/repro_bind_pollution.py
+exit: 0
+BIND ('', 'CTL: ERROR writer-lock: objective qualification corrupted its input; recover before retry: GATE: NO-GO reason=check-mutated-ledger:before=023e200b0f5e8bf004d1249db3f653419f79ded229af04361af9fc6bd295df1d after=7260d6eba4407ca6171c868c746de7dad3a2dfc01f7cc0767417e114668795cd (a check wrote the ledger mid-run - only .goal/evidence/ is fair game) hint=see-reason\n')
+PENDING True
+RECOVER ('CTL: RECOVER ok (checks were not replayed)\n', '')
+LOG_RESTORED True
+GATE ('GATE: GO digest=v2-7024f81432019300f72ee9b0d8eb704735f63364c2752917e698caab37ec2494 iter=1 ac=2 pass=2 unverified=0 mode=threshold score=10 best=10\n', '')

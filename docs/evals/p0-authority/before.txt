@@ -1,0 +1,20 @@
+F
+======================================================================
+FAIL: test_ambient_mode_without_inherited_descriptor_cannot_bypass_view_check (test_view_authority.ViewAuthority.test_ambient_mode_without_inherited_descriptor_cannot_bypass_view_check)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-authority-before-i1yfejpe/tests/test_view_authority.py", line 142, in test_ambient_mode_without_inherited_descriptor_cannot_bypass_view_check
+    self.call(GATE, '--check', expected=4, env=env)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-authority-before-i1yfejpe/tests/test_view_authority.py", line 39, in call
+    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 4 : GATE: GO digest=v2-3e1237e00c97c4aea141771a60d54eb7d70173c771506df6301790a262437d9b iter=1 ac=1 pass=1 unverified=0 mode=threshold
+/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-authority-before-i1yfejpe/scripts/goal_parse.sh: line 414: tmp: unbound variable
+/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-authority-before-i1yfejpe/scripts/goal_parse.sh: line 740: tmp: unbound variable
+
+
+----------------------------------------------------------------------
+Ran 1 test in 1.951s
+
+FAILED (failures=1)

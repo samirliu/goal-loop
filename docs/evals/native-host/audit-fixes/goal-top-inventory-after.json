@@ -1,0 +1,8 @@
+{
+  "command": "bash scripts/goal_gate.sh --check --project /tmp/goal-p0-followup-b6x8tybz/flat",
+  "chunk_id": "e85503",
+  "wall_time_seconds": 0.444314583,
+  "exit_code": 2,
+  "original_token_count": 85,
+  "output": "GATE: NOTE false-complete suspected; already counted by the ratchet - fix the artifact and let the claim pass, do not re-claim unchanged\nGATE: NO-GO reason=verdicts-stale:block=v2-1a9249796a57c8cb6599724e3f3902a6e2de1b1eda28fdabfb4e1873984c8720 current=v2-491470a4ad3a59f16bc6bac517b5a2f03676d0f2ec7e52cecbd348a7ab990b9b hint=rebind-judged\n"
+}

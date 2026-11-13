@@ -1,0 +1,11 @@
+{
+  "evidence_scope": "implementation verified within stated source scopes; real pilot before2/2 after1/2; no utility promotion",
+  "maximum_model_calls": 4,
+  "model_calls_after_pilot": 0,
+  "model_calls_so_far": 4,
+  "receipt": "delivery-receipt.json",
+  "running_task_handles": [],
+  "source_files": 149,
+  "status": "complete",
+  "stopped": true
+}

@@ -1,0 +1,8 @@
+  ok   - 71 minimize divergence -> rc2 (rc=2)
+  ok   - 71 DIVERGENCE token
+  ok   - 71 dir named
+== results: pass=3 fail=0 ==
+  ok   - 72 minimize agree -> GO (rc=0)
+  ok   - 72 no DIVERGENCE
+== results: pass=2 fail=0 ==
+== total: pass=5 fail=0 shards=2 ==

@@ -1,0 +1,76 @@
+Command: python3.12 -m pytest -q -s tests/test_owner_watch_guard.py
+OWNER_GUARD_OBSERVATION {"command_ready": false, "elapsed": 0.06274166703224182, "infinite_requested": false, "late_write": false, "mode": "normal", "result": 7, "stderr": "", "stdout": "{\"nofile\": [4096, 9223372036854775807]}\n"}
+uOWNER_GUARD_OBSERVATION {"command_ready": true, "elapsed": 0.30931045790202916, "infinite_requested": false, "late_write": false, "mode": "timeout", "result": 124, "stderr": "", "stdout": "{\"nofile\": [4096, 9223372036854775807]}\n"}
+uOWNER_GUARD_OBSERVATION {"command_ready": true, "elapsed": 0.13401674991473556, "infinite_requested": false, "late_write": false, "mode": "cancel", "result": 130, "stderr": "", "stdout": "{\"nofile\": [4096, 9223372036854775807]}\n"}
+u.OWNER_GUARD_FDS {"guard_alive": true, "guard_wait": [0, 0], "high_fd": 2000, "infinite_requested": false, "lock_released_while_parent_alive": true, "nofile": [4096, 9223372036854775807], "parent_alive": true, "stderr": "", "stdout": "", "stdout_eof_while_parent_alive": true}
+.OWNER_GUARD_FDS {"guard_alive": false, "guard_wait": [98147, 256], "high_fd": 2000, "infinite_requested": true, "lock_released_while_parent_alive": true, "nofile": [9223372036854775807, 9223372036854775807], "parent_alive": true, "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"/Users/m/repo/goal-loop/scripts/goal_owner_watch.py\", line 174, in _group_guard\n    os.closerange(0, resource.getrlimit(resource.RLIMIT_NOFILE)[0])\nOverflowError: Python int too large to convert to C int\n", "stdout": "", "stdout_eof_while_parent_alive": true}
+FOWNER_GUARD_OBSERVATION {"command_ready": false, "elapsed": 0.0717047918587923, "infinite_requested": true, "late_write": false, "mode": "normal", "result": 4, "stderr": "OWNER_WATCH: ERROR command-start: Python int too large to convert to C int\nBOUNDED: ERROR [Errno 1] Operation not permitted\n", "stdout": "{\"nofile\": [9223372036854775807, 9223372036854775807]}\n"}
+uOWNER_GUARD_OBSERVATION {"command_ready": true, "elapsed": 0.3144781670998782, "infinite_requested": true, "late_write": false, "mode": "timeout", "result": 124, "stderr": "OWNER_WATCH: ERROR command-start: Python int too large to convert to C int\n", "stdout": "{\"nofile\": [9223372036854775807, 9223372036854775807]}\n"}
+uOWNER_GUARD_OBSERVATION {"command_ready": true, "elapsed": 0.1234979999717325, "infinite_requested": true, "late_write": false, "mode": "cancel", "result": 130, "stderr": "OWNER_WATCH: ERROR command-start: Python int too large to convert to C int\n", "stdout": "{\"nofile\": [9223372036854775807, 9223372036854775807]}\n"}
+u.
+=================================== FAILURES ===================================
+_ GroupGuard.test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors _
+
+self = <test_owner_watch_guard.GroupGuard testMethod=test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors>
+
+    @unittest.skipUnless(INFINITY, 'actual hard RLIMIT_NOFILE prevents inheriting infinity')
+    def test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors(self):
+>       self.guard_descriptors(infinite=True)
+
+tests/test_owner_watch_guard.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_owner_watch_guard.py:122: in guard_descriptors
+    self.assertTrue(observed['guard_alive'], observed)
+E   AssertionError: False is not true : {'guard_alive': False, 'guard_wait': [98147, 256], 'nofile': [9223372036854775807, 9223372036854775807], 'high_fd': 2000, 'stdout_eof_while_parent_alive': True, 'lock_released_while_parent_alive': True, 'parent_alive': True, 'infinite_requested': True, 'stdout': '', 'stderr': 'Traceback (most recent call last):\n  File "<string>", line 1, in <module>\n  File "/Users/m/repo/goal-loop/scripts/goal_owner_watch.py", line 174, in _group_guard\n    os.closerange(0, resource.getrlimit(resource.RLIMIT_NOFILE)[0])\nOverflowError: Python int too large to convert to C int\n'}
+___ GroupGuard.test_infinite_limit_normal_timeout_and_cancel (mode='normal') ___
+
+self = <test_owner_watch_guard.GroupGuard testMethod=test_infinite_limit_normal_timeout_and_cancel>
+
+    @unittest.skipUnless(INFINITY, 'actual hard RLIMIT_NOFILE prevents inheriting infinity')
+    def test_infinite_limit_normal_timeout_and_cancel(self):
+        for mode in ('normal', 'timeout', 'cancel'):
+            with self.subTest(mode=mode):
+>               self.bounded(mode, infinite=True)
+
+tests/test_owner_watch_guard.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_owner_watch_guard.py:68: in bounded
+    self.assertEqual(process.returncode, {'normal': 7, 'timeout': 124, 'cancel': 130}[mode], observed)
+E   AssertionError: 4 != 7 : {'mode': 'normal', 'infinite_requested': True, 'result': 4, 'elapsed': 0.0717047918587923, 'stdout': '{"nofile": [9223372036854775807, 9223372036854775807]}\n', 'stderr': 'OWNER_WATCH: ERROR command-start: Python int too large to convert to C int\nBOUNDED: ERROR [Errno 1] Operation not permitted\n', 'command_ready': False, 'late_write': False}
+__ GroupGuard.test_infinite_limit_normal_timeout_and_cancel (mode='timeout') ___
+
+self = <test_owner_watch_guard.GroupGuard testMethod=test_infinite_limit_normal_timeout_and_cancel>
+
+    @unittest.skipUnless(INFINITY, 'actual hard RLIMIT_NOFILE prevents inheriting infinity')
+    def test_infinite_limit_normal_timeout_and_cancel(self):
+        for mode in ('normal', 'timeout', 'cancel'):
+            with self.subTest(mode=mode):
+>               self.bounded(mode, infinite=True)
+
+tests/test_owner_watch_guard.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_owner_watch_guard.py:69: in bounded
+    self.assertNotIn(b'command-start', stderr, observed)
+E   AssertionError: b'command-start' unexpectedly found in b'OWNER_WATCH: ERROR command-start: Python int too large to convert to C int\n' : {'mode': 'timeout', 'infinite_requested': True, 'result': 124, 'elapsed': 0.3144781670998782, 'stdout': '{"nofile": [9223372036854775807, 9223372036854775807]}\n', 'stderr': 'OWNER_WATCH: ERROR command-start: Python int too large to convert to C int\n', 'command_ready': True, 'late_write': False}
+___ GroupGuard.test_infinite_limit_normal_timeout_and_cancel (mode='cancel') ___
+
+self = <test_owner_watch_guard.GroupGuard testMethod=test_infinite_limit_normal_timeout_and_cancel>
+
+    @unittest.skipUnless(INFINITY, 'actual hard RLIMIT_NOFILE prevents inheriting infinity')
+    def test_infinite_limit_normal_timeout_and_cancel(self):
+        for mode in ('normal', 'timeout', 'cancel'):
+            with self.subTest(mode=mode):
+>               self.bounded(mode, infinite=True)
+
+tests/test_owner_watch_guard.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_owner_watch_guard.py:69: in bounded
+    self.assertNotIn(b'command-start', stderr, observed)
+E   AssertionError: b'command-start' unexpectedly found in b'OWNER_WATCH: ERROR command-start: Python int too large to convert to C int\n' : {'mode': 'cancel', 'infinite_requested': True, 'result': 130, 'elapsed': 0.1234979999717325, 'stdout': '{"nofile": [9223372036854775807, 9223372036854775807]}\n', 'stderr': 'OWNER_WATCH: ERROR command-start: Python int too large to convert to C int\n', 'command_ready': True, 'late_write': False}
+=========================== short test summary info ============================
+FAILED tests/test_owner_watch_guard.py::GroupGuard::test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors
+SUBFAILED(mode='normal') tests/test_owner_watch_guard.py::GroupGuard::test_infinite_limit_normal_timeout_and_cancel
+SUBFAILED(mode='timeout') tests/test_owner_watch_guard.py::GroupGuard::test_infinite_limit_normal_timeout_and_cancel
+SUBFAILED(mode='cancel') tests/test_owner_watch_guard.py::GroupGuard::test_infinite_limit_normal_timeout_and_cancel
+4 failed, 3 passed, 3 subtests passed in 4.11s
+

@@ -1,0 +1,27 @@
+{
+  "version": "before",
+  "command": [
+    "/opt/homebrew/opt/python@3.12/bin/python3.12",
+    "-I",
+    "/tmp/goal-owner-guard-f5/fixed-bounded-before/goal_bounded.py",
+    "--owner",
+    "612",
+    "--seconds",
+    "2",
+    "--",
+    "/opt/homebrew/opt/python@3.12/bin/python3.12",
+    "-I",
+    "-c",
+    "import json,resource; print(json.dumps({\"nofile\":resource.getrlimit(resource.RLIMIT_NOFILE)}),flush=True); raise SystemExit(7)"
+  ],
+  "uid": 501,
+  "platform": "darwin",
+  "python": "/opt/homebrew/opt/python@3.12/bin/python3.12",
+  "elapsed": 0.06355233304202557,
+  "result": 4,
+  "stdout": "{\"nofile\": [9223372036854775807, 9223372036854775807]}\n",
+  "stderr": "OWNER_WATCH: ERROR command-start: Python int too large to convert to C int\nBOUNDED: ERROR [Errno 1] Operation not permitted\n",
+  "owner_watch_sha256": "d0d8bc8d5511f6b3394f56b16a468e0349f15c65eaa0eade3e24166505a17644",
+  "bounded_sha256": "1c0825e9d3af649e997c294ce704f3de41b2edc6defd431be9de64aeeb79d5f6",
+  "trace_sha256": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb"
+}

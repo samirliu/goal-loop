@@ -1,0 +1,60 @@
+{
+  "baseline_commit": "cf198829f9c8efe740d7d30a09de5d0251303b62",
+  "captured_at": "2026-11-10T15:27:47.274238+00:00",
+  "platform": "darwin",
+  "sources": {
+    "scripts/goal_ctl.sh": "2271a933d5b0b53fe7951c4fa26532b95db8b4982b0f7af9356b3c340bfd7af4",
+    "scripts/goal_gate.sh": "8a47c3987f4c5ad48e32e66fbae7d13684931521533bd515bcbe864de4ba6295",
+    "scripts/goal_loop.sh": "c26ac0238af7887f6f5be617ed7e38654d481c819cb38ce9a08fe2592ef85973",
+    "scripts/goal_owner_watch.py": "7ae7b1a6598d46252866dcad9adcc6deab1d765777aae9801a34687ba7d80277",
+    "scripts/goal_parse.sh": "42dc2241e2ab33e2e135d7185ea59d413ffbcbc573ee19b026685b097258e193",
+    "scripts/goal_store.py": "27a9800fdd11b472330f04199fa6865cda88ea5af84a032e9bbbd790b1815a46",
+    "scripts/goal_bounded.py": "63f9710cc67cefe90a2d4096067b94e9d3df0c88e96db5fe7eb5a6119f11038c",
+    "scripts/goal_runner.py": "f2e6028a404a061d05f8bf687e3a31af9adeba5c89c21258bd66307ab7bddb9a",
+    "tests/test_runner_lifecycle.py": "646fefcfb82bf3bcb7ee6d7956a3d144861c831fd12fe071430123dbcae67145"
+  },
+  "cases": [
+    {
+      "selector": "runner_death_before_reaping",
+      "before_exit": 1,
+      "before_log": "before-runner_death_before_reaping.txt",
+      "after_evidence": "python-regression.txt",
+      "after_result": "ok"
+    },
+    {
+      "selector": "standalone_gate_ignores_unbounded_timeout_tool",
+      "before_exit": 1,
+      "before_log": "before-standalone_gate_ignores_unbounded_timeout_tool.txt",
+      "after_evidence": "python-regression.txt",
+      "after_result": "ok"
+    },
+    {
+      "selector": "standalone_gate_zombie",
+      "before_exit": 1,
+      "before_log": "before-standalone_gate_zombie.txt",
+      "after_evidence": "python-regression.txt",
+      "after_result": "ok"
+    }
+  ],
+  "checks": {
+    "python": {
+      "tests": 96,
+      "failures": 0,
+      "sha256": "310b1060400d1490b196053978c1c71053b0dd4c79fad7e7e1b84f07ab0a7b16"
+    },
+    "shell": {
+      "assertions": 592,
+      "failures": 0,
+      "sha256": "4a21424f271be461582cc2b8f814cb50d7fba64e12b9eaafff3a4db89cf43b2f"
+    },
+    "implementation_patch_sha256": "7e5d78cee88a30d5a4ec046db82f590505e35fcb834cdf456f184117741d2452"
+  },
+  "nested_cancellation": {
+    "before_exit": 1,
+    "before_log": "before-nested-cancellation.txt",
+    "before_bounded_sha256": "c53f414f35013c5f67571228f07336705370f3c620abcb6b8acbc2ed8e8aac79",
+    "after_evidence": "python-regression.txt",
+    "after_result": "ok",
+    "reproduction_patch": "reproduce-nested-bug.patch"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "archive_sha256": "05f6f845711c1baa7517f025a3f16d5192adfeabf93a9b1318b19109aa05f553",
+  "reconstructed_root": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-agent-evolution-reconstruct-sqo1tdrj/goal-real-evolution-20261111",
+  "result": {
+    "verified": true,
+    "attempts": 4,
+    "pairs": 98,
+    "raw_outputs": 196,
+    "measured_inputs": 98,
+    "holdout_evaluations": [
+      1,
+      2,
+      3
+    ],
+    "selected": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9"
+  }
+}

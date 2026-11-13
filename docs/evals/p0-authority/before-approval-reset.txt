@@ -1,0 +1,18 @@
+F
+======================================================================
+FAIL: test_resetting_approval_marker_cannot_reapprove_a_weaker_contract (test_view_authority.ViewAuthority.test_resetting_approval_marker_cannot_reapprove_a_weaker_contract)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-p0-baseline-dz6eautf/tests/test_view_authority.py", line 150, in test_resetting_approval_marker_cannot_reapprove_a_weaker_contract
+    self.call(CTL, 'stamp', '--auto', expected=4)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-p0-baseline-dz6eautf/tests/test_view_authority.py", line 40, in call
+    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 4 : approved: 56680ac5 2026-11-10 auto
+
+
+----------------------------------------------------------------------
+Ran 1 test in 1.690s
+
+FAILED (failures=1)

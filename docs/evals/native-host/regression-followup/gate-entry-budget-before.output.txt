@@ -1,0 +1,15 @@
+GATE_ENTRY_OBSERVATION {"case": "__main__.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement", "completed": ["0", "1"], "contexts": [["missing", "1651057.261126083"], ["missing", "1651057.261126083"], ["missing", "1651057.261126083"]], "elapsed": 5.839658624958247, "returncode": 2, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": "GATE: VERIFY AC-1|PASS|exit=0\nGATE: VERIFY AC-2|PASS|exit=0\n", "view_read": {"finished": 1651054.171960541, "real_views_verified": true, "started": 1651052.155562375}}
+F
+======================================================================
+FAIL: test_slow_real_view_preflight_spends_the_same_settlement (__main__.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_gate_entry_budget.py", line 99, in test_slow_real_view_preflight_spends_the_same_settlement
+    self.assertLess(observed['elapsed'], 4.2, observed)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 5.839658624958247 not less than 4.2 : {'case': '__main__.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement', 'elapsed': 5.839658624958247, 'returncode': 2, 'contexts': [['missing', '1651057.261126083'], ['missing', '1651057.261126083'], ['missing', '1651057.261126083']], 'completed': ['0', '1'], 'stdout': 'GATE: VERIFY AC-1|PASS|exit=0\nGATE: VERIFY AC-2|PASS|exit=0\n', 'stderr': 'GATE: NO-GO reason=verification-time-budget-exhausted\n', 'view_read': {'started': 1651052.155562375, 'finished': 1651054.171960541, 'real_views_verified': True}}
+
+----------------------------------------------------------------------
+Ran 1 test in 7.451s
+
+FAILED (failures=1)

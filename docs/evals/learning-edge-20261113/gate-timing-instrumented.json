@@ -1,0 +1,18 @@
+{
+  "elapsed": 3.8496263748966157,
+  "entry": 1794497563.739346,
+  "stdout": "",
+  "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n",
+  "result": 2,
+  "events": "1794497564.525078058 /Users/m/repo/goal-loop/scripts/goal_store.py\n1794497564.588134050 /Users/m/repo/goal-loop/scripts/goal_runner.py\n1794497564.641803026 /Users/m/repo/goal-loop/scripts/goal_bounded.py\n1794497564.702101946 /Users/m/repo/goal-loop/scripts/goal_store.py\n1794497564.791394949 /Users/m/repo/goal-loop/scripts/goal_runner.py\n1794497564.905769110 /Users/m/repo/goal-loop/scripts/goal_tree_digest.py\n",
+  "spans": [
+    {
+      "started": 1794497564.6863291,
+      "start_monotonic": 1683139.382830791,
+      "elapsed": 2.8848367501050234,
+      "label": "verify",
+      "state": "complete",
+      "result": 124
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "python": {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "returncode": 1,
+    "seconds": 528.8900509579107
+  },
+  "shell": {
+    "command": [
+      "bash",
+      "tests/run_tests.sh"
+    ],
+    "returncode": 0,
+    "seconds": 96.29763658414595
+  },
+  "docs": {
+    "command": [
+      "bash",
+      "tests/docs_consistency.sh"
+    ],
+    "returncode": 0,
+    "seconds": 0.4487044170964509
+  },
+  "parser": {
+    "command": [
+      "bash",
+      "tests/test_parse.sh"
+    ],
+    "returncode": 0,
+    "seconds": 0.27254183287732303
+  },
+  "forge": {
+    "command": [
+      "bash",
+      "companions/contract-forge/tests/run_fixtures.sh"
+    ],
+    "returncode": 0,
+    "seconds": 0.972887207986787
+  }
+}

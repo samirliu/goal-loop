@@ -1,0 +1,571 @@
+{
+  "source": "/src",
+  "uid": 65534,
+  "pid": 7,
+  "owner_watch_sha256": "d0d8bc8d5511f6b3394f56b16a468e0349f15c65eaa0eade3e24166505a17644",
+  "temporary_fixture": "/tmp/goal-owner-diagnostic-gyg48gbg",
+  "parent_chain": [
+    {
+      "pid": 7,
+      "comm": "python3",
+      "state": "R",
+      "ppid": 1,
+      "pgrp": 1,
+      "session": 1,
+      "starttime": 10598119,
+      "stat": "7 (python3) R 1 1 1 0 -1 4194560 5599 0 0 0 15 0 0 0 20 0 1 0 10598119 36093952 6749 18446744073709551615 187650257649664 187650257652616 281474626573584 0 0 0 0 16781312 2 0 0 0 17 0 0 0 0 0 0 187650257780120 187650257780792 187650530361344 281474626575941 281474626576041 281474626576041 281474626576353 0\n",
+      "status": "Name:\tpython3\nUmask:\t0022\nState:\tR (running)\nTgid:\t7\nNgid:\t0\nPid:\t7\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t64\nGroups:\t65534 \nNStgid:\t7\nNSpid:\t7\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t   35500 kB\nVmSize:\t   35248 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   27264 kB\nVmRSS:\t   27204 kB\nRssAnon:\t   16940 kB\nRssFile:\t   10264 kB\nRssShmem:\t       0 kB\nVmData:\t   17256 kB\nVmStk:\t     132 kB\nVmExe:\t       4 kB\nVmLib:\t   14204 kB\nVmPTE:\t     112 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t21\nnonvoluntary_ctxt_switches:\t9\n",
+      "cmdline": "python3\u0000-B\u0000/results/owner_watch_diag.py\u0000--source\u0000/src\u0000--output\u0000/results/owner-watch-diagnostic.json\u0000",
+      "children": "",
+      "fds_error": "FileNotFoundError(2, 'No such file or directory')"
+    },
+    {
+      "pid": 1,
+      "comm": "runuser",
+      "state": "S",
+      "ppid": 0,
+      "pgrp": 1,
+      "session": 1,
+      "starttime": 10598117,
+      "stat": "1 (runuser) S 0 1 1 0 -1 4194560 997 0 0 0 0 0 0 0 20 0 1 0 10598117 7888896 782 18446744073709551615 1 1 0 0 0 0 2147196671 0 16384 0 0 0 17 11 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
+      "status": "Name:\trunuser\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t0\t0\t0\t0\nGid:\t0\t0\t0\t0\nFDSize:\t64\nGroups:\t65534 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t    7768 kB\nVmSize:\t    7704 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    3136 kB\nVmRSS:\t    3136 kB\nRssAnon:\t     392 kB\nRssFile:\t    2744 kB\nRssShmem:\t       0 kB\nVmData:\t     404 kB\nVmStk:\t     132 kB\nVmExe:\t      84 kB\nVmLib:\t    4832 kB\nVmPTE:\t      52 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\tfffffffe7ffb9eff\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000004000\nCapInh:\t0000000000000000\nCapPrm:\t00000000a80425fb\nCapEff:\t00000000a80425fb\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t16\nnonvoluntary_ctxt_switches:\t0\n",
+      "cmdline": "runuser\u0000-u\u0000nobody\u0000--\u0000python3\u0000-B\u0000/results/owner_watch_diag.py\u0000--source\u0000/src\u0000--output\u0000/results/owner-watch-diagnostic.json\u0000",
+      "children": "7 ",
+      "fds_error": "PermissionError(13, 'Permission denied')"
+    }
+  ],
+  "pid1": {
+    "pid": 1,
+    "comm": "runuser",
+    "state": "S",
+    "ppid": 0,
+    "pgrp": 1,
+    "session": 1,
+    "starttime": 10598117,
+    "stat": "1 (runuser) S 0 1 1 0 -1 4194560 997 0 0 0 0 0 0 0 20 0 1 0 10598117 7888896 782 18446744073709551615 1 1 0 0 0 0 2147196671 0 16384 0 0 0 17 11 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
+    "status": "Name:\trunuser\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t0\t0\t0\t0\nGid:\t0\t0\t0\t0\nFDSize:\t64\nGroups:\t65534 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t    7768 kB\nVmSize:\t    7704 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    3136 kB\nVmRSS:\t    3136 kB\nRssAnon:\t     392 kB\nRssFile:\t    2744 kB\nRssShmem:\t       0 kB\nVmData:\t     404 kB\nVmStk:\t     132 kB\nVmExe:\t      84 kB\nVmLib:\t    4832 kB\nVmPTE:\t      52 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\tfffffffe7ffb9eff\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000004000\nCapInh:\t0000000000000000\nCapPrm:\t00000000a80425fb\nCapEff:\t00000000a80425fb\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t16\nnonvoluntary_ctxt_switches:\t0\n",
+    "cmdline": "runuser\u0000-u\u0000nobody\u0000--\u0000python3\u0000-B\u0000/results/owner_watch_diag.py\u0000--source\u0000/src\u0000--output\u0000/results/owner-watch-diagnostic.json\u0000",
+    "children": "7 ",
+    "fds_error": "PermissionError(13, 'Permission denied')"
+  },
+  "locks_held_by_this_supervisor": {
+    "target_inodes": {
+      "ledger_directory": "0:42:261032",
+      "writer_lock": "0:42:261033"
+    },
+    "matching": [
+      "1: FLOCK  ADVISORY  WRITE 7 00:42:261033 0 EOF",
+      "2: FLOCK  ADVISORY  WRITE 7 00:42:261032 0 EOF"
+    ],
+    "probes": {
+      "ledger_directory": "blocked",
+      "writer_lock": "blocked"
+    }
+  },
+  "cpu_stat_before": "usage_usec 174664\nuser_usec 163622\nsystem_usec 11042\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+  "load_before": "2.55 2.29 2.16 1/549 7\n",
+  "get_child_subreaper": {
+    "returncode": 0,
+    "value": 0
+  },
+  "live_control_running": true,
+  "observation_test_sha256": "045346788c78390bfdcf2a54d8da95722d5ee9dd46056f338e8e332f6b0c400d",
+  "supervise_result": 0,
+  "supervise_elapsed": 0.05657000000064727,
+  "ready": "READY pidfd 9\n",
+  "background_pid": 11,
+  "locks_before_retained_fds_close": {
+    "target_inodes": {
+      "ledger_directory": "0:42:261032",
+      "writer_lock": "0:42:261033"
+    },
+    "matching": [
+      "1: FLOCK  ADVISORY  WRITE 7 00:42:261033 0 EOF",
+      "2: FLOCK  ADVISORY  WRITE 7 00:42:261032 0 EOF"
+    ],
+    "probes": {
+      "ledger_directory": "blocked",
+      "writer_lock": "blocked"
+    }
+  },
+  "locks_after_retained_fds_close": {
+    "target_inodes": {
+      "ledger_directory": "0:42:261032",
+      "writer_lock": "0:42:261033"
+    },
+    "matching": [],
+    "probes": {
+      "ledger_directory": "available",
+      "writer_lock": "available"
+    }
+  },
+  "observations": [
+    {
+      "after_return": 0.000562834000447765,
+      "signal0": "success",
+      "test_observer_running": false,
+      "background": {
+        "pid": 11,
+        "comm": "python3",
+        "state": "Z",
+        "ppid": 1,
+        "pgrp": 9,
+        "session": 9,
+        "starttime": 10598143,
+        "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+        "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+        "cmdline": "",
+        "children": "",
+        "fds_error": "PermissionError(13, 'Permission denied')"
+      },
+      "parent_chain": [
+        {
+          "pid": 11,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598143,
+          "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        },
+        {
+          "pid": 1,
+          "comm": "runuser",
+          "state": "S",
+          "ppid": 0,
+          "pgrp": 1,
+          "session": 1,
+          "starttime": 10598117,
+          "stat": "1 (runuser) S 0 1 1 0 -1 4194560 997 0 0 0 0 0 0 0 20 0 1 0 10598117 7888896 782 18446744073709551615 1 1 0 0 0 0 2147196671 0 16384 0 0 0 17 11 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
+          "status": "Name:\trunuser\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t0\t0\t0\t0\nGid:\t0\t0\t0\t0\nFDSize:\t64\nGroups:\t65534 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t    7768 kB\nVmSize:\t    7704 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    3136 kB\nVmRSS:\t    3136 kB\nRssAnon:\t     392 kB\nRssFile:\t    2744 kB\nRssShmem:\t       0 kB\nVmData:\t     404 kB\nVmStk:\t     132 kB\nVmExe:\t      84 kB\nVmLib:\t    4832 kB\nVmPTE:\t      52 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t1/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000010000\nSigBlk:\tfffffffe7ffb9eff\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000004000\nCapInh:\t0000000000000000\nCapPrm:\t00000000a80425fb\nCapEff:\t00000000a80425fb\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t16\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "runuser\u0000-u\u0000nobody\u0000--\u0000python3\u0000-B\u0000/results/owner_watch_diag.py\u0000--source\u0000/src\u0000--output\u0000/results/owner-watch-diagnostic.json\u0000",
+          "children": "7 10 11 ",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        }
+      ],
+      "group": [
+        {
+          "pid": 10,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598138,
+          "stat": "10 (python3) Z 1 9 9 0 -1 4228172 446 0 0 0 0 0 0 0 20 0 1 0 10598138 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 7 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t10\nNgid:\t0\nPid:\t10\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t10\nNSpid:\t10\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000000\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        },
+        {
+          "pid": 11,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598143,
+          "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        }
+      ],
+      "locks": {
+        "target_inodes": {
+          "ledger_directory": "0:42:261032",
+          "writer_lock": "0:42:261033"
+        },
+        "matching": [],
+        "probes": {
+          "ledger_directory": "available",
+          "writer_lock": "available"
+        }
+      }
+    },
+    {
+      "after_return": 0.10273258399683982,
+      "signal0": "success",
+      "test_observer_running": false,
+      "background": {
+        "pid": 11,
+        "comm": "python3",
+        "state": "Z",
+        "ppid": 1,
+        "pgrp": 9,
+        "session": 9,
+        "starttime": 10598143,
+        "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+        "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+        "cmdline": "",
+        "children": "",
+        "fds_error": "PermissionError(13, 'Permission denied')"
+      },
+      "parent_chain": [
+        {
+          "pid": 11,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598143,
+          "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        },
+        {
+          "pid": 1,
+          "comm": "runuser",
+          "state": "S",
+          "ppid": 0,
+          "pgrp": 1,
+          "session": 1,
+          "starttime": 10598117,
+          "stat": "1 (runuser) S 0 1 1 0 -1 4194560 997 0 0 0 0 0 0 0 20 0 1 0 10598117 7888896 782 18446744073709551615 1 1 0 0 0 0 2147196671 0 16384 0 0 0 17 11 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
+          "status": "Name:\trunuser\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t0\t0\t0\t0\nGid:\t0\t0\t0\t0\nFDSize:\t64\nGroups:\t65534 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t    7768 kB\nVmSize:\t    7704 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    3136 kB\nVmRSS:\t    3136 kB\nRssAnon:\t     392 kB\nRssFile:\t    2744 kB\nRssShmem:\t       0 kB\nVmData:\t     404 kB\nVmStk:\t     132 kB\nVmExe:\t      84 kB\nVmLib:\t    4832 kB\nVmPTE:\t      52 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t1/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000010000\nSigBlk:\tfffffffe7ffb9eff\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000004000\nCapInh:\t0000000000000000\nCapPrm:\t00000000a80425fb\nCapEff:\t00000000a80425fb\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t16\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "runuser\u0000-u\u0000nobody\u0000--\u0000python3\u0000-B\u0000/results/owner_watch_diag.py\u0000--source\u0000/src\u0000--output\u0000/results/owner-watch-diagnostic.json\u0000",
+          "children": "7 10 11 ",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        }
+      ],
+      "group": [
+        {
+          "pid": 10,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598138,
+          "stat": "10 (python3) Z 1 9 9 0 -1 4228172 446 0 0 0 0 0 0 0 20 0 1 0 10598138 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 7 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t10\nNgid:\t0\nPid:\t10\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t10\nNSpid:\t10\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000000\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        },
+        {
+          "pid": 11,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598143,
+          "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        }
+      ],
+      "locks": {
+        "target_inodes": {
+          "ledger_directory": "0:42:261032",
+          "writer_lock": "0:42:261033"
+        },
+        "matching": [],
+        "probes": {
+          "ledger_directory": "available",
+          "writer_lock": "available"
+        }
+      }
+    },
+    {
+      "after_return": 0.5034437510039425,
+      "signal0": "success",
+      "test_observer_running": false,
+      "background": {
+        "pid": 11,
+        "comm": "python3",
+        "state": "Z",
+        "ppid": 1,
+        "pgrp": 9,
+        "session": 9,
+        "starttime": 10598143,
+        "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+        "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+        "cmdline": "",
+        "children": "",
+        "fds_error": "PermissionError(13, 'Permission denied')"
+      },
+      "parent_chain": [
+        {
+          "pid": 11,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598143,
+          "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        },
+        {
+          "pid": 1,
+          "comm": "runuser",
+          "state": "S",
+          "ppid": 0,
+          "pgrp": 1,
+          "session": 1,
+          "starttime": 10598117,
+          "stat": "1 (runuser) S 0 1 1 0 -1 4194560 997 0 0 0 0 0 0 0 20 0 1 0 10598117 7888896 782 18446744073709551615 1 1 0 0 0 0 2147196671 0 16384 0 0 0 17 11 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
+          "status": "Name:\trunuser\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t0\t0\t0\t0\nGid:\t0\t0\t0\t0\nFDSize:\t64\nGroups:\t65534 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t    7768 kB\nVmSize:\t    7704 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    3136 kB\nVmRSS:\t    3136 kB\nRssAnon:\t     392 kB\nRssFile:\t    2744 kB\nRssShmem:\t       0 kB\nVmData:\t     404 kB\nVmStk:\t     132 kB\nVmExe:\t      84 kB\nVmLib:\t    4832 kB\nVmPTE:\t      52 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t1/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000010000\nSigBlk:\tfffffffe7ffb9eff\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000004000\nCapInh:\t0000000000000000\nCapPrm:\t00000000a80425fb\nCapEff:\t00000000a80425fb\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t16\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "runuser\u0000-u\u0000nobody\u0000--\u0000python3\u0000-B\u0000/results/owner_watch_diag.py\u0000--source\u0000/src\u0000--output\u0000/results/owner-watch-diagnostic.json\u0000",
+          "children": "7 10 11 ",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        }
+      ],
+      "group": [
+        {
+          "pid": 10,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598138,
+          "stat": "10 (python3) Z 1 9 9 0 -1 4228172 446 0 0 0 0 0 0 0 20 0 1 0 10598138 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 7 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t10\nNgid:\t0\nPid:\t10\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t10\nNSpid:\t10\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000000\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        },
+        {
+          "pid": 11,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598143,
+          "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        }
+      ],
+      "locks": {
+        "target_inodes": {
+          "ledger_directory": "0:42:261032",
+          "writer_lock": "0:42:261033"
+        },
+        "matching": [],
+        "probes": {
+          "ledger_directory": "available",
+          "writer_lock": "available"
+        }
+      }
+    },
+    {
+      "after_return": 1.0032522929977858,
+      "signal0": "success",
+      "test_observer_running": false,
+      "background": {
+        "pid": 11,
+        "comm": "python3",
+        "state": "Z",
+        "ppid": 1,
+        "pgrp": 9,
+        "session": 9,
+        "starttime": 10598143,
+        "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+        "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+        "cmdline": "",
+        "children": "",
+        "fds_error": "PermissionError(13, 'Permission denied')"
+      },
+      "parent_chain": [
+        {
+          "pid": 11,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598143,
+          "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        },
+        {
+          "pid": 1,
+          "comm": "runuser",
+          "state": "S",
+          "ppid": 0,
+          "pgrp": 1,
+          "session": 1,
+          "starttime": 10598117,
+          "stat": "1 (runuser) S 0 1 1 0 -1 4194560 997 0 0 0 0 0 0 0 20 0 1 0 10598117 7888896 782 18446744073709551615 1 1 0 0 0 0 2147196671 0 16384 0 0 0 17 11 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
+          "status": "Name:\trunuser\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t0\t0\t0\t0\nGid:\t0\t0\t0\t0\nFDSize:\t64\nGroups:\t65534 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t    7768 kB\nVmSize:\t    7704 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    3136 kB\nVmRSS:\t    3136 kB\nRssAnon:\t     392 kB\nRssFile:\t    2744 kB\nRssShmem:\t       0 kB\nVmData:\t     404 kB\nVmStk:\t     132 kB\nVmExe:\t      84 kB\nVmLib:\t    4832 kB\nVmPTE:\t      52 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t1/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000010000\nSigBlk:\tfffffffe7ffb9eff\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000004000\nCapInh:\t0000000000000000\nCapPrm:\t00000000a80425fb\nCapEff:\t00000000a80425fb\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t16\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "runuser\u0000-u\u0000nobody\u0000--\u0000python3\u0000-B\u0000/results/owner_watch_diag.py\u0000--source\u0000/src\u0000--output\u0000/results/owner-watch-diagnostic.json\u0000",
+          "children": "7 10 11 ",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        }
+      ],
+      "group": [
+        {
+          "pid": 10,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598138,
+          "stat": "10 (python3) Z 1 9 9 0 -1 4228172 446 0 0 0 0 0 0 0 20 0 1 0 10598138 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 7 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t10\nNgid:\t0\nPid:\t10\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t10\nNSpid:\t10\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000000\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        },
+        {
+          "pid": 11,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598143,
+          "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        }
+      ],
+      "locks": {
+        "target_inodes": {
+          "ledger_directory": "0:42:261032",
+          "writer_lock": "0:42:261033"
+        },
+        "matching": [],
+        "probes": {
+          "ledger_directory": "available",
+          "writer_lock": "available"
+        }
+      }
+    },
+    {
+      "after_return": 2.2044750850036507,
+      "signal0": "success",
+      "test_observer_running": false,
+      "background": {
+        "pid": 11,
+        "comm": "python3",
+        "state": "Z",
+        "ppid": 1,
+        "pgrp": 9,
+        "session": 9,
+        "starttime": 10598143,
+        "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+        "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+        "cmdline": "",
+        "children": "",
+        "fds_error": "PermissionError(13, 'Permission denied')"
+      },
+      "parent_chain": [
+        {
+          "pid": 11,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598143,
+          "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        },
+        {
+          "pid": 1,
+          "comm": "runuser",
+          "state": "S",
+          "ppid": 0,
+          "pgrp": 1,
+          "session": 1,
+          "starttime": 10598117,
+          "stat": "1 (runuser) S 0 1 1 0 -1 4194560 997 0 0 0 0 0 0 0 20 0 1 0 10598117 7888896 782 18446744073709551615 1 1 0 0 0 0 2147196671 0 16384 0 0 0 17 11 0 0 0 0 0 0 0 0 0 0 0 0 0\n",
+          "status": "Name:\trunuser\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t0\t0\t0\t0\nGid:\t0\t0\t0\t0\nFDSize:\t64\nGroups:\t65534 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t    7768 kB\nVmSize:\t    7704 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    3136 kB\nVmRSS:\t    3136 kB\nRssAnon:\t     392 kB\nRssFile:\t    2744 kB\nRssShmem:\t       0 kB\nVmData:\t     404 kB\nVmStk:\t     132 kB\nVmExe:\t      84 kB\nVmLib:\t    4832 kB\nVmPTE:\t      52 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffff\nThreads:\t1\nSigQ:\t1/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000010000\nSigBlk:\tfffffffe7ffb9eff\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000004000\nCapInh:\t0000000000000000\nCapPrm:\t00000000a80425fb\nCapEff:\t00000000a80425fb\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t16\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "runuser\u0000-u\u0000nobody\u0000--\u0000python3\u0000-B\u0000/results/owner_watch_diag.py\u0000--source\u0000/src\u0000--output\u0000/results/owner-watch-diagnostic.json\u0000",
+          "children": "7 10 11 ",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        }
+      ],
+      "group": [
+        {
+          "pid": 10,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598138,
+          "stat": "10 (python3) Z 1 9 9 0 -1 4228172 446 0 0 0 0 0 0 0 20 0 1 0 10598138 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 0 1 0 0 17 7 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t10\nNgid:\t0\nPid:\t10\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t10\nNSpid:\t10\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000000\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        },
+        {
+          "pid": 11,
+          "comm": "python3",
+          "state": "Z",
+          "ppid": 1,
+          "pgrp": 9,
+          "session": 9,
+          "starttime": 10598143,
+          "stat": "11 (python3) Z 1 9 9 0 -1 4228172 129 0 0 0 0 0 0 0 20 0 1 0 10598143 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 2 1 0 0 17 9 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "status": "Name:\tpython3\nState:\tZ (zombie)\nTgid:\t11\nNgid:\t0\nPid:\t11\nPPid:\t1\nTracerPid:\t0\nUid:\t65534\t65534\t65534\t65534\nGid:\t65534\t65534\t65534\t65534\nFDSize:\t0\nGroups:\t65534 \nNStgid:\t11\nNSpid:\t11\nNSpgid:\t9\nNSsid:\t9\nKthread:\t0\nThreads:\t1\nSigQ:\t0/31336\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000100\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000000000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t00000000a80425fb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tvulnerable\nSpeculationIndirectBranch:\tunknown\nCpus_allowed:\tfff\nCpus_allowed_list:\t0-11\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t2\nnonvoluntary_ctxt_switches:\t0\n",
+          "cmdline": "",
+          "children": "",
+          "fds_error": "PermissionError(13, 'Permission denied')"
+        }
+      ],
+      "locks": {
+        "target_inodes": {
+          "ledger_directory": "0:42:261032",
+          "writer_lock": "0:42:261033"
+        },
+        "matching": [],
+        "probes": {
+          "ledger_directory": "available",
+          "writer_lock": "available"
+        }
+      }
+    }
+  ],
+  "cleanup": [
+    {
+      "pid": 10,
+      "state": "Z",
+      "waitpid": "ChildProcessError(10, 'No child processes')"
+    },
+    {
+      "pid": 11,
+      "state": "Z",
+      "waitpid": "ChildProcessError(10, 'No child processes')"
+    }
+  ],
+  "owner_wait": -15,
+  "reaped_control_running": false,
+  "cpu_stat_after": "usage_usec 259129\nuser_usec 234020\nsystem_usec 25109\nnice_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0\n",
+  "load_after": "2.55 2.29 2.16 2/551 11\n",
+  "late_write_exists": false
+}

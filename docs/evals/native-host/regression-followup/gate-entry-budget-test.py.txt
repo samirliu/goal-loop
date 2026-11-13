@@ -1,0 +1,173 @@
+"""Real gate entry preparation consumes the existing batch envelope."""
+import fcntl
+import json
+import os
+from pathlib import Path
+import shlex
+import subprocess
+import sys
+import tempfile
+import time
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+CTL, GATE = ROOT/'scripts/goal_ctl.sh', ROOT/'scripts/goal_gate.sh'
+
+
+class GateEntryBudget(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory(prefix='goal-gate-entry-')
+        self.addCleanup(self.temporary.cleanup)
+        self.project = Path(self.temporary.name)
+        self.state = self.project/'.goal'
+        self.call(CTL, 'init', expected=0)
+
+    def call(self, script, *args, expected=None, env=None, pass_fds=()):
+        result = subprocess.run(['bash', str(script), *args, '--project', str(self.project)],
+                                capture_output=True, text=True, env=env, pass_fds=pass_fds, timeout=12)
+        if expected is not None:
+            self.assertEqual(result.returncode, expected, result.stdout+result.stderr)
+        return result
+
+    def contract(self, *, budgeted=True, checks=5, duration=1, check_timeout=10, durations=None):
+        rows = []
+        for index in range(checks):
+            delay = duration if durations is None else durations[index]
+            command = ('if test -f .goal/evidence/armed; then '
+                       'printf "%s|%s\\n" "${GOAL_GATE_MONOTONIC_START:-missing}" '
+                       '"${GOAL_RUNNER_MONOTONIC_END:-missing}" >> .goal/evidence/context; '
+                       'sleep '+str(delay)+'; echo '+str(index)+' >> .goal/evidence/completed; fi; true')
+            rows.append('- AC-%s | bounded | check: `%s` | expected: exit=0' % (index+1, command))
+        (self.state/'goal.md').write_text('# Goal\n\n## Acceptance criteria\n\n'+'\n'.join(rows)+
+            '\n\n## Budgets\n\ncheck_timeout='+str(check_timeout)+'\n\n## Approval\n\napproved: PENDING\n')
+        self.call(CTL, 'stamp', '--auto', *(['--time-budget=1'] if budgeted else []), expected=0)
+        if budgeted:
+            time.sleep(1.1)
+        (self.state/'evidence/armed').touch()
+
+    def slow_real_view_reader(self, seconds=2):
+        """Delay the real imported verify_views; retain its real lock/exec path."""
+        probe = self.state/'entry-probe'; probe.mkdir()
+        wrapper = probe/'access_probe.py'
+        marker = self.state/'evidence/slow-view-read.json'
+        wrapper.write_text(
+            'import importlib.util,json,os,sys,time\nfrom pathlib import Path\n'
+            'spec=importlib.util.spec_from_file_location("actual_goal_store",sys.argv[1])\n'
+            'store=importlib.util.module_from_spec(spec);spec.loader.exec_module(store)\n'
+            'real=store.verify_views\n'
+            'def slow(state):\n'
+            ' marker=Path(os.environ["GATE_ENTRY_READ_MARKER"])\n'
+            ' if marker.exists(): return real(state)\n'
+            ' began=time.monotonic()\n'
+            ' time.sleep(float(os.environ["GATE_ENTRY_READ_DELAY"]))\n'
+            ' value=real(state)\n'
+            ' marker.write_text(json.dumps({"started":began,"finished":time.monotonic(),"real_views_verified":True}))\n'
+            ' return value\n'
+            'store.verify_views=slow\n'
+            'store._access_exec(sys.argv[3:])\n')
+        bindir = probe/'bin'; bindir.mkdir()
+        shim = bindir/'python3'
+        shim.write_text('#!/bin/bash\nif [ "${1:-}" = -I ] && [ "${2:-}" = '+
+            shlex.quote(str(ROOT/'scripts/goal_store.py'))+' ] && [ "${3:-}" = access-exec ] && '
+            '[ "${5:-}" = gate ]; then\n exec '+shlex.quote(sys.executable)+' -I '+
+            shlex.quote(str(wrapper))+' "${@:2}"\nfi\nexec '+shlex.quote(sys.executable)+' "$@"\n')
+        shim.chmod(0o755)
+        return dict(os.environ, PATH=str(bindir)+os.pathsep+os.environ['PATH'],
+                    GATE_ENTRY_READ_MARKER=str(marker), GATE_ENTRY_READ_DELAY=str(seconds)), marker
+
+    def contexts(self):
+        path = self.state/'evidence/context'
+        return [line.split('|') for line in path.read_text().splitlines()] if path.exists() else []
+
+    def observation(self, result, started, **extra):
+        completed = self.state/'evidence/completed'
+        value = dict(case=self.id(), started_monotonic=started, elapsed=time.monotonic()-started, returncode=result.returncode,
+                     contexts=self.contexts(), completed=completed.read_text().splitlines() if completed.exists() else [],
+                     stdout=result.stdout, stderr=result.stderr, **extra)
+        print('GATE_ENTRY_OBSERVATION '+json.dumps(value, sort_keys=True), file=sys.stderr, flush=True)
+        return value
+
+    def test_slow_real_view_preflight_spends_the_same_settlement(self):
+        self.contract()
+        env, marker = self.slow_real_view_reader()
+        started = time.monotonic()
+        result = self.call(GATE, '--verify', env=env)
+        read = json.loads(marker.read_bytes())
+        observed = self.observation(result, started, view_read=read)
+        self.assertTrue(read['real_views_verified'])
+        self.assertGreaterEqual(read['finished']-read['started'], 2)
+        self.assertEqual(result.returncode, 2, observed)
+        self.assertLess(observed['elapsed'], 4.2, observed)
+
+    def test_fresh_future_origin_and_supervision_marker_cannot_grant_time(self):
+        self.contract()
+        env, marker = self.slow_real_view_reader()
+        future = str(time.monotonic()+3600)
+        env.update(GOAL_GATE_MONOTONIC_START=future, GOAL_GATE_SUPERVISED='1')
+        started = time.monotonic()
+        result = self.call(GATE, '--verify', env=env)
+        read = json.loads(marker.read_bytes())
+        observed = self.observation(result, started, injected_origin=future, view_read=read)
+        self.assertEqual(result.returncode, 2, observed)
+        self.assertLess(observed['elapsed'], 4.2, observed)
+        self.assertTrue(observed['contexts'], observed)
+        for origin, _ in observed['contexts']:
+            self.assertNotEqual(origin, future, observed)
+            self.assertGreaterEqual(float(origin), started, observed)
+            self.assertLessEqual(float(origin), read['started'], observed)
+
+    def borrowed_reader(self, origin, cap):
+        fd = os.open(self.state, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
+        self.addCleanup(os.close, fd)
+        env = dict(os.environ, GOAL_ACCESS_FD=str(fd), GOAL_ACCESS_OWNER_PID=str(os.getpid()),
+                   GOAL_ACCESS_MODE='read', GOAL_GATE_MONOTONIC_START=str(origin),
+                   GOAL_RUNNER_MONOTONIC_END=str(cap))
+        return fd, env
+
+    def test_borrowed_reader_preserves_time_spent_before_nested_gate(self):
+        self.contract()
+        entered = time.monotonic()
+        fd, env = self.borrowed_reader(entered, entered+8)
+        # This is real elapsed preparation under the retained SH lock. No
+        # clock, inherited FD validation or subprocess exec is replaced.
+        time.sleep(2)
+        result = self.call(GATE, '--verify', env=env, pass_fds=(fd,))
+        observed = self.observation(result, entered)
+        self.assertEqual(result.returncode, 2, observed)
+        self.assertLess(observed['elapsed'], 4.2, observed)
+        self.assertTrue(observed['contexts'], observed)
+        for origin, cap in observed['contexts']:
+            self.assertEqual(origin, str(entered), observed)
+            self.assertLessEqual(float(cap), entered+3, observed)
+
+    def test_borrowed_nested_gate_keeps_shorter_global_cap(self):
+        self.contract(checks=2, duration=3, check_timeout=10)
+        entered = time.monotonic()
+        inherited = entered+2.5
+        fd, env = self.borrowed_reader(entered, inherited)
+        result = self.call(GATE, '--verify', env=env, pass_fds=(fd,))
+        observed = self.observation(result, entered, inherited_cap=inherited)
+        self.assertEqual(result.returncode, 2, observed)
+        self.assertLess(observed['elapsed'], 4.2, observed)
+        self.assertTrue(observed['contexts'], observed)
+        self.assertEqual(observed['completed'], [], observed)
+        for origin, cap in observed['contexts']:
+            self.assertEqual(origin, str(entered), observed)
+            self.assertLessEqual(float(cap), inherited, observed)
+
+    def test_unbudgeted_batch_has_only_individual_check_timeouts(self):
+        self.contract(budgeted=False, checks=4, durations=(1.1, 1.1, 1.1, 3.5), check_timeout=2)
+        started = time.monotonic()
+        result = self.call(GATE, '--verify')
+        observed = self.observation(result, started)
+        self.assertEqual(result.returncode, 2, observed)
+        self.assertGreater(observed['elapsed'], 3, observed)
+        self.assertEqual(observed['completed'], ['0', '1', '2'], observed)
+        self.assertEqual(len(observed['contexts']), 4, observed)
+        self.assertTrue(all(cap == 'missing' for _, cap in observed['contexts']), observed)
+        self.assertIn('124', result.stdout+result.stderr, observed)
+
+
+if __name__ == '__main__':
+    unittest.main()

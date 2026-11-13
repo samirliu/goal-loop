@@ -1,0 +1,65 @@
+{
+  "scope": "Posthoc only; original frozen v3 scores/times and closed139 full matrix unchanged",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 3834,
+      "sha256": "03dd76b7118e93d30e99f6b23b7b07c09cb68d1d75ee610e642b37db26ab4b7d"
+    },
+    {
+      "path": "after-grade.py.txt",
+      "bytes": 13062,
+      "sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"
+    },
+    {
+      "path": "after-targeted.log",
+      "bytes": 1499,
+      "sha256": "be95d2f73f6c4be663088e6d748b80ff8ec36b60eddc297264c96c96c895c009"
+    },
+    {
+      "path": "archive-index.json",
+      "bytes": 488,
+      "sha256": "ecfea63fb73b0570cd6c30d4f74569904644fb9c338eef21313e8acc7953afe7"
+    },
+    {
+      "path": "before-grade.py.txt",
+      "bytes": 10464,
+      "sha256": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19"
+    },
+    {
+      "path": "before-targeted.log",
+      "bytes": 3644,
+      "sha256": "669389a34413b3c896549def124620720b62d4bce41160d60a3bf5706c969271"
+    },
+    {
+      "path": "calibration-before.tar.xz",
+      "bytes": 45584,
+      "sha256": "93fe605252de3d3f82112e406769a27084c9d16b951f0c580e3545924d8f0163"
+    },
+    {
+      "path": "implementation.patch",
+      "bytes": 9345,
+      "sha256": "ed1e2d1c837cb5c036e4726171fa36b742fc73d72adf04aaeacdfa3d21d709d2"
+    },
+    {
+      "path": "posthoc-six.log",
+      "bytes": 541,
+      "sha256": "b2862c5670bfacf1c4fc330b8f9c848f9c0aa599aa6ec410d2b2012a73f9a02a"
+    },
+    {
+      "path": "posthoc-six.tar.xz",
+      "bytes": 17192,
+      "sha256": "9f0dc8d73e47d588225037296e42ed27dd2fc290950d07745c172a20c5a53e99"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 903,
+      "sha256": "3c17f9e1c8dd7704447827b9ff10d998601ac9646d24bf00d2fffc2d7a89deb3"
+    },
+    {
+      "path": "test_medium_grader.py.txt",
+      "bytes": 5930,
+      "sha256": "6381ef5802a80bbfec70a67f2d4b40ae5e3ca163834e2ca0a428d9acb2b17902"
+    }
+  ]
+}

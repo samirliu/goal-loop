@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/opt/homebrew/opt/python@3.12/bin/python3.12",
+    "-B",
+    "-c",
+    "import resource,pytest; soft,hard=resource.getrlimit(resource.RLIMIT_NOFILE); resource.setrlimit(resource.RLIMIT_NOFILE,(1024,hard)); raise SystemExit(pytest.main([\"-q\",\"-s\",\"tests/test_owner_watch_guard.py\",\"-k\",\"guard_drops_stdout\"]))"
+  ],
+  "returncode": 1,
+  "platform": "darwin",
+  "uid": 501,
+  "actual_test_process_soft_limit": 1024,
+  "test_sha256": "189f4106ab2692ded4a4194cddf82a5fc180a1458312adb3fa1c6b92eb3a9872",
+  "production_sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+  "stdout": "F\n=================================== FAILURES ===================================\n_________ GroupGuard.test_guard_drops_stdout_and_high_lock_descriptor __________\n\nself = <test_owner_watch_guard.GroupGuard testMethod=test_guard_drops_stdout_and_high_lock_descriptor>\n\n    def test_guard_drops_stdout_and_high_lock_descriptor(self):\n>       self.guard_descriptors()\n\ntests/test_owner_watch_guard.py:141: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \ntests/test_owner_watch_guard.py:100: in guard_descriptors\n    self.assertTrue(ready.exists(), 'guard descriptor probe did not become ready')\nE   AssertionError: False is not true : guard descriptor probe did not become ready\n=========================== short test summary info ============================\nFAILED tests/test_owner_watch_guard.py::GroupGuard::test_guard_drops_stdout_and_high_lock_descriptor\n1 failed, 4 deselected in 0.06s\n",
+  "stderr": "",
+  "scope": "Real macOS low-soft-limit fixture reproduction only; no production change, model or full suite"
+}

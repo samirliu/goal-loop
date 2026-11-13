@@ -1,0 +1,36 @@
+{
+  "scope": "New gate-entry budget regressions only; no full suite/model/cohort",
+  "owned_repository_file": "tests/test_gate_entry_budget.py",
+  "before": "/tmp/goal-gate-entry-before-20261112.json",
+  "after_minimal": "/tmp/goal-gate-entry-after-minimal-20261112.json",
+  "after_all": "/tmp/goal-gate-entry-after-20261112.json",
+  "before_observed": {
+    "tests": 1,
+    "exit_code": 1,
+    "elapsed": 5.839658624958247,
+    "limit": 4.2,
+    "real_verify_views_seconds": 2.016398166073486
+  },
+  "after_observed": {
+    "tests": 5,
+    "exit_code": 0,
+    "slow_real_views_elapsed": 3.584906958974898,
+    "fresh_future_marker_elapsed": 3.738300499971956,
+    "borrowed_spent_2s_elapsed": 3.0351223750039935,
+    "shorter_global_cap": 2.5,
+    "shorter_global_cap_elapsed": 2.514656624989584,
+    "unbudgeted_elapsed": 6.444451542105526,
+    "unbudgeted_completed_checks": 3,
+    "last_individual_timeout": 124
+  },
+  "final_hashes": {
+    "tests/test_gate_entry_budget.py": "1123414cf146c56190abe1057defcd74a1d4976cc903222cb4c12f8313142905",
+    "tests/test_gate_budget.py": "1cdb2a65200462028d9cf7b464f131c06078ddbecca353b8b682fafbc029534e",
+    "scripts/goal_store.py": "13d4250e70d406d030eace9d7c2b12c6fc0a0dd4cff11fcd536671ae4d0ee8f3",
+    "scripts/goal_runner.py": "09c14fe4f348bc768ee66605353df80267017caf494b046b37f0fb8716ff39aa"
+  },
+  "test_gate_budget_unchanged": true,
+  "assertion_limit_unchanged": 4.2,
+  "production_edited_by_this_agent": false,
+  "other_tests_edited_by_this_agent": false
+}

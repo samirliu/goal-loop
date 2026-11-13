@@ -1,0 +1,227 @@
+"""Production entrypoints: concurrent ownership, budget commits and cancellation."""
+import json
+import os
+from pathlib import Path
+import signal
+import subprocess
+import tempfile
+import time
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+CTL = ROOT / 'scripts/goal_ctl.sh'
+LOOP = ROOT / 'scripts/goal_loop.sh'
+GATE = ROOT / 'scripts/goal_gate.sh'
+
+
+class Lifecycle(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix='goal-lifecycle-')
+        self.addCleanup(self.temp.cleanup)
+        self.project = Path(self.temp.name)
+        self.state = self.project / '.goal'
+        self.call(CTL, 'init')
+
+    def call(self, script, *args, env=None, timeout=15):
+        return subprocess.run(['bash', str(script), *args, '--project', str(self.project)],
+                              capture_output=True, env=env, timeout=timeout)
+
+    def contract(self, command='true', knobs=''):
+        (self.state / 'goal.md').write_text(
+            '# Goal\n\n## Acceptance criteria\n\n'
+            '- AC-1 | output | check: `' + command + '` | expected: exit=0\n\n'
+            '## Budgets\n\n' + knobs + '\n\n## Approval\n\napproved: PENDING\n')
+        result = self.call(CTL, 'stamp', '--auto')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def mock(self, source):
+        path = self.project / 'executor'
+        path.write_text('#!/bin/bash\n' + source)
+        path.chmod(0o755)
+        return dict(os.environ, CLAUDE_BIN=str(path))
+
+    def start(self, script, *args, env=None):
+        process = subprocess.Popen(['bash', str(script), *args, '--project', str(self.project)],
+                                   env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        def cleanup():
+            if process.poll() is None:
+                process.kill()
+            process.communicate(timeout=6)
+        self.addCleanup(cleanup)
+        return process
+
+    def wait_file(self, name, process):
+        until = time.monotonic() + 6
+        path = self.state / name
+        while not path.exists():
+            if process.poll() is not None:
+                out, err = process.communicate()
+                self.fail('process exited before ready: %r' % (out + err))
+            self.assertLess(time.monotonic(), until, 'no readiness marker')
+            time.sleep(0.01)
+        return path
+
+    def test_competing_runners_dispatch_exactly_one_worker(self):
+        self.contract()
+        env = self.mock('echo call >> .goal/calls\ntouch .goal/ready\nsleep 2\n')
+        jobs = [self.start(LOOP, '--continue', '--wallclock=8', '--max-iterations=1', env=env) for _ in range(6)]
+        results = []
+        for job in jobs:
+            out, err = job.communicate(timeout=12)
+            results.append((job.returncode, out + err))
+        self.assertEqual((self.state / 'calls').read_text().count('call'), 1, results)
+        self.assertEqual(sum(rc == 3 for rc, _ in results), 1, results)
+        self.assertEqual(sum(rc == 4 and b'live-lock' in out for rc, out in results), 5, results)
+        self.assertFalse((self.state / 'lock').exists())
+
+    def test_runner_death_before_reaping_stops_group_and_releases_ownership(self):
+        if not hasattr(os, 'waitid') or not hasattr(os, 'WNOWAIT'):
+            self.skipTest('requires waitid WNOWAIT')
+        self.contract()
+        env = self.mock('(sleep 1.5; echo leaked > .goal/leak) &\ntouch .goal/ready\nwait\n')
+        owner = self.start(LOOP, '--continue', '--wallclock=10', env=env)
+        self.wait_file('ready', owner)
+        owner.kill()
+        status = os.waitid(os.P_PID, owner.pid, os.WEXITED | os.WNOWAIT)
+        self.assertEqual(status.si_status, signal.SIGKILL)
+        time.sleep(1.8)
+        os.kill(owner.pid, 0)  # Still an unreaped zombie, not a dead PID probe.
+        self.assertFalse((self.state / 'leak').exists())
+        retry = self.call(LOOP, '--continue', '--resume', '--dry-run', '--wallclock=10', '--max-iterations=1')
+        self.assertEqual(retry.returncode, 3, retry.stdout + retry.stderr)
+        self.assertEqual(os.waitid(os.P_PID, owner.pid, os.WEXITED | os.WNOWAIT).si_pid, owner.pid)
+        self.assertEqual(owner.wait(timeout=3), -signal.SIGKILL)
+
+    def test_budget_commit_failure_sides_and_exact_recovery(self):
+        self.contract()
+        before = (self.state / 'store/commits/current').read_bytes()
+        env = dict(os.environ, GOAL_RUNNER_FAULT='generation-published')
+        failed = self.call(LOOP, '--continue', '--dry-run', '--wallclock=20', '--max-iterations=1', env=env)
+        self.assertNotEqual(failed.returncode, 0)
+        self.assertEqual((self.state / 'store/commits/current').read_bytes(), before)
+        self.assertFalse((self.state / 'runner.deadline').exists())
+        self.assertEqual(self.call(CTL, 'status').returncode, 0)
+
+        env['GOAL_RUNNER_FAULT'] = 'pointer-published'
+        failed = self.call(LOOP, '--continue', '--dry-run', '--wallclock=20', '--max-iterations=1', env=env)
+        self.assertNotEqual(failed.returncode, 0)
+        self.assertNotEqual((self.state / 'store/commits/current').read_bytes(), before)
+        rejected = self.call(GATE, '--verify')
+        self.assertEqual(rejected.returncode, 4, rejected.stdout + rejected.stderr)
+        self.assertIn(b'ledger-view-mismatch', rejected.stderr)
+        result = self.call(CTL, 'recover')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        value = json.loads((self.state / 'runner.json').read_bytes())
+        deadline = (self.state / 'runner.deadline').read_bytes()
+        self.assertEqual(int(deadline), value['deadline'])
+        self.assertEqual(int((self.state / 'runner.clock').read_bytes()), value['clock'])
+        self.assertEqual(self.call(GATE, '--verify').returncode, 0)
+        retry = self.call(LOOP, '--continue', '--resume', '--dry-run', '--wallclock=200', '--max-iterations=1')
+        self.assertEqual(retry.returncode, 3, retry.stdout + retry.stderr)
+        self.assertEqual((self.state / 'runner.deadline').read_bytes(), deadline)
+
+    def test_runner_views_cannot_extend_budget_outside_commit(self):
+        self.contract()
+        result = self.call(LOOP, '--continue', '--dry-run', '--wallclock=10', '--max-iterations=1')
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        originals = {name: (self.state / name).read_bytes() for name in ('runner.clock', 'runner.deadline', 'runner.json')}
+        for name, data in originals.items():
+            with self.subTest(name=name):
+                (self.state / name).write_bytes(data + b' ')
+                result = self.call(CTL, 'status')
+                self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
+                self.assertIn(b'ledger-view-mismatch', result.stderr)
+                self.assertEqual(self.call(CTL, 'recover').returncode, 0)
+                self.assertEqual((self.state / name).read_bytes(), data)
+
+    def test_late_product_go_is_not_counted_as_timely_success(self):
+        self.contract()
+        env = self.mock('echo unexpected > .goal/worker-started\n')
+        (self.project / 'artifact.txt').write_text('delivered\n')
+        closed = self.call(CTL, 'close-iteration', '--task', 'T1', '--files', 'artifact.txt',
+                           '--checks-pass', '1', '--checks-fail', '0', '--checks-unverifiable', '0',
+                           '--progress', 'yes', '--exit-signal', 'yes', '--adversarial', 'clear',
+                           '--adversarial-note', 'reviewed', '--no-gate')
+        self.assertEqual(closed.returncode, 0, closed.stdout + closed.stderr)
+        (self.state / 'runner.deadline').write_text('1\n')  # legacy expired run, imported once
+        result = self.call(LOOP, '--continue', '--wallclock=20', '--max-iterations=1', env=env)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn(b'GATE: GO', result.stdout + result.stderr)
+        self.assertIn(b'timing=after-deadline', result.stdout + result.stderr)
+        self.assertFalse((self.state / 'worker-started').exists())
+        receipt = json.loads((self.state / 'runner.json').read_bytes())['result']
+        self.assertEqual(receipt['outcome'], 'delivered')
+        self.assertFalse(receipt['timely'])
+
+    def test_frozen_wall_clock_cannot_renew_monotonic_budget(self):
+        self.contract()
+        env = self.mock('echo call >> .goal/calls\nsleep 3\n')
+        bindir = self.project / 'bin'
+        bindir.mkdir()
+        date = bindir / 'date'
+        date.write_text('#!/bin/bash\nif [ "$1" = +%s ]; then echo ' + str(int(time.time())) + '; else /bin/date "$@"; fi\n')
+        date.chmod(0o755)
+        env['PATH'] = str(bindir) + os.pathsep + env['PATH']
+        start = time.monotonic()
+        result = self.call(LOOP, '--continue', '--wallclock=2', '--max-iterations=3', env=env)
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        # Two seconds search + at most three seconds final settlement + setup.
+        self.assertLess(time.monotonic() - start, 6)
+        self.assertEqual((self.state / 'calls').read_text().count('call'), 1)
+        retry = self.call(LOOP, '--continue', '--resume', '--wallclock=200', '--max-iterations=1', env=env)
+        self.assertEqual(retry.returncode, 3, retry.stdout + retry.stderr)
+        self.assertEqual((self.state / 'calls').read_text().count('call'), 1, 'resume renewed frozen-clock budget')
+
+    def slow_check(self, timeout=1):
+        self.contract('if test -f .goal/evidence/slow; then (sleep 2; echo leaked > .goal/evidence/leak) & '
+                      'touch .goal/evidence/ready; wait; fi; true', 'check_timeout=' + str(timeout))
+        (self.state / 'evidence/slow').touch()
+
+    def test_standalone_gate_ignores_unbounded_timeout_tool(self):
+        self.slow_check()
+        bindir = self.project / 'bin'
+        bindir.mkdir()
+        timeout = bindir / 'timeout'
+        timeout.write_text('#!/bin/bash\necho used > "$UNSAFE_TIMEOUT_MARKER"\nshift\nexec "$@"\n')
+        timeout.chmod(0o755)
+        env = dict(os.environ, PATH=str(bindir) + os.pathsep + os.environ['PATH'],
+                   UNSAFE_TIMEOUT_MARKER=str(self.state / 'timeout-used'))
+        start = time.monotonic()
+        result = self.call(GATE, '--verify', env=env)
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertLess(time.monotonic()-start, 2)
+        self.assertIn(b'124', result.stdout + result.stderr)
+        self.assertFalse((self.state / 'timeout-used').exists())
+        time.sleep(1.3)
+        self.assertFalse((self.state / 'evidence/leak').exists())
+
+    def test_standalone_gate_zombie_cannot_leave_check_running(self):
+        if not hasattr(os, 'waitid') or not hasattr(os, 'WNOWAIT'):
+            self.skipTest('requires waitid WNOWAIT')
+        self.slow_check(timeout=10)
+        owner = self.start(GATE, '--verify')
+        self.wait_file('evidence/ready', owner)
+        owner.kill()
+        os.waitid(os.P_PID, owner.pid, os.WEXITED | os.WNOWAIT)
+        time.sleep(2.2)
+        self.assertFalse((self.state / 'evidence/leak').exists())
+        self.assertEqual(os.waitid(os.P_PID, owner.pid, os.WEXITED | os.WNOWAIT).si_pid, owner.pid)
+        self.assertEqual(owner.wait(timeout=3), -signal.SIGKILL)
+
+    def test_outer_executor_cancellation_cleans_nested_check_group(self):
+        self.slow_check(timeout=10)
+        env = self.mock('bash "$NESTED_GATE" --verify --project .\n')
+        env['NESTED_GATE'] = str(GATE)
+        owner = self.start(LOOP, '--continue', '--wallclock=20', '--max-iterations=1', env=env)
+        self.wait_file('evidence/ready', owner)
+        owner.kill()
+        os.waitid(os.P_PID, owner.pid, os.WEXITED | os.WNOWAIT)
+        # Nested checks create their own command group. Killing an outer
+        # executor must leave their supervisor alive long enough to clean it.
+        time.sleep(2.3)
+        self.assertFalse((self.state / 'evidence/leak').exists(), 'nested group outlived its executor')
+        self.assertEqual(owner.wait(timeout=3), -signal.SIGKILL)
+
+
+if __name__ == '__main__':
+    unittest.main()

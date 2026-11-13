@@ -1,0 +1,17 @@
+F
+======================================================================
+FAIL: test_public_cli_reads_api_observations_without_changing_their_transport (__main__.Crew.test_public_cli_reads_api_observations_without_changing_their_transport)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_crew.py", line 378, in test_public_cli_reads_api_observations_without_changing_their_transport
+    self.assertEqual(actual[field], expected[field], (field, actual, expected))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'serial' != 'crew'
+- serial
++ crew
+ : ('choice', {'budget_fit': 'unknown', 'choice': 'serial', 'condition': '2b1df2c9185b3ada5d8c77e143f0ca167fc83b299b90e21f2443a4b7cb5e8a27', 'crew_upper': None, 'effective_dependencies': {'T1': [], 'T2': []}, 'failures': 0, 'money': None, 'observations': 0, 'pending': 0, 'reason': 'insufficient-observed-costs', 'serial_lower': None, 'single_observations': 0, 'tokens': None}, {'choice': 'crew', 'reason': 'observed-latency-benefit', 'condition': 'b5e47ff5808e2058a261fa174680ba053563eedbd4ae32aa832e9974376aaa1e', 'serial_lower': 51, 'crew_upper': 21, 'observations': 9, 'failures': 0, 'pending': 0, 'tokens': None, 'money': None, 'budget_fit': 'yes', 'effective_dependencies': {'T1': [], 'T2': []}, 'single_observations': 3, 'single_worker_lower': 51, 'serial_basis': 'single-worker', 'serial_worker_seconds_lower': 50, 'crew_worker_seconds_upper': 40, 'uncertainty': 'observed-range; not a confidence interval'})
+
+----------------------------------------------------------------------
+Ran 1 test in 1.058s
+
+FAILED (failures=1)

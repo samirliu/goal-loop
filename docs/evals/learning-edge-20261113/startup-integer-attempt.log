@@ -1,0 +1,14 @@
+..F
+======================================================================
+FAIL: test_hash_preparation_is_inside_the_same_bound (__main__.GateBudget.test_hash_preparation_is_inside_the_same_bound)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_gate_budget.py", line 71, in test_hash_preparation_is_inside_the_same_bound
+    self.assertTrue(marker.exists(), 'slow hashing was never reached')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : slow hashing was never reached
+
+----------------------------------------------------------------------
+Ran 3 tests in 12.080s
+
+FAILED (failures=1)

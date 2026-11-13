@@ -1,0 +1,4 @@
+Command: python3.12 -B -m pytest -q tests/test_policy_transition.py tests/test_evolve.py
+.......................                                       [100%]
+23 passed, 11 subtests passed in 12.13s
+

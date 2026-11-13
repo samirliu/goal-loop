@@ -1,0 +1,46 @@
+--- a/tests/test_ledger_access.py
++++ b/tests/test_ledger_access.py
+@@ -4,6 +4,7 @@
+ from pathlib import Path
+ import subprocess
+ import signal
++import sys
+ import tempfile
+ import time
+ import unittest
+@@ -15,6 +16,22 @@
+ 
+ 
+ class LedgerAccess(unittest.TestCase):
++    @staticmethod
++    def child_running(pid):
++        try:
++            os.kill(pid, 0)
++        except ProcessLookupError:
++            return False
++        if sys.platform.startswith('linux'):
++            # A non-reaping container PID1 can retain killed grandchildren.
++            # Zombies execute no code and hold no locks; signal 0 still works.
++            try:
++                state = (Path('/proc')/str(pid)/'stat').read_text().rpartition(')')[2].split()[0]
++            except FileNotFoundError:
++                return False
++            return state not in ('Z', 'X')
++        return True
++
+     def setUp(self):
+         self.tmp = tempfile.TemporaryDirectory(prefix='goal-access-')
+         self.addCleanup(self.tmp.cleanup)
+@@ -147,11 +164,7 @@
+                 child = int((self.state / 'evidence/childpid').read_text())
+                 children.append(child)
+                 until = time.monotonic() + 2
+-                while True:
+-                    try:
+-                        os.kill(child, 0)
+-                    except ProcessLookupError:
+-                        break
++                while self.child_running(child):
+                     self.assertLess(time.monotonic(), until, 'background check escaped cancellation')
+                     time.sleep(0.01)
+                 self.run_script(CTL, 'bind', expected=0, input='AC-1|PASS|x|x|x|x\n')

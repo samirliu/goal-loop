@@ -1,0 +1,20 @@
+import argparse
+import fcntl
+import json
+import os
+from pathlib import Path
+import resource
+import tempfile
+
+p=argparse.ArgumentParser();p.add_argument('--source');p.add_argument('--output');a=p.parse_args()
+fd,path=tempfile.mkstemp(prefix='goal-guard-fd-capacity-')
+record=dict(uid=os.geteuid(),nofile=resource.getrlimit(resource.RLIMIT_NOFILE),requested_minimum_fd=2000)
+try:
+    try:
+        duplicate=fcntl.fcntl(fd,fcntl.F_DUPFD,2000)
+        record['duplicate']=duplicate;os.close(duplicate)
+    except OSError as exc:
+        record['duplicate_error']=dict(type=type(exc).__name__,errno=exc.errno,text=str(exc))
+finally:
+    os.close(fd);os.unlink(path)
+Path(a.output).write_text(json.dumps(record,indent=2)+'\n');print(json.dumps(record))

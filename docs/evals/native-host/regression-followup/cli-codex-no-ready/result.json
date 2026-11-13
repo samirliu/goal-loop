@@ -1,0 +1,24 @@
+{
+  "path": "/tmp/goal-host-cli-stdin.my59r0g4",
+  "result": 124,
+  "elapsed": 60.01416649995372,
+  "ready": false,
+  "events": [
+    {
+      "type": "thread.started",
+      "item_type": null,
+      "elapsed": 0.18820624984800816,
+      "thread_id": "01a1ce97-ce06-7cf1-8ae7-a7b39534697d"
+    },
+    {
+      "type": "turn.started",
+      "item_type": null,
+      "elapsed": 1.7733049169182777
+    },
+    {
+      "type": "error",
+      "item_type": null,
+      "elapsed": 47.98463529185392
+    }
+  ]
+}

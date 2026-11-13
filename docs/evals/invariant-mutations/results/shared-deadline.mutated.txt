@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_expired_standalone_batch_does_not_give_every_ac_new_time (__main__.GateBudget.test_expired_standalone_batch_does_not_give_every_ac_new_time)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-invariant-mutations-1cvu1cyn/shared-deadline/tests/test_gate_budget.py", line 49, in test_expired_standalone_batch_does_not_give_every_ac_new_time
+    self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : b'GATE: VERIFY AC-1|PASS|exit=0\nGATE: VERIFY AC-2|PASS|exit=0\nGATE: VERIFY AC-3|PASS|exit=0\nGATE: VERIFY AC-4|PASS|exit=0\nGATE: VERIFY AC-5|PASS|exit=0\nGATE: VERIFY-OK checked=5\n'
+
+----------------------------------------------------------------------
+Ran 1 test in 7.864s
+
+FAILED (failures=1)

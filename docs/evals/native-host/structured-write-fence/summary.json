@@ -1,0 +1,9 @@
+{
+  "scope": "Known Claude structured Write/Edit fence; original row.files anchor, no OS/shell sandbox claim",
+  "before_production_sha256": "7cd29cccfbc59672a4393e68e0561bf54e9034a307a111e41949683f08879570",
+  "after_production_sha256": "a33b910a23954aa2f08ce86863a16433d113f582c127723aeaed238c94065e3d",
+  "before_original_tests_sha256": "1819aca0f08da9dca9cc0e56c0e19cbb1f181d36a3b02c2451ff7c7b48ecc1c5",
+  "same_tests_in_before_and_after_sha256": "ab8fff931a51c728153912cdc6d50d50bc3394f56edd7302b20a7b680c733489",
+  "before_result": "1 failed, 15 deselected in 0.86s (expected denial absent)",
+  "after_result": "16 passed, 16 subtests passed in 16.86s"
+}

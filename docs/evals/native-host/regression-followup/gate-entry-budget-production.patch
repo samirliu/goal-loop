@@ -1,0 +1,43 @@
+--- previous-frozen/scripts/goal_store.py
++++ current-frozen/scripts/goal_store.py
+@@ -335,6 +335,7 @@
+     The descriptor survives exec and is shared by cooperating child readers.
+     Nested writers are refused, including writers launched by a check.
+     """
++    entered = time.monotonic()
+     write_modes = ('write', 'recover', 'migrate', 'init')
+     if len(argv) < 3 or argv[1] not in ('read', 'gate') + write_modes:
+         raise StoreError('access-exec requires state, read|write|gate, script')
+@@ -402,9 +403,14 @@
+         env['GOAL_ACCESS_OWNER_PID'] = str(owner if inherited is not None else os.getpid())
+         env['GOAL_ACCESS_MODE'] = actual_mode
+         if inherited is None:
+-            for key in ('GOAL_GATE_SUPERVISED', 'GOAL_WRITER_OWNER_PID', 'GOAL_CLOSE_EXEC_PID', 'GOAL_CLOSE_LOCK_FD',
++            for key in ('GOAL_GATE_SUPERVISED', 'GOAL_GATE_MONOTONIC_START', 'GOAL_WRITER_OWNER_PID', 'GOAL_CLOSE_EXEC_PID', 'GOAL_CLOSE_LOCK_FD',
+                         'GOAL_CLOSE_OPERATION', 'GOAL_CLOSE_INTENT'):
+                 env.pop(key, None)
++        if mode == 'gate' and 'GOAL_GATE_MONOTONIC_START' not in env:
++            # Fresh access owns this origin; caller environment cannot grant
++            # time. Borrowed readers retain it, including time spent here
++            # acquiring/validating the ledger before gate-limit can run.
++            env['GOAL_GATE_MONOTONIC_START'] = repr(entered)
+         # Kept for the controller's internal check until its pending marker
+         # check is replaced by the common lock-aware access guard.
+         if env['GOAL_ACCESS_MODE'] == 'write':
+--- previous-frozen/scripts/goal_runner.py
++++ current-frozen/scripts/goal_runner.py
+@@ -320,7 +320,13 @@
+         if not math.isfinite(inherited) or inherited < 0:
+             raise store.StoreError('invalid-monotonic-deadline')
+     expired = bool(remaining) and min(remaining) <= 0
+-    cap = mono + (3 if expired and settlement else min(remaining)) if remaining else None
++    entered = os.environ.get('GOAL_GATE_MONOTONIC_START')
++    if entered is not None:
++        entered = float(entered)
++        if not math.isfinite(entered) or not 0 <= entered <= mono:
++            raise store.StoreError('invalid-gate-monotonic-origin')
++    cap = ((mono if entered is None else entered) + 3 if expired and settlement
++           else mono + min(remaining)) if remaining else None
+     if inherited is not None:
+         cap = inherited if cap is None else min(cap, inherited)
+     return cap, expired

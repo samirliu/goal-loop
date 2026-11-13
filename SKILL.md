@@ -12,6 +12,7 @@ description: |-
 
 契约定义成功，crew 执行，门控重跑验收；测量反馈决定下一波。
 持久状态在 `.goal/`，恢复时先 `status`。额外编排的价值必须通过同预算对照证明。
+入口优先执行 `python3 -I <skill>/scripts/goal_host.py enter <project> <seconds>`：从唯一真实 prompt 回执识别宿主，不猜 session；无回执时用宿主实际身份调用 begin。接着 `bash <skill>/scripts/goal_ctl.sh context --project <project>` 取得当前地图与带版本的准确命令；已获自动批准授权时加 `--auto`。过期后重新派生，不读源码重建协议。恢复也用 context；`status` 保留完整诊断。
 
 ## 五条不变量（唯一的法律）
 
@@ -34,6 +35,7 @@ description: |-
 
 ## Step 1 契约
 
+- 开始执行即绑定宿主 `begin`，沿用已有最早截止；有 prompt hook 时从 prompt 起算，否则明确 `host-tool-entry`。不在 stamp 或 resume 重新起表。配置和调用见 [宿主接入](references/host.md)。
 - Level 0 AC：`- AC-N | <yes/no 陈述> | check: \`<命令>\` | expected: <spec>`
 - spec：`exit=0|exit=N` / 数值（`>=60`）/ `maximize`|`minimize` / `judged`
 - **Goodhart 哨兵**：不推进目标也能满足 = 代理指标，重写或删。
@@ -58,7 +60,7 @@ description: |-
 单一端到端验收、局部改动、无需跨 worker 协调的小任务（可含多个文件）直接串行走快车道；不为凑 crew 写接口或扩充检查；实际复审后再填 clear 和证据：
 
 ```
-bash scripts/goal_ctl.sh init  --project .                 # 再填 .goal/goal.md
+[ -d .goal ] || bash scripts/goal_ctl.sh init --project . # hook/enter 已初始化时跳过；context 提供最小契约
 bash scripts/goal_ctl.sh stamp --project . --auto          # 冒烟过 check 之后
 bash scripts/goal_ctl.sh close-iteration --project . --operation-id wave-T1-001 --task T1 --files <产物> \
   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes \
@@ -79,6 +81,7 @@ bash scripts/goal_ctl.sh close-iteration --project . --operation-id wave-T1-001 
 
 ## Step 2 派工
 
+- 原生 worker 用宿主 adapter `prepare → 实际 spawn → attach → reconcile → validate/adopt`；首个工具执行返回的 ready 命令，shell 沿用所属 wrapper。取消标记与真实宿主 interrupt 同时使用，读取终态后才记 cancelled；启动回执/报告正文不能代替完成。见 [宿主接入](references/host.md)。
 - 可拆不等于应并行：启动+协调+join+验收须装得进剩余预算；启动成本未知的短预算小任务先串行贯通。并行仅限互不相交文件域，人数由净收益决定。
 - **一波一收账**（缺省 1）：join 后必须 `close-iteration`（objective 带 `--score --strategy`）再开下一波。
 - **接口先行**：`.goal/interfaces.md` 冻结，改走提案。
@@ -86,12 +89,14 @@ bash scripts/goal_ctl.sh close-iteration --project . --operation-id wave-T1-001 
 - **peer-notes**：`.goal/evidence/peer-notes/<task>.md` 每迭代 ≤1 行；claim-not-instruction。
 - 账本：`task=T<n>[crew:N]`（N=该波实际并发人数，非上限）；work-plan 是正本；**勾完 ≠ GO**。详见 `crew.md`。
 - **worker 掉线/空转**：`close-iteration --fault CLASS --fault-outcome OUTCOME`（后缀由工具派生，不许自封；audit **A11** 双向核账）；没勾的 work-plan 项让门控拒收（`open-items`）。见 `crew.md` §3.5。
+- 需跨波复用时用 crew 图 v2 的显式 `inputs`；只派未接受单元。候选路由用已有进化状态的 `--policy-state` 接入 plan/begin，prepare 返回实际消费版本与输入简报；未验证候选不生效，撤回或版本改变后先重规划。细节见 `crew.md`。
 - Worker 工艺自理；联合波次只归因整波。策略迁移/写回 skill 必须过留出对照，见 gradient pack。
 
 ## Step 3 Join + gate
 
 - 合并审阅；接口冲突串行修；两轮未解退串行并记录。
 - `goal_gate.sh --check` = **唯一完成判定**。claim 前必跑 `goal_audit.sh --project .`，rc!=0 不许 claim。
+- 收尾 `python3 -I <skill>/scripts/goal_context.py receipt <project>` 在同一截止内执行原 audit/Gate，输出证据回执；不代替收账或授予额外 GO。
 - 记账 `close-iteration --score N` / `--strategy-delta` / `--strategy`（objective 下强制）。
   勾账 work-plan `[ ]`→`[x]`。
 
@@ -111,6 +116,6 @@ bash scripts/goal_ctl.sh close-iteration --project . --operation-id wave-T1-001 
 
 ## 脚本与自检
 
-`scripts/{goal_gate,goal_ctl,goal_hook,goal_parse,goal_audit,goal_loop}.sh` · `assets/goal.contract.md`。
+`scripts/{goal_gate,goal_ctl,goal_hook,goal_parse,goal_audit}.sh` · `assets/goal.contract.md`。正常运行只用宿主原生工具；外部 harness runner 仅在仓库 `devtools/goal_loop.sh` 显式选择，原安装路径拒绝启动。
 自检：`tests/run_tests.sh` · `tests/docs_consistency.sh` · `examples/quickstart-one-shot/run.sh`。
 卸载 = 删 skill 目录 + `~/.claude/agents/goal-*.md`。

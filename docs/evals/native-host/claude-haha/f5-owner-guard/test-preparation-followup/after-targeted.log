@@ -1,0 +1,13 @@
+Command: python3.12 -m pytest -q -s tests/test_owner_watch_guard.py tests/test_owner_watch.py
+Exit: 0
+OWNER_GUARD_OBSERVATION {"command_ready": false, "elapsed": 0.06799483392387629, "infinite_requested": false, "late_write": false, "mode": "normal", "result": 7, "stderr": "", "stdout": "{\"nofile\": [4096, 9223372036854775807]}\n"}
+uOWNER_GUARD_OBSERVATION {"command_ready": true, "elapsed": 0.29394612507894635, "infinite_requested": false, "late_write": false, "mode": "timeout", "result": 124, "stderr": "", "stdout": "{\"nofile\": [4096, 9223372036854775807]}\n"}
+uOWNER_GUARD_OBSERVATION {"command_ready": true, "elapsed": 0.13742941711097956, "infinite_requested": false, "late_write": false, "mode": "cancel", "result": 130, "stderr": "", "stdout": "{\"nofile\": [4096, 9223372036854775807]}\n"}
+u.OWNER_GUARD_FDS {"guard_alive": true, "guard_wait": [0, 0], "high_fd": 2000, "infinite_requested": false, "lock_released_while_parent_alive": true, "nofile": [4096, 9223372036854775807], "nofile_before_fd_setup": [4096, 9223372036854775807], "parent_alive": true, "stderr": "", "stdout": "", "stdout_eof_while_parent_alive": true}
+.OWNER_GUARD_FDS {"guard_alive": true, "guard_wait": [0, 0], "high_fd": 2000, "infinite_requested": true, "lock_released_while_parent_alive": true, "nofile": [9223372036854775807, 9223372036854775807], "nofile_before_fd_setup": [9223372036854775807, 9223372036854775807], "parent_alive": true, "stderr": "", "stdout": "", "stdout_eof_while_parent_alive": true}
+.OWNER_GUARD_OBSERVATION {"command_ready": false, "elapsed": 0.10085024987347424, "infinite_requested": true, "late_write": false, "mode": "normal", "result": 7, "stderr": "", "stdout": "{\"nofile\": [9223372036854775807, 9223372036854775807]}\n"}
+uOWNER_GUARD_OBSERVATION {"command_ready": true, "elapsed": 0.3083691669162363, "infinite_requested": true, "late_write": false, "mode": "timeout", "result": 124, "stderr": "", "stdout": "{\"nofile\": [9223372036854775807, 9223372036854775807]}\n"}
+uOWNER_GUARD_OBSERVATION {"command_ready": true, "elapsed": 0.109868458006531, "infinite_requested": true, "late_write": false, "mode": "cancel", "result": 130, "stderr": "", "stdout": "{\"nofile\": [9223372036854775807, 9223372036854775807]}\n"}
+u.OWNER_GUARD_UNAVAILABLE {"command_executed": false, "result": 4, "stderr": "OWNER_WATCH: ERROR command-start: open-descriptor-inventory-unavailable\nSUPERVISOR_SETUP_ERROR: [Errno 1] Operation not permitted\n", "stdout": ""}
+.s....s...
+12 passed, 2 skipped, 6 subtests passed in 4.28s

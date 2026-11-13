@@ -1,0 +1,23 @@
+test_acceptance_check_cannot_replace_the_archived_scope_during_close (__main__.ForgeCoverage.test_acceptance_check_cannot_replace_the_archived_scope_during_close) ... FAIL
+
+======================================================================
+FAIL: test_acceptance_check_cannot_replace_the_archived_scope_during_close (__main__.ForgeCoverage.test_acceptance_check_cannot_replace_the_archived_scope_during_close)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 232, in test_acceptance_check_cannot_replace_the_archived_scope_during_close
+    self.call(CTL, 'close-iteration', '--task', 'T1', '--files', 'algorithm.py',
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              '--checks-pass', '1', '--checks-fail', '0', '--checks-unverifiable', '0',
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              '--progress', 'yes', '--exit-signal', 'no', '--dry', 'yes', '--no-gate', expected=4)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 51, in call
+    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 4 : CTL: CLOSE ok iter=1 digest=v2-3e97b287f26143fadaf6b9cf590c8da5d5ca61a3dfa4dfe1bc1ad390dfdcba89 operation=8261a72cea854165b674579712aad2c1
+
+
+----------------------------------------------------------------------
+Ran 1 test in 2.206s
+
+FAILED (failures=1)

@@ -1,0 +1,6 @@
+python=1
+shell=0
+shellcheck=0
+docs=0
+parser=0
+forge=0

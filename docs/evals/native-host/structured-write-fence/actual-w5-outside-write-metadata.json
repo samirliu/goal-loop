@@ -1,0 +1,45 @@
+{
+  "scope": "Read-only retained real W5 recording; no new hooks or model execution",
+  "events_path": "/tmp/goal-w5-claude-auditlog-v2/single-1/events.jsonl",
+  "events_sha256": "86173c0b524156ed9457002f8dc365d56cdc3946ad39a4af7b25b6f7957566a7",
+  "attempts": [
+    {
+      "id": "e3c9a80f3f964cc98eb7e6f69b80b511",
+      "call_id": "call_01a1cf34b807722abcba4ae7",
+      "agent_id": "a42435c3d33ef5ff5",
+      "files": [
+        "auditlog/__init__.py",
+        "auditlog/codec.py",
+        "auditlog/aggregate.py",
+        "auditlog/__main__.py"
+      ],
+      "phase": "returned"
+    }
+  ],
+  "outside_write_results": [
+    {
+      "line": 157,
+      "is_error": null,
+      "text_sha256": "b369320a4ec31214f776b06cbb20d3bab6b7c2b8e16087ee8d386960fd8c2fae",
+      "tool_use_id": "call_01a1cf376ddc75c4b576c1cd"
+    },
+    {
+      "line": 171,
+      "is_error": null,
+      "text_sha256": "2ee83e165b3cbce6c7e15575632db4a81123a28bce3746fe916262448c0a91f8",
+      "tool_use_id": "call_01a1cf37c57c7633b8d2c0fe"
+    },
+    {
+      "line": 185,
+      "is_error": null,
+      "text_sha256": "2ee83e165b3cbce6c7e15575632db4a81123a28bce3746fe916262448c0a91f8",
+      "tool_use_id": "call_01a1cf37ddcc77b9b9f89f5a"
+    },
+    {
+      "line": 199,
+      "is_error": null,
+      "text_sha256": "2ee83e165b3cbce6c7e15575632db4a81123a28bce3746fe916262448c0a91f8",
+      "tool_use_id": "call_01a1cf38164773adad4c38cd"
+    }
+  ]
+}

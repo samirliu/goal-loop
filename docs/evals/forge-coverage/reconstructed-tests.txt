@@ -1,0 +1,18 @@
+test_acceptance_check_cannot_replace_the_archived_scope_during_close (__main__.ForgeCoverage.test_acceptance_check_cannot_replace_the_archived_scope_during_close) ... ok
+test_clear_receipts_without_dry_probes_never_complete_forge (__main__.ForgeCoverage.test_clear_receipts_without_dry_probes_never_complete_forge) ... ok
+test_coverage_can_grow_without_dropping_earlier_cases_or_failures (__main__.ForgeCoverage.test_coverage_can_grow_without_dropping_earlier_cases_or_failures) ... ok
+test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe (__main__.ForgeCoverage.test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe) ... ok
+test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit (__main__.ForgeCoverage.test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit) ... ok
+test_failed_floor_skips_probe_spend_and_cannot_become_dry (__main__.ForgeCoverage.test_failed_floor_skips_probe_spend_and_cannot_become_dry) ... ok
+test_legacy_forge_migration_retains_history_and_requires_new_probe_evidence (__main__.ForgeCoverage.test_legacy_forge_migration_retains_history_and_requires_new_probe_evidence) ... ok
+test_open_critic_finding_and_stale_critic_cannot_earn_dry_credit (__main__.ForgeCoverage.test_open_critic_finding_and_stale_critic_cannot_earn_dry_credit) ... ok
+test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope (__main__.ForgeCoverage.test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope) ... ok
+test_probe_ledger_mutation_leaves_a_recoverable_pending_transaction (__main__.ForgeCoverage.test_probe_ledger_mutation_leaves_a_recoverable_pending_transaction) ... ok
+test_renamed_duplicate_probe_does_not_earn_new_coverage (__main__.ForgeCoverage.test_renamed_duplicate_probe_does_not_earn_new_coverage) ... ok
+test_repeated_clear_records_stability_and_explicit_blind_spots (__main__.ForgeCoverage.test_repeated_clear_records_stability_and_explicit_blind_spots) ... ok
+test_stamp_requires_a_declared_probe_scope_before_any_commit (__main__.ForgeCoverage.test_stamp_requires_a_declared_probe_scope_before_any_commit) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 54.817s
+
+OK

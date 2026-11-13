@@ -1,0 +1,7 @@
+{
+  "provenance": "Tool-returned output transcribed from root session 19542; not a separately captured pytest stdout file",
+  "command": "python3.12 -m pytest -q -s tests/test_host.py -k launcher",
+  "returncode": 0,
+  "output": "....\n4 passed, 16 deselected in 2.61s\n",
+  "scope": "Actual hook subprocess and original launcher execution; path mutations denied before binding; interpreter replacement is a controlled constructor test, not this cohort failure cause"
+}

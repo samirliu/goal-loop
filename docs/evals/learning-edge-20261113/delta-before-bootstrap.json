@@ -1,0 +1,10 @@
+{
+  "base": "/tmp/goal-deepening-closed-mclzou1g",
+  "changed": [
+    "devtools/evaluate_entry.py",
+    "devtools/verify_entry.py",
+    "scripts/goal_context.py",
+    "tests/test_learning_flow.py"
+  ],
+  "scope": "context phase projection + its regression; external evaluator/verifier metrics only; core runner/host/crew/store/gate unchanged"
+}

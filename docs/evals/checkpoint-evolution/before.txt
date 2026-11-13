@@ -1,0 +1,35 @@
+test_broken_grader_does_not_withdraw_an_enabled_policy (__main__.Evolution.test_broken_grader_does_not_withdraw_an_enabled_policy) ... FAIL
+test_former_development_inputs_cannot_be_used_as_holdout (__main__.Evolution.test_former_development_inputs_cannot_be_used_as_holdout) ... FAIL
+test_trial_budget_covers_worker_and_grader_together (__main__.Evolution.test_trial_budget_covers_worker_and_grader_together) ... FAIL
+
+======================================================================
+FAIL: test_broken_grader_does_not_withdraw_an_enabled_policy (__main__.Evolution.test_broken_grader_does_not_withdraw_an_enabled_policy)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/goal-w6-replay.FiyqNK/tests/w6_counterexamples.py", line 136, in test_broken_grader_does_not_withdraw_an_enabled_policy
+    self.assertEqual(monitored['enabled'], initial['enabled'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != 'b1b5ba90c098a185c4d07e423f324505bd5a7ec2b15b8037aac61d5a5e3c4f4d'
+
+======================================================================
+FAIL: test_former_development_inputs_cannot_be_used_as_holdout (__main__.Evolution.test_former_development_inputs_cannot_be_used_as_holdout)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/goal-w6-replay.FiyqNK/tests/w6_counterexamples.py", line 145, in test_former_development_inputs_cannot_be_used_as_holdout
+    with self.assertRaisesRegex(evolve.ExperimentError, 'already exposed'):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ExperimentError not raised
+
+======================================================================
+FAIL: test_trial_budget_covers_worker_and_grader_together (__main__.Evolution.test_trial_budget_covers_worker_and_grader_together)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/goal-w6-replay.FiyqNK/tests/w6_counterexamples.py", line 153, in test_trial_budget_covers_worker_and_grader_together
+    self.assertFalse(record['ok'])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.080s
+
+FAILED (failures=3)

@@ -1,0 +1,32 @@
+import argparse
+import json
+import os
+from pathlib import Path
+import subprocess
+import time
+
+p=argparse.ArgumentParser()
+p.add_argument('--cohort',type=Path,required=True)
+a=p.parse_args()
+report=json.loads((a.cohort/'report.json').read_bytes())
+samples=[s for s in report['samples'] if s.get('cli_supervisor_pid')]
+ids={s['cli_supervisor_pid'] for s in samples}
+sessions={s['session'] for s in samples}
+text=subprocess.check_output(['ps','-axo','pid,ppid,pgid,command'],text=True)
+matches=[]
+recorded=[]
+for line in text.splitlines()[1:]:
+    parts=line.strip().split(None,3)
+    if len(parts)!=4: continue
+    pid,ppid,pgid,command=parts
+    if not pid.isdigit() or int(pid) in (os.getpid(),os.getppid()): continue
+    if int(pid) in ids:
+        recorded.append(dict(pid=int(pid),ppid=int(ppid),pgid=int(pgid),command=command))
+    if any('--session-id '+s in command for s in sessions):
+        matches.append(dict(pid=int(pid),ppid=int(ppid),pgid=int(pgid),command=command))
+record=dict(observed_epoch=time.time(),scope='Read-only exact CLI session identities and recorded supervisor PIDs; no remote service inference assertion',
+            recorded_supervisor_pids=sorted(ids),recorded_pids_still_present=recorded,
+            matching_session_processes=matches,cohort_status=report['status'])
+target=a.cohort.parent/(a.cohort.name+'-owned-liveness.json')
+target.write_text(json.dumps(record,indent=2)+'\n')
+print(json.dumps(record))

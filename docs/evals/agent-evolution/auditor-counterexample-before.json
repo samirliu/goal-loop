@@ -1,0 +1,9 @@
+{
+  "purpose": "synthetic inconsistent withdrawal with only 10% cost regression vs frozen 15% threshold",
+  "shadow": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-auditor-counterexample-zv6v4no7/recorded-run",
+  "expected_rejection": true,
+  "verifier_exit": 0,
+  "stdout": "{\n  \"verified\": true,\n  \"attempts\": 4,\n  \"pairs\": 98,\n  \"raw_outputs\": 196,\n  \"measured_inputs\": 98,\n  \"holdout_evaluations\": [\n    1,\n    2,\n    3\n  ],\n  \"selected\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\"\n}\n",
+  "stderr": "",
+  "original_report_unchanged": true
+}

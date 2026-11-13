@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "scope": "Frozen source and existing full-run outputs; no new experiments during archival work.",
+  "source_origin": "/tmp/goal-p1-final-20261112-fixed/source",
+  "source_file_count": 137,
+  "source_archive_members": 138,
+  "test_output_archive_members": 19,
+  "source_manifest_sha256": "5d788deee2c9e9193cda8323498fec155743ff921fde1a7fa6a3dcad53763c3b",
+  "full_regression_green": false,
+  "macos_python": {
+    "tests": 237,
+    "failures": 1
+  },
+  "linux_python": {
+    "tests": 237,
+    "failures": 2
+  },
+  "linux_terminal_status_file": "linux/result.txt",
+  "isolated_results_evidence_type": "tool-receipt-summary",
+  "files": {
+    "README.md": {
+      "sha256": "156d758df0f6479bc52f2358f6bdaefa024754c88ead4c70319da7885562e79f",
+      "bytes": 2972
+    },
+    "isolated-hash-preparation-tool-receipts.json": {
+      "sha256": "dcd02a673544ed943f338bfdd16bd696834cfc6f2b7f81d0ba09c5e0cc2c69f1",
+      "bytes": 1165
+    },
+    "linux/dependencies.txt": {
+      "sha256": "a75ba4a8c482ace6ec799ece2f1ce08f51304f563f0eeca7f663a745183f2fc3",
+      "bytes": 20348
+    },
+    "linux/docs.txt": {
+      "sha256": "bd3d582709cc6a78a799f0492ef0f575ea2eaa47ff98c017b7846537cc9b191a",
+      "bytes": 7243
+    },
+    "linux/environment.txt": {
+      "sha256": "2bd0fb9b7e87cc1214de51f9a155fcf26640ecb45a59e4f531f7ff2e63a5bad8",
+      "bytes": 322
+    },
+    "linux/forge.txt": {
+      "sha256": "0f4b9efa4e1faa31b7276e25edb544bd95e5eebdc641176115c9516243cee930",
+      "bytes": 494
+    },
+    "linux/parser.txt": {
+      "sha256": "a0b897741e261e18dcabb31bb172e5b2766f0d05c73cfb005a41ff18e9daee92",
+      "bytes": 2330
+    },
+    "linux/python.txt": {
+      "sha256": "aae8f6bbff3e4441058a25a8495e6cc7e8aa9ea6d08cd31b8cb55cae5f451144",
+      "bytes": 37633
+    },
+    "linux/result.txt": {
+      "sha256": "2275005c688f0cda7c56c5d41ed407bc78a93bec6d2aff41d7f861e49bfc5579",
+      "bytes": 54
+    },
+    "linux/shell.txt": {
+      "sha256": "8a5a7fcfe715aecb0c86c3590c239bc2fcccc295fce6f6bca0817e39e7caaa0e",
+      "bytes": 25412
+    },
+    "linux/shellcheck.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "linux-driver.txt": {
+      "sha256": "c4fea650e130b4a2e9c26a8037cb93fa1189270e41accc0519782705c52c70de",
+      "bytes": 1289
+    },
+    "macos/docs.txt": {
+      "sha256": "bd3d582709cc6a78a799f0492ef0f575ea2eaa47ff98c017b7846537cc9b191a",
+      "bytes": 7243
+    },
+    "macos/environment.json": {
+      "sha256": "39be67957ea0cc509566cbbb19de845a387b236b7cb531620e2dad796d0d302c",
+      "bytes": 207
+    },
+    "macos/forge.txt": {
+      "sha256": "126fa8aff1221bd9c4fce47a472a3d1e7a3a34a198f0ab4862ea4bd40745c61a",
+      "bytes": 258
+    },
+    "macos/parser.txt": {
+      "sha256": "a0b897741e261e18dcabb31bb172e5b2766f0d05c73cfb005a41ff18e9daee92",
+      "bytes": 2330
+    },
+    "macos/python.txt": {
+      "sha256": "9ae57fac0781b772b229886ac1f5502053ec87b3d875a4a8912eb167d69049ff",
+      "bytes": 37030
+    },
+    "macos/results.json": {
+      "sha256": "5296dcc7314f78ebb42e9ae44076fbeb04abc0adc8567426f422b1e9ae8cec0e",
+      "bytes": 871
+    },
+    "macos/shell.txt": {
+      "sha256": "c560f283e06c5e4f0a29f8e8b9fd31f28dd965aa5ffcfa982bff851fa77a4b05",
+      "bytes": 25430
+    },
+    "macos/source-check.json": {
+      "sha256": "a344b81ddcd45bb29b2c5ed37771d663056ccfb0ec62caaf4e3b51471d4d7acc",
+      "bytes": 20
+    },
+    "source-manifest.json": {
+      "sha256": "5d788deee2c9e9193cda8323498fec155743ff921fde1a7fa6a3dcad53763c3b",
+      "bytes": 14655
+    },
+    "source.tar.xz": {
+      "sha256": "01ae47e88d1e1763ae1daac5e75222cbedddeffa2915de104cb7611d647dd97b",
+      "bytes": 6089872
+    },
+    "summary.json": {
+      "sha256": "3b3729eab566755be4a2562818cbe8f9fd3d0389bcee9bc2de0af19ca71ea29f",
+      "bytes": 3122
+    },
+    "test-results.tar.xz": {
+      "sha256": "6d41fed3e686f0fb5e6ee415a4ba94e7f610e88367f119e9f41eb9e47e216fc1",
+      "bytes": 20716
+    },
+    "diagnostics/macos-ledger-tool-receipt.json": {
+      "sha256": "41510c0a3220fe82a9edbe6fc3684eaf6e7aac57d0c5b1aa9b666766c9ca8336",
+      "bytes": 350
+    },
+    "diagnostics/owner-watch-after.json": {
+      "sha256": "da9eb7bf2923ba76aa5428f214ca2b306b1775b19952cb22ee0514362db919bc",
+      "bytes": 46748
+    },
+    "diagnostics/test_ledger_access-after.py": {
+      "sha256": "045346788c78390bfdcf2a54d8da95722d5ee9dd46056f338e8e332f6b0c400d",
+      "bytes": 14330
+    },
+    "diagnostics/ledger-observation.patch": {
+      "sha256": "6e54f0e1d97df294d425808644f539ad733da82c9d95b062daef28aff018b8de",
+      "bytes": 1650
+    },
+    "diagnostics/owner-watch-driver.py": {
+      "sha256": "fba6cf034ce3048b645cd53caa56e2aec74ed5b80306332db0bbe43daa1cc087",
+      "bytes": 9181
+    },
+    "diagnostics/owner-watch-before.json": {
+      "sha256": "a3fac7eb02246b6deddd1b607a242d283541025ee41c7aac787d80c02fc15c12",
+      "bytes": 46393
+    }
+  },
+  "related_evidence": {
+    "../audit-fixes/final-two-replays.json": {
+      "sha256": "a5b551a6f297689733ec482a31f4fad9b0972b6ab53367921e1d32f1ea6e54fb",
+      "bytes": 18052
+    },
+    "../audit-fixes/goal-verifier-optimize-source.sha256": {
+      "sha256": "9bb140249c32d291100b0237c85c9e491be30f965663289f8ae6a4cbe9773b26",
+      "bytes": 108
+    },
+    "../raw-native-host-manifest.json": {
+      "sha256": "40adb06d8fc7730e942d6c84f9b0adacadd4b90ddfa40e9fb97b3458fb032625",
+      "bytes": 147543
+    },
+    "../raw-native-host.tar.xz": {
+      "sha256": "976d88b8ed6ac11568e1e13fb3610c8f40964f25fb0061189514ba55df352cc7",
+      "bytes": 186660
+    },
+    "../../agent-evolution/raw-run.tar.xz": {
+      "sha256": "05f6f845711c1baa7517f025a3f16d5192adfeabf93a9b1318b19109aa05f553",
+      "bytes": 5815512
+    },
+    "../../agent-evolution/reconstruction-initial.json": {
+      "sha256": "9b082a7b27185897bacbc0addfbc937c68c44128bcede07341bc9c702dea4cde",
+      "bytes": 511
+    },
+    "../../agent-evolution/reconstruction-after-audit.json": {
+      "sha256": "8020cf4abca8d9db25b9efee35aec233e87d2c36e31175eeb3c9819378ab909c",
+      "bytes": 3461
+    }
+  },
+  "historical_original_audit_sha256": "b617dea0d62795dfffbeee691fb2c3e1fe1f3cb00ee1c41ff5e11eaa4b2ec913",
+  "exclusions": [
+    "unmanifested Python bytecode",
+    "user .archify",
+    "agent-harness documents"
+  ],
+  "note": "The frozen source includes the unchanged W7 raw archive needed by regression fixtures. Current prose indexes were edited after the source freeze and are not claimed as tested source.",
+  "post_full_diagnostic": {
+    "production_source_changed": false,
+    "changed_tests": [
+      "tests/test_ledger_access.py"
+    ],
+    "outcome": "Non-reaping PID1 retains killed grandchildren as Z; no execution, late writes or held locks.",
+    "observed_uid": 65534,
+    "live_control_running": true,
+    "reaped_control_running": false,
+    "current_test_sha256": "045346788c78390bfdcf2a54d8da95722d5ee9dd46056f338e8e332f6b0c400d",
+    "full_suite_rerun": false,
+    "timing_thresholds_changed": false,
+    "note": "Original full-run failures remain recorded; diagnostics are separate evidence."
+  }
+}

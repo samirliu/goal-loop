@@ -1,0 +1,11 @@
+--- a/scripts/goal_runner.py
++++ b/scripts/goal_runner.py
+@@ -172,7 +172,7 @@
+         if not math.isfinite(inherited) or inherited < 0:
+             raise store.StoreError('invalid-monotonic-deadline')
+     expired = bool(remaining) and min(remaining) <= 0
+-    cap = mono + (3 if expired and settlement else min(remaining)) if remaining else None
++    cap = None
+     if inherited is not None:
+         cap = inherited if cap is None else min(cap, inherited)
+     return cap, expired

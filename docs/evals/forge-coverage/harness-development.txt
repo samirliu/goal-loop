@@ -1,0 +1,25 @@
+test_repeated_clear_records_stability_and_explicit_blind_spots: PASS
+test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe: PASS
+test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit: PASS
+test_open_critic_finding_and_stale_critic_cannot_earn_dry_credit: PASS
+test_acceptance_check_cannot_replace_the_archived_scope_during_close: PASS
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/docs/evals/forge-coverage/run.py", line 126, in <module>
+    run(parser.parse_args().output)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/docs/evals/forge-coverage/run.py", line 60, in run
+    migration_faults(output)
+    ~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/Users/m/repo/goal-loop/docs/evals/forge-coverage/run.py", line 100, in migration_faults
+    result = test.call(scenarios.CTL, 'migrate', expected=4, env=env)
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 51, in call
+    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/case.py", line 925, in assertEqual
+    assertion_func(first, second, msg=msg)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/case.py", line 918, in _baseAssertEqual
+    raise self.failureException(msg)
+AssertionError: 0 != 4 : CTL: MIGRATE ok
+FORGE: adopted scope; executed dry evidence must be gathered again
+

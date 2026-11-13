@@ -1,0 +1,20 @@
+{
+  "owned_changes": [
+    "scripts/goal_evolve.py",
+    "tests/test_policy_transition.py",
+    "docs/transaction-state.md policy section"
+  ],
+  "source_sha256": {
+    "scripts/goal_evolve.py": "e6ff794567ce37409a8cd7cca0efc2efa93b35a0bf968b3d22411ccd908d0ae7",
+    "tests/test_policy_transition.py": "d50f99acd573d3671a07f29ea0cefb699f003a4d923e5da130335486cdcc2f64"
+  },
+  "before": "/tmp/goal-policy-transition-before.json",
+  "after_fault_evidence": "/tmp/goal-policy-transition-after.json",
+  "after_fault_evidence_note": "This exact-source fault run precedes a comment-only wording edit. Final regression below ran after that edit.",
+  "final_targeted_command": "python3.12 -B -m pytest -q tests/test_policy_transition.py tests/test_evolve.py",
+  "final_targeted_result": "23 passed, 11 subtests passed in 12.13s",
+  "final_targeted_log": "/tmp/goal-policy-transition-targeted-complete.log",
+  "patch": "/tmp/goal-policy-transition.patch",
+  "full_suite_run": false,
+  "models_or_network_used": false
+}

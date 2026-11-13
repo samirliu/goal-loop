@@ -1,0 +1,33 @@
+{
+  "baseline_commit": "cf198829f9c8efe740d7d30a09de5d0251303b62",
+  "replay_order": [
+    "../crew-cost/implementation.patch",
+    "../incumbent/implementation.patch",
+    "../checkpoint-evolution/implementation.patch",
+    "implementation.patch"
+  ],
+  "sources": {
+    "scripts/goal_gate.sh": "97ac3e67a816882c4091f9e8fab3c7d6a14acd15d98816b542ca2a6d71249c1a",
+    "scripts/goal_ctl.sh": "d3434cf669ec3b2a806de5026422fe9694aebf383d72bef0116c6cda37406fb9",
+    "scripts/goal_store.py": "03bce8731fab96bd76c60ff59984b303f9dd532be8c3dce209ed5dba82941b9c",
+    "tests/test_incumbent.py": "8b6efadf34c76d5a74bba9690010c271d4b74ec8cd26b498186275a5450af3c1",
+    "tests/cases.inc.sh": "6688da5a4360c245c68ba65f3facbff792a2298ce382856fa140342414d2d791"
+  },
+  "evidence": {
+    "water-mark-before.txt": "0e1406d5e3730f4f90c5009f90a785baecb64ad7b9ad2cdfa3ff2c2dc2bbe8ba",
+    "macos-shell.txt": "0c3c5f5d66850df007f3d41356865e2f30bb3e5cff3df45e9d59c7b13fe79d43",
+    "checkpoint-replay.txt": "d98cfda152e6f1628d49b83479a6f3803efdd0a991a2c9dbf8a6f557cd702017",
+    "macos-python.txt": "f574b7b328d8a43290887b0ecb4223e9c66629114942be7aa1a85a99553c6b97",
+    "checkpoint-before.txt": "3d588a6aaba7f27145bdb4ba15b524754a4e51b739aa28f3f500142b4f339663",
+    "implementation.patch": "33c94c2e125bd68ffc0c0b47a75bccd3a16736f4fac824f5f5f505746cb1cb92",
+    "README.md": "6b8e99f4907465b237605d8576a9945332aa6e16da79a872d88242ff05f5c561",
+    "measurement-replay.txt": "d81a246ed4edb0f28d0b2083e45aacc874d9ab9f730644cb0902d8a0af23a9fd",
+    "measurement-before.txt": "55881fe9c20e2dba3862845d731bc028e292dc8d6f6552a440b53a4eb42d8f65"
+  },
+  "regression": {
+    "macos_python": 129,
+    "macos_shell": 601,
+    "isolated_checkpoint": 8,
+    "isolated_measurement": 9
+  }
+}

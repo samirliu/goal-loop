@@ -1,0 +1,619 @@
+--- a/scripts/goal_ctl.sh
++++ b/scripts/goal_ctl.sh
+@@ -514,28 +514,19 @@
+     fi
+     mi=$(state_get max_iterations); [ -n "$mi" ] || mi=$max_iterations
+     drys=$(state_get dry_streak); [ -n "$drys" ] || drys=0
+-    # best_score: water mark for the objective (R11). maximize -> high-water
+-    # (keep the larger); minimize -> low-water (keep the smaller).
++    # Raw observations stay in scores.rec. Only the full quality qualification
++    # below may advance the objective water mark; an infeasible score cannot.
+     best=$(state_get best_score); [ -n "$best" ] || best=none
+-    if [ -n "$score" ]; then
+-      if [ "$best" = none ]; then
+-        best=$score
+-      else
+-        if [ "$obj_dir" = minimize ]; then
+-          better=$(awk -v c="$score" -v b="$best" 'BEGIN{print (c+0<b+0)?1:0}')
+-        else
+-          better=$(awk -v c="$score" -v b="$best" 'BEGIN{print (c+0>b+0)?1:0}')
+-        fi
+-        [ "$better" = 1 ] && best=$score
+-      fi
+-    fi
++    best_basis=$(state_get best_score_basis)
++    quality_score=$(state_get last_quality_score)
++    quality_judge=$(state_get last_quality_judge)
+     if [ "$dry" = yes ]; then drys=$((drys+1)); else drys=0; fi
+     dlimit=$(state_get dry_limit); [ -n "$dlimit" ] || dlimit=3
+     ctmo=$(state_get check_timeout); [ -n "$ctmo" ] || ctmo=120
+     tb=$(state_get time_budget); [ -n "$tb" ] || tb=0
+     dl=$(state_get deadline); [ -n "$dl" ] || dl=0
+-    printf 'iteration=%s\nbreaker=%s\nfalse_completes=%s\nreplans=%s\nno_progress_streak=%s\nlast_progress_iteration=%s\nmax_iterations=%s\nno_progress_limit=%s\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=%s\ndry_limit=%s\ncheck_timeout=%s\ntime_budget=%s\ndeadline=%s\nbest_score=%s\n' \
+-      "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" "$best" > "$sd/state.rec" || exit 4
++    printf 'iteration=%s\nbreaker=%s\nfalse_completes=%s\nreplans=%s\nno_progress_streak=%s\nlast_progress_iteration=%s\nmax_iterations=%s\nno_progress_limit=%s\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=%s\ndry_limit=%s\ncheck_timeout=%s\ntime_budget=%s\ndeadline=%s\nbest_score=%s\nbest_score_basis=%s\nlast_quality_score=%s\nlast_quality_judge=%s\n' \
++      "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" "$best" "$best_basis" "$quality_score" "$quality_judge" > "$sd/state.rec" || exit 4
+     # Two-pass + sensor dump (harness engineering). Raw verify output is the
+     # mechanical evidence a claim must carry; the adversarial receipt is the
+     # second pass and is written only when the controller has run one
+@@ -573,6 +564,9 @@
+       fnote=$(printf '%s' "${fault_note:-none}" | tr '|\n\r' '   ')
+       printf '%s|%s|%s|%s|%s\n' "$fbase" "$fault" "$fsuf" "$fnote" "$(date +%s)" >> "$sd/evidence/faults.rec" || exit 4
+       echo "CTL: FAULT task=$fbase class=$fault suffix=($fsuf) note=$fnote"
++    fi
++    if [ -n "$obj_ac" ]; then
++      python3 -I "$here/goal_store.py" qualify-objective "$sd" || exit 4
+     fi
+     if [ "$no_gate" -eq 1 ]; then
+       python3 -I "$here/goal_store.py" close-journal "$sd" finish 0 || exit 4
+--- a/scripts/goal_gate.sh
++++ b/scripts/goal_gate.sh
+@@ -26,6 +26,7 @@
+     --verify) mode=verify ;;
+     --baseline-check) mode=baseline ;;
+     --checkpoint) mode=checkpoint ;;
++    --quality) mode=quality ;;
+     --project) [ $# -ge 2 ] || { echo "GATE: NO-GO reason=missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
+     --help|-h) usage; exit 0 ;;
+     -*) echo "GATE: NO-GO reason=unknown-flag:$1" >&2; exit 4 ;;
+@@ -389,7 +390,7 @@
+   # per AC. An inherited envelope also caps a nested gate's final settlement.
+   gate_budget=$(python3 -I "$here/goal_runner.py" gate-limit "$sd") || state_err budget-unavailable
+   read -r gate_cap deadline_expired <<< "$gate_budget"
+-  if [ "$mode" = checkpoint ] && [ "$deadline_expired" = 1 ]; then
++  if { [ "$mode" = checkpoint ] || [ "$mode" = quality ]; } && [ "$deadline_expired" = 1 ]; then
+     blocked time-budget-exhausted
+   fi
+   if [ "$gate_cap" != none ]; then
+@@ -402,7 +403,7 @@
+       GOAL_GATE_SUPERVISED=1 python3 -I "$here/goal_bounded.py" --owner "$$" \
+         --kind "$gate_kind" --label "$mode" -- bash "$here/goal_gate.sh" "${_goal_gate_args[@]}"; gate_rc=$?
+       if [ "$gate_rc" -eq 124 ]; then
+-        if [ "$mode" = check ] || [ "$mode" = checkpoint ]; then blocked time-budget-exhausted; fi
++        if [ "$mode" = check ] || [ "$mode" = checkpoint ] || [ "$mode" = quality ]; then blocked time-budget-exhausted; fi
+         echo 'GATE: NO-GO reason=verification-time-budget-exhausted' >&2; exit 2
+       fi
+       exit "$gate_rc"
+@@ -543,7 +544,7 @@
+      # fail() escalates to BLOCKED, a green claim still GO (see fail/GO).
+      [ "$now" -gt "$dl" ] && deadline_expired=1 ;;
+ esac
+-if [ "$mode" = checkpoint ] && [ "${deadline_expired:-0}" = 1 ]; then
++if { [ "$mode" = checkpoint ] || [ "$mode" = quality ]; } && [ "${deadline_expired:-0}" = 1 ]; then
+   blocked time-budget-exhausted
+ fi
+ if [ "$exit_mode" = forge ]; then
+@@ -581,7 +582,7 @@
+ done
+ [ -z "$missing_lk" ] || echo "GATE: NOTE loop-log-missing-keys:${missing_lk# }" >&2
+ claim=$(printf '%s\n' "$lb" | grep -E '^exit_signal=' | tail -1 | cut -d= -f2-)
+-[ "$claim" = yes ] || [ "$mode" = checkpoint ] || fail "not-claimed"
++[ "$claim" = yes ] || [ "$mode" = checkpoint ] || [ "$mode" = quality ] || fail "not-claimed"
+ # (5c/5d two-pass + raw run immediately before GO - after mechanical ACs)
+ # R12 tooth at the arbiter (v2.7): the CLAIMING block must carry a schema-valid
+ # task= id. ctl enforces this at write time, but a hand-written ledger block
+@@ -742,7 +743,7 @@
+   fi
+ done
+ [ $((unv*3)) -le "$total" ] || fail "unverifiable-excessive:unv=$unv total=$total"
+-if [ "$mode" = checkpoint ] && [ "$unv" -gt 0 ]; then
++if { [ "$mode" = checkpoint ] || [ "$mode" = quality ]; } && [ "$unv" -gt 0 ]; then
+   fail "checkpoint-unverifiable:unv=$unv"
+ fi
+ 
+@@ -758,7 +759,7 @@
+ [ "$ld_check0" = "$ld2" ] || fail "check-mutated-ledger:before=$ld_check0 after=$ld2 (a check wrote the ledger mid-run - only .goal/evidence/ is fair game)"
+ 
+ # -11. forge: floors alone are not an exit; exhaustion is -----------------
+-if [ "$exit_mode" = forge ] && [ "$mode" != checkpoint ]; then
++if [ "$exit_mode" = forge ] && [ "$mode" != checkpoint ] && [ "$mode" != quality ]; then
+   dry=$(state_get dry_streak); dl=$(state_get dry_limit)
+   [ "${dry:-0}" -ge "${dl:-3}" ] || fail "not-dry:dry_streak=${dry:-0} limit=$dl (forge exits on verification exhaustion, not on floors alone)"
+ fi
+@@ -778,6 +779,11 @@
+ if [ -n "$primary" ]; then
+   [ -n "$observed_score" ] || fail "score-missing:$primary (objective score needs a numeric observed score)"
+   best=$(state_get best_score)
++  basis=$(python3 -I "$here/goal_store.py" watermark-basis "$sd") || state_err watermark-basis-unavailable
++  if [ "$(state_get best_score_basis)" != "$basis" ]; then
++    case "$best" in ''|none) : ;; *) echo "GATE: NOTE legacy-watermark-unqualified:value=$best" >&2 ;; esac
++    best=none
++  fi
+   pdir=$(objective_dir); [ -n "$pdir" ] || pdir=maximize
+   # Relative tolerance absorbs benchmark noise (same code varies +-5% across
+   # runs; an exact water-mark would false-alarm "regressed" every round and
+@@ -795,7 +801,7 @@
+   else
+     band="$tol"; src="tol=$tol"
+   fi
+-  if [ -n "$best" ] && [ "$best" != "none" ]; then
++  if [ "$mode" != quality ] && [ -n "$best" ] && [ "$best" != "none" ]; then
+     # Noise band = b +/- |b|*t. Multiplying (1-t)*b flips the band on
+     # NEGATIVE water marks (b=-10,t=.1 -> band -9, so -10 reads "regressed");
+     # absolute value keeps the band on the correct side in every sign.
+@@ -810,8 +816,9 @@
+ fi
+ 
+ # -14. score<->judge divergence (R13): the objective may improve while the
+-# cold seat falls - that is optimizing the wrong thing. Compare the last two
+-# comparable points in .goal/scores.rec (iter|score|judge, both numeric).
++# cold seat falls - that is optimizing the wrong thing. Objective contracts
++# compare against the latest qualified pair; raw failed attempts cannot
++# contaminate recovery. Legacy non-objective records retain the raw-pair rule.
+ # Quality direction: maximize -> higher score is better; minimize -> lower
+ # score is better. Judge score is always higher-is-better. Opposite quality
+ # directions -> refuse the claim. Flat is "unverified movement", not
+@@ -823,6 +830,19 @@
+       s1=s2; j1=j2; s2=$2+0; j2=$3+0; n++
+     }
+     END { if (n >= 2) printf "%s %s %s %s\n", s1, j1, s2, j2 }')
++  # Objective comparisons use the latest qualified pair. Failed attempts remain
++  # visible in scores.rec but cannot make a valid rollback look divergent.
++  if [ -n "$primary" ]; then
++    pair=""
++    qs=$(state_get last_quality_score)
++    bj=$(state_get last_quality_judge)
++    cj=$(r < "$sd/scores.rec" | awk -F'|' -v i="$iter" '$1==i {j=$3} END{print j}')
++    [ "$(state_get best_score_basis)" = "$basis" ] || qs=none
++    if printf '%s\n' "${qs:-none}" "${bj:-none}" "${cj:-none}" | awk '
++      $0 !~ /^-?[0-9]+(\.[0-9]+)?$/ {bad=1} END{exit bad}'; then
++      pair="$qs $bj $observed_score $cj"
++    fi
++  fi
+   if [ -n "$pair" ]; then
+     set -- $pair
+     awk -v s1="$1" -v j1="$2" -v s2="$3" -v j2="$4" -v d="$rdir" \
+@@ -833,6 +853,13 @@
+       }' \
+       && fail "DIVERGENCE:score-vs-judge score:$1->$3 judge:$2->$4 dir=$rdir (objective and cold-seat moving apart - the metric is pulling away from perceived quality; redesign the AC or the direction)"
+   fi
++fi
++
++if [ "$mode" = quality ]; then
++  [ -n "$primary" ] && [ -n "$observed_score" ] || fail "quality-objective-required"
++  [ "${deadline_expired:-0}" != 1 ] || blocked time-budget-exhausted
++  echo "GATE: QUALITY-OK digest=$digest iter=$iter score=$observed_score"
++  exit 0
+ fi
+ 
+ if [ "${deadline_expired:-0}" = 1 ]; then
+--- a/scripts/goal_parse.sh
++++ b/scripts/goal_parse.sh
+@@ -315,11 +315,12 @@
+ # R3 frozen surface: AC section body + exit: + objective: lines. ctl stamp and
+ # gate check MUST hash the same thing or every legitimate run trips
+ # contract-tampered. This is that one definition.
+-gp_ac_body_hash(){
++gp_ac_body(){
+   { gp_goal_r "$1" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
+     gp_goal_r "$1" | grep -E '^(exit|objective|horizon-waived):' || true
+-  } | gp_hash_std | cut -c1-8
+-}
++  }
++}
++gp_ac_body_hash(){ gp_ac_body "$1" | gp_hash_std | cut -c1-8; }
+ 
+ # expected token -> a routing class the gate understands
+ gp_classify_expected(){
+--- a/scripts/goal_store.py
++++ b/scripts/goal_store.py
+@@ -436,7 +436,7 @@
+ _MUTATION_FILES = {
+     'init': ('state.rec', 'loop-log.md', 'verdicts.rec', 'work-plan.md'),
+     'stamp': ('state.rec', 'goal.md', 'check_freeze', 'pre-reg.md'),
+-    'bind': ('verdicts.rec',),
++    'bind': ('verdicts.rec', 'state.rec'),
+     'forge': ('state.rec', 'check_freeze', 'evidence/raw/0.txt'),
+ }
+ 
+@@ -894,7 +894,8 @@
+             or (record['base_head'] is not None and (not isinstance(record['base_head'], str)
+                 or not _SHA256.fullmatch(record['base_head'])))
+             or not isinstance(record['files'], dict)
+-            or set(record['files']) != set(_MUTATION_FILES[record['kind']])):
++            or (set(record['files']) != set(_MUTATION_FILES[record['kind']])
++                and not (record['kind'] == 'bind' and set(record['files']) == {'verdicts.rec'}))):
+         raise StoreError('invalid mutation journal fields')
+     for data in record['files'].values():
+         if data is not None:
+@@ -923,13 +924,17 @@
+             or len(set(meta['missing'])) != len(meta['missing'])):
+         raise StoreError('invalid mutation commit metadata')
+     scope = set(_MUTATION_FILES[kind])
++    # Earlier bind commits owned verdicts only. Preserve that historical
++    # scope when replaying/recovering; there was no qualified-state mutation.
++    if kind == 'bind' and 'state.rec' not in snapshot and 'state.rec' not in meta['missing']:
++        scope = {'verdicts.rec'}
+     files = {name: data for name, data in snapshot.items() if name in scope}
+     if not set(meta['missing']).issubset(scope):
+         raise StoreError('invalid mutation missing-file scope')
+     if set(files).intersection(meta['missing']):
+         raise StoreError('conflicting mutation snapshot paths')
+     files.update(dict.fromkeys(meta['missing']))
+-    if set(files) != set(_MUTATION_FILES[kind]):
++    if set(files) != scope:
+         raise StoreError('invalid mutation snapshot file set')
+     if meta['intent'] != intent:
+         raise Conflict('operation-id reused with different arguments or input')
+@@ -967,6 +972,13 @@
+     record = _mutation_record(pending)
+     kind = record['kind']
+     if action == 'finish':
++        if kind == 'bind':
++            _, previous = commits.read()
++            if _VIEW_META in previous:
++                expected = _committed_views(previous)
++                names = (set(expected) | _view_names(state, bool(_RUNNER_FILES.intersection(expected)))) - set(record['files'])
++                if _capture_files(state, names) != {name: expected.get(name) for name in names}:
++                    raise StoreError('bind modified managed evidence outside its write scope')
+         _sync_views(state, record['files'])
+         files = _capture_files(state, record['files'])
+         snapshot = {name: data for name, data in files.items() if data is not None}
+@@ -1010,6 +1022,7 @@
+     identity = mutation_journal(state, 'begin', 'bind', intent=intent, operation=operation)
+     with target.open('ab') as output:
+         output.write(('\n'.join(lines) + '\n').encode('utf-8'))
++    qualify_objective(state)
+     mutation_journal(state, 'finish')
+     print('CTL: BIND ok appended=%s skipped=0 operation=%s' % (len(lines), identity))
+ 
+@@ -1059,6 +1072,76 @@
+     freeze = state / 'check_freeze'
+     return {'contract': _hash((state / 'goal.md').read_bytes()),
+             'check_freeze': _hash(freeze.read_bytes()) if freeze.exists() else None}
++
++
++def watermark_basis(state):
++    import subprocess
++    state = Path(state)
++    body = subprocess.check_output(['bash', '-c', '. "$1"; gp_ac_body "$2"', 'watermark',
++                                    str(Path(__file__).with_name('goal_parse.sh')), str(state.parent)])
++    freeze = state / 'check_freeze'
++    return 'quality-v1:' + _hash(_encode(dict(contract=_hash(body),
++        check_freeze=_hash(freeze.read_bytes()) if freeze.exists() else None)))
++
++
++def qualify_objective(state):
++    """Advance best only from current floors+horizon, inside the caller's commit."""
++    from decimal import Decimal, InvalidOperation
++    import subprocess
++
++    state = Path(state)
++    if not (state / 'goal.md').is_file():
++        return
++    objectives = re.findall(r'^objective: *(maximize|minimize) +(AC-[0-9]+).*$',
++                            (state / 'goal.md').read_text().replace('\r', ''), re.M)
++    if not objectives:
++        return
++    if os.environ.get('GOAL_ACCESS_MODE') != 'write' or not (state / 'store/pending').is_file():
++        raise StoreError('objective qualification requires an active controller transaction')
++    path = state / 'state.rec'
++    lines = path.read_text().splitlines()
++    values = dict(line.split('=', 1) for line in lines if '=' in line)
++    basis = watermark_basis(state)
++    qualified = values.get('best_score_basis') == basis
++    previous = values.get('best_score', 'none') if qualified else 'none'
++    quality_score = values.get('last_quality_score', 'none') if qualified else 'none'
++    quality_judge = values.get('last_quality_judge', 'none') if qualified else 'none'
++    if previous == 'none' and values.get('best_score', 'none') != 'none':
++        print('CTL: NOTE legacy-watermark-unqualified:value=' + values['best_score'])
++    descriptors = tuple({int(os.environ[key]) for key in ('GOAL_ACCESS_FD', 'GOAL_CLOSE_LOCK_FD', 'GOAL_RUNNER_FD')
++                         if os.environ.get(key)})
++    check = subprocess.run(['bash', str(Path(__file__).with_name('goal_gate.sh')), '--quality',
++                            '--project', str(state.parent)], pass_fds=descriptors, capture_output=True)
++    text = check.stdout.decode('utf-8', 'replace')
++    diagnostics = text + check.stderr.decode('utf-8', 'replace')
++    if check.returncode == 4 or re.search(r'reason=check-mutated-(tree|ledger)', diagnostics):
++        raise StoreError('objective qualification corrupted its input; recover before retry: ' + diagnostics.strip())
++    observed = re.findall(r'^GATE: QUALITY-OK .* score=(-?[0-9]+(?:\.[0-9]+)?)$', text, re.M)
++    best = previous
++    if check.returncode == 0 and len(observed) == 1:
++        try:
++            candidate = Decimal(observed[0])
++            current = None if previous == 'none' else Decimal(previous)
++            if not candidate.is_finite() or current is not None and not current.is_finite():
++                raise InvalidOperation()
++            if current is None or (candidate > current if objectives[-1][0] == 'maximize' else candidate < current):
++                best = observed[0]
++            rows = [line.split('|') for line in (state / 'scores.rec').read_text().splitlines()]
++            current_rows = [row for row in rows if len(row) >= 3 and row[0] == values.get('iteration')]
++            quality_score = observed[0]
++            quality_judge = current_rows[-1][2] if current_rows else 'none'
++        except InvalidOperation as exc:
++            raise StoreError('invalid qualified objective score') from exc
++        print(text.strip())
++    else:
++        reason = check.stderr.decode('utf-8', 'replace').strip().splitlines()
++        print('CTL: QUALITY not-qualified result=%s reason=%s' % (check.returncode, reason[-1] if reason else 'no receipt'))
++        return  # A failed/tampered contract cannot erase a prior qualification.
++    updated = [line for line in lines if not line.startswith(('best_score=', 'best_score_basis=', 'best_score_judge=',
++                                                             'last_quality_score=', 'last_quality_judge='))]
++    updated.extend(['best_score=' + best, 'best_score_basis=' + basis,
++                    'last_quality_score=' + quality_score, 'last_quality_judge=' + quality_judge])
++    _atomic(path, ('\n'.join(updated) + '\n').encode())
+ 
+ 
+ def _incumbent_archive(state, identity):
+@@ -1354,6 +1437,10 @@
+                 print(identity)
+         elif len(sys.argv) >= 3 and sys.argv[1] == 'bind-mutation':
+             bind_mutation(sys.argv[2], sys.argv[3:], sys.stdin.buffer.read())
++        elif len(sys.argv) == 3 and sys.argv[1] == 'qualify-objective':
++            qualify_objective(sys.argv[2])
++        elif len(sys.argv) == 3 and sys.argv[1] == 'watermark-basis':
++            print(watermark_basis(sys.argv[2]))
+         elif len(sys.argv) == 3 and sys.argv[1] == 'check-views':
+             print(verify_views(sys.argv[2]))
+         elif len(sys.argv) == 3 and sys.argv[1] == 'guard-digest':
+--- a/tests/test_incumbent.py
++++ b/tests/test_incumbent.py
+@@ -5,6 +5,7 @@
+ import os
+ from pathlib import Path
+ import subprocess
++import shutil
+ import sys
+ import tempfile
+ import unittest
+@@ -167,6 +168,9 @@
+                  '--strategy', 'baseline', '--score', '10', '--judge-score', '1')
+ 
+     def bind(self, horizon='PASS', calibrate=True):
++        self.ctl('bind', input=self.bind_rows(horizon, calibrate))
++
++    def bind_rows(self, horizon='PASS', calibrate=True):
+         digest = self.gate('--digest')[0].strip()
+         iteration = next(line.split('=')[1] for line in (self.state / 'state.rec').read_text().splitlines()
+                          if line.startswith('iteration='))
+@@ -176,13 +180,15 @@
+         if calibrate:
+             rows.extend([f'AC-3#good|PASS|{iteration}|{digest}|cat good.txt|good.txt',
+                          f'AC-3#bad|FAIL|{iteration}|{digest}|cat bad.txt|bad.txt'])
+-        self.ctl('bind', input='\n'.join(rows) + '\n')
++        return '\n'.join(rows) + '\n'
+ 
+     def save(self, **kwargs):
+         return self.checkpoint('save', '--intermediate', '--file', 'artifact.txt', '--file', 'score.txt', **kwargs)
+ 
+     def test_intermediate_restore_requalifies_without_claiming_completion(self):
++        self.assertIn('best_score=none\n', (self.state / 'state.rec').read_text())
+         self.bind()
++        self.assertIn('best_score=10\n', (self.state / 'state.rec').read_text())
+         self.assertIn('not-claimed', self.gate('--check', expected=2)[1])
+         self.checkpoint('save', '--file', 'artifact.txt', expected=4)
+         base = self.save()[0].strip()
+@@ -216,6 +222,178 @@
+         self.assertIn('time-budget-exhausted', self.save(expected=4, env=env)[1])
+         self.assertFalse((self.state / 'store/incumbents').exists())
+ 
++    def test_failed_horizon_cannot_advance_an_otherwise_feasible_score(self):
++        self.bind()
++        (self.project / 'score.txt').write_text('100\n')
++        self.book()
++        self.bind(horizon='FAIL')
++        self.assertIn('best_score=10\n', (self.state / 'state.rec').read_text())
++        self.assertIn('2|100|', (self.state / 'scores.rec').read_text())
++        self.assertIn('open-FAIL:AC-3', self.gate('--quality', expected=2)[1])
++
++    def test_qualification_and_bind_recover_on_both_sides_of_commit(self):
++        from test_mutation_commit import MutationCommit
++        source = self.project
++        for point in ('generation-published', 'pointer-published'):
++            with self.subTest(point=point):
++                self.project = source.parent / (source.name + '-' + point)
++                self.addCleanup(shutil.rmtree, self.project)
++                shutil.copytree(source, self.project)
++                self.state = self.project / '.goal'
++                control = Path(tempfile.mkdtemp(prefix='goal-bind-fault-'))
++                self.addCleanup(shutil.rmtree, control)
++                env = MutationCommit.fault_env(self, control, point)
++                rows = self.bind_rows()
++                killed = MutationCommit.call(self, self.project, ['bind', '--operation-id', 'qualify-once'],
++                                             input=rows, env=env)
++                self.assertNotEqual(killed.returncode, 0)
++                self.ctl('recover')
++                if point == 'generation-published':
++                    self.assertIn('best_score=none\n', (self.state / 'state.rec').read_text())
++                    self.ctl('bind', '--operation-id', 'qualify-once', input=rows)
++                else:
++                    self.assertIn('best_score=10\n', (self.state / 'state.rec').read_text())
++                before = (self.state / 'state.rec').read_bytes()
++                self.assertIn('REPLAY', self.ctl('bind', '--operation-id', 'qualify-once', input=rows)[0])
++                self.assertEqual(before, (self.state / 'state.rec').read_bytes())
++                self.gate('--checkpoint')
++
++
++class QualifiedWatermark(ProjectCase):
++    def setup_goal(self, direction='maximize', floor='grep -qx ready artifact.txt'):
++        (self.state / 'goal.md').write_text(
++            '# Goal\n\n## Objective\n\nobjective: ' + direction + ' AC-1\n'
++            'horizon-waived: exact readiness floor for this focused counterexample\n\n'
++            '## Acceptance criteria\n\n'
++            '- AC-1 | score | check: `cat score.txt` | expected: ' + direction + '\n'
++            '- AC-2 | floor | check: `' + floor + '` | expected: exit=0\n\n'
++            '## Approval\n\napproved: PENDING\n')
++        (self.project / 'artifact.txt').write_text('ready\n')
++        (self.project / 'score.txt').write_text('10\n')
++        self.ctl('stamp', '--auto')
++
++    def book(self, score, judge=None):
++        self.ctl('close-iteration', '--task', 'T1', '--files', 'artifact.txt,score.txt',
++                 '--checks-pass', '2', '--checks-fail', '0', '--checks-unverifiable', '0',
++                 '--progress', 'yes', '--exit-signal', 'yes', '--adversarial', 'clear',
++                 '--adversarial-note', 'read actual floor result', '--no-gate',
++                 '--strategy', 'baseline', '--score', str(score),
++                 *(('--judge-score', str(judge)) if judge is not None else ()))
++
++    def check_failed_candidate(self, direction, infeasible):
++        self.setup_goal(direction)
++        self.book(10, judge=1)
++        base = self.checkpoint('save', '--file', 'artifact.txt', '--file', 'score.txt')[0].strip()
++        (self.project / 'artifact.txt').write_text('broken\n')
++        (self.project / 'score.txt').write_text(str(infeasible) + '\n')
++        self.book(infeasible, judge=.2)
++        self.assertIn('best_score=10\n', (self.state / 'state.rec').read_text())
++        self.assertIn('2|' + str(infeasible) + '|', (self.state / 'scores.rec').read_text())
++        candidate = self.checkpoint('candidate', '--base', base)[0].strip()
++        self.checkpoint('restore', '--base', base, '--candidate', candidate)
++        self.book(10, judge=1)
++        self.assertIn('score=10 best=10', self.gate('--check')[0])
++        self.assertIn('last_quality_judge=1\n', (self.state / 'state.rec').read_text())
++
++    def test_infeasible_maximum_cannot_poison_restored_incumbent(self):
++        self.check_failed_candidate('maximize', 100)
++
++    def test_infeasible_minimum_cannot_poison_restored_incumbent(self):
++        self.check_failed_candidate('minimize', -100)
++
++    def test_feasible_lower_score_does_not_replace_qualified_best(self):
++        self.setup_goal()
++        self.book(10)
++        (self.project / 'score.txt').write_text('7\n')
++        self.book(7)
++        self.assertIn('best_score=10\n', (self.state / 'state.rec').read_text())
++        self.assertIn('score-regressed', self.gate('--check', expected=2)[1])
++        self.assertIn('GATE: QUALITY-OK', self.gate('--quality')[0])
++
++    def test_improving_objective_with_declining_judge_still_fails(self):
++        self.setup_goal()
++        self.book(10, judge=1)
++        (self.project / 'score.txt').write_text('20\n')
++        self.book(20, judge=.2)
++        self.assertIn('best_score=10\n', (self.state / 'state.rec').read_text())
++        self.assertIn('DIVERGENCE:score-vs-judge', self.gate('--check', expected=2)[1])
++
++    def test_same_score_qualified_judge_is_used_for_next_comparison(self):
++        self.setup_goal()
++        self.book(10, judge=1)
++        self.book(10, judge=2)
++        self.assertIn('last_quality_judge=2\n', (self.state / 'state.rec').read_text())
++        (self.project / 'score.txt').write_text('100\n')
++        self.book(100, judge=1.5)
++        self.assertIn('best_score=10\n', (self.state / 'state.rec').read_text())
++        self.assertIn('DIVERGENCE:score-vs-judge', self.gate('--check', expected=2)[1])
++
++    def test_lower_minimize_score_with_declining_judge_still_fails(self):
++        self.setup_goal('minimize')
++        (self.project / 'score.txt').write_text('20\n')
++        self.book(20, judge=8)
++        (self.project / 'score.txt').write_text('10\n')
++        self.book(10, judge=3)
++        self.assertIn('best_score=20\n', (self.state / 'state.rec').read_text())
++        failure = self.gate('--check', expected=2)[1]
++        self.assertIn('DIVERGENCE:score-vs-judge', failure)
++        self.assertIn('dir=minimize', failure)
++
++    def test_unfrozen_prose_cannot_reset_a_qualified_watermark(self):
++        self.setup_goal()
++        (self.project / 'score.txt').write_text('100\n')
++        self.book(100)
++        basis = next(line for line in (self.state / 'state.rec').read_text().splitlines()
++                     if line.startswith('best_score_basis='))
++        with (self.state / 'goal.md').open('a') as stream:
++            stream.write('\n## Notes\nReviewed on Wednesday.\n')
++        (self.project / 'score.txt').write_text('10\n')
++        self.book(10)
++        self.assertIn(basis, (self.state / 'state.rec').read_text())
++        self.assertIn('best_score=100\n', (self.state / 'state.rec').read_text())
++        self.assertIn('score-regressed', self.gate('--check', expected=2)[1])
++
++    def test_temporary_contract_tamper_cannot_erase_prior_qualification(self):
++        self.setup_goal()
++        (self.project / 'score.txt').write_text('100\n')
++        self.book(100)
++        original = (self.state / 'goal.md').read_bytes()
++        (self.state / 'goal.md').write_bytes(original.replace(b'floor |', b'altered floor |'))
++        (self.project / 'score.txt').write_text('10\n')
++        self.book(10)
++        self.assertIn('best_score=100\n', (self.state / 'state.rec').read_text())
++        (self.state / 'goal.md').write_bytes(original)
++        self.book(10)
++        self.assertIn('score-regressed', self.gate('--check', expected=2)[1])
++
++    def check_corrupting_qualifier(self, target):
++        floor = 'if test -e .goal/evidence/trip; then echo contamination >> .goal/' + target + '; fi; grep -qx ready artifact.txt'
++        self.setup_goal(floor=floor)
++        self.book(10)
++        names = ['state.rec', 'loop-log.md', 'verdicts.rec', 'evidence/raw/1.txt', 'store/commits/current']
++        before = {name: (self.state / name).read_bytes() for name in names}
++        (self.state / 'evidence/trip').touch()
++        failure = self.ctl('bind', input='AC-1|PASS|1|unused|cat score.txt|observed\n', expected=4)
++        self.assertIn('corrupted its input', failure[1])
++        self.assertTrue((self.state / 'store/pending').exists())
++        self.assertEqual(before['store/commits/current'], (self.state / 'store/commits/current').read_bytes())
++        self.ctl('recover')
++        self.assertEqual(before, {name: (self.state / name).read_bytes() for name in names})
++        (self.state / 'evidence/trip').unlink()
++        self.gate('--check')
++
++    def test_bind_qualifier_cannot_publish_log_mutation(self):
++        self.check_corrupting_qualifier('loop-log.md')
++
++    def test_bind_qualifier_cannot_publish_verdict_mutation_in_its_own_scope(self):
++        self.check_corrupting_qualifier('verdicts.rec')
++
++    def test_bind_qualifier_cannot_publish_state_mutation_in_its_own_scope(self):
++        self.check_corrupting_qualifier('state.rec')
++
++    def test_bind_qualifier_cannot_publish_historical_raw_mutation(self):
++        self.check_corrupting_qualifier('evidence/raw/1.txt')
++
+ 
+ if __name__ == '__main__':
+     unittest.main()
+--- a/tests/cases.inc.sh
++++ b/tests/cases.inc.sh
+@@ -678,6 +678,10 @@
+   --exit-signal yes --no-gate --judge-score 3 --strategy probe-first >/dev/null 2>&1
+ # score improved (20->10, lower=better) but judge fell (8->3) -> DIVERGENCE
+ printf '1|20|8\n2|10|3\n' >> "$T/t71/.goal/scores.rec"
++# This semantic fixture supplies a previously qualified comparison point;
++# raw attempted scores alone no longer grant objective qualification.
++sed_in 's/^last_quality_score=.*/last_quality_score=20/' "$T/t71/.goal/state.rec"
++sed_in 's/^last_quality_judge=.*/last_quality_judge=8/' "$T/t71/.goal/state.rec"
+ out=$(bash "$GATE" --check --project "$T/t71" 2>&1); assert_rc "71 minimize divergence -> rc2" 2 $?
+ assert_has "71 DIVERGENCE token" 'DIVERGENCE:score-vs-judge' "$out"
+ assert_has "71 dir named" 'dir=minimize' "$out"
+@@ -700,6 +704,8 @@
+   --exit-signal yes --no-gate --judge-score 8 --strategy probe-first >/dev/null 2>&1
+ two_pass t72
+ printf '1|20|3\n2|10|8\n' >> "$T/t72/.goal/scores.rec"
++sed_in 's/^last_quality_score=.*/last_quality_score=20/' "$T/t72/.goal/state.rec"
++sed_in 's/^last_quality_judge=.*/last_quality_judge=3/' "$T/t72/.goal/state.rec"
+ out=$(bash "$GATE" --check --project "$T/t72" 2>&1); assert_rc "72 minimize agree -> GO" 0 $?
+ printf '%s' "$out" | grep -q 'DIVERGENCE' && no "72 unexpected DIVERGENCE" || ok "72 no DIVERGENCE"
+ 
+--- a/references/gate.md
++++ b/references/gate.md
+@@ -34,6 +34,8 @@
+ false_completes replans no_progress_streak last_progress_iteration
+ max_iterations no_progress_limit max_replans per_check_fail_cap panel_max
+ dry_streak dry_limit check_timeout time_budget deadline best_score.
++Objective records also carry best_score_basis, last_quality_score and
++last_quality_judge. Raw failed attempts remain in scores.rec.
+ `dry_streak/dry_limit` required only for `exit: forge`.
+ Budget knobs written in goal.md (max_iterations, dry_limit, check_timeout,
+ wallclock, ...) BIND at stamp - goal_ctl.sh stamp copies them into state.rec.
+--- a/docs/transaction-state.md
++++ b/docs/transaction-state.md
+@@ -57,6 +57,20 @@
+ ID 为 1—128 位 ASCII 字母、数字及 `._-`，首位为字母或数字，作用域是当前项目提交历史。省略时生成 UUID 并在 `CLOSE ok` 中输出；未提前保存身份的调用在丢失确认后不具有可自动判断的重试身份。
+ 
+ init、stamp、bind 也支持固定 `--operation-id`，并使用相同的 commits/current 指针。它们的 v4 日志保存 kind、严格的文件范围、基线 HEAD 和请求摘要；恢复采用同样的提交前回滚、提交后前滚规则。bind 的请求摘要还绑定原始 stdin 字节，整批行先验证再追加；与旧版“跳过坏行、保留已追加好行”不同，坏批次现在 rc=4 且不追加任何行。缺少 approved 占位行的 stamp 在首次写入前拒绝。
++
++objective 的 `best_score` 只由通过质量资格的实际读数更新。收账和 bind
++在各自事务内调用 `gate --quality`，重跑全部地板和校准 horizon，并检查
++指纹、账本、截止与质量背离；它返回 `QUALITY-OK`，不代表 GO，也不替代
++交付要求的 claim、工作计划、adversarial 和 forge 覆盖。普通任务不增加这次检查。
++原始失败读数仍留在 scores.rec，不能抬高/压低合格水位或污染 R13 比较。
++
++`best_score_basis` 以 SHA-256 绑定与 stamp 相同的语义表面及 check_freeze，
++普通备注不会重置水位。`last_quality_score/judge` 独立保存最近一次通过资格的
++比较点，含同分的新判断；不能用全局最佳分的旧判断代替它。
++旧版未证明资格的水位保留在提交历史，并明确记为 legacy-unqualified；
++它不能冒充当前契约的合格水位。首次有界资格检查后再建立新水位。
++bind 的新写范围包括 state.rec，保证判词和资格更新共同提交/恢复；
++旧 verdicts-only 日志与已提交操作按其真实历史范围恢复和重放。
+ 
+ 相同 ID、相同请求再次调用，直接返回保存的历史收账返回码，并输出 `CTL: REPLAY ... historical-result=...`。不会重跑测量、重复加分、增加假完成计数或消费另一轮；重放较早 ID 也不会把 current 或文件倒退。请求摘要按原始参数序列计算，仅排除项目路径和 operation-id；改变顺序、显式增加默认参数等也会作为不同请求拒绝，避免猜测语义等价。
+ 

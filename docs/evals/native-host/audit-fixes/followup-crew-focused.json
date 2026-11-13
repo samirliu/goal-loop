@@ -1,0 +1,10 @@
+{
+  "command": "python3 -B tests/test_crew.py Crew.test_all_cost_history_expires_when_frozen_input_bytes_change Crew.test_public_cli_reads_api_observations_without_changing_their_transport Crew.test_different_producer_transports_cannot_be_pooled",
+  "result": {
+    "chunk_id": "aa952f",
+    "wall_time_seconds": 3.125710209,
+    "exit_code": 0,
+    "original_token_count": 26,
+    "output": "...\n----------------------------------------------------------------------\nRan 3 tests in 3.180s\n\nOK\n"
+  }
+}

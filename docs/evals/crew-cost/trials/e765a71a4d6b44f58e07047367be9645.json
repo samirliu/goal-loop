@@ -1,0 +1,314 @@
+{
+  "observation": {
+    "baseline": {
+      "output-T1.json": null,
+      "output-T2.json": null,
+      "output-T3.json": null
+    },
+    "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+    "clock": 1794330793.6142552,
+    "condition": "5e5fa257b838b8b4a0acf17f009480f1fb9c3313515f5a6e56f06cc2695c7d95",
+    "contract_sha256": "e5156e6550c329fb36634b2261f618865cd24b382d2326e43865bb74bd6a4caf",
+    "deadline": 1516932.4919879513,
+    "edges": {
+      "T1": [],
+      "T2": [],
+      "T3": []
+    },
+    "elapsed": 1.8902068329043686,
+    "final_validation": {
+      "start": 1.8132918749470264,
+      "end": 1.8901792080141604,
+      "result": 0,
+      "digest": {
+        "output-T1.json": [
+          420,
+          "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+        ],
+        "output-T2.json": [
+          420,
+          "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+        ],
+        "output-T3.json": [
+          420,
+          "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+        ]
+      },
+      "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+      "stdout": "",
+      "stderr": ""
+    },
+    "finished": 1794330793.691194,
+    "graph": {
+      "capacity": 3,
+      "context": {
+        "backend": "local-process-demo-v1",
+        "controller": "python-fixture-v1",
+        "host_capacity": 3,
+        "input_shape": {
+          "factor_bits": 20,
+          "items": 18,
+          "jobs": 3
+        },
+        "startup_delay_seconds": 8.0
+      },
+      "final_check": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "task.py",
+        "grade-all"
+      ],
+      "inputs": [
+        "input-T1.json",
+        "input-T2.json",
+        "input-T3.json"
+      ],
+      "instrument_hashes": {
+        "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+      },
+      "instrument_paths": {
+        "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-_6ucowep/task.py"
+      },
+      "instruments": [
+        "../../task.py"
+      ],
+      "jobs": [
+        {
+          "check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade",
+            "T1"
+          ],
+          "deps": [],
+          "files": [
+            "output-T1.json"
+          ],
+          "id": "T1"
+        },
+        {
+          "check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade",
+            "T2"
+          ],
+          "deps": [],
+          "files": [
+            "output-T2.json"
+          ],
+          "id": "T2"
+        },
+        {
+          "check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade",
+            "T3"
+          ],
+          "deps": [],
+          "files": [
+            "output-T3.json"
+          ],
+          "id": "T3"
+        }
+      ],
+      "version": 1
+    },
+    "id": "e765a71a4d6b44f58e07047367be9645",
+    "inputs": {
+      "input-T1.json": [
+        420,
+        "d50d0abd623f78f45430fe3385723f28959ed77ca7a2ec7bb479e534bdee04cd"
+      ],
+      "input-T2.json": [
+        420,
+        "b03af63cae439775d9352c3032a744da641e124bffecdcca1b19c827b40e6e47"
+      ],
+      "input-T3.json": [
+        420,
+        "68e9ff50b5f8e81abef832554228636d7462bfb7ff66655e7f28b688deda7c3c"
+      ]
+    },
+    "jobs": {
+      "T1": {
+        "adopted": 0.6043470830190927,
+        "adopted_digest": {
+          "output-T1.json": [
+            420,
+            "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+          ]
+        },
+        "adoption_version": 0,
+        "dispatch": 0.0009557500015944242,
+        "fault": null,
+        "first_valid": 0.6037930829916149,
+        "result": 0,
+        "returned": 0.5281371669843793,
+        "started": 0.06441299989819527,
+        "validations": [
+          {
+            "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+            "digest": {
+              "output-T1.json": [
+                420,
+                "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+              ]
+            },
+            "end": 0.6037930829916149,
+            "result": 0,
+            "start": 0.5290887919254601,
+            "stderr": "",
+            "stdout": ""
+          }
+        ],
+        "dependency_queue_seconds": 0.0009557500015944242,
+        "startup_queue_seconds": 0.06345724989660084
+      },
+      "T2": {
+        "adopted": 1.209371249889955,
+        "adopted_digest": {
+          "output-T2.json": [
+            420,
+            "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+          ]
+        },
+        "adoption_version": 0,
+        "dispatch": 0.6052493329625577,
+        "fault": null,
+        "first_valid": 1.2087850000243634,
+        "result": 0,
+        "returned": 1.1329201669432223,
+        "started": 0.671722374856472,
+        "validations": [
+          {
+            "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+            "digest": {
+              "output-T2.json": [
+                420,
+                "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+              ]
+            },
+            "end": 1.2087850000243634,
+            "result": 0,
+            "start": 1.1339776669628918,
+            "stderr": "",
+            "stdout": ""
+          }
+        ],
+        "dependency_queue_seconds": 0.6052493329625577,
+        "startup_queue_seconds": 0.06647304189391434
+      },
+      "T3": {
+        "adopted": 1.8123653328511864,
+        "adopted_digest": {
+          "output-T3.json": [
+            420,
+            "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+          ]
+        },
+        "adoption_version": 0,
+        "dispatch": 1.210237167077139,
+        "fault": null,
+        "first_valid": 1.8117717080749571,
+        "result": 0,
+        "returned": 1.7362528329249471,
+        "started": 1.2742769999895245,
+        "validations": [
+          {
+            "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+            "digest": {
+              "output-T3.json": [
+                420,
+                "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+              ]
+            },
+            "end": 1.8117717080749571,
+            "result": 0,
+            "start": 1.7372640829999,
+            "stderr": "",
+            "stdout": ""
+          }
+        ],
+        "dependency_queue_seconds": 1.210237167077139,
+        "startup_queue_seconds": 0.06403983291238546
+      }
+    },
+    "mode": "inline",
+    "money": null,
+    "origin": 1516366.292977208,
+    "quality": true,
+    "stages": [
+      {
+        "end": 0.06495691696181893,
+        "name": "coordination",
+        "start": 0.000544707989320159
+      },
+      {
+        "end": 0.5286389999091625,
+        "name": "join",
+        "start": 0.06534804194234312
+      },
+      {
+        "end": 0.6724079998675734,
+        "name": "coordination",
+        "start": 0.6048406669870019
+      },
+      {
+        "end": 1.1335075830575079,
+        "name": "join",
+        "start": 0.6729206249583513
+      },
+      {
+        "end": 1.2748974170535803,
+        "name": "coordination",
+        "start": 1.2098406669683754
+      },
+      {
+        "end": 1.7367670419625938,
+        "name": "join",
+        "start": 1.275372917065397
+      },
+      {
+        "end": 1.8128557498566806,
+        "name": "conflict",
+        "skipped": "no operation performed",
+        "start": 1.8128557498566806
+      },
+      {
+        "name": "revalidation",
+        "start": 1.8132918749470264,
+        "end": 1.8901792080141604,
+        "source": "frozen-final-check"
+      }
+    ],
+    "started": 1794330791.800989,
+    "tokens": null,
+    "trial": "high-cal-109",
+    "version": 1,
+    "worker_seconds": 1.5808679168112576,
+    "stage_seconds": {
+      "join": 1.385272040963173,
+      "coordination": 0.1970362919382751,
+      "conflict": 0.0,
+      "recovery": null,
+      "revalidation": 0.07688733306713402
+    }
+  },
+  "raw": {
+    "T1": {
+      "stdout": "READY\n",
+      "stderr": "",
+      "result": 0
+    },
+    "T2": {
+      "stdout": "READY\n",
+      "stderr": "",
+      "result": 0
+    },
+    "T3": {
+      "stdout": "READY\n",
+      "stderr": "",
+      "result": 0
+    }
+  }
+}

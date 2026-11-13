@@ -1,0 +1,644 @@
+{
+  "actual_ready_interval_overlap_seconds": 12.169778125127777,
+  "budget": {
+    "deadline_extended": false,
+    "deadline_monotonic": 1665135.667361833,
+    "driver_entry_monotonic": 1664955.667361833,
+    "full_verification_before_cap": true,
+    "generations": [
+      {
+        "deadline_epoch": 1794479562,
+        "deadline_monotonic": 1665135.667361833,
+        "generation": "61eea70bccdf6a988363901ed8d5911e8fd1a472f4bfafbb4ffa973e1a9e387a"
+      }
+    ],
+    "origin": {
+      "backend": "claude",
+      "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+      "epoch": 1794479382.799082,
+      "kind": "prompt",
+      "monotonic": 1664957.422922416,
+      "session": "0ee1e51f-6686-4628-91ee-41c4fff02963"
+    },
+    "outer_deadline_epoch": 1794479561.043524,
+    "seconds": 180,
+    "stored_deadline_epoch": 1794479562
+  },
+  "checker_sha256": "23924c16704f6df4c5213c114daa129cba4c1ff0ac77c49c2f9ca26eba6b5175",
+  "cli_returncode": 0,
+  "coordination_join_stage_seconds_recorded": false,
+  "driver_sha256": "3d5e520b06537d0df1f49f5378f300f5aac35fb8712707cb91d888ac2aa576d9",
+  "evidence_root": "/tmp/goal-claude-hooks-launcher-rg1v7ekj-independent-frozen",
+  "final_finish_since_driver_entry": 31.2559309580829,
+  "final_quality": true,
+  "forbidden_files_absent": true,
+  "host_lifecycle_unknown_span_count": 6,
+  "input_file_count": 96,
+  "input_inventory": {
+    "begin.json": {
+      "bytes": 353,
+      "mode": 420,
+      "sha256": "091e546fc233f7d24d830504a1c5b267f7bb5692bb356856a2b1182f03cc1319"
+    },
+    "briefs.json": {
+      "bytes": 5419,
+      "mode": 420,
+      "sha256": "bfbe71ca0ce8d031c5003fa6292ffdb92d8f71146c9274e02318087569df07f3"
+    },
+    "control/grade.py": {
+      "bytes": 227,
+      "mode": 420,
+      "sha256": "8d5a5bec8725a8f69156ac2a4b5d09aa7d3b63749ec53df88bf8be282e3426ca"
+    },
+    "control/graph.json": {
+      "bytes": 701,
+      "mode": 420,
+      "sha256": "e355ee82d16d799e4ae35f2ded0b1dcae0882840ac13a85fe1cb43c8f8f0f5b5"
+    },
+    "control/job_check.py": {
+      "bytes": 129,
+      "mode": 420,
+      "sha256": "c71c3e3894a6bb9dde2c8572f7d01282a12a8bba6392d69d6bbba5a2e2eb4766"
+    },
+    "control/mcp.json": {
+      "bytes": 18,
+      "mode": 420,
+      "sha256": "e93fc8db2b1bd77107fe6c758bca9545fa864cf7cce8ab93a7b2b93a1d566a7b"
+    },
+    "driver.py": {
+      "bytes": 11910,
+      "mode": 420,
+      "sha256": "3d5e520b06537d0df1f49f5378f300f5aac35fb8712707cb91d888ac2aa576d9"
+    },
+    "events.json": {
+      "bytes": 70324,
+      "mode": 420,
+      "sha256": "e768d693c34ef573918a4ea6de0c5c7f7be1da279ea6ed1d233910db48e8d087"
+    },
+    "manifest.json": {
+      "bytes": 2960,
+      "mode": 420,
+      "sha256": "232125b3ab57a31cf6e303d416d841b10ffbd4ee43bb6fe2150ec865b8773297"
+    },
+    "report.json": {
+      "bytes": 21209,
+      "mode": 420,
+      "sha256": "76137d1b99a044d9f8b5890cee91ca95269149ed9880764b67de4baad4b25f4e"
+    },
+    "sources/.claude-plugin/plugin.json": {
+      "bytes": 149,
+      "mode": 420,
+      "sha256": "e36378fbc9c44db142d171ceb4303e5614cef87f2ee030040a61dfeda7b98dde"
+    },
+    "sources/SKILL.md": {
+      "bytes": 8332,
+      "mode": 420,
+      "sha256": "ec03584de0cfbeb69dec7ee011178fb6b5126ac273b0f47a38f5ae40a1ceb840"
+    },
+    "sources/agents/goal-adjudicator.md": {
+      "bytes": 1663,
+      "mode": 420,
+      "sha256": "f7ede0b8f73573a4e6c416d1282fda5d8340226611b2c68c0603ba2b803d73f3"
+    },
+    "sources/agents/goal-checker-req.md": {
+      "bytes": 3062,
+      "mode": 420,
+      "sha256": "407a8d9d2e85261bfb09b2a0c2ee5d6864a4abb572b4adc25ffeab3cb7c7c73d"
+    },
+    "sources/agents/goal-critic.md": {
+      "bytes": 2552,
+      "mode": 420,
+      "sha256": "d3034a768937c08f2766bbcdccb2b276df669d950f0f143bca40188a378b5544"
+    },
+    "sources/agents/goal-mech-worker.md": {
+      "bytes": 1504,
+      "mode": 420,
+      "sha256": "cf95458067dee6950a6fc73d8641bd381519eaeafc1396c6c7e1da37f0ead7d6"
+    },
+    "sources/agents/goal-worker.md": {
+      "bytes": 2250,
+      "mode": 420,
+      "sha256": "93fc6d5de4e0b3c03d31c5e62b250b277017fe3ebdd3e18667203e1e5e7cfd06"
+    },
+    "sources/hooks/hooks.json": {
+      "bytes": 1331,
+      "mode": 420,
+      "sha256": "9343223f6d4a673d7dfa84d38ee095702ef3ff652d07e558c325b4ce0e3da44f"
+    },
+    "sources/references/companions.md": {
+      "bytes": 4658,
+      "mode": 420,
+      "sha256": "f004518887cfd11d0e599bd3dc4f0ed8fc91ef73237ddc5aaa7f3906fd2c8fa3"
+    },
+    "sources/references/crew.md": {
+      "bytes": 12647,
+      "mode": 420,
+      "sha256": "5c776149323657ba9e215fac646fbc37490186e9cc6c75120951f6c3f6fa798a"
+    },
+    "sources/references/gate.md": {
+      "bytes": 20899,
+      "mode": 420,
+      "sha256": "934894c986d6c97e1d6360aa6e5e83c140ad442ab0562dd14ebb1033cf5f9f58"
+    },
+    "sources/references/host.md": {
+      "bytes": 5986,
+      "mode": 420,
+      "sha256": "5978ddc28ddcd2032e9de2633d02d4ea39cafc28904c8edf8bb143e28ab26013"
+    },
+    "sources/references/packs/README.md": {
+      "bytes": 962,
+      "mode": 420,
+      "sha256": "4c0b959ea7644cccc65055d8b3b4471767a43b3ae58e6b47c24e2568819a04fd"
+    },
+    "sources/references/packs/external.md": {
+      "bytes": 2022,
+      "mode": 420,
+      "sha256": "25f77d3591b44f9c77a6213897659f3883acd55e0cfda71691cab46000c08d78"
+    },
+    "sources/references/packs/gradient.md": {
+      "bytes": 12311,
+      "mode": 420,
+      "sha256": "be89ba286423a5b1c1247ac2196876bd789a3b234705db8135518e9bd82c5ed9"
+    },
+    "sources/references/packs/instrument.md": {
+      "bytes": 3918,
+      "mode": 420,
+      "sha256": "9ba9e8591472c1d0afe30ad1dc1711e4d4d744f8beef47f36759e8a9f2b569c1"
+    },
+    "sources/references/patterns.md": {
+      "bytes": 8754,
+      "mode": 420,
+      "sha256": "2dfb30a03ea84b946c93d8c656ba05b212f81fd58695267323e73b1c8e65320d"
+    },
+    "sources/scripts/goal_audit.sh": {
+      "bytes": 8455,
+      "mode": 420,
+      "sha256": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb"
+    },
+    "sources/scripts/goal_bounded.py": {
+      "bytes": 4880,
+      "mode": 420,
+      "sha256": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c"
+    },
+    "sources/scripts/goal_crew.py": {
+      "bytes": 29793,
+      "mode": 420,
+      "sha256": "f0bf48438a6c2d4eecbc7a1be03c9d6b990da94a686dbde1e251c58a7c23bae9"
+    },
+    "sources/scripts/goal_ctl.sh": {
+      "bytes": 48567,
+      "mode": 420,
+      "sha256": "2bb2ad319b73da9ce8d9927a7e0c4f7e2ccc424ae4efdeee65ab70cd0c745a64"
+    },
+    "sources/scripts/goal_evolve.py": {
+      "bytes": 39633,
+      "mode": 420,
+      "sha256": "e6ff794567ce37409a8cd7cca0efc2efa93b35a0bf968b3d22411ccd908d0ae7"
+    },
+    "sources/scripts/goal_forge.py": {
+      "bytes": 19977,
+      "mode": 420,
+      "sha256": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb"
+    },
+    "sources/scripts/goal_gate.sh": {
+      "bytes": 52825,
+      "mode": 420,
+      "sha256": "4fbedbde2f524d69e3b3ca16e2f150a7aee7cf62b789e5a8abdbf8bb01cc6c8c"
+    },
+    "sources/scripts/goal_hook.sh": {
+      "bytes": 2898,
+      "mode": 420,
+      "sha256": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87"
+    },
+    "sources/scripts/goal_host.py": {
+      "bytes": 35065,
+      "mode": 420,
+      "sha256": "6cd50115f5e0ac78e89b9287a2475026a6aa9a3db7a2245a4efe9e9d8c2eb060"
+    },
+    "sources/scripts/goal_host_command.py": {
+      "bytes": 4049,
+      "mode": 420,
+      "sha256": "4331b9672bb9e3b658a2fe0320411da08721995126b71690ab535ebcbaa600e5"
+    },
+    "sources/scripts/goal_host_config.py": {
+      "bytes": 904,
+      "mode": 420,
+      "sha256": "fcb9118c8ce1b9a940bfeed1cc289155f4366c301ff2acaa926cb5c0d494f1f5"
+    },
+    "sources/scripts/goal_loop.sh": {
+      "bytes": 8830,
+      "mode": 420,
+      "sha256": "d5481f38bdbba6ae781479979985b4d415acb6be688d5e227914f0458948f05a"
+    },
+    "sources/scripts/goal_owner_watch.py": {
+      "bytes": 14672,
+      "mode": 420,
+      "sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd"
+    },
+    "sources/scripts/goal_parse.sh": {
+      "bytes": 24003,
+      "mode": 420,
+      "sha256": "368fdcbb5838c8a8d64570f409b1ea713ec3ce24938825a8dc5f9f2ed1a85bdb"
+    },
+    "sources/scripts/goal_runner.py": {
+      "bytes": 19620,
+      "mode": 420,
+      "sha256": "09c14fe4f348bc768ee66605353df80267017caf494b046b37f0fb8716ff39aa"
+    },
+    "sources/scripts/goal_store.py": {
+      "bytes": 73190,
+      "mode": 420,
+      "sha256": "13d4250e70d406d030eace9d7c2b12c6fc0a0dd4cff11fcd536671ae4d0ee8f3"
+    },
+    "sources/scripts/goal_strategy.awk": {
+      "bytes": 6219,
+      "mode": 420,
+      "sha256": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c"
+    },
+    "sources/scripts/goal_trace.py": {
+      "bytes": 9591,
+      "mode": 420,
+      "sha256": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb"
+    },
+    "sources/scripts/goal_tree_digest.py": {
+      "bytes": 8401,
+      "mode": 420,
+      "sha256": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d"
+    },
+    "stamp.json": {
+      "bytes": 71,
+      "mode": 420,
+      "sha256": "50297a08edaa703942521f190258c1c7023f1392c662b8a7dc65decd618eaaa0"
+    },
+    "state.json": {
+      "bytes": 237,
+      "mode": 420,
+      "sha256": "02225a4d3aec7ccf832e258f227362a1b1dc2130c01d7af82cf8f8473f9b513d"
+    },
+    "stderr.txt": {
+      "bytes": 0,
+      "mode": 420,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "work/.goal/check_freeze": {
+      "bytes": 68,
+      "mode": 420,
+      "sha256": "c5d3a90c88ce05bc19fbe301e90767e2caba05267e7803e8c7df80a6670cbea8"
+    },
+    "work/.goal/evidence/crew/41a6d5cc39984299ae2eaefdfa70d3fb.json": {
+      "bytes": 3882,
+      "mode": 384,
+      "sha256": "d2a59cdfa60f2c16122b34b22a806c9740e869ee0f94abc30e6e1b64bf02edf7"
+    },
+    "work/.goal/evidence/host/attempt-7bae983de0f44633b1b923bb5f5241c8.json": {
+      "bytes": 1450,
+      "mode": 384,
+      "sha256": "2be792b1a16141faf9d1fc3bbb0d224229ec2d7540e1826d02e7705949c0e6bc"
+    },
+    "work/.goal/evidence/host/attempt-7d412d7f61644fc78482639359c5614d.json": {
+      "bytes": 1451,
+      "mode": 384,
+      "sha256": "beec39fdd622248401d06bcfe3de2cbe0adf278c8cebd6295859c78b0c4b5cd7"
+    },
+    "work/.goal/evidence/host/event-0b4be88df8457d846a44689e4cef77bc244ef2764914fe0d35c5394037733aff.json": {
+      "bytes": 364,
+      "mode": 384,
+      "sha256": "e9dd4d46c1843a4496814e54c4536188c8dee49d541c9db978b0aaa45b346828"
+    },
+    "work/.goal/evidence/host/event-ae55b25c1c47accdc0d5ca1f88d99782538cc0250e0ca50e055187b52a432458.json": {
+      "bytes": 365,
+      "mode": 384,
+      "sha256": "1c4360244d712e463ad0e8655c22561813da2025ad5af8c7b926af5b66d7a142"
+    },
+    "work/.goal/evidence/host/event-b076a0c960fd7d90bb02e5748a944a46fbb50fff2f98152618b46c82caae7569.json": {
+      "bytes": 341,
+      "mode": 384,
+      "sha256": "e3bd60729294acc02de942fddd697ea47a17dde96327e739b81d8b4101356fe3"
+    },
+    "work/.goal/evidence/host/event-cafb9c433e4850adcb2ebcfc8cd6ad57b02f4e004fb7732bbb00fe68c1459eb8.json": {
+      "bytes": 365,
+      "mode": 384,
+      "sha256": "67aeb58b50bf7bf5b47f93360dcfb06d96426d600a9d733ece8cf0306edb02f3"
+    },
+    "work/.goal/evidence/host/event-e575e664d2b48df0d330c8ae76b34765c7530b9243168c63012fbf4b4a16a9c0.json": {
+      "bytes": 347,
+      "mode": 384,
+      "sha256": "e311787fc88bbce4cebaa6d1c83db9aec6f67dbefa74cc0a9f6885ef20972808"
+    },
+    "work/.goal/evidence/host/event-f93b2d7ed8a5cc96afdd5d0ac6e8e6b0b5d423d7e2d25f26549a45e52e5bcd74.json": {
+      "bytes": 364,
+      "mode": 384,
+      "sha256": "289a2ed7406e0c17534c6a9fcbb9e163a44d904598eb832e7b2770d27ffe3c8d"
+    },
+    "work/.goal/evidence/host/prompt-6214c2fcf073de4b61b2c40c74c1f7f771dd744b661ee0d9f25b8b4c80f51e7d.json": {
+      "bytes": 392,
+      "mode": 384,
+      "sha256": "4cc39fa6d6bf6c2d3de2d10569a718fc5df28d410e165bf05b2cc18a24fb313f"
+    },
+    "work/.goal/evidence/host/ready-7bae983de0f44633b1b923bb5f5241c8.sh": {
+      "bytes": 458,
+      "mode": 384,
+      "sha256": "09f91bfefcdb3338a4e7e7fa52e261eb3a3dbfbff0996b527feb03948607afab"
+    },
+    "work/.goal/evidence/host/ready-7d412d7f61644fc78482639359c5614d.sh": {
+      "bytes": 458,
+      "mode": 384,
+      "sha256": "474dec9086600991a8c44c8321883ab7f57cb1f55b7b73ee7876bc14add7c6d8"
+    },
+    "work/.goal/evidence/host/session-6214c2fcf073de4b61b2c40c74c1f7f771dd744b661ee0d9f25b8b4c80f51e7d.json": {
+      "bytes": 304,
+      "mode": 384,
+      "sha256": "9d0a0877fc0371dd40a118471bb42f5aa0103cae61dd9e0d68a1115c486fdf1e"
+    },
+    "work/.goal/evidence/runtime/1d9ea2040e6a4ea28438eef122ce3e8b.json": {
+      "bytes": 1222,
+      "mode": 384,
+      "sha256": "0a7a62bf9f95e4ea045443929700fb9b882cff13c91968e1e4d6fc3b375b439c"
+    },
+    "work/.goal/evidence/runtime/20d921e5420949f6a741279c27f033e0.json": {
+      "bytes": 1189,
+      "mode": 384,
+      "sha256": "7e43ce0ec7b95a5829bc02633b0bba19f21eaf17cba1a93fbb9da7ef98aec0cf"
+    },
+    "work/.goal/evidence/runtime/2a94ff327f0443e599904c57f612d31e.json": {
+      "bytes": 1454,
+      "mode": 384,
+      "sha256": "279d128f37e2c44960e148935e8c12f06a8e893463b9c6202a17375cd76f0060"
+    },
+    "work/.goal/evidence/runtime/3b0dd1d6761849f3bf2f3f2938c65881.json": {
+      "bytes": 1449,
+      "mode": 384,
+      "sha256": "268fa28f9757991e40ffa863ee83e3453bb898b8605c0f323fef90f1fdfb0cad"
+    },
+    "work/.goal/evidence/runtime/3b68251bcfb04f58b40b0061cae9a1dd.json": {
+      "bytes": 1190,
+      "mode": 384,
+      "sha256": "42bda9e47099377846a9d6debc867301670b34eac7974f5cb9ded0ac0f2e6615"
+    },
+    "work/.goal/evidence/runtime/428b4a934be44218bdc2817bd3bf63df.json": {
+      "bytes": 1352,
+      "mode": 384,
+      "sha256": "0d19662e5680e824eabfb23a3ebc9785ab0092876d0e48efe7ce595e61c72398"
+    },
+    "work/.goal/evidence/runtime/50ca0d0107c84b1286cba6cd4f9ae909.json": {
+      "bytes": 1451,
+      "mode": 384,
+      "sha256": "c30a24c662aca73645185e73a7ac60924eef2ebe3abb0e4d0790fe21325b8585"
+    },
+    "work/.goal/evidence/runtime/6480702ff432464ba9596b81a4b7dc8b.json": {
+      "bytes": 1418,
+      "mode": 384,
+      "sha256": "71ea88ba598b27dea56c3da7c446608e0339236607b31ae5666067595435b589"
+    },
+    "work/.goal/evidence/runtime/709a30a62ad6435c8d115ef5089cc876.json": {
+      "bytes": 1223,
+      "mode": 384,
+      "sha256": "454717725db6fa032ba02e8adb81b23336f0730bc000923b2ce4ea619f07ec9d"
+    },
+    "work/.goal/evidence/runtime/879fdcab75384520bd6f8f67ff20bd5c.json": {
+      "bytes": 1315,
+      "mode": 384,
+      "sha256": "e462f1ad741d3367c72c23c3678a021222b8465f9caa49a2a1e9f87e6646984d"
+    },
+    "work/.goal/evidence/runtime/8ea73ead67e04153b8617dc6c459c953.json": {
+      "bytes": 1319,
+      "mode": 384,
+      "sha256": "03c2c0224b52585e9f2708a484db99ce91db763bfb749edac1e60e4f7ceaf155"
+    },
+    "work/.goal/evidence/runtime/babadd0f40a843458fc772882797559f.json": {
+      "bytes": 1173,
+      "mode": 384,
+      "sha256": "27dcf2eabfc8ecb954cdfde64d2d57c2c2c69b2b6d6ca3d854998c95a9effe87"
+    },
+    "work/.goal/evidence/runtime/c475515ea4664ebabc12fc1fd0c48023.json": {
+      "bytes": 1818,
+      "mode": 384,
+      "sha256": "f0fa7f573541c4bf8faef6575d6d68f8385277477a69e25d6929c7bcb65ee482"
+    },
+    "work/.goal/evidence/runtime/df2a7881f0584728bc9f9082c881df9b.json": {
+      "bytes": 1815,
+      "mode": 384,
+      "sha256": "df60e369fd30be826a8d1b36312073e7c45661ba672582b9bf7c22361437b4a2"
+    },
+    "work/.goal/evidence/runtime/eef0ceda703c4544a745b5b0d75fbe4b.json": {
+      "bytes": 1433,
+      "mode": 384,
+      "sha256": "cb14d2b7d02f583faea81d3e98657f651cc2b95ab2e1ec3cf6e07fba48fc190f"
+    },
+    "work/.goal/evidence/runtime/f60d5df3c0804ba599a1cea1f47f8963.json": {
+      "bytes": 1219,
+      "mode": 384,
+      "sha256": "85dbc2140af15fb817db626af321c26977c9fc923ca80de1c8a0ba50d3c4e5e5"
+    },
+    "work/.goal/evidence/runtime/fd78b1a70f7949ea9ed7fca70212978c.json": {
+      "bytes": 1453,
+      "mode": 384,
+      "sha256": "71cab0e64248022f862e5780588985a162c85e8da6742a3339647fbdf9584e82"
+    },
+    "work/.goal/goal.md": {
+      "bytes": 241,
+      "mode": 420,
+      "sha256": "8181749001191d575b3f7326964e1331d8509aabcc3c706f64a682df28a5bfbe"
+    },
+    "work/.goal/loop-log.md": {
+      "bytes": 0,
+      "mode": 420,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "work/.goal/pre-reg.md": {
+      "bytes": 1958,
+      "mode": 420,
+      "sha256": "8a0459da08a0be0a548ec31155e0bd85003cc0c3865d82df1e3961ae2025bfd2"
+    },
+    "work/.goal/runner.clock": {
+      "bytes": 11,
+      "mode": 384,
+      "sha256": "f30dc5ff36a55d9e2e50ac3b6d57ef85873aa8f1a0c8ea84d52d378b11f43282"
+    },
+    "work/.goal/runner.deadline": {
+      "bytes": 11,
+      "mode": 384,
+      "sha256": "d644a6edee59b233110d36128a7d1ef474ff92175236e8ac5fd0dfbbaf5c6850"
+    },
+    "work/.goal/runner.json": {
+      "bytes": 500,
+      "mode": 384,
+      "sha256": "7cbde7db005ac24f1aa3d43bfa00e7386b72688b1c96c80b3b67c14de4982cef"
+    },
+    "work/.goal/state.rec": {
+      "bytes": 255,
+      "mode": 420,
+      "sha256": "f41891e0c1ff7c75fce9efeebee9ade0c5ba0d06f76ea8c718ab0ebf7947a8c4"
+    },
+    "work/.goal/store/commits/current": {
+      "bytes": 87,
+      "mode": 384,
+      "sha256": "3215e63e8d2f513e8fc83e14b476de944f776c50438281db6c4388903693a00e"
+    },
+    "work/.goal/store/commits/generations/61eea70bccdf6a988363901ed8d5911e8fd1a472f4bfafbb4ffa973e1a9e387a": {
+      "bytes": 5398,
+      "mode": 384,
+      "sha256": "61eea70bccdf6a988363901ed8d5911e8fd1a472f4bfafbb4ffa973e1a9e387a"
+    },
+    "work/.goal/store/commits/generations/652ada8ac287788137ccc69a2d3ac68a944d4cee540cf172d0cb2bd36a1c62ef": {
+      "bytes": 4564,
+      "mode": 384,
+      "sha256": "652ada8ac287788137ccc69a2d3ac68a944d4cee540cf172d0cb2bd36a1c62ef"
+    },
+    "work/.goal/store/commits/generations/fca679c06b54fa46a972e8174c3a536f4b8f15d617504bb8b8f2c29f16356b11": {
+      "bytes": 1524,
+      "mode": 384,
+      "sha256": "fca679c06b54fa46a972e8174c3a536f4b8f15d617504bb8b8f2c29f16356b11"
+    },
+    "work/.goal/store/commits/writer.lock": {
+      "bytes": 0,
+      "mode": 384,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "work/.goal/verdicts.rec": {
+      "bytes": 0,
+      "mode": 420,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "work/.goal/work-plan.md": {
+      "bytes": 132,
+      "mode": 420,
+      "sha256": "6ffd71e91f37544a950eee06eefec77899e5375e1e95f083e93c3d3608a1761f"
+    },
+    "work/out1.txt": {
+      "bytes": 6,
+      "mode": 420,
+      "sha256": "3dfa3fb239f56c778a1e9b33eb31328349edd155a95806dac4378904e88527e5"
+    },
+    "work/out2.txt": {
+      "bytes": 6,
+      "mode": 420,
+      "sha256": "3dfa3fb239f56c778a1e9b33eb31328349edd155a95806dac4378904e88527e5"
+    }
+  },
+  "limitations": [
+    "Write exercised live; Edit not invoked in this canary.",
+    "T2 repeats the named check with echo EXIT; hook wraps the extra shell and its runtime completes/result0.",
+    "Negative hook association uses unique ordered call/hook-ID/result brackets; full raw hook inputs and tool text were not retained.",
+    "One canary, different task from auditlog v2: no speed causality, 3+3 completion or general net-benefit claim.",
+    "No model, named check, existing verifier, production API or test rerun by this reader."
+  ],
+  "live_edit_tool_exercised": false,
+  "model": "MiniMax-M3.1-Flash",
+  "money": null,
+  "negative_write_probes": 2,
+  "owned_and_parent_complete_runtime_span_count": 11,
+  "parent_message_id": "0744c81ca2b5372bbd661c898748c1bb",
+  "post_tool_use_agent_hooks": [
+    {
+      "elapsed": 26.19000345817767,
+      "event": 88,
+      "exit_code": 0,
+      "hook_id": "0afc7ec7-08ce-4cec-9590-6b1f5da729d1"
+    },
+    {
+      "elapsed": 29.421212082961574,
+      "event": 96,
+      "exit_code": 0,
+      "hook_id": "072d8453-c5f9-4d71-a0c5-deff7fdfb2b9"
+    }
+  ],
+  "recorded_elapsed_before_parent_validation": 31.00634525017813,
+  "runtime": "999.0.0-local",
+  "scope": "one real two-worker short-READY and structured-Write canary",
+  "session_end_host_receipt": true,
+  "session_end_stream_event_present": false,
+  "session_start_attributed_to_this_plugin": false,
+  "source_goal_host_sha256": "6cd50115f5e0ac78e89b9287a2475026a6aa9a3db7a2245a4efe9e9d8c2eb060",
+  "tokens": null,
+  "verified": true,
+  "workers": [
+    {
+      "adopted": 24.3119382080622,
+      "agent_id": "a3c2672ca717c7d2a",
+      "call_id": "call_01a1cf4e793e75588f5a58d0",
+      "denied_write": {
+        "call_event": 43,
+        "call_id": "call_01a1cf4e94ce73c288cde638",
+        "file_absent": true,
+        "hook_event": 45,
+        "hook_id": "554f1bf3-a237-4660-a176-7d229f109bd1",
+        "is_error": true,
+        "permission_decision": {
+          "hookEventName": "PreToolUse",
+          "permissionDecision": "deny",
+          "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"
+        },
+        "tool_result_event": 46
+      },
+      "extra_worker_calls": [],
+      "first_bash_call_id": "call_01a1cf4e8db8754aa407bb61",
+      "first_bash_exact": true,
+      "first_valid": 24.228902207920328,
+      "launcher_command": "bash /private/tmp/goal-claude-hooks-launcher-rg1v7ekj/work/.goal/evidence/host/ready-7d412d7f61644fc78482639359c5614d.sh",
+      "launcher_sha256": "474dec9086600991a8c44c8321883ab7f57cb1f55b7b73ee7876bc14add7c6d8",
+      "legal_write": {
+        "bytes": 6,
+        "call_id": "call_01a1cf4e9fd676ef8d669c98",
+        "sha256": "3dfa3fb239f56c778a1e9b33eb31328349edd155a95806dac4378904e88527e5",
+        "tool_result_event": 58
+      },
+      "named_check_call_id": "call_01a1cf4ea713726d9d57b6e7",
+      "named_check_runtime_count": 1,
+      "nonce": "29fcd92f28fc4c1d9ce11c40ad046d31",
+      "parent_validation_start_monotonic": 1664986.674413958,
+      "ready_monotonic": 1664969.547157958,
+      "returned_monotonic": 1664981.846550916,
+      "task": "T1",
+      "typed_completion_elapsed": 26.190947167109698
+    },
+    {
+      "adopted": 24.31315075000748,
+      "agent_id": "a902ef06f8f77e2a7",
+      "call_id": "call_01a1cf4e811a771f97f77a14",
+      "denied_write": {
+        "call_event": 48,
+        "call_id": "call_d6129444dc944b288577cb50",
+        "file_absent": true,
+        "hook_event": 50,
+        "hook_id": "f03e6e4e-05ed-43d0-83ad-a0406cd47972",
+        "is_error": true,
+        "permission_decision": {
+          "hookEventName": "PreToolUse",
+          "permissionDecision": "deny",
+          "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"
+        },
+        "tool_result_event": 51
+      },
+      "extra_worker_calls": [
+        {
+          "call_id": "call_35bc143c21b6455e8cbd45a9",
+          "input": {
+            "command": "/opt/homebrew/opt/python@3.14/bin/python3.14 -I /Users/m/repo/goal-loop/scripts/goal_host_command.py --check /private/tmp/goal-claude-hooks-launcher-rg1v7ekj/work 7bae983de0f44633b1b923bb5f5241c8:93116297dd194454b709542e67c00072; echo \"EXIT=$?\"",
+            "description": "Re-run frozen check and report exit code"
+          },
+          "name": "Bash"
+        }
+      ],
+      "first_bash_call_id": "call_5c57689dafca4e2ba2341633",
+      "first_bash_exact": true,
+      "first_valid": 24.311038417043164,
+      "launcher_command": "bash /private/tmp/goal-claude-hooks-launcher-rg1v7ekj/work/.goal/evidence/host/ready-7bae983de0f44633b1b923bb5f5241c8.sh",
+      "launcher_sha256": "09f91bfefcdb3338a4e7e7fa52e261eb3a3dbfbff0996b527feb03948607afab",
+      "legal_write": {
+        "bytes": 6,
+        "call_id": "call_396cad30a88e46a380e6f669",
+        "sha256": "3dfa3fb239f56c778a1e9b33eb31328349edd155a95806dac4378904e88527e5",
+        "tool_result_event": 65
+      },
+      "named_check_call_id": "call_d30153d753b340289ff1497f",
+      "named_check_runtime_count": 2,
+      "nonce": "93116297dd194454b709542e67c00072",
+      "parent_validation_start_monotonic": 1664986.75788,
+      "ready_monotonic": 1664969.676772791,
+      "returned_monotonic": 1664985.078147916,
+      "task": "T2",
+      "typed_completion_elapsed": 29.422384875128046
+    }
+  ]
+}

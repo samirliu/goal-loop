@@ -1,0 +1,327 @@
+{
+  "reason": "user-requested-stop",
+  "user_stopped": true,
+  "timeout": false,
+  "product_failure": false,
+  "time": 1794398109.734048,
+  "monotonic": 1583684.308154041,
+  "worker": "/root/cohort_v2_controller/r10_skill",
+  "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a",
+  "monitor_session_id": 95250,
+  "pre_interrupt": {
+    "trial": {
+      "version": 1,
+      "arm": "skill",
+      "family": "medium",
+      "seed": 329103,
+      "repetition": 0,
+      "status": "running",
+      "workspace": "/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work",
+      "skill": "/private/tmp/goal-agent-cohort-v2-20261111/skill",
+      "oracle": "/private/tmp/goal-agent-cohort-v2-20261111/oracle/grade.py",
+      "frozen": {
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/SKILL.md": "d16193951dac2b6bb595121f47f74daaf480e31a485e63ac68ef24a5130e98a1",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/references/gate.md": "934894c986d6c97e1d6360aa6e5e83c140ad442ab0562dd14ebb1033cf5f9f58",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/references/crew.md": "b5730ee5fc59082b849ffd45bed8f72d6cf44508239f416ac462cbcd31d08dbc",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/references/patterns.md": "2dfb30a03ea84b946c93d8c656ba05b212f81fd58695267323e73b1c8e65320d",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/references/companions.md": "f004518887cfd11d0e599bd3dc4f0ed8fc91ef73237ddc5aaa7f3906fd2c8fa3",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/agents/goal-critic.md": "d3034a768937c08f2766bbcdccb2b276df669d950f0f143bca40188a378b5544",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/agents/goal-worker.md": "cde5712d328f720f8b102aedf63c9e33a20122783b0eb1da143b461e2d15689b",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/agents/goal-adjudicator.md": "f7ede0b8f73573a4e6c416d1282fda5d8340226611b2c68c0603ba2b803d73f3",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/agents/goal-mech-worker.md": "f5486790209d165fc930b0c783fb11ec437249f791ea739cd84ba5cd925f0517",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/agents/goal-checker-req.md": "7ef23f31506fd617926a13e3d6c889feab9da4c5f5294db8a6c495dd7b5cc917",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_evolve.py": "fabae22d1506b52177e93fa9a5d6b1230a70e7653f39579baecc51c44dcdf4fa",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_runner.py": "d50a3c75997f79e7c6cad21318f7f29bba8b78ca10051c98e6ecf7508b3b73a4",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_ctl.sh": "2bb2ad319b73da9ce8d9927a7e0c4f7e2ccc424ae4efdeee65ab70cd0c745a64",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_hook.sh": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_audit.sh": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_crew.py": "9c7857b963cdb379260cf7ebf66ed3b6d4b8c5d56a07a708983ef1ca14c39b0f",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_parse.sh": "81b2444b42d13157f19c487bdccd572f3ea29843a5d087ad84d7e5dd660d809d",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_strategy.awk": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_loop.sh": "05998e8dbfa24c9b7c5c75becbdc2c989dac301d4de4217b3f54c85578d26a5b",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_trace.py": "bf7072b2d3cda49dd091c070f2631783848908799a695208b579ea54135ee3b3",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_tree_digest.py": "278d31ee556181063e3664bc7b51e63f7ed278bcdde2664d4ca2c5de44218268",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_forge.py": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_gate.sh": "4fbedbde2f524d69e3b3ca16e2f150a7aee7cf62b789e5a8abdbf8bb01cc6c8c",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/scripts/goal_store.py": "9f170dfab248f882f7a952522ff73c355cefad0ccd67f043b2de67e56c651929",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/assets/pre-reg.template.md": "3f17b602e9bc31149816cecae5812ae1fdc010d4345a39e28766f0ddbc276b7e",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/assets/goal.contract.md": "a1b065ecb9c8d5d93ed1fd5cbf31d1fb51e0e6471e078441cc8422d542287ac3",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/assets/evidence_cache.sh": "c03dbb8ccb2ed8b0101199f33700b66abff23fac2cadeded86436deccb41db9a",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/references/packs/external.md": "25f77d3591b44f9c77a6213897659f3883acd55e0cfda71691cab46000c08d78",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/references/packs/instrument.md": "9ba9e8591472c1d0afe30ad1dc1711e4d4d744f8beef47f36759e8a9f2b569c1",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/references/packs/README.md": "4c0b959ea7644cccc65055d8b3b4471767a43b3ae58e6b47c24e2568819a04fd",
+        "/private/tmp/goal-agent-cohort-v2-20261111/skill/references/packs/gradient.md": "fc3304262fc9e7eb9a6146d43497f797f8b15ed20f44a206a419004eb5b04211",
+        "/private/tmp/goal-agent-cohort-v2-20261111/oracle/tasks.py": "5441b4ad2aeab3558f31f26f4a0c117e10dfa3f439f86d3ad6aa29ece5416e38",
+        "/private/tmp/goal-agent-cohort-v2-20261111/oracle/bench.py": "569b3f0d3ece5eafdec293a905d9eca666bf165d6b81a2a246d996ef391024af",
+        "/private/tmp/goal-agent-cohort-v2-20261111/oracle/check_harness.py": "82531494ef817ab217ce8b63a2be873823c2d704a82e1e836122cea319a05a4b",
+        "/private/tmp/goal-agent-cohort-v2-20261111/oracle/pre-reg.md": "771626e9dd163963f830cc6b3499930f9def591dadf8371256acf5ba63ab8551",
+        "/private/tmp/goal-agent-cohort-v2-20261111/oracle/report.py": "f310431ec8ccd5885c25a86c58a24697129b0814386d74c2090faec36a049c25",
+        "/private/tmp/goal-agent-cohort-v2-20261111/oracle/grade.py": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19"
+      },
+      "protected": {
+        "TASK.md": "82ab0743fa37841a91d88f7c8fb525612cc74be34c947799e2646e84fa9952fd",
+        "public.py": "898d8b22ddfef661a431ff233760b65d1f6a439cd924412bfd49df56532e7a2f"
+      },
+      "initial": {
+        "public.py": "import json,subprocess,sys,tempfile\nfrom pathlib import Path\nfrom auditlog.codec import parse_line\nfrom auditlog.aggregate import summarize\nassert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\nassert summarize(iter([{\"key\":\"b\",\"amount\":3},{\"key\":\"b\",\"amount\":-2}]))==[{\"key\":\"b\",\"count\":2,\"total\":1,\"min\":-2,\"max\":3}]\nwith tempfile.TemporaryDirectory() as tmp:\n    source,out=Path(tmp)/\"in\",Path(tmp)/\"out\"\n    source.write_text('{\"key\":\"a\",\"amount\":2}\\n{broken\\n')\n    out.write_text(\"keep\")\n    args=[sys.executable,\"-B\",\"-m\",\"auditlog\",\"--input\",str(source),\"--output\",str(out)]\n    result=subprocess.run(args,capture_output=True,text=True)\n    assert result.returncode==2 and out.read_text()==\"keep\" and \"2\" in result.stderr\n    result=subprocess.run(args+[\"--skip-bad\"],capture_output=True,text=True)\n    assert result.returncode==0 and json.loads(out.read_text())[\"total\"]==2\n    assert json.loads(result.stderr)=={\"skipped\":1}\nprint(\"PUBLIC PASS\")\n",
+        "TASK.md": "Implement the standard-library auditlog package with codec.py, aggregate.py,\n__main__.py and __init__.py. codec.parse_line(line) returns a dict containing\nthe original key and amount, or raises ValueError. Valid records are JSON\nobjects with a nonempty string key and integer amount (bool is invalid).\nExtra fields are ignored. aggregate.summarize(records) accepts an iterable\nand returns key-sorted dicts with key,count,total,min,max.\npython3 -m auditlog --input PATH --output PATH [--skip-bad] reads UTF-8 JSONL.\nIgnore blank lines. Output one JSON object per group. Strict invalid input\nexits 2, names the physical line on stderr and preserves an existing output.\nWith --skip-bad, skip invalid rows and print {\"skipped\":N} on stderr.\nMissing input exits 2. Empty input produces an empty output file.\nPublish output atomically. Only edit auditlog/ and optional tests you create.\nRun python3 public.py. No third-party dependencies.\n",
+        "auditlog/aggregate.py": "def summarize(records):\n    raise NotImplementedError\n",
+        "auditlog/__init__.py": "",
+        "auditlog/codec.py": "def parse_line(line):\n    raise NotImplementedError\n",
+        "auditlog/__main__.py": "raise SystemExit(\"not implemented\")\n"
+      },
+      "budget_seconds": 600,
+      "started": 1794397935.95713,
+      "start_monotonic": 1583510.530734416,
+      "deadline": 1794398535.957131,
+      "first_valid": null,
+      "observations": [
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 10.42505554179661
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 20.71412720880471
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 30.97839758382179
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 41.23717562481761
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 51.496137958951294
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 61.73986658384092
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 72.03800745890476
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 82.28101529181004
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 92.54338479181752
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 102.81392887490802
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 113.08390879188664
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 123.36311779194511
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 133.6574543749448
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 143.92813820880838
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 154.19389591692016
+        },
+        {
+          "result": 1,
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/public.py\", line 5, in <module>\n    assert parse_line('{\"key\":\"a\",\"amount\":2,\"extra\":4}')=={\"key\":\"a\",\"amount\":2}\n           ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a/work/auditlog/codec.py\", line 2, in parse_line\n    raise NotImplementedError\nNotImplementedError\n",
+          "elapsed_from_dispatch": 164.45430337497965
+        }
+      ],
+      "agent": null,
+      "tokens": null,
+      "money": null,
+      "brief_sha256": "f7629f3db92621d30aec30ed7da4a3a2877f7f614e689cd40437b40548ea4b82"
+    },
+    "markers": {
+      "READY.json": {
+        "time": 1794398022.2251961,
+        "monotonic": 1583596.799194
+      },
+      "DONE.json": null,
+      "result.json": null
+    }
+  },
+  "cleanup": {
+    "cohort_status": "user-stopped",
+    "stop_reason": "User explicitly changed priority and requested immediate stop; not timeout or product failure.",
+    "total_preregistered": 36,
+    "dispatched": 10,
+    "completed": 9,
+    "user_stopped_attempts": 1,
+    "prepared_undispatched": 26,
+    "accepted_completed": 9,
+    "protocol_compliant_completed": 7,
+    "current": null,
+    "results": [
+      {
+        "n": 1,
+        "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/601d7cbb24d142df8a9aab666c7973dc",
+        "family": "small",
+        "arm": "plain",
+        "terminal": "returned",
+        "accepted": true,
+        "timely": true,
+        "protocol_compliant": true,
+        "independent_finished_seconds": 139.8476342081558
+      },
+      {
+        "n": 2,
+        "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/defad5bb4f054f8c83d5d9a151236851",
+        "family": "small",
+        "arm": "skill",
+        "terminal": "returned",
+        "accepted": true,
+        "timely": true,
+        "protocol_compliant": true,
+        "independent_finished_seconds": 232.35937987500802
+      },
+      {
+        "n": 3,
+        "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/945e9bf2babd4e1f94621a632f259d9d",
+        "family": "small",
+        "arm": "native",
+        "terminal": "returned",
+        "accepted": true,
+        "timely": true,
+        "protocol_compliant": false,
+        "independent_finished_seconds": 155.57455649995245
+      },
+      {
+        "n": 4,
+        "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/8323e503369b407fad57ea6d209f8713",
+        "family": "small",
+        "arm": "skill",
+        "terminal": "returned",
+        "accepted": true,
+        "timely": true,
+        "protocol_compliant": true,
+        "independent_finished_seconds": 367.8647861671634
+      },
+      {
+        "n": 5,
+        "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/0a6df7da8392486b9fda2062b3f110bf",
+        "family": "small",
+        "arm": "native",
+        "terminal": "returned",
+        "accepted": true,
+        "timely": true,
+        "protocol_compliant": true,
+        "independent_finished_seconds": 247.3504293751903
+      },
+      {
+        "n": 6,
+        "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/e17952877f204704a9c0fc16e4aae4b4",
+        "family": "small",
+        "arm": "plain",
+        "terminal": "returned",
+        "accepted": true,
+        "timely": true,
+        "protocol_compliant": true,
+        "independent_finished_seconds": 321.0981460828334
+      },
+      {
+        "n": 7,
+        "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/be10cc1891974a37b2a349d6e2fb8fba",
+        "family": "small",
+        "arm": "native",
+        "terminal": "returned",
+        "accepted": true,
+        "timely": true,
+        "protocol_compliant": false,
+        "independent_finished_seconds": 241.34165354189463
+      },
+      {
+        "n": 8,
+        "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/f76123585c984c398deb914f9bb85f50",
+        "family": "small",
+        "arm": "plain",
+        "terminal": "returned",
+        "accepted": true,
+        "timely": true,
+        "protocol_compliant": true,
+        "independent_finished_seconds": 231.92137941601686
+      },
+      {
+        "n": 9,
+        "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/0b843e810b694cc8b1a2785053acaf3b",
+        "family": "small",
+        "arm": "skill",
+        "terminal": "returned",
+        "accepted": true,
+        "timely": true,
+        "protocol_compliant": true,
+        "independent_finished_seconds": 458.11335154110566
+      },
+      {
+        "n": 10,
+        "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a",
+        "family": "medium",
+        "arm": "skill",
+        "terminal": "user-stopped",
+        "accepted": false,
+        "timely": true,
+        "protocol_compliant": false,
+        "independent_finished_seconds": 205.0848184588831
+      }
+    ],
+    "updated_time": 1794398174.205733,
+    "updated_monotonic": 1583748.779916208,
+    "worker": "/root/cohort_v2_controller/r10_skill",
+    "monitor_session_id": 95250,
+    "monitor_termination_receipt": {
+      "exit_code": 130,
+      "write_stdin_chars": "Ctrl-C",
+      "output": ""
+    },
+    "native_goal_receipt_exists": false,
+    "raw_report": "final-report.json"
+  }
+}

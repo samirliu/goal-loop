@@ -1,0 +1,50 @@
+{
+  "baseline_commit": "cf198829f9c8efe740d7d30a09de5d0251303b62",
+  "sources": {
+    "scripts/goal_ctl.sh": "ba8cd4a1b1d4524611eaa8dfabf18f151cec0f10ad964caddc95cbe7cf806693",
+    "scripts/goal_gate.sh": "429b7e2ee8470b4ac14e361f3e31f4ed42ae85727698c4ecac3f43bf2d57c62d",
+    "scripts/goal_loop.sh": "da68f631e0d4f6b3312e7f0015521fb366806c617e4a023abb572e361c35db11",
+    "scripts/goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6",
+    "scripts/goal_parse.sh": "42dc2241e2ab33e2e135d7185ea59d413ffbcbc573ee19b026685b097258e193",
+    "scripts/goal_store.py": "089fa9f474aa5ff3d67784449cc30117c8d7ad4287846977ef479ae8c677ac12",
+    "scripts/goal_strategy.awk": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+    "tests/cases.inc.sh": "dc7324371d37cd899629398670fbd6a986f62331c39e37136718045cc93170e5",
+    "tests/lib.sh": "0abdc7e059ef794b086fdaadbe92c954960325e9ac3003fae7346fc78819944e",
+    "tests/test_budget.py": "e02018c250847764f31f8faf51af9330571c14fe7fab1b60f1687fbfd2bc8266",
+    "tests/test_ledger_access.py": "6885b221205f9d62a4343ebb9fcab8ff1eb5a56dbefccdc276a095a20161d9ac",
+    "tests/test_owner_watch.py": "a7396cfc5daf23d73fa7e0b32617d4a694c9c0fb92a79ddc643eda3756b1f4e2",
+    "examples/crew-cost/README.md": "556737a7bc870bdff5dabcecec1808899177de258f1d1cb326d2058262e77978",
+    "examples/crew-cost/run.py": "a209763a00fff96929fcb2d9ceba541f70e231b1ea79ead120e9ced39a3ccb1f",
+    "examples/crew-cost/task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2",
+    "examples/evolution-dedupe/README.md": "0023728cdcb75876f7c469f3d84ff2a2912baa07464345fa55d75d6c2c7cad52",
+    "examples/evolution-dedupe/run.py": "048a04d6ac90c434e1922fbd1cce2237c84328c179d873a735907b03706f0870",
+    "scripts/goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+    "scripts/goal_crew.py": "9c7857b963cdb379260cf7ebf66ed3b6d4b8c5d56a07a708983ef1ca14c39b0f",
+    "scripts/goal_evolve.py": "b7d4b7f528723def0b54446b214c3adaa9d156d8df882a0266e3dd666b387467",
+    "scripts/goal_runner.py": "d50a3c75997f79e7c6cad21318f7f29bba8b78ca10051c98e6ecf7508b3b73a4",
+    "scripts/goal_trace.py": "bf7072b2d3cda49dd091c070f2631783848908799a695208b579ea54135ee3b3",
+    "tests/test_crew.py": "08825a585f4f19c2be1c7ca37427cb4895ac14c66a388a92b9cdebf27eaaf66e",
+    "tests/test_evolve.py": "f5b54de77cfa60987143314eda54d1d6ee528348e982b5b359e062e53069f2d5",
+    "tests/test_gate_budget.py": "1cdb2a65200462028d9cf7b464f131c06078ddbecca353b8b682fafbc029534e",
+    "tests/test_mutation_commit.py": "935c4b7951e16debbb88fc7e7e9d01bd417c1f38a75697e09f864f089c3dcd57",
+    "tests/test_runner_lifecycle.py": "646fefcfb82bf3bcb7ee6d7956a3d144861c831fd12fe071430123dbcae67145",
+    "tests/test_runtime_trace.py": "f89efde64499f9090c66c91e3aed12a8db3ca9a5f7f73dd6e43ede7cf4f1e3dd",
+    "tests/test_strategy_events.py": "7b9bdb04316ff080dbd0765f2370d99f34a25d5412dfb625315828287af21dfa",
+    "tests/test_view_authority.py": "6c5bef2f55d4a99307df7cc1ef5d57154edfb19ba9bae20885e6d9d50a984156",
+    "tests/test_worktree_scope.py": "265e0bb76b81addf118f80ee8b77691906878f4256b96b07478fc11efbba9539",
+    "tests/view_fixture.py": "e588c57170b32b57935e95284ee9cca6bf19bcd1e47922c17e8ff58066e1f029"
+  },
+  "trials": 18,
+  "fresh_seed": 1009,
+  "checks": {
+    "python": 117,
+    "shell": 592
+  },
+  "artifacts": {
+    "results.json": "48292c45212fccfddd468e02820532eba9bcffb024d618df44ce9afbd1e668ef",
+    "implementation.patch": "f3998f63c5cb55b005e4fdee9aaaedf1a7ad21b311716997437e97512aa9da22",
+    "python-regression.txt": "77f73a55f0d03fd31bb0853dcf6b873ae14a353001491805b3817139d4f804fc",
+    "shell-regression.txt": "4a21424f271be461582cc2b8f814cb50d7fba64e12b9eaafff3a4db89cf43b2f",
+    "runtime.log": "b45cd4bc15a86b3348c10a526dd9d803a29819dcd9295573c808a9bc1ed5b6ef"
+  }
+}

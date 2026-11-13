@@ -1,0 +1,17 @@
+{
+  "scope": "Posthoc only; original frozen v3 scores/times and closed139 full matrix unchanged",
+  "archives": [
+    {
+      "path": "calibration-before.tar.xz",
+      "payload_files": 92,
+      "bytes": 45584,
+      "sha256": "93fe605252de3d3f82112e406769a27084c9d16b951f0c580e3545924d8f0163"
+    },
+    {
+      "path": "posthoc-six.tar.xz",
+      "payload_files": 39,
+      "bytes": 17192,
+      "sha256": "9f0dc8d73e47d588225037296e42ed27dd2fc290950d07745c172a20c5a53e99"
+    }
+  ]
+}

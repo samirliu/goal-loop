@@ -7,6 +7,22 @@ no(){ failn=$((failn+1)); echo "  FAIL - $1"; }
 assert_rc(){ [ "$3" = "$2" ] && ok "$1 (rc=$3)" || no "$1 (want rc=$2 got rc=$3)"; }
 assert_has(){ printf '%s' "$3" | grep -qE -- "$2" && ok "$1" || no "$1"; }
 
+# These scenarios hand-author state/log/verdict records to isolate gate rules.
+# Publish that fixture input before the real entrypoint reads it. This shell
+# function is deliberately not exported: production subprocesses and the
+# direct Python integration suites never receive this setup hook.
+bash(){
+  if [ "${1:-}" = "$here/scripts/goal_gate.sh" ] && [ "${2:-}" = --digest ]; then
+    command bash "$@"
+    return $?
+  fi
+  case "${1:-}" in
+    "$here/scripts/goal_gate.sh"|"$here/scripts/goal_ctl.sh"|"$here/scripts/goal_audit.sh"|"$here/devtools/goal_loop.sh"|"$here/scripts/goal_hook.sh")
+      python3 -I "$here/tests/view_fixture.py" "$T" "$@" || return 4 ;;
+  esac
+  command bash "$@"
+}
+
 # BSD/GNU portability (v2.9): `sed -i` with no extension is GNU-only (on
 # macOS/BSD it swallows the expression as a backup suffix). One in-place
 # substitution = transform to a sibling tmp + atomic mv.
@@ -23,6 +39,11 @@ contract(){ # $1 proj NAME under $T; $2.. = AC lines; optional FORGE=1 / TB=seco
     for l in "$@"; do printf '%s\n' "$l"; done
     printf '\n%s\n\n## Out of scope\n\n- nothing\n\n## Approval\n\napproved: PENDING\n' "$forge_line"
   } > "$p/.goal/goal.md"
+  if [ "${FORGE:-0}" = 1 ]; then
+    printf 'fixture\n' > "$p/forge-input.txt"
+    printf '#!/usr/bin/env bash\ntest "$(cat)" = fixture\n' > "$p/forge-probe.sh"
+    printf '%s\n' '{"version":1,"instruments":["forge-probe.sh"],"cases":[{"id":"fixture","dimension":"fixture","input":"forge-input.txt","command":["bash","forge-probe.sh"]}],"blind_spots":["toy fixture covers its declared input"]}' > "$p/.goal/forge-plan.json"
+  fi
   [ "${NOSTAMP:-0}" = 1 ] || bash "$CTL" stamp --project "$p" --auto ${TB:+--time-budget=$TB} >/dev/null
 }
 
@@ -35,10 +56,24 @@ bind_v(){ # $1 proj NAME under $T; $2 verdict-line with DIGEST placeholder
 close_iter(){ # $1 proj NAME under $T, rest passed to close-iteration (--no-gate implied)
   local name="$1" p="$T/$1"; shift
   : > "$p/a.txt"
+  forge_critic "$name"
   bash "$CTL" close-iteration --project "$p" --task T1 --files a.txt \
     --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
     --exit-signal yes "$@" --no-gate >/dev/null 2>&1
   two_pass "$name"
+}
+
+forge_critic(){ # Explicit critic fixture bound to the next production close.
+  local p="$T/$1" it digest fingerprint
+  grep -q '^exit: forge' "$p/.goal/goal.md" || return 0
+  [ -f "$p/.goal/forge-plan.json" ] || return 0
+  it=$(awk -F= '$1=="iteration"{print $2+1}' "$p/.goal/state.rec")
+  digest=$(bash "$GATE" --digest --project "$p") || return 1
+  fingerprint=$(python3 -I "$here/scripts/goal_forge.py" freeze --project "$p") || return 1
+  fingerprint=${fingerprint#forge=}; fingerprint=${fingerprint%;}
+  mkdir -p "$p/.goal/evidence"
+  printf 'ITERATION|%s\nARTIFACT|%s\nPLAN|%s\nCLEAR|finite input fixture inspected\n' "$it" "$digest" "$fingerprint" \
+    > "$p/.goal/evidence/critic-iter-$it.md"
 }
 
 # Plant claim-time two-pass artifacts for the latest iteration (adversarial
@@ -55,14 +90,14 @@ two_pass(){
 
 # --- suite-level globals (must exist in every shard) ---
 AUDIT="${AUDIT:-$here/scripts/goal_audit.sh}"
-LOOPT="${LOOPT:-$here/scripts/goal_loop.sh}"
+LOOPT="${LOOPT:-$here/devtools/goal_loop.sh}"
 
 # --- shared body helpers (defined in cases.inc.sh too; lib wins first) ---
 stall(){ printf 'no_progress_streak=1\n' >> "$1/.goal/state.rec"; }
 hblocks(){ local p="$T/$1/.goal/loop-log.md" n=1; : > "$p"
   shift
   while [ $# -ge 2 ]; do
-    printf '## iteration %d\ntask=%s\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=deadbeefcafe\nscore=none\nstrategy_delta=none\nstrategy=%s\n' "$n" "$1" "$2" >> "$p"; n=$((n+1)); shift 2 || break
+    printf '## iteration %d\ntask=%s\nfiles_modified=a.txt\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=no\nfalse_complete=no\ndigest=v2-%064d\nscore=none\nstrategy_delta=none\nstrategy=%s\n' "$n" "$1" "$n" "$2" >> "$p"; n=$((n+1)); shift 2 || break
   done; }
 scorefile(){ local f="$T/$1/.goal/scores.rec"; : > "$f"; shift; local n=1 kv
   for kv in "$@"; do printf '%s|%s|none\n' "$n" "$kv" >> "$f"; n=$((n+1)); done; }

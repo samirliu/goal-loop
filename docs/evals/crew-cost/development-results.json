@@ -1,0 +1,4994 @@
+{
+  "version": 1,
+  "backend": "controlled local subprocesses, not native Agent API",
+  "trials": [
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329504.247783,
+        "condition": "f82210bdef8fac92409afe8d1dc6e291fbd55d8e7747e2b9f421fa3de8dca7bb",
+        "deadline": 1515676.4901368716,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 1.9349652079399675,
+        "final_validation": {
+          "start": 1.8571669170632958,
+          "end": 1.9349338749889284,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+            ],
+            "output-T2.json": [
+              420,
+              "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+            ],
+            "output-T3.json": [
+              420,
+              "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329504.325608,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 0.01
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "774944f732c941ada74e75b891a631cc",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "423f93fb6bb6a20c0eb298252b7ec9e437a6fb8f377d772e0267e487a0b5adda"
+          ],
+          "input-T2.json": [
+            420,
+            "858a274955efb1bbd5d4d6ce5038ec64cca092f0f08df5af6ab07ef0006ee0a7"
+          ],
+          "input-T3.json": [
+            420,
+            "e62339eb2e398bc567f46ed7a8f3ec68cf198e61f4b17d6090a7da279c0b5a74"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.629233832936734,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0014587920159101486,
+            "fault": null,
+            "first_valid": 0.6285754998680204,
+            "result": 0,
+            "returned": 0.5467794169671834,
+            "started": 0.07306937500834465,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+                  ]
+                },
+                "end": 0.6285754998680204,
+                "result": 0,
+                "start": 0.5473172499332577,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0014587920159101486,
+            "startup_queue_seconds": 0.0716105829924345
+          },
+          "T2": {
+            "adopted": 1.2454826668836176,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.6297221248969436,
+            "fault": null,
+            "first_valid": 1.2449115829076618,
+            "result": 0,
+            "returned": 1.1657878330443054,
+            "started": 0.6972853329498321,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+                  ]
+                },
+                "end": 1.2449115829076618,
+                "result": 0,
+                "start": 1.1663412500638515,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.6297221248969436,
+            "startup_queue_seconds": 0.06756320805288851
+          },
+          "T3": {
+            "adopted": 1.8558460830245167,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 1.2459207919891924,
+            "fault": null,
+            "first_valid": 1.8552304168697447,
+            "result": 0,
+            "returned": 1.7781242078635842,
+            "started": 1.3122814169619232,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+                  ]
+                },
+                "end": 1.8552304168697447,
+                "result": 0,
+                "start": 1.7786706250626594,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 1.2459207919891924,
+            "startup_queue_seconds": 0.06636062497273088
+          }
+        },
+        "mode": "inline",
+        "money": null,
+        "origin": 1515076.880780708,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0010579579975456,
+            "name": "coordination",
+            "start": 0.0006779578980058432
+          },
+          {
+            "end": 1.8567462919745594,
+            "name": "join",
+            "start": 1.8563094579149038
+          }
+        ],
+        "started": 1794329502.390643,
+        "tokens": null,
+        "trial": "low-cal-41",
+        "version": 1,
+        "worker_seconds": 1.6135897489730269,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.00043683405965566635,
+          "coordination": 0.0003800000995397568
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329505.152533,
+        "condition": "f82210bdef8fac92409afe8d1dc6e291fbd55d8e7747e2b9f421fa3de8dca7bb",
+        "deadline": 1515676.4901394376,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 0.9070059158839285,
+        "final_validation": {
+          "start": 0.824065790977329,
+          "end": 0.9069700408726931,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+            ],
+            "output-T2.json": [
+              420,
+              "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+            ],
+            "output-T3.json": [
+              420,
+              "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329505.235499,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 0.01
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "8fa3635846ab4d2e82f319d1f10ac0f0",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "423f93fb6bb6a20c0eb298252b7ec9e437a6fb8f377d772e0267e487a0b5adda"
+          ],
+          "input-T2.json": [
+            420,
+            "858a274955efb1bbd5d4d6ce5038ec64cca092f0f08df5af6ab07ef0006ee0a7"
+          ],
+          "input-T3.json": [
+            420,
+            "e62339eb2e398bc567f46ed7a8f3ec68cf198e61f4b17d6090a7da279c0b5a74"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6653883329126984,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012618328910320997,
+            "fault": null,
+            "first_valid": 0.6647786248940974,
+            "result": 0,
+            "returned": 0.5833742909599096,
+            "started": 0.08485208288766444,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+                  ]
+                },
+                "end": 0.6647786248940974,
+                "result": 0,
+                "start": 0.5839333748444915,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012618328910320997,
+            "startup_queue_seconds": 0.08359024999663234
+          },
+          "T2": {
+            "adopted": 0.7442683749832213,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0030509158968925476,
+            "fault": null,
+            "first_valid": 0.7436511248815805,
+            "result": 0,
+            "returned": 0.6662492910400033,
+            "started": 0.665837625041604,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+                  ]
+                },
+                "end": 0.7436511248815805,
+                "result": 0,
+                "start": 0.66665104101412,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0030509158968925476,
+            "startup_queue_seconds": 0.6627867091447115
+          },
+          "T3": {
+            "adopted": 0.8227862908970565,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0048799579963088036,
+            "fault": null,
+            "first_valid": 0.8221759160514921,
+            "result": 0,
+            "returned": 0.7451867498457432,
+            "started": 0.7447623750194907,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+                  ]
+                },
+                "end": 0.8221759160514921,
+                "result": 0,
+                "start": 0.7456031660549343,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0048799579963088036,
+            "startup_queue_seconds": 0.7398824170231819
+          }
+        },
+        "mode": "crew",
+        "money": null,
+        "origin": 1515078.818632625,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008610829245299101,
+            "name": "coordination",
+            "start": 0.000508040888234973
+          },
+          {
+            "end": 0.823644916061312,
+            "name": "join",
+            "start": 0.8232502499595284
+          }
+        ],
+        "started": 1794329504.328493,
+        "tokens": null,
+        "trial": "low-cal-41",
+        "version": 1,
+        "worker_seconds": 1.9856176250614226,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.000394666101783514,
+          "coordination": 0.00035304203629493713
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329506.066311,
+        "condition": "f82210bdef8fac92409afe8d1dc6e291fbd55d8e7747e2b9f421fa3de8dca7bb",
+        "deadline": 1515676.490140165,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 0.9057303329464048,
+        "final_validation": {
+          "start": 0.8279780000448227,
+          "end": 0.9057014998979867,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+            ],
+            "output-T2.json": [
+              420,
+              "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+            ],
+            "output-T3.json": [
+              420,
+              "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329506.144088,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 0.01
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "457fe581a009434bb40b54d2d175d2e7",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "20aa6086eb1fd75c8e15e6cd64a411d495a2579e01b57ff78cbcdf1d06844642"
+          ],
+          "input-T2.json": [
+            420,
+            "9b1fdc35773a77606dff773d228972e962a5af4481493c11803093a3d27c5e2f"
+          ],
+          "input-T3.json": [
+            420,
+            "c404e194edd62318dd0ebd05dc60ed882aaa33ce3172242639408d414f2ecceb"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6696065000724047,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0013968748971819878,
+            "fault": null,
+            "first_valid": 0.6690305001102388,
+            "result": 0,
+            "returned": 0.5896934580523521,
+            "started": 0.08688279194757342,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+                  ]
+                },
+                "end": 0.6690305001102388,
+                "result": 0,
+                "start": 0.5902209579944611,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0013968748971819878,
+            "startup_queue_seconds": 0.08548591705039144
+          },
+          "T2": {
+            "adopted": 0.7481882080901414,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.00319975009188056,
+            "fault": null,
+            "first_valid": 0.7475462919101119,
+            "result": 0,
+            "returned": 0.6704584578983486,
+            "started": 0.6700492498930544,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+                  ]
+                },
+                "end": 0.7475462919101119,
+                "result": 0,
+                "start": 0.6708634169772267,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.00319975009188056,
+            "startup_queue_seconds": 0.6668494998011738
+          },
+          "T3": {
+            "adopted": 0.8267096669878811,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.004991499939933419,
+            "fault": null,
+            "first_valid": 0.826148624997586,
+            "result": 0,
+            "returned": 0.749129582894966,
+            "started": 0.7486877921037376,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+                  ]
+                },
+                "end": 0.826148624997586,
+                "result": 0,
+                "start": 0.7495542080141604,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.004991499939933419,
+            "startup_queue_seconds": 0.7436962921638042
+          }
+        },
+        "mode": "crew",
+        "money": null,
+        "origin": 1515079.728498708,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008807498961687088,
+            "name": "coordination",
+            "start": 0.0004977080971002579
+          },
+          {
+            "end": 0.827555000083521,
+            "name": "join",
+            "start": 0.8271663750056177
+          }
+        ],
+        "started": 1794329505.238358,
+        "tokens": null,
+        "trial": "low-cal-73",
+        "version": 1,
+        "worker_seconds": 1.9996933739166707,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.0003886250779032707,
+          "coordination": 0.00038304179906845093
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329507.993885,
+        "condition": "f82210bdef8fac92409afe8d1dc6e291fbd55d8e7747e2b9f421fa3de8dca7bb",
+        "deadline": 1515676.4901423417,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 1.925737916957587,
+        "final_validation": {
+          "start": 1.84719645883888,
+          "end": 1.9257128338795155,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+            ],
+            "output-T2.json": [
+              420,
+              "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+            ],
+            "output-T3.json": [
+              420,
+              "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329508.072451,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 0.01
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "2c697e82ab814077920c892f4e88482a",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "20aa6086eb1fd75c8e15e6cd64a411d495a2579e01b57ff78cbcdf1d06844642"
+          ],
+          "input-T2.json": [
+            420,
+            "9b1fdc35773a77606dff773d228972e962a5af4481493c11803093a3d27c5e2f"
+          ],
+          "input-T3.json": [
+            420,
+            "c404e194edd62318dd0ebd05dc60ed882aaa33ce3172242639408d414f2ecceb"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6103510838001966,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012143747881054878,
+            "fault": null,
+            "first_valid": 0.6098026249092072,
+            "result": 0,
+            "returned": 0.5326224998570979,
+            "started": 0.06555424979887903,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+                  ]
+                },
+                "end": 0.6098026249092072,
+                "result": 0,
+                "start": 0.5330773338209838,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012143747881054878,
+            "startup_queue_seconds": 0.06433987501077354
+          },
+          "T2": {
+            "adopted": 1.2249503338243812,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.6107804998755455,
+            "fault": null,
+            "first_valid": 1.2243692087940872,
+            "result": 0,
+            "returned": 1.143397375009954,
+            "started": 0.6759813339449465,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+                  ]
+                },
+                "end": 1.2243692087940872,
+                "result": 0,
+                "start": 1.1438817088492215,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.6107804998755455,
+            "startup_queue_seconds": 0.06520083406940103
+          },
+          "T3": {
+            "adopted": 1.845805874792859,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 1.225403333781287,
+            "fault": null,
+            "first_valid": 1.845083916792646,
+            "result": 0,
+            "returned": 1.7671560838352889,
+            "started": 1.2919598747976124,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+                  ]
+                },
+                "end": 1.845083916792646,
+                "result": 0,
+                "start": 1.7677097499836236,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 1.225403333781287,
+            "startup_queue_seconds": 0.06655654101632535
+          }
+        },
+        "mode": "inline",
+        "money": null,
+        "origin": 1515080.636857791,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008159168064594269,
+            "name": "coordination",
+            "start": 0.0004616249352693558
+          },
+          {
+            "end": 1.8467676248401403,
+            "name": "join",
+            "start": 1.8463578748051077
+          }
+        ],
+        "started": 1794329506.1467159,
+        "tokens": null,
+        "trial": "low-cal-73",
+        "version": 1,
+        "worker_seconds": 1.6057777502574027,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.00040975003503262997,
+          "coordination": 0.0003542918711900711
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329509.923947,
+        "condition": "f82210bdef8fac92409afe8d1dc6e291fbd55d8e7747e2b9f421fa3de8dca7bb",
+        "deadline": 1515676.4901447266,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 1.926992375170812,
+        "final_validation": {
+          "start": 1.8487528341356665,
+          "end": 1.9269662089645863,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+            ],
+            "output-T2.json": [
+              420,
+              "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+            ],
+            "output-T3.json": [
+              420,
+              "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329510.002214,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 0.01
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "38431eeff5d04649b98cb47053fd8b33",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "d50d0abd623f78f45430fe3385723f28959ed77ca7a2ec7bb479e534bdee04cd"
+          ],
+          "input-T2.json": [
+            420,
+            "b03af63cae439775d9352c3032a744da641e124bffecdcca1b19c827b40e6e47"
+          ],
+          "input-T3.json": [
+            420,
+            "68e9ff50b5f8e81abef832554228636d7462bfb7ff66655e7f28b688deda7c3c"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6140119591727853,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012401251588016748,
+            "fault": null,
+            "first_valid": 0.613482000073418,
+            "result": 0,
+            "returned": 0.5368907919619232,
+            "started": 0.06670316704548895,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+                  ]
+                },
+                "end": 0.613482000073418,
+                "result": 0,
+                "start": 0.5374424171168357,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012401251588016748,
+            "startup_queue_seconds": 0.06546304188668728
+          },
+          "T2": {
+            "adopted": 1.2289334170054644,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.6144361670594662,
+            "fault": null,
+            "first_valid": 1.2283518749754876,
+            "result": 0,
+            "returned": 1.1514597500208765,
+            "started": 0.6795780840329826,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+                  ]
+                },
+                "end": 1.2283518749754876,
+                "result": 0,
+                "start": 1.1519722500815988,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.6144361670594662,
+            "startup_queue_seconds": 0.06514191697351635
+          },
+          "T3": {
+            "adopted": 1.847331042168662,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 1.2293776250444353,
+            "fault": null,
+            "first_valid": 1.8466627500019968,
+            "result": 0,
+            "returned": 1.7679706250783056,
+            "started": 1.2968445841688663,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+                  ]
+                },
+                "end": 1.8466627500019968,
+                "result": 0,
+                "start": 1.7685296251438558,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 1.2293776250444353,
+            "startup_queue_seconds": 0.06746695912443101
+          }
+        },
+        "mode": "inline",
+        "money": null,
+        "origin": 1515082.565369041,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008157920092344284,
+            "name": "coordination",
+            "start": 0.0004556670319288969
+          },
+          {
+            "end": 1.8483166249934584,
+            "name": "join",
+            "start": 1.8478822091128677
+          }
+        ],
+        "started": 1794329508.0752242,
+        "tokens": null,
+        "trial": "low-cal-109",
+        "version": 1,
+        "worker_seconds": 1.6112672497984022,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.00043441588059067726,
+          "coordination": 0.0003601249773055315
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329510.821541,
+        "condition": "f82210bdef8fac92409afe8d1dc6e291fbd55d8e7747e2b9f421fa3de8dca7bb",
+        "deadline": 1515676.4901475003,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 0.8944297078996897,
+        "final_validation": {
+          "start": 0.8167304580565542,
+          "end": 0.8943983749486506,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+            ],
+            "output-T2.json": [
+              420,
+              "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+            ],
+            "output-T3.json": [
+              420,
+              "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329510.899266,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 0.01
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "b46689d2b6ec42479b8bd10a5c50b865",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "d50d0abd623f78f45430fe3385723f28959ed77ca7a2ec7bb479e534bdee04cd"
+          ],
+          "input-T2.json": [
+            420,
+            "b03af63cae439775d9352c3032a744da641e124bffecdcca1b19c827b40e6e47"
+          ],
+          "input-T3.json": [
+            420,
+            "68e9ff50b5f8e81abef832554228636d7462bfb7ff66655e7f28b688deda7c3c"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6602903329767287,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012443328741937876,
+            "fault": null,
+            "first_valid": 0.6597452079877257,
+            "result": 0,
+            "returned": 0.5821962910704315,
+            "started": 0.08523308299481869,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+                  ]
+                },
+                "end": 0.6597452079877257,
+                "result": 0,
+                "start": 0.5827662909869105,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012443328741937876,
+            "startup_queue_seconds": 0.0839887501206249
+          },
+          "T2": {
+            "adopted": 0.7377485409379005,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0030375830829143524,
+            "fault": null,
+            "first_valid": 0.7371049579232931,
+            "result": 0,
+            "returned": 0.6612538329791278,
+            "started": 0.6608047909103334,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+                  ]
+                },
+                "end": 0.7371049579232931,
+                "result": 0,
+                "start": 0.6616787910461426,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0030375830829143524,
+            "startup_queue_seconds": 0.657767207827419
+          },
+          "T3": {
+            "adopted": 0.8154505828861147,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0048680000472813845,
+            "fault": null,
+            "first_valid": 0.8148423749953508,
+            "result": 0,
+            "returned": 0.7386567909270525,
+            "started": 0.7382200830616057,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+                  ]
+                },
+                "end": 0.8148423749953508,
+                "result": 0,
+                "start": 0.7390703749842942,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0048680000472813845,
+            "startup_queue_seconds": 0.7333520830143243
+          }
+        },
+        "mode": "crew",
+        "money": null,
+        "origin": 1515084.494984125,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.000836583087220788,
+            "name": "coordination",
+            "start": 0.00046849995851516724
+          },
+          {
+            "end": 0.8163092909380794,
+            "name": "join",
+            "start": 0.8159149158746004
+          }
+        ],
+        "started": 1794329510.004836,
+        "tokens": null,
+        "trial": "low-cal-109",
+        "version": 1,
+        "worker_seconds": 1.9729569989722222,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.0003943750634789467,
+          "coordination": 0.00036808312870562077
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329511.7278259,
+        "condition": "f82210bdef8fac92409afe8d1dc6e291fbd55d8e7747e2b9f421fa3de8dca7bb",
+        "deadline": 1515676.490149087,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 0.9015687499195337,
+        "final_validation": {
+          "start": 0.823142415843904,
+          "end": 0.9015418328344822,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+            ],
+            "output-T2.json": [
+              420,
+              "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+            ],
+            "output-T3.json": [
+              420,
+              "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329511.806276,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 0.01
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "7f0c5ebdb03d420bbfc14df9d39c1b4b",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "43e8d801b2fbb745c05d578d20512e7f88ffb26e6a1f3f13fbdd99a47bca1df6"
+          ],
+          "input-T2.json": [
+            420,
+            "0ad61ee4faae2c61698dfe831f930554aa9aa6956d7d52696d498c5acf971e6b"
+          ],
+          "input-T3.json": [
+            420,
+            "b21c3e820e55e81b432e8988c085483c8fa53ea9285c7f3ada719aed9a5876c1"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6637838748283684,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.001254499889910221,
+            "fault": null,
+            "first_valid": 0.6632421659305692,
+            "result": 0,
+            "returned": 0.5852072909474373,
+            "started": 0.0856094160117209,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+                  ]
+                },
+                "end": 0.6632421659305692,
+                "result": 0,
+                "start": 0.5858427910134196,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.001254499889910221,
+            "startup_queue_seconds": 0.08435491612181067
+          },
+          "T2": {
+            "adopted": 0.7435191250406206,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0032049999572336674,
+            "fault": null,
+            "first_valid": 0.7428333328571171,
+            "result": 0,
+            "returned": 0.6646187498699874,
+            "started": 0.664215707918629,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+                  ]
+                },
+                "end": 0.7428333328571171,
+                "result": 0,
+                "start": 0.6649958328343928,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0032049999572336674,
+            "startup_queue_seconds": 0.6610107079613954
+          },
+          "T3": {
+            "adopted": 0.8218595408834517,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.005062500014901161,
+            "fault": null,
+            "first_valid": 0.8212383328936994,
+            "result": 0,
+            "returned": 0.7444390410091728,
+            "started": 0.7440126659348607,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+                  ]
+                },
+                "end": 0.8212383328936994,
+                "result": 0,
+                "start": 0.7448621660005301,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.005062500014901161,
+            "startup_queue_seconds": 0.7389501659199595
+          }
+        },
+        "mode": "crew",
+        "money": null,
+        "origin": 1515085.394856875,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008521659765392542,
+            "name": "coordination",
+            "start": 0.0004818749148398638
+          },
+          {
+            "end": 0.8227337908465415,
+            "name": "join",
+            "start": 0.8223339158575982
+          }
+        ],
+        "started": 1794329510.9047081,
+        "tokens": null,
+        "trial": "low-fresh-211",
+        "version": 1,
+        "worker_seconds": 1.9847430819645524,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.0003998749889433384,
+          "coordination": 0.0003702910616993904
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329513.6513972,
+        "condition": "f82210bdef8fac92409afe8d1dc6e291fbd55d8e7747e2b9f421fa3de8dca7bb",
+        "deadline": 1515676.4901508086,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 1.9206073330715299,
+        "final_validation": {
+          "start": 1.8424644579645246,
+          "end": 1.9205782080534846,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+            ],
+            "output-T2.json": [
+              420,
+              "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+            ],
+            "output-T3.json": [
+              420,
+              "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329513.729564,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 0.01
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "77b4a37919c642088def3df7645d79f5",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "43e8d801b2fbb745c05d578d20512e7f88ffb26e6a1f3f13fbdd99a47bca1df6"
+          ],
+          "input-T2.json": [
+            420,
+            "0ad61ee4faae2c61698dfe831f930554aa9aa6956d7d52696d498c5acf971e6b"
+          ],
+          "input-T3.json": [
+            420,
+            "b21c3e820e55e81b432e8988c085483c8fa53ea9285c7f3ada719aed9a5876c1"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6101949999574572,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012204579543322325,
+            "fault": null,
+            "first_valid": 0.6096264999359846,
+            "result": 0,
+            "returned": 0.5336014160420746,
+            "started": 0.06697375001385808,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+                  ]
+                },
+                "end": 0.6096264999359846,
+                "result": 0,
+                "start": 0.5340651250444353,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012204579543322325,
+            "startup_queue_seconds": 0.06575329205952585
+          },
+          "T2": {
+            "adopted": 1.2238241659943014,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.6106745409779251,
+            "fault": null,
+            "first_valid": 1.223199041094631,
+            "result": 0,
+            "returned": 1.1468252909835428,
+            "started": 0.6753377909772098,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+                  ]
+                },
+                "end": 1.223199041094631,
+                "result": 0,
+                "start": 1.1473388329613954,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.6106745409779251,
+            "startup_queue_seconds": 0.06466324999928474
+          },
+          "T3": {
+            "adopted": 1.8411802081391215,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 1.2243362080771476,
+            "fault": null,
+            "first_valid": 1.8406094161327928,
+            "result": 0,
+            "returned": 1.7633288749493659,
+            "started": 1.2891164161264896,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+                  ]
+                },
+                "end": 1.8406094161327928,
+                "result": 0,
+                "start": 1.7639293330721557,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 1.2243362080771476,
+            "startup_queue_seconds": 0.06478020804934204
+          }
+        },
+        "mode": "inline",
+        "money": null,
+        "origin": 1515086.29910875,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008204160258173943,
+            "name": "coordination",
+            "start": 0.0004688331391662359
+          },
+          {
+            "end": 1.8420380409806967,
+            "name": "join",
+            "start": 1.841642500134185
+          }
+        ],
+        "started": 1794329511.808959,
+        "tokens": null,
+        "trial": "low-fresh-211",
+        "version": 1,
+        "worker_seconds": 1.6075243749655783,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.0003955408465117216,
+          "coordination": 0.00035158288665115833
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329515.581859,
+        "condition": "9e44382de3c804f313eedcb47e1ae1ebd0c2debc383532e3907e343b5a4a5e80",
+        "deadline": 1515676.490152892,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 1.9287591250613332,
+        "final_validation": {
+          "start": 1.8494615410454571,
+          "end": 1.9287302501033992,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+            ],
+            "output-T2.json": [
+              420,
+              "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+            ],
+            "output-T3.json": [
+              420,
+              "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329515.661185,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 8.0
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "2a7b5561a27d4b81a8f7d099e82a296d",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "423f93fb6bb6a20c0eb298252b7ec9e437a6fb8f377d772e0267e487a0b5adda"
+          ],
+          "input-T2.json": [
+            420,
+            "858a274955efb1bbd5d4d6ce5038ec64cca092f0f08df5af6ab07ef0006ee0a7"
+          ],
+          "input-T3.json": [
+            420,
+            "e62339eb2e398bc567f46ed7a8f3ec68cf198e61f4b17d6090a7da279c0b5a74"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6140778751578182,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012613330036401749,
+            "fault": null,
+            "first_valid": 0.6135108331218362,
+            "result": 0,
+            "returned": 0.5361892499495298,
+            "started": 0.06726545793935657,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+                  ]
+                },
+                "end": 0.6135108331218362,
+                "result": 0,
+                "start": 0.5366934579797089,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012613330036401749,
+            "startup_queue_seconds": 0.06600412493571639
+          },
+          "T2": {
+            "adopted": 1.2310438330750912,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.6145165001507849,
+            "fault": null,
+            "first_valid": 1.2304071250837296,
+            "result": 0,
+            "returned": 1.1493446661625057,
+            "started": 0.6790717081166804,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+                  ]
+                },
+                "end": 1.2304071250837296,
+                "result": 0,
+                "start": 1.1499027500394732,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.6145165001507849,
+            "startup_queue_seconds": 0.06455520796589553
+          },
+          "T3": {
+            "adopted": 1.8480704161338508,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 1.2314898751210421,
+            "fault": null,
+            "first_valid": 1.8474648750852793,
+            "result": 0,
+            "returned": 1.7690584999509156,
+            "started": 1.2979157499503344,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+                  ]
+                },
+                "end": 1.8474648750852793,
+                "result": 0,
+                "start": 1.7695944581646472,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 1.2314898751210421,
+            "startup_queue_seconds": 0.0664258748292923
+          }
+        },
+        "mode": "inline",
+        "money": null,
+        "origin": 1515088.2225805,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008733330760151148,
+            "name": "coordination",
+            "start": 0.0005113331135362387
+          },
+          {
+            "end": 1.8489934159442782,
+            "name": "join",
+            "start": 1.8485252500977367
+          }
+        ],
+        "started": 1794329513.732428,
+        "tokens": null,
+        "trial": "high-cal-41",
+        "version": 1,
+        "worker_seconds": 1.607324707787484,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.00046816584654152393,
+          "coordination": 0.0003619999624788761
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329524.515073,
+        "condition": "9e44382de3c804f313eedcb47e1ae1ebd0c2debc383532e3907e343b5a4a5e80",
+        "deadline": 1515676.4901550533,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 8.92986120795831,
+        "final_validation": {
+          "start": 8.851249333005399,
+          "end": 8.929832540918142,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+            ],
+            "output-T2.json": [
+              420,
+              "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+            ],
+            "output-T3.json": [
+              420,
+              "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329524.593709,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 8.0
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "dda3f6ac06924b88bad02a46975c5d1b",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "423f93fb6bb6a20c0eb298252b7ec9e437a6fb8f377d772e0267e487a0b5adda"
+          ],
+          "input-T2.json": [
+            420,
+            "858a274955efb1bbd5d4d6ce5038ec64cca092f0f08df5af6ab07ef0006ee0a7"
+          ],
+          "input-T3.json": [
+            420,
+            "e62339eb2e398bc567f46ed7a8f3ec68cf198e61f4b17d6090a7da279c0b5a74"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 8.695243166061118,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0013462500646710396,
+            "fault": null,
+            "first_valid": 8.694660332985222,
+            "result": 0,
+            "returned": 8.616093958029523,
+            "started": 8.079255624907091,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "fe4961b08715a56b6f107ad417305de0dad639e51ade35790085af71d2be9d86"
+                  ]
+                },
+                "end": 8.694660332985222,
+                "result": 0,
+                "start": 8.61688550002873,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0013462500646710396,
+            "startup_queue_seconds": 8.07790937484242
+          },
+          "T2": {
+            "adopted": 8.772690457990393,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0031755000818520784,
+            "fault": null,
+            "first_valid": 8.7720580000896,
+            "result": 0,
+            "returned": 8.69611879112199,
+            "started": 8.695707082981244,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "1b5bb277332eb23c0697972a5e9e2998e522693e7d2a845eb164ec0cf328e978"
+                  ]
+                },
+                "end": 8.7720580000896,
+                "result": 0,
+                "start": 8.696510707959533,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0031755000818520784,
+            "startup_queue_seconds": 8.692531582899392
+          },
+          "T3": {
+            "adopted": 8.849951416021213,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.004993207985535264,
+            "fault": null,
+            "first_valid": 8.849336415994912,
+            "result": 0,
+            "returned": 8.773586625000462,
+            "started": 8.773157374933362,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "caf419557a420a1e2e289c9f157d5464c7e609eeaa5fd366df5f9ffdb3a6b0cb"
+                  ]
+                },
+                "end": 8.849336415994912,
+                "result": 0,
+                "start": 8.77399770799093,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.004993207985535264,
+            "startup_queue_seconds": 8.768164166947827
+          }
+        },
+        "mode": "crew",
+        "money": null,
+        "origin": 1515090.154016,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0009404579177498817,
+            "name": "coordination",
+            "start": 0.0005210831295698881
+          },
+          {
+            "end": 8.850823750020936,
+            "name": "join",
+            "start": 8.8504249160178
+          }
+        ],
+        "started": 1794329515.66386,
+        "tokens": null,
+        "trial": "high-cal-41",
+        "version": 1,
+        "worker_seconds": 26.076284416019917,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.00039883400313556194,
+          "coordination": 0.00041937478817999363
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329533.4508271,
+        "condition": "9e44382de3c804f313eedcb47e1ae1ebd0c2debc383532e3907e343b5a4a5e80",
+        "deadline": 1515676.4901687687,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 8.932517458917573,
+        "final_validation": {
+          "start": 8.85443687508814,
+          "end": 8.932486624922603,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+            ],
+            "output-T2.json": [
+              420,
+              "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+            ],
+            "output-T3.json": [
+              420,
+              "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329533.528932,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 8.0
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "22eae8c3431d4d299e1563e8021e9889",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "20aa6086eb1fd75c8e15e6cd64a411d495a2579e01b57ff78cbcdf1d06844642"
+          ],
+          "input-T2.json": [
+            420,
+            "9b1fdc35773a77606dff773d228972e962a5af4481493c11803093a3d27c5e2f"
+          ],
+          "input-T3.json": [
+            420,
+            "c404e194edd62318dd0ebd05dc60ed882aaa33ce3172242639408d414f2ecceb"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 8.698080874979496,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012370420154184103,
+            "fault": null,
+            "first_valid": 8.69754279195331,
+            "result": 0,
+            "returned": 8.61905295890756,
+            "started": 8.078489625127986,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+                  ]
+                },
+                "end": 8.69754279195331,
+                "result": 0,
+                "start": 8.619649833999574,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012370420154184103,
+            "startup_queue_seconds": 8.077252583112568
+          },
+          "T2": {
+            "adopted": 8.775199624942616,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.002980499994009733,
+            "fault": null,
+            "first_valid": 8.77462587505579,
+            "result": 0,
+            "returned": 8.698921666946262,
+            "started": 8.698518875055015,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+                  ]
+                },
+                "end": 8.77462587505579,
+                "result": 0,
+                "start": 8.69930341700092,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.002980499994009733,
+            "startup_queue_seconds": 8.695538375061005
+          },
+          "T3": {
+            "adopted": 8.85304579208605,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.004832500126212835,
+            "fault": null,
+            "first_valid": 8.852415834087878,
+            "result": 0,
+            "returned": 8.776120250113308,
+            "started": 8.775665458990261,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+                  ]
+                },
+                "end": 8.852415834087878,
+                "result": 0,
+                "start": 8.776523750042543,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.004832500126212835,
+            "startup_queue_seconds": 8.770832958864048
+          }
+        },
+        "mode": "crew",
+        "money": null,
+        "origin": 1515099.086595041,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.000843374989926815,
+            "name": "coordination",
+            "start": 0.0004755419213324785
+          },
+          {
+            "end": 8.854010167066008,
+            "name": "join",
+            "start": 8.853581374976784
+          }
+        ],
+        "started": 1794329524.596427,
+        "tokens": null,
+        "trial": "high-cal-73",
+        "version": 1,
+        "worker_seconds": 26.08504483383149,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.0004287920892238617,
+          "coordination": 0.0003678330685943365
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329535.369401,
+        "condition": "9e44382de3c804f313eedcb47e1ae1ebd0c2debc383532e3907e343b5a4a5e80",
+        "deadline": 1515676.4901811457,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 1.916665791068226,
+        "final_validation": {
+          "start": 1.837692708009854,
+          "end": 1.9166367501020432,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+            ],
+            "output-T2.json": [
+              420,
+              "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+            ],
+            "output-T3.json": [
+              420,
+              "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329535.448402,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 8.0
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "d2d9b7c3df5a45dc94a29eb2d50b21fa",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "20aa6086eb1fd75c8e15e6cd64a411d495a2579e01b57ff78cbcdf1d06844642"
+          ],
+          "input-T2.json": [
+            420,
+            "9b1fdc35773a77606dff773d228972e962a5af4481493c11803093a3d27c5e2f"
+          ],
+          "input-T3.json": [
+            420,
+            "c404e194edd62318dd0ebd05dc60ed882aaa33ce3172242639408d414f2ecceb"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6137410411611199,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0013565830886363983,
+            "fault": null,
+            "first_valid": 0.6130618751049042,
+            "result": 0,
+            "returned": 0.5341929160058498,
+            "started": 0.0668214161414653,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+                  ]
+                },
+                "end": 0.6130618751049042,
+                "result": 0,
+                "start": 0.5347469160333276,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0013565830886363983,
+            "startup_queue_seconds": 0.06546483305282891
+          },
+          "T2": {
+            "adopted": 1.2208337909542024,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.6142733751330525,
+            "fault": null,
+            "first_valid": 1.220264291157946,
+            "result": 0,
+            "returned": 1.1436819999944419,
+            "started": 0.6804947080090642,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+                  ]
+                },
+                "end": 1.220264291157946,
+                "result": 0,
+                "start": 1.1442042500711977,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.6142733751330525,
+            "startup_queue_seconds": 0.06622133287601173
+          },
+          "T3": {
+            "adopted": 1.836289833066985,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 1.2212827501352876,
+            "fault": null,
+            "first_valid": 1.8356999580282718,
+            "result": 0,
+            "returned": 1.7578036249615252,
+            "started": 1.2863001660443842,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+                  ]
+                },
+                "end": 1.8356999580282718,
+                "result": 0,
+                "start": 1.75835166615434,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 1.2212827501352876,
+            "startup_queue_seconds": 0.0650174159090966
+          }
+        },
+        "mode": "inline",
+        "money": null,
+        "origin": 1515108.021919875,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0009345000144094229,
+            "name": "coordination",
+            "start": 0.0005406660493463278
+          },
+          {
+            "end": 1.8372194580733776,
+            "name": "join",
+            "start": 1.8367505001369864
+          }
+        ],
+        "started": 1794329533.531739,
+        "tokens": null,
+        "trial": "high-cal-73",
+        "version": 1,
+        "worker_seconds": 1.5987658326048404,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.0004689579363912344,
+          "coordination": 0.0003938339650630951
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329537.285583,
+        "condition": "9e44382de3c804f313eedcb47e1ae1ebd0c2debc383532e3907e343b5a4a5e80",
+        "deadline": 1515676.4901838526,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 1.912093250080943,
+        "final_validation": {
+          "start": 1.8344607080798596,
+          "end": 1.912058874964714,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+            ],
+            "output-T2.json": [
+              420,
+              "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+            ],
+            "output-T3.json": [
+              420,
+              "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329537.363246,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 8.0
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "8ddcd7be004347469d659b60d26d8ae0",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "d50d0abd623f78f45430fe3385723f28959ed77ca7a2ec7bb479e534bdee04cd"
+          ],
+          "input-T2.json": [
+            420,
+            "b03af63cae439775d9352c3032a744da641e124bffecdcca1b19c827b40e6e47"
+          ],
+          "input-T3.json": [
+            420,
+            "68e9ff50b5f8e81abef832554228636d7462bfb7ff66655e7f28b688deda7c3c"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.61535554099828,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012591660488396883,
+            "fault": null,
+            "first_valid": 0.6147487498819828,
+            "result": 0,
+            "returned": 0.5375877080950886,
+            "started": 0.06584549997933209,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+                  ]
+                },
+                "end": 0.6147487498819828,
+                "result": 0,
+                "start": 0.538123165955767,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012591660488396883,
+            "startup_queue_seconds": 0.0645863339304924
+          },
+          "T2": {
+            "adopted": 1.2233902080915868,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.6158143330831081,
+            "fault": null,
+            "first_valid": 1.222716457908973,
+            "result": 0,
+            "returned": 1.14426195807755,
+            "started": 0.6807085000909865,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+                  ]
+                },
+                "end": 1.222716457908973,
+                "result": 0,
+                "start": 1.1448434160556644,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.6158143330831081,
+            "startup_queue_seconds": 0.06489416700787842
+          },
+          "T3": {
+            "adopted": 1.8331413751002401,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 1.2238739160820842,
+            "fault": null,
+            "first_valid": 1.8324797078967094,
+            "result": 0,
+            "returned": 1.7553407500963658,
+            "started": 1.2889089579693973,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+                  ]
+                },
+                "end": 1.8324797078967094,
+                "result": 0,
+                "start": 1.7559337499551475,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 1.2238739160820842,
+            "startup_queue_seconds": 0.06503504188731313
+          }
+        },
+        "mode": "inline",
+        "money": null,
+        "origin": 1515109.9413385,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008516248781234026,
+            "name": "coordination",
+            "start": 0.0004815829452127218
+          },
+          {
+            "end": 1.8340251659974456,
+            "name": "join",
+            "start": 1.8336203750222921
+          }
+        ],
+        "started": 1794329535.451155,
+        "tokens": null,
+        "trial": "high-cal-109",
+        "version": 1,
+        "worker_seconds": 1.5962430010549724,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.0004047909751534462,
+          "coordination": 0.00037004193291068077
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329546.21621,
+        "condition": "9e44382de3c804f313eedcb47e1ae1ebd0c2debc383532e3907e343b5a4a5e80",
+        "deadline": 1515676.4901862622,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 8.928327666828409,
+        "final_validation": {
+          "start": 8.850294583011419,
+          "end": 8.928299874998629,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+            ],
+            "output-T2.json": [
+              420,
+              "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+            ],
+            "output-T3.json": [
+              420,
+              "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329546.294271,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 8.0
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "5f3aaa5f24fa472ebd866113e50f1db1",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "d50d0abd623f78f45430fe3385723f28959ed77ca7a2ec7bb479e534bdee04cd"
+          ],
+          "input-T2.json": [
+            420,
+            "b03af63cae439775d9352c3032a744da641e124bffecdcca1b19c827b40e6e47"
+          ],
+          "input-T3.json": [
+            420,
+            "68e9ff50b5f8e81abef832554228636d7462bfb7ff66655e7f28b688deda7c3c"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 8.693942457903177,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0013179578818380833,
+            "fault": null,
+            "first_valid": 8.693366499850526,
+            "result": 0,
+            "returned": 8.616112541873008,
+            "started": 8.079971333034337,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "9329888595e882db9464e002d38b56e4581a28d9791d152e18f3aac0096ab4fd"
+                  ]
+                },
+                "end": 8.693366499850526,
+                "result": 0,
+                "start": 8.616774624912068,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0013179578818380833,
+            "startup_queue_seconds": 8.078653375152498
+          },
+          "T2": {
+            "adopted": 8.770964541938156,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.003171792021021247,
+            "fault": null,
+            "first_valid": 8.77038291702047,
+            "result": 0,
+            "returned": 8.69481366686523,
+            "started": 8.694393582874909,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "8a0917640ce1aa9bf6cdc2aed8cbf608ef466cefe364dc2af34b7ccaca3a30e0"
+                  ]
+                },
+                "end": 8.77038291702047,
+                "result": 0,
+                "start": 8.695224958006293,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.003171792021021247,
+            "startup_queue_seconds": 8.691221790853888
+          },
+          "T3": {
+            "adopted": 8.848885957850143,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.004949457943439484,
+            "fault": null,
+            "first_valid": 8.848265582928434,
+            "result": 0,
+            "returned": 8.771842249901965,
+            "started": 8.771414999850094,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "8f4cf434ab6368726f91bb623d368069a7a8bb609e76f147974ccdf1abfa07b2"
+                  ]
+                },
+                "end": 8.848265582928434,
+                "result": 0,
+                "start": 8.77224566694349,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.004949457943439484,
+            "startup_queue_seconds": 8.766465541906655
+          }
+        },
+        "mode": "crew",
+        "money": null,
+        "origin": 1515111.856141583,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.000881916843354702,
+            "name": "coordination",
+            "start": 0.0005077498499304056
+          },
+          {
+            "end": 8.849854792002589,
+            "name": "join",
+            "start": 8.849422917002812
+          }
+        ],
+        "started": 1794329537.365955,
+        "tokens": null,
+        "trial": "high-cal-109",
+        "version": 1,
+        "worker_seconds": 26.073329250793904,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.0004318749997764826,
+          "coordination": 0.0003741669934242964
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329555.159471,
+        "condition": "9e44382de3c804f313eedcb47e1ae1ebd0c2debc383532e3907e343b5a4a5e80",
+        "deadline": 1515676.4901989019,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 8.939424040960148,
+        "final_validation": {
+          "start": 8.858993915840983,
+          "end": 8.939394125016406,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+            ],
+            "output-T2.json": [
+              420,
+              "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+            ],
+            "output-T3.json": [
+              420,
+              "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329555.239926,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 8.0
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "5b902f01fafb4da890a71474bef4bb0d",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "43e8d801b2fbb745c05d578d20512e7f88ffb26e6a1f3f13fbdd99a47bca1df6"
+          ],
+          "input-T2.json": [
+            420,
+            "0ad61ee4faae2c61698dfe831f930554aa9aa6956d7d52696d498c5acf971e6b"
+          ],
+          "input-T3.json": [
+            420,
+            "b21c3e820e55e81b432e8988c085483c8fa53ea9285c7f3ada719aed9a5876c1"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 8.699800124857575,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012178330216556787,
+            "fault": null,
+            "first_valid": 8.69919354096055,
+            "result": 0,
+            "returned": 8.618746208027005,
+            "started": 8.078760833013803,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+                  ]
+                },
+                "end": 8.69919354096055,
+                "result": 0,
+                "start": 8.619351082947105,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012178330216556787,
+            "startup_queue_seconds": 8.077542999992147
+          },
+          "T2": {
+            "adopted": 8.778671665815637,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0031364159658551216,
+            "fault": null,
+            "first_valid": 8.778081374941394,
+            "result": 0,
+            "returned": 8.700720290886238,
+            "started": 8.700282583013177,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+                  ]
+                },
+                "end": 8.778081374941394,
+                "result": 0,
+                "start": 8.70110824983567,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0031364159658551216,
+            "startup_queue_seconds": 8.697146167047322
+          },
+          "T3": {
+            "adopted": 8.857727458002046,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.004976165946573019,
+            "fault": null,
+            "first_valid": 8.857090999837965,
+            "result": 0,
+            "returned": 8.779562124982476,
+            "started": 8.77914329082705,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+                  ]
+                },
+                "end": 8.857090999837965,
+                "result": 0,
+                "start": 8.779964374843985,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.004976165946573019,
+            "startup_queue_seconds": 8.774167124880478
+          }
+        },
+        "mode": "crew",
+        "money": null,
+        "origin": 1515120.790719625,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008167079649865627,
+            "name": "coordination",
+            "start": 0.00046512484550476074
+          },
+          {
+            "end": 8.85857854085043,
+            "name": "join",
+            "start": 8.858194791013375
+          }
+        ],
+        "started": 1794329546.30052,
+        "tokens": null,
+        "trial": "high-fresh-211",
+        "version": 1,
+        "worker_seconds": 26.089698208961636,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.00038374983705580235,
+          "coordination": 0.000351583119481802
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329557.074209,
+        "condition": "9e44382de3c804f313eedcb47e1ae1ebd0c2debc383532e3907e343b5a4a5e80",
+        "deadline": 1515676.4902187611,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 1.9094404159113765,
+        "final_validation": {
+          "start": 1.8313463749364018,
+          "end": 1.9094110829755664,
+          "result": 0,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+            ],
+            "output-T2.json": [
+              420,
+              "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+            ],
+            "output-T3.json": [
+              420,
+              "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329557.1523268,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 8.0
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "15abb3081a7c4e75bc573d15b50d1445",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "43e8d801b2fbb745c05d578d20512e7f88ffb26e6a1f3f13fbdd99a47bca1df6"
+          ],
+          "input-T2.json": [
+            420,
+            "0ad61ee4faae2c61698dfe831f930554aa9aa6956d7d52696d498c5acf971e6b"
+          ],
+          "input-T3.json": [
+            420,
+            "b21c3e820e55e81b432e8988c085483c8fa53ea9285c7f3ada719aed9a5876c1"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6125493750441819,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012658329214900732,
+            "fault": null,
+            "first_valid": 0.611967165954411,
+            "result": 0,
+            "returned": 0.535231291083619,
+            "started": 0.06770183308981359,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "e7d2dfecd40e97d480ab08569a37783b2302d486700b6c5eea21f70232c1cd8f"
+                  ]
+                },
+                "end": 0.611967165954411,
+                "result": 0,
+                "start": 0.5357341659255326,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012658329214900732,
+            "startup_queue_seconds": 0.06643600016832352
+          },
+          "T2": {
+            "adopted": 1.2248925410676748,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.6130162079352885,
+            "fault": null,
+            "first_valid": 1.2243252908810973,
+            "result": 0,
+            "returned": 1.1474096248857677,
+            "started": 0.6778457080945373,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "54d7a3ad12baf635873982aa7ffc117ce3dc39a1c46119b5dfcbb24fa119489d"
+                  ]
+                },
+                "end": 1.2243252908810973,
+                "result": 0,
+                "start": 1.147952290950343,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.6130162079352885,
+            "startup_queue_seconds": 0.06482950015924871
+          },
+          "T3": {
+            "adopted": 1.8300773329101503,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 1.2253332079853863,
+            "fault": null,
+            "first_valid": 1.8294992910232395,
+            "result": 0,
+            "returned": 1.7532649158965796,
+            "started": 1.290049416013062,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "36a8fbdf04a6209354398eb24213ac906451cbf342081869b7cedd48d6d5d2bb"
+                  ]
+                },
+                "end": 1.8294992910232395,
+                "result": 0,
+                "start": 1.7538004158996046,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 1.2253332079853863,
+            "startup_queue_seconds": 0.06471620802767575
+          }
+        },
+        "mode": "inline",
+        "money": null,
+        "origin": 1515129.7331085,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008651250973343849,
+            "name": "coordination",
+            "start": 0.0004935408942401409
+          },
+          {
+            "end": 1.8309325000736862,
+            "name": "join",
+            "start": 1.8305348330177367
+          }
+        ],
+        "started": 1794329555.24289,
+        "tokens": null,
+        "trial": "high-fresh-211",
+        "version": 1,
+        "worker_seconds": 1.5962905830238014,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.00039766705594956875,
+          "coordination": 0.000371584203094244
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T1.json": null,
+          "output-T2.json": null,
+          "output-T3.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329557.960329,
+        "condition": "f82210bdef8fac92409afe8d1dc6e291fbd55d8e7747e2b9f421fa3de8dca7bb",
+        "deadline": 1515676.4902225349,
+        "edges": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "elapsed": 0.8934485418722034,
+        "final_validation": {
+          "start": 0.8051662920042872,
+          "end": 0.8934167500119656,
+          "result": 1,
+          "digest": {
+            "output-T1.json": [
+              420,
+              "64a4638df0a8c708a6bc138f54d40cb68bada839a71c9b50040f2f83da7b545b"
+            ],
+            "output-T2.json": null,
+            "output-T3.json": [
+              420,
+              "06eb0ecf467fd97801d84e9e1da8a43ac49501219ec83fb74e09baaa51ebfd0b"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": "Traceback (most recent call last):\n  File \"/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py\", line 69, in <module>\n    grade('T%s' % i)\n    ~~~~~^^^^^^^^^^^\n  File \"/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py\", line 48, in grade\n    rows = json.loads(Path('output-' + task + '.json').read_bytes())\n                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py\", line 777, in read_bytes\n    with self.open(mode='rb', buffering=0) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: 'output-T2.json'\n"
+        },
+        "finished": 1794329558.0486379,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 0.01
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T1"
+              ],
+              "deps": [],
+              "files": [
+                "output-T1.json"
+              ],
+              "id": "T1"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            },
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T3"
+              ],
+              "deps": [],
+              "files": [
+                "output-T3.json"
+              ],
+              "id": "T3"
+            }
+          ],
+          "version": 1
+        },
+        "id": "608807dfba074823898988b0cc9b1210",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "839f75abaa1ffe1c7af8e75c04f3f2464086f8476454bc0f9c2695efc3d44466"
+          ],
+          "input-T2.json": [
+            420,
+            "90751a199cac56fb01797bb6f644ead2b6f41d394eba800aea5e0b90a4e002c4"
+          ],
+          "input-T3.json": [
+            420,
+            "7aa610d08e20190813cfd8a2b15de9107d90c7fcba5aefc44a04d4e6095f79ea"
+          ]
+        },
+        "jobs": {
+          "T1": {
+            "adopted": 0.6404066670220345,
+            "adopted_digest": {
+              "output-T1.json": [
+                420,
+                "64a4638df0a8c708a6bc138f54d40cb68bada839a71c9b50040f2f83da7b545b"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0012589169200509787,
+            "fault": null,
+            "first_valid": 0.6398340419400483,
+            "result": 0,
+            "returned": 0.5627221670001745,
+            "started": 0.08532699989154935,
+            "validations": [
+              {
+                "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+                "digest": {
+                  "output-T1.json": [
+                    420,
+                    "64a4638df0a8c708a6bc138f54d40cb68bada839a71c9b50040f2f83da7b545b"
+                  ]
+                },
+                "end": 0.6398340419400483,
+                "result": 0,
+                "start": 0.5632324169855565,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0012589169200509787,
+            "startup_queue_seconds": 0.08406808297149837
+          },
+          "T2": {
+            "adopted": null,
+            "adopted_digest": null,
+            "adoption_version": null,
+            "dispatch": 0.003165291855111718,
+            "fault": {
+              "kind": "death",
+              "note": "nonzero worker result"
+            },
+            "first_valid": null,
+            "result": 137,
+            "returned": 0.6413069588597864,
+            "started": 0.6408435418270528,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": null
+                },
+                "end": 0.7269179169088602,
+                "result": 1,
+                "start": 0.6417145838495344,
+                "stderr": "Traceback (most recent call last):\n  File \"/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py\", line 66, in <module>\n    grade(sys.argv[2])\n    ~~~~~^^^^^^^^^^^^^\n  File \"/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py\", line 48, in grade\n    rows = json.loads(Path('output-' + task + '.json').read_bytes())\n                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py\", line 777, in read_bytes\n    with self.open(mode='rb', buffering=0) as f:\n         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/pathlib/__init__.py\", line 771, in open\n    return io.open(self, mode, buffering, encoding, errors, newline)\n           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: 'output-T2.json'\n",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.003165291855111718,
+            "startup_queue_seconds": 0.6376782499719411
+          },
+          "T3": {
+            "adopted": 0.8038060418330133,
+            "adopted_digest": {
+              "output-T3.json": [
+                420,
+                "06eb0ecf467fd97801d84e9e1da8a43ac49501219ec83fb74e09baaa51ebfd0b"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.005043999990448356,
+            "fault": null,
+            "first_valid": 0.8031554999761283,
+            "result": 0,
+            "returned": 0.7280097918119282,
+            "started": 0.7275496670044959,
+            "validations": [
+              {
+                "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+                "digest": {
+                  "output-T3.json": [
+                    420,
+                    "06eb0ecf467fd97801d84e9e1da8a43ac49501219ec83fb74e09baaa51ebfd0b"
+                  ]
+                },
+                "end": 0.8031554999761283,
+                "result": 0,
+                "start": 0.7284353338181973,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.005043999990448356,
+            "startup_queue_seconds": 0.7225056670140475
+          }
+        },
+        "mode": "crew",
+        "money": null,
+        "origin": 1515131.645412916,
+        "quality": false,
+        "stages": [
+          {
+            "end": 0.0008415838237851858,
+            "name": "coordination",
+            "start": 0.00048420880921185017
+          },
+          {
+            "end": 0.8047182499431074,
+            "name": "join",
+            "start": 0.8043035420123488
+          }
+        ],
+        "started": 1794329557.15519,
+        "tokens": null,
+        "trial": "fault-307",
+        "version": 1,
+        "worker_seconds": 1.922570708906278,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": null,
+          "conflict": null,
+          "join": 0.00041470793075859547,
+          "coordination": 0.00035737501457333565
+        }
+      },
+      "raw": {
+        "T1": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        },
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 137
+        },
+        "T3": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    },
+    {
+      "observation": {
+        "baseline": {
+          "output-T2.json": null
+        },
+        "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+        "clock": 1794329559.919208,
+        "condition": "c61fb61af6e89710677087b17f08c7c158742280ab404ead3d5c1489353146a8",
+        "deadline": 1515676.4902267915,
+        "edges": {
+          "T2": []
+        },
+        "elapsed": 0.6939866249449551,
+        "final_validation": {
+          "start": 0.6161951669491827,
+          "end": 0.6939578747842461,
+          "result": 0,
+          "digest": {
+            "output-T2.json": [
+              420,
+              "b1ee5427a7c1a3f10e145e5915550053bca0607c31649a4b51275cf750d06e55"
+            ]
+          },
+          "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+          "stdout": "",
+          "stderr": ""
+        },
+        "finished": 1794329559.997028,
+        "graph": {
+          "capacity": 3,
+          "context": {
+            "backend": "local-process-demo-v1",
+            "host_capacity": 3,
+            "input_shape": {
+              "factor_bits": 20,
+              "items": 18,
+              "jobs": 3
+            },
+            "startup_delay_seconds": 0.01
+          },
+          "final_check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade-all"
+          ],
+          "inputs": [
+            "input-T1.json",
+            "input-T2.json",
+            "input-T3.json"
+          ],
+          "instrument_hashes": {
+            "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+          },
+          "instrument_paths": {
+            "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-9l_no7js/task.py"
+          },
+          "instruments": [
+            "../../task.py"
+          ],
+          "jobs": [
+            {
+              "check": [
+                "/opt/homebrew/opt/python@3.14/bin/python3.14",
+                "task.py",
+                "grade",
+                "T2"
+              ],
+              "deps": [],
+              "files": [
+                "output-T2.json"
+              ],
+              "id": "T2"
+            }
+          ],
+          "version": 1
+        },
+        "id": "1eb0908a1f7c4f07b449b706b9835c11",
+        "inputs": {
+          "input-T1.json": [
+            420,
+            "839f75abaa1ffe1c7af8e75c04f3f2464086f8476454bc0f9c2695efc3d44466"
+          ],
+          "input-T2.json": [
+            420,
+            "90751a199cac56fb01797bb6f644ead2b6f41d394eba800aea5e0b90a4e002c4"
+          ],
+          "input-T3.json": [
+            420,
+            "7aa610d08e20190813cfd8a2b15de9107d90c7fcba5aefc44a04d4e6095f79ea"
+          ]
+        },
+        "jobs": {
+          "T2": {
+            "adopted": 0.6145840419922024,
+            "adopted_digest": {
+              "output-T2.json": [
+                420,
+                "b1ee5427a7c1a3f10e145e5915550053bca0607c31649a4b51275cf750d06e55"
+              ]
+            },
+            "adoption_version": 0,
+            "dispatch": 0.0016176248900592327,
+            "fault": null,
+            "first_valid": 0.6140371249057353,
+            "result": 0,
+            "returned": 0.5376053338404745,
+            "started": 0.06790612498298287,
+            "validations": [
+              {
+                "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+                "digest": {
+                  "output-T2.json": [
+                    420,
+                    "b1ee5427a7c1a3f10e145e5915550053bca0607c31649a4b51275cf750d06e55"
+                  ]
+                },
+                "end": 0.6140371249057353,
+                "result": 0,
+                "start": 0.5381773340050131,
+                "stderr": "",
+                "stdout": ""
+              }
+            ],
+            "dependency_queue_seconds": 0.0016176248900592327,
+            "startup_queue_seconds": 0.06628850009292364
+          }
+        },
+        "mode": "inline",
+        "money": null,
+        "origin": 1515133.793268541,
+        "quality": true,
+        "stages": [
+          {
+            "end": 0.0008837499190121889,
+            "name": "coordination",
+            "start": 0.0005186668131500483
+          },
+          {
+            "end": 0.6158113749697804,
+            "name": "recovery",
+            "start": 0.00122683378867805
+          },
+          {
+            "end": 0.6154363749083132,
+            "name": "join",
+            "start": 0.6150535419583321
+          }
+        ],
+        "started": 1794329559.303042,
+        "tokens": null,
+        "trial": "recovery-307",
+        "version": 1,
+        "worker_seconds": 0.5359877089504153,
+        "stage_seconds": {
+          "revalidation": null,
+          "recovery": 0.6145845411811024,
+          "conflict": null,
+          "join": 0.0003828329499810934,
+          "coordination": 0.00036508310586214066
+        }
+      },
+      "raw": {
+        "T2": {
+          "stdout": "READY\n",
+          "stderr": "",
+          "result": 0
+        }
+      }
+    }
+  ],
+  "choices": [
+    {
+      "profile": "low",
+      "decision_before_fresh_input": {
+        "choice": "crew",
+        "reason": "observed-latency-benefit",
+        "condition": "f82210bdef8fac92409afe8d1dc6e291fbd55d8e7747e2b9f421fa3de8dca7bb",
+        "serial_lower": 1.9119535414502025,
+        "crew_upper": 0.90721908188425,
+        "observations": 6,
+        "failures": 0,
+        "pending": 0,
+        "tokens": null,
+        "money": null,
+        "budget_fit": "yes",
+        "effective_dependencies": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "serial_worker_seconds_lower": 1.5962284160777926,
+        "crew_worker_seconds_upper": 1.9996933739166707,
+        "uncertainty": "observed-range; not a confidence interval"
+      },
+      "fresh_delivery_seconds": {
+        "crew": 0.9015687499195337,
+        "inline": 1.9206073330715299
+      }
+    },
+    {
+      "profile": "high",
+      "decision_before_fresh_input": {
+        "choice": "serial",
+        "reason": "startup-coordination-or-dependency-cost",
+        "condition": "9e44382de3c804f313eedcb47e1ae1ebd0c2debc383532e3907e343b5a4a5e80",
+        "serial_lower": 1.9086010409519076,
+        "crew_upper": 8.932517458917573,
+        "observations": 6,
+        "failures": 0,
+        "pending": 0,
+        "tokens": null,
+        "money": null,
+        "budget_fit": "yes",
+        "effective_dependencies": {
+          "T1": [],
+          "T2": [],
+          "T3": []
+        },
+        "serial_worker_seconds_lower": 1.592750791925937,
+        "crew_worker_seconds_upper": 26.08504483383149,
+        "uncertainty": "observed-range; not a confidence interval"
+      },
+      "fresh_delivery_seconds": {
+        "crew": 8.939424040960148,
+        "inline": 1.9094404159113765
+      }
+    }
+  ],
+  "preserved_sibling_sha256": {
+    "output-T1.json": "64a4638df0a8c708a6bc138f54d40cb68bada839a71c9b50040f2f83da7b545b",
+    "output-T3.json": "06eb0ecf467fd97801d84e9e1da8a43ac49501219ec83fb74e09baaa51ebfd0b"
+  },
+  "fault_book": "CTL: FAULT task=T1[crew:3] class=death suffix=(re-run:death) note=T2 self SIGKILL after backend READY; useful siblings retained\nCTL: CLOSE ok iter=1 digest=v2-0693c825134577e31ff8e81658cc014ce9a3dfb11e45f9c1babed13f7e4265b7 operation=1ffbd32cf1d244e683a35715c2ec45b4\n",
+  "recovery_book": "CTL: CLOSE ok iter=2 digest=v2-16a888e324124b130e379c364c4d5cd95cbe74bb9d5ee4b897127a93748d02a9 operation=71ab2e9807e2412ab07b6d11bd42ef71\n",
+  "final_gate": "GATE: GO digest=v2-16a888e324124b130e379c364c4d5cd95cbe74bb9d5ee4b897127a93748d02a9 iter=2 ac=3 pass=3 unverified=0 mode=threshold\n",
+  "tokens": null,
+  "money": null
+}

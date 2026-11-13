@@ -1,0 +1,1146 @@
+--- a/scripts/goal_ctl.sh
++++ b/scripts/goal_ctl.sh
+@@ -113,6 +113,9 @@
+ case "$cmd" in
+   migrate)
+     python3 -I "$here/goal_store.py" migrate-views "$sd" || exit 4
++    if [ "$(gp_contract_mode "$project")" = forge ]; then
++      python3 -I "$here/goal_forge.py" adopt --project "$project" || exit 4
++    fi
+     exit 0 ;;
+   recover)
+     python3 -I "$here/goal_store.py" close-journal "$sd" recover || exit 4
+@@ -160,6 +163,14 @@
+       [ -n "$exp" ] \
+         || { echo "CTL: ERROR stamp-refused: $ac_id expected: token is empty after parse (single-line AC required)" >&2; exit 2; }
+     done
++    forge_freeze=""
++    # The declared finite probe scope is approved with the existing freeze.
++    if [ "$(gp_contract_mode "$project")" = forge ]; then
++      forge_freeze=$(python3 -I "$here/goal_forge.py" freeze --project "$project") || {
++        echo 'CTL: ERROR stamp-refused: forge needs a valid .goal/forge-plan.json' >&2
++        exit 2
++      }
++    fi
+     # forge contracts: baseline must cover every delta metric AC BEFORE the
+     # stamp - t=0 exposure, never a mid-loop rc=4 surprise (v1.5)
+     if grep -qE '^exit: *forge' "$sd/goal.md" 2>/dev/null; then
+@@ -268,7 +279,12 @@
+         printf '%s=%s;' "$scr" "$h"
+       done
+     )
+-    printf '%s\n' "$freeze" > "$sd/check_freeze" || exit 4
++    printf '%s\n' "$freeze$forge_freeze" > "$sd/check_freeze" || exit 4
++    if [ -n "$forge_freeze" ]; then
++      mkdir -p "$sd/evidence/raw" || exit 4
++      python3 -I "$here/goal_forge.py" archive --project "$project" --expected "$forge_freeze" \
++        > "$sd/evidence/raw/0.txt" || exit 4
++    fi
+     marker=""; [ "$auto" -eq 1 ] && marker=" auto"
+     gp_sed_inplace "s/^approved: .*/approved: $h $(date +%F)$marker/" "$sd/goal.md" \
+       || { echo "CTL: ERROR stamp-failed: could not write the approved: line" >&2; exit 4; }
+@@ -525,8 +541,19 @@
+     # second pass and is written only when the controller has run one
+     # (--adversarial clear|finding). Never auto-clear.
+     mkdir -p "$sd/evidence/raw" || exit 4
+-    bash "$here/goal_gate.sh" --verify --project "$project" > "$sd/evidence/raw/$new.txt" 2>&1 || true
++    verify_rc=0
++    GOAL_RAW_OUTPUT_ITERATION="$new" bash "$here/goal_gate.sh" --verify --project "$project" > "$sd/evidence/raw/$new.txt" 2>&1 || verify_rc=$?
+     [ -s "$sd/evidence/raw/$new.txt" ] || { printf 'CTL: WARN raw-empty (verify produced no output - claim will fail raw-evidence-missing)\n' > "$sd/evidence/raw/$new.txt" || exit 4; }
++    if [ "$dry" = yes ] && [ "$(gp_contract_mode "$project")" = forge ]; then
++      forge_record=$(python3 -I "$here/goal_forge.py" run --project "$project" --iteration "$new" --artifact "$digest" --floor-result "$verify_rc")
++      forge_rc=$?
++      printf '%s\n' "$forge_record" >> "$sd/evidence/raw/$new.txt" || exit 4
++      [ "$forge_rc" -eq 0 ] || [ "$forge_rc" -eq 2 ] || exit 4
++      if [ "$forge_rc" -ne 0 ]; then
++        gp_sed_inplace 's/^dry_streak=.*/dry_streak=0/' "$sd/state.rec" || exit 4
++        echo 'CTL: NOTE forge-not-dry (executed probes found a finding, failed, or exhausted their budget)' >&2
++      fi
++    fi
+     if [ -n "$adversarial" ]; then
+       case "$adversarial" in
+         clear|finding) : ;;
+@@ -600,6 +627,9 @@
+   status)
+     [ ! -e "$sd/store/pending" ] || { echo 'CTL: ERROR recovery-required' >&2; exit 4; }
+     [ -f "$sd/state.rec" ] || { echo "CTL: STATUS no active goal-loop ledger ($sd/state.rec missing)" >&2; exit 4; }
++    if [ "$(gp_contract_mode "$project")" = forge ]; then
++      python3 -I "$here/goal_forge.py" status --project "$project" || echo 'CTL: FORGE coverage=unverified'
++    fi
+     g(){ state_get "$1"; }
+     left="off"
+     d=$(g deadline); if [ -n "$d" ] && [ "$d" != 0 ]; then left=$(( d - $(date +%s) ))s; [ "$left" = "" ] && left=0s; fi
+--- a/scripts/goal_gate.sh
++++ b/scripts/goal_gate.sh
+@@ -75,15 +75,10 @@
+ ac_body_hash(){ gp_ac_body_hash "$project"; }       # R3 frozen surface - single definition
+ state_get(){ gp_state_get "$project" "$1"; }
+ 
+-ledger_digest(){                                       # 8 hex over the LEDGER state files
+-  # Checks may write evidence (.goal/evidence/) but nothing else under
+-  # .goal/ (R6). The tree digest is blind to .goal, so the ledger gets its
+-  # own before/after guard - a check editing goal.md/state/verdicts mid-run
+-  # would otherwise measure one state and report another.
+-  { for f in goal.md state.rec loop-log.md verdicts.rec scores.rec work-plan.md baseline.md interfaces.md runner.deadline runner.clock runner.json store/commits/current; do
+-      [ -f "$sd/$f" ] && { printf '%s\n' "$f"; r < "$sd/$f"; }
+-    done
+-  } | hash_std | cut -c1-8
++ledger_digest(){
++  # Canonical evidence shares the managed-view capture path. Only the raw
++  # stream currently being written by the owning controller is excluded.
++  python3 -I "$here/goal_store.py" guard-digest "$sd"
+ }
+ 
+ last_block(){                                          # last loop-log block as key=value lines
+@@ -416,7 +411,8 @@
+ 
+ digest=$(tree_digest) || state_err "unreadable-project"
+ # ledger state before the rerun batch (the tree guard is blind to .goal/)
+-[ -d "$sd" ] && ld_check0=$(ledger_digest) || ld_check0=none
++ld_check0=none
++if [ -d "$sd" ] && [ "$mode" != digest ]; then ld_check0=$(ledger_digest) || state_err unreadable-ledger; fi
+ if [ "$mode" = digest ]; then echo "$digest"; exit 0; fi
+ 
+ [ -f "$sd/goal.md" ] || state_err "no-goal-md"
+@@ -432,7 +428,8 @@
+       || { echo "GATE: NO-GO reason=unknown-ac-id:$rid (no such AC in the contract)" >&2; exit 4; }
+   done
+   want="$positional "
+-  d0="$digest"; ld0=$(ledger_digest); nfail=0; nbroken=0; nchecked=0; npending=0
++  d0="$digest"; ld0=$(ledger_digest) || state_err unreadable-ledger
++  nfail=0; nbroken=0; nchecked=0; npending=0
+   for id in $(all_ac_ids); do
+     if [ -n "${want// /}" ]; then case "$want" in *" $id "*) ;; *) continue ;; esac; fi
+     cls=$(classify_expected "$(ac_expected "$id")")
+@@ -451,7 +448,7 @@
+   # the ledger is digest-excluded from the tree, so a check editing goal.md /
+   # state.rec / verdicts.rec mid-rerun is invisible to the tree guard: same
+   # before/after rule, over the LEDGER state files (evidence/ stays free).
+-  ld1=$(ledger_digest)
++  ld1=$(ledger_digest) || state_err unreadable-ledger
+   [ "$ld0" = "$ld1" ] || { echo "GATE: NO-GO reason=check-mutated-ledger:before=$ld0 after=$ld1 (a check wrote the ledger mid-run - only .goal/evidence/ is fair game)" >&2; exit 2; }
+   [ "$nchecked" -gt 0 ] || { echo "GATE: VERIFY-OK nothing-deterministic"; exit 0; }
+   if [ $((nfail+nbroken)) -eq 0 ]; then
+@@ -525,6 +522,10 @@
+ fi
+ freeze_st=""
+ [ -f "$sd/check_freeze" ] && freeze_st=$(r < "$sd/check_freeze")
++if [ "$exit_mode" = forge ]; then
++  forge_freeze=$(python3 -I "$here/goal_forge.py" freeze --project "$project") || fail "forge-plan-invalid:see probe scope"
++  freeze_now="$freeze_now$forge_freeze"
++fi
+ norm_freeze(){ printf '%s' "$1" | tr ';' '\n' | sed '/^$/d' | sort | tr '\n' ';'; }
+ if [ "$(norm_freeze "$freeze_now")" != "$(norm_freeze "$freeze_st")" ]; then
+   fail "check-script-tampered:stamped=$(norm_freeze "$freeze_st") now=$(norm_freeze "$freeze_now")"
+@@ -753,7 +754,7 @@
+ # state and report another while leaving the tree pristine. The ledger gets
+ # its own before/after digest; evidence/ is the only directory checks may
+ # write (R6), so it stays out of the hash.
+-ld2=$(ledger_digest)
++ld2=$(ledger_digest) || state_err unreadable-ledger
+ [ "$ld_check0" = "$ld2" ] || fail "check-mutated-ledger:before=$ld_check0 after=$ld2 (a check wrote the ledger mid-run - only .goal/evidence/ is fair game)"
+ 
+ # -11. forge: floors alone are not an exit; exhaustion is -----------------
+@@ -911,12 +912,18 @@
+ rawf="$sd/evidence/raw/${claim_iter}.txt"
+ [ -s "$rawf" ] || fail "raw-evidence-missing:need non-empty .goal/evidence/raw/${claim_iter}.txt with the real check output"
+ 
++coverage=""
++if [ "$exit_mode" = forge ] && [ "$mode" != checkpoint ]; then
++  python3 -I "$here/goal_forge.py" audit --project "$project" --iteration "$iter" --limit "$dl" --artifact "$digest" \
++    || fail "forge-coverage-unverified:see executed probe scope"
++  coverage=" coverage=declared"
++fi
+ outcome=GO
+ [ "$mode" != checkpoint ] || outcome=CHECKPOINT-OK
+ if [ -n "$primary" ]; then
+-  echo "GATE: $outcome digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}"
++  echo "GATE: $outcome digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}$coverage"
+   exit 0
+ fi
+ 
+-echo "GATE: $outcome digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode"
++echo "GATE: $outcome digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode$coverage"
+ exit 0
+--- a/scripts/goal_store.py
++++ b/scripts/goal_store.py
+@@ -437,6 +437,7 @@
+     'init': ('state.rec', 'loop-log.md', 'verdicts.rec', 'work-plan.md'),
+     'stamp': ('state.rec', 'goal.md', 'check_freeze', 'pre-reg.md'),
+     'bind': ('verdicts.rec',),
++    'forge': ('state.rec', 'check_freeze', 'evidence/raw/0.txt'),
+ }
+ 
+ 
+@@ -734,6 +735,18 @@
+         raise StoreError('ledger-view-mismatch: ' + ','.join(changed) + '; run goal_ctl.sh recover')
+     _assert_approval(state, snapshot)
+     return head
++
++
++def guard_digest(state):
++    state = Path(state)
++    names = _view_names(state) | {'goal.md', 'work-plan.md', 'baseline.md', 'interfaces.md',
++                                 'forge-plan.json', 'store/commits/current', 'store/pending'}
++    output_iteration = os.environ.get('GOAL_RAW_OUTPUT_ITERATION')
++    if (os.environ.get('GOAL_ACCESS_MODE') == 'write' and os.environ.get('GOAL_CLOSE_OPERATION')
++            and output_iteration is not None and re.fullmatch(r'[1-9][0-9]*', output_iteration)):
++        names.discard('evidence/raw/' + output_iteration + '.txt')
++    files = _capture_files(state, names)
++    return _hash(_encode({name: _hash(data) if data is not None else None for name, data in files.items()}))
+ 
+ 
+ def restore_committed_views(state, allow_legacy=False):
+@@ -1278,9 +1291,14 @@
+                                             'intent': record['intent'], 'result': result,
+                                             'iteration': iteration, 'missing': sorted(missing)})
+             commits = Store(state / 'store/commits')
+-            head, _ = commits.read()
++            head, previous = commits.read()
+             if record['version'] == 3 and head != record['base_head']:
+                 raise Conflict('close baseline committed version changed')
++            if _VIEW_META in previous:
++                expected = _committed_views(previous)
++                names = (set(expected) | _view_names(state, bool(_RUNNER_FILES.intersection(expected)))) - set(files)
++                if _capture_files(state, names) != {name: expected.get(name) for name in names}:
++                    raise StoreError('close modified managed evidence outside its write scope')
+             # The atomic current pointer publication is the close commit point.
+             # Its snapshot is also the source of recovery after this point.
+             commits.commit(record['operation'], record['intent'].encode('ascii'), attach_views(state, snapshot),
+@@ -1338,6 +1356,8 @@
+             bind_mutation(sys.argv[2], sys.argv[3:], sys.stdin.buffer.read())
+         elif len(sys.argv) == 3 and sys.argv[1] == 'check-views':
+             print(verify_views(sys.argv[2]))
++        elif len(sys.argv) == 3 and sys.argv[1] == 'guard-digest':
++            print(guard_digest(sys.argv[2]))
+         elif len(sys.argv) == 3 and sys.argv[1] == 'migrate-views':
+             migrate_views(sys.argv[2])
+             print('CTL: MIGRATE ok')
+--- /dev/null
++++ b/scripts/goal_forge.py
+@@ -0,0 +1,355 @@
++#!/usr/bin/env python3
++"""Execute a frozen finite probe scope and qualify forge dry evidence."""
++import argparse
++import base64
++import importlib.util
++import json
++import os
++from pathlib import Path
++import re
++import resource
++import subprocess
++import sys
++import tempfile
++import time
++
++sys.dont_write_bytecode = True
++SPEC = importlib.util.spec_from_file_location('forge_budget', Path(__file__).with_name('goal_runner.py'))
++budget = importlib.util.module_from_spec(SPEC)
++SPEC.loader.exec_module(budget)
++store = budget.store
++ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$')
++
++
++def require(condition, message):
++    if not condition:
++        raise ValueError(message)
++
++
++def read_file(project, name):
++    require(store._valid_name(name) and not {'.goal', '.git'}.intersection(name.split('/')),
++            'invalid probe input/instrument path')
++    path = store._close_path(project, name)
++    require(path.is_file(), 'missing probe input/instrument: ' + name)
++    return path.read_bytes()
++
++
++def plan(project):
++    data = store._close_path(project / '.goal', 'forge-plan.json').read_bytes()
++    value = json.loads(data)
++    require(isinstance(value, dict) and set(value) == {'version', 'instruments', 'cases', 'blind_spots'}
++            and type(value['version']) is int and value['version'] == 1, 'invalid forge plan')
++    require(isinstance(value['blind_spots'], list)
++            and all(isinstance(x, str) and x.strip() for x in value['blind_spots']), 'invalid blind spots')
++    require(isinstance(value['instruments'], list) and value['instruments']
++            and all(isinstance(x, str) for x in value['instruments'])
++            and len(set(value['instruments'])) == len(value['instruments']), 'invalid probe instruments')
++    files = {name: read_file(project, name) for name in value['instruments']}
++    require(isinstance(value['cases'], list) and value['cases'], 'empty probe scope')
++    ids = set()
++    for case in value['cases']:
++        require(isinstance(case, dict) and set(case) == {'id', 'dimension', 'input', 'command'}, 'invalid probe case')
++        require(isinstance(case['id'], str) and ID.fullmatch(case['id']) and case['id'] not in ids, 'invalid case id')
++        require(isinstance(case['dimension'], str) and ID.fullmatch(case['dimension']), 'invalid probe dimension')
++        command = case['command']
++        require(isinstance(command, list) and command and all(isinstance(s, str) and '\0' not in s for s in command),
++                'invalid probe command')
++        files[case['input']] = read_file(project, case['input'])
++        ids.add(case['id'])
++    identity = store._hash(store._encode({'plan': store._hash(data), 'files': {k: store._hash(v) for k, v in files.items()}}))
++    return value, files, identity
++
++
++def expected_plan(project):
++    rows = re.findall(r'(?:^|;)forge=([a-f0-9]{64});?', (project / '.goal/check_freeze').read_text().strip())
++    require(len(rows) == 1, 'forge plan has no approved freeze; start a reviewed run with a declared scope')
++    return rows[0]
++
++
++def archive_scope(project, expected):
++    definition, files, fingerprint = plan(project)
++    require(expected == 'forge=' + fingerprint + ';', 'probe scope changed during approval')
++    raw = (project / '.goal/forge-plan.json').read_bytes()
++    require(store._hash(store._encode({'plan': store._hash(raw),
++                                      'files': {name: store._hash(data) for name, data in files.items()}})) == fingerprint,
++            'probe plan changed during capture')
++    return dict(version=1, fingerprint=fingerprint, definition=definition,
++                plan_base64=base64.b64encode(raw).decode('ascii'),
++                files={name: base64.b64encode(data).decode('ascii') for name, data in files.items()})
++
++
++def adopt(project):
++    state = project / '.goal'
++    descriptor = int(os.environ.get('GOAL_ACCESS_FD', '-1'))
++    require(descriptor >= 3 and os.environ.get('GOAL_ACCESS_MODE') == 'write',
++            'use goal_ctl.sh migrate to hold ledger ownership')
++    borrowed, directory = os.fstat(descriptor), state.stat()
++    require((borrowed.st_dev, borrowed.st_ino) == (directory.st_dev, directory.st_ino),
++            'migration lock belongs to another ledger')
++    store.verify_views(state)
++    freeze = (state / 'check_freeze').read_text().strip()
++    definition, files, fingerprint = plan(project)
++    sealed = bool(re.search(r'(^|;)forge=', freeze))
++    if sealed:
++        if fingerprint == expected_plan(project):
++            return
++        raw = (state / 'evidence/raw/0.txt').read_text()
++        require(raw.startswith('FORGE-SCOPE: '), 'missing archived probe scope')
++        previous = json.loads(raw[13:])
++        require(previous['fingerprint'] == expected_plan(project), 'unbound archived scope')
++        old = previous['definition']
++        current = {case['id']: case for case in definition['cases']}
++        require(len(current) > len(old['cases']) and all(current.get(case['id']) == case for case in old['cases'])
++                and definition['blind_spots'] == old['blind_spots']
++                and set(old['instruments']).issubset(definition['instruments'])
++                and all(files.get(name) == base64.b64decode(data, validate=True) for name, data in previous['files'].items()),
++                'migration permits additional probes while preserving approved cases and materials')
++    body = subprocess.check_output(['bash', '-c', '. "$1"; gp_ac_body_hash "$2"', 'forge-migration',
++                                    str(Path(__file__).with_name('goal_parse.sh')), str(project)]).decode().strip()
++    approval = store.current_approval(state)
++    require(approval is not None and approval[:8] == body, 'migration cannot amend the approved contract')
++    marker = 'forge=' + fingerprint + ';'
++    captured = archive_scope(project, marker)
++    text = (state / 'state.rec').read_text()
++    require(len(re.findall(r'^dry_streak=', text, re.M)) == 1, 'invalid legacy dry counter')
++    text = re.sub(r'^dry_streak=.*$', 'dry_streak=0', text, flags=re.M)
++    store.mutation_journal(state, 'begin', 'forge', args=('adopt-forge', fingerprint))
++    upgraded = re.sub(r'(^|;)forge=[a-f0-9]{64};?', lambda match: match[1] + marker, freeze) if sealed else (
++        (freeze.rstrip(';') + ';' if freeze else '') + marker)
++    store._atomic(state / 'check_freeze', (upgraded + '\n').encode())
++    store._atomic(state / 'state.rec', text.encode())
++    raw = store._close_path(state, 'evidence/raw/0.txt')
++    raw.parent.mkdir(parents=True, exist_ok=True)
++    store._atomic(raw, b'FORGE-SCOPE: ' + store._encode(captured) + b'\n')
++    store.mutation_journal(state, 'finish')
++    print('FORGE: adopted scope; executed dry evidence must be gathered again')
++
++
++def reports(project, iteration):
++    path = store._close_path(project / '.goal', 'evidence/raw/%s.txt' % iteration)
++    return [json.loads(line[7:]) for line in path.read_text().splitlines() if line.startswith('FORGE: ')]
++
++
++def read_critic(project, iteration, artifact, fingerprint):
++    path = store._close_path(project / '.goal', 'evidence/critic-iter-%s.md' % iteration)
++    try:
++        raw = path.read_bytes()
++    except FileNotFoundError as exc:
++        raise ValueError('critic-evidence-missing') from exc
++    return critic_record(raw, iteration, artifact, fingerprint)
++
++
++def critic_record(raw, iteration, artifact, fingerprint):
++    rows = [line.split('|', 1) for line in raw.decode('utf-8').splitlines() if line.strip()]
++    require(all(len(row) == 2 and row[0] in ('ITERATION', 'ARTIFACT', 'PLAN', 'FINDING', 'CLEAR') for row in rows), 'unknown critic record')
++    headers = {name: [row[1] for row in rows if row[0] == name] for name in ('ITERATION', 'ARTIFACT', 'PLAN', 'CLEAR')}
++    require(headers['ITERATION'] == [str(iteration)] and headers['ARTIFACT'] == [artifact]
++            and headers['PLAN'] == [fingerprint], 'critic evidence is stale or unbound')
++    require(len(headers['CLEAR']) == 1 and headers['CLEAR'][0].strip(), 'missing critic conclusion')
++    findings = [row[1].split('|', 2) for row in rows if row[0] == 'FINDING']
++    require(all(len(row) == 3 and all(value.strip() for value in row) for row in findings), 'malformed critic finding')
++    return dict(sha256=store._hash(raw), text=raw.decode('utf-8'), findings=findings)
++
++
++def case_identity(fingerprint, case, artifact, input_sha):
++    return store._hash(store._encode(dict(plan=fingerprint, command=case['command'], input=input_sha, artifact=artifact)))
++
++
++def probe_identity(case, input_sha):
++    return store._hash(store._encode(dict(command=case['command'], input=input_sha)))
++
++
++def prior_cases(project, iteration):
++    observed = set()
++    for number in range(1, iteration):
++        for report in reports(project, number):
++            observed.update(row.get('probe_identity', row['identity']) for row in report.get('cases', [])
++                            if row.get('result') == 0)
++    return observed
++
++
++def execute(project, case, data, seconds, artifact, deadline):
++    started = time.monotonic()
++    with tempfile.TemporaryDirectory(prefix='goal-forge-probe-') as tmp:
++        root = Path(tmp)
++        receipt = root / 'receipt'
++        env = {k: v for k, v in os.environ.items() if not k.startswith(('GOAL_ACCESS_', 'GOAL_CLOSE_', 'GOAL_WRITER_'))}
++        env.pop('GOAL_RUNNER_FD', None)
++        env['GOAL_TRACE_PROJECT'] = str(project)
++        if deadline is not None:
++            env['GOAL_RUNNER_MONOTONIC_END'] = str(deadline)
++
++        def bound_files():
++            _, hard = resource.getrlimit(resource.RLIMIT_FSIZE)
++            resource.setrlimit(resource.RLIMIT_FSIZE, (min(1024 * 1024, hard) if hard != resource.RLIM_INFINITY else 1024 * 1024, hard))
++
++        with (root / 'input').open('w+b') as source, (root / 'output').open('w+b') as output, (root / 'error').open('w+b') as error:
++            source.write(data)
++            source.seek(0)
++            result = subprocess.run([sys.executable, '-I', str(Path(__file__).with_name('goal_bounded.py')),
++                                     '--owner', str(os.getpid()), '--seconds', str(seconds),
++                                     '--kind', 'verification', '--label', 'forge:' + case['id'],
++                                     '--artifact', artifact, '--receipt', str(receipt), '--', *case['command']],
++                                    cwd=project, env=env, stdin=source, stdout=output, stderr=error,
++                                    start_new_session=True, preexec_fn=bound_files)
++            output.seek(0)
++            stdout = output.read(1024 * 1024)
++            error.seek(0)
++            stderr = error.read(1024 * 1024)
++        rc = int(receipt.read_text()) if result.returncode == 0 and receipt.is_file() else None
++    return dict(result=rc, elapsed=time.monotonic() - started, stdout=stdout.decode('utf-8', 'replace'),
++                stdout_base64=base64.b64encode(stdout).decode('ascii'),
++                stderr_base64=base64.b64encode(stderr).decode('ascii'))
++
++
++def run(project, iteration, artifact, floor_result):
++    started = time.monotonic()
++    state = project / '.goal'
++    ledger = None
++    ledger_names = set()
++    report = dict(version=1, iteration=iteration, artifact=artifact, plan=None, qualified=False,
++                  reason=None, cases=[], remaining=[], blind_spots=[], new_cases=0, repeated_cases=0,
++                  started=time.time(), elapsed=None, fatal=False, critic=None)
++    try:
++        definition, files, fingerprint = plan(project)
++        report.update(plan=fingerprint, blind_spots=definition['blind_spots'],
++                      remaining=[case['id'] for case in definition['cases']])
++        require(fingerprint == expected_plan(project), 'frozen probe scope changed')
++        report['critic'] = read_critic(project, iteration, artifact, fingerprint)
++        require(not report['critic']['findings'], 'critic-has-findings')
++        require(floor_result == 0 and '|DEFERRED|' not in
++                (project / '.goal' / ('evidence/raw/%s.txt' % iteration)).read_text(), 'floor-verification-incomplete')
++        observed = prior_cases(project, iteration)
++        ledger_names = store._view_names(state) | {'goal.md', 'forge-plan.json', 'baseline.md', 'work-plan.md',
++                                                   'interfaces.md', 'store/commits/current', 'store/pending'}
++        ledger = store._capture_files(state, ledger_names)
++        cap, expired = budget.gate_limit(project / '.goal', settlement=False)
++        timeout = budget.natural(next(line.split('=')[1] for line in (project / '.goal/state.rec').read_text().splitlines()
++                                      if line.startswith('check_timeout=')), 'check-timeout')
++        for case in definition['cases']:
++            left = timeout if cap is None else min(timeout, cap - time.monotonic())
++            if expired or left <= 0:
++                report['reason'] = 'time-budget-exhausted'
++                break
++            result = execute(project, case, files[case['input']], left, artifact, cap)
++            result.update(id=case['id'], dimension=case['dimension'], input_sha256=store._hash(files[case['input']]),
++                          identity=case_identity(fingerprint, case, artifact, store._hash(files[case['input']])),
++                          probe_identity=probe_identity(case, store._hash(files[case['input']])))
++            report['cases'].append(result)
++            report['remaining'].remove(case['id'])
++            if result['result'] == 0:
++                key = 'repeated_cases' if result['probe_identity'] in observed else 'new_cases'
++                report[key] += 1
++                observed.add(result['probe_identity'])
++            elif result['result'] == 124:
++                report['reason'] = 'probe-timeout'
++                break
++        require(plan(project)[2] == fingerprint, 'probe changed its frozen scope')
++        require(read_critic(project, iteration, artifact, fingerprint) == report['critic'], 'critic changed during probing')
++        digest = subprocess.check_output(['bash', str(Path(__file__).with_name('goal_gate.sh')), '--digest',
++                                          '--project', str(project)]).decode('ascii').strip()
++        require(digest == artifact, 'probe changed the artifact')
++        if cap is not None and time.monotonic() >= cap:
++            report['reason'] = 'time-budget-exhausted'
++        report['qualified'] = (not report['remaining'] and report['reason'] is None
++                               and all(row['result'] == 0 for row in report['cases']))
++        if not report['qualified'] and report['reason'] is None:
++            report['reason'] = 'probe-finding-or-failure'
++    except (OSError, ValueError, KeyError, TypeError, store.StoreError, subprocess.SubprocessError) as exc:
++        report['reason'] = str(exc)
++    finally:
++        if ledger is not None:
++            try:
++                unchanged = store._capture_files(state, ledger_names | store._view_names(state)) == ledger
++            except (OSError, ValueError, store.StoreError):
++                unchanged = False
++            if not unchanged:
++                report.update(qualified=False, fatal=True, reason='probe-changed-ledger')
++    report['elapsed'] = time.monotonic() - started
++    return report
++
++
++def audit(project, iteration, limit, artifact):
++    definition, files, fingerprint = plan(project)
++    require(fingerprint == expected_plan(project), 'frozen probe scope changed')
++    require(limit > 0 and iteration >= limit, 'insufficient executed dry rounds')
++    expected = [case['id'] for case in definition['cases']]
++    for number in range(iteration - limit + 1, iteration + 1):
++        rows = reports(project, number)
++        require(len(rows) == 1, 'missing or ambiguous executed dry evidence')
++        report = rows[0]
++        require(report['version'] == 1 and report['iteration'] == number and report['plan'] == fingerprint
++                and report['qualified'] is True and report['remaining'] == [] and report['reason'] is None
++                and [row['id'] for row in report['cases']] == expected
++                and report['blind_spots'] == definition['blind_spots'] and report['fatal'] is False
++                and report['critic'] is not None and report['critic']['findings'] == []
++                and all(type(row['result']) is int and row['result'] == 0 for row in report['cases']),
++                'unqualified dry evidence')
++        if number == iteration:
++            require(report['artifact'] == artifact, 'stale dry evidence')
++        critic = report['critic']
++        require(critic == critic_record(critic['text'].encode('utf-8'), number, report['artifact'], fingerprint),
++                'unbound archived critic')
++        for case, result in zip(definition['cases'], report['cases']):
++            require(result['identity'] == case_identity(fingerprint, case, report['artifact'], store._hash(files[case['input']]))
++                    and result['dimension'] == case['dimension']
++                    and result['probe_identity'] == probe_identity(case, store._hash(files[case['input']]))
++                    and result['input_sha256'] == store._hash(files[case['input']]), 'unbound probe case')
++    return dict(cases=len(expected), blind_spots=definition['blind_spots'])
++
++
++def status(project):
++    definition, _, fingerprint = plan(project)
++    require(fingerprint == expected_plan(project), 'frozen probe scope changed')
++    iteration = int(next(line.split('=')[1] for line in (project / '.goal/state.rec').read_text().splitlines()
++                         if line.startswith('iteration=')))
++    rows = reports(project, iteration) if iteration else []
++    if not rows:
++        return dict(qualified=False, reason='no-executed-dry-evidence', executed=0,
++                    remaining=[case['id'] for case in definition['cases']], blind_spots=definition['blind_spots'])
++    require(len(rows) == 1, 'ambiguous dry evidence')
++    report = rows[0]
++    return {key: report[key] for key in ('iteration', 'artifact', 'qualified', 'reason', 'new_cases',
++                                        'repeated_cases', 'remaining', 'blind_spots')}
++
++
++def main():
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('action', choices=('freeze', 'archive', 'adopt', 'run', 'audit', 'status'))
++    parser.add_argument('--project', default='.')
++    parser.add_argument('--iteration', type=int)
++    parser.add_argument('--artifact')
++    parser.add_argument('--limit', type=int)
++    parser.add_argument('--floor-result', type=int)
++    parser.add_argument('--expected')
++    args = parser.parse_args()
++    project = Path(args.project).resolve(strict=True)
++    if args.action == 'freeze':
++        print('forge=' + plan(project)[2] + ';')
++        return 0
++    if args.action == 'archive':
++        print('FORGE-SCOPE: ' + store._encode(archive_scope(project, args.expected)).decode('ascii'))
++        return 0
++    if args.action == 'adopt':
++        adopt(project)
++        return 0
++    if args.action == 'status':
++        print('CTL: FORGE ' + json.dumps(status(project), sort_keys=True))
++        return 0
++    if args.action == 'run':
++        require(args.iteration is not None and args.iteration > 0 and args.artifact, 'run needs iteration and artifact')
++        require(args.floor_result is not None, 'run needs the real verification result')
++        report = run(project, args.iteration, args.artifact, args.floor_result)
++        print('FORGE: ' + store._encode(report).decode('ascii'))
++        return 4 if report['fatal'] else 0 if report['qualified'] else 2
++    require(args.iteration is not None and args.limit is not None and args.artifact, 'audit needs iteration, limit and artifact')
++    print('FORGE: COVERAGE ' + json.dumps(audit(project, args.iteration, args.limit, args.artifact), sort_keys=True))
++    return 0
++
++
++if __name__ == '__main__':
++    try:
++        sys.exit(main())
++    except (OSError, ValueError, KeyError, TypeError, store.StoreError) as exc:
++        print('FORGE: ERROR ' + str(exc), file=sys.stderr)
++        sys.exit(2)
+--- /dev/null
++++ b/tests/test_forge.py
+@@ -0,0 +1,271 @@
++"""Forge exit uses executed, frozen probes and reports its bounded coverage."""
++import json
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import tempfile
++import time
++import unittest
++
++ROOT = Path(__file__).resolve().parents[1]
++CTL, GATE = (ROOT / 'scripts' / name for name in ('goal_ctl.sh', 'goal_gate.sh'))
++
++
++class ForgeCoverage(unittest.TestCase):
++    def setUp(self):
++        self.tmp = tempfile.TemporaryDirectory(prefix='goal-forge-test-')
++        self.addCleanup(self.tmp.cleanup)
++        self.root = Path(self.tmp.name)
++        self.state = self.root / '.goal'
++        self.call(CTL, 'init')
++        (self.state / 'goal.md').write_text(
++            '# Goal\n\n## Objective\n\nexit: forge\n\n'
++            '## Acceptance criteria\n\n'
++            '- AC-1 | function exists | check: `grep -q dedupe algorithm.py` | expected: exit=0\n\n'
++            '## Budget\n\ncheck_timeout=1\n\n## Approval\n\napproved: PENDING\n')
++        (self.root / 'algorithm.py').write_text('def dedupe(items):\n    return sorted(set(items))\n')
++        (self.root / 'probe.py').write_text(
++            'import json,sys,time\nfrom pathlib import Path\nfrom algorithm import dedupe\n'
++            'if Path(".goal/evidence/slow").exists(): time.sleep(5)\n'
++            'items=json.load(sys.stdin)\nexpected=[]\n'
++            'for value in sorted(items):\n'
++            '    if value not in expected: expected.append(value)\n'
++            'actual=dedupe(items)\n'
++            'print(json.dumps(dict(expected=expected,actual=actual)))\n'
++            'sys.exit(0 if expected == actual else 1)\n')
++        cases = []
++        for name, data in (('positive', [4, 2, 4]), ('negative', [-3, 2, -3])):
++            (self.root / (name + '.json')).write_text(json.dumps(data))
++            cases.append(dict(id=name, dimension='integer-sign', input=name + '.json',
++                              command=[sys.executable, '-B', 'probe.py']))
++        self.plan = dict(version=1, instruments=['probe.py'], cases=cases,
++                         blind_spots=['non-integer inputs and lists over three elements'])
++        self.plan_path = self.state / 'forge-plan.json'
++        self.plan_path.write_text(json.dumps(self.plan))
++
++    def call(self, script, *args, expected=0, env=None):
++        result = subprocess.run(['bash', str(script), *args, '--project', str(self.root)],
++                                capture_output=True, text=True, env=env, timeout=15)
++        self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
++        return result
++
++    def stamp(self):
++        self.call(CTL, 'stamp', '--auto')
++
++    def critic(self, findings=''):
++        iteration = int(next(line.split('=')[1] for line in (self.state / 'state.rec').read_text().splitlines()
++                             if line.startswith('iteration='))) + 1
++        artifact = self.call(GATE, '--digest').stdout.strip()
++        frozen = (self.state / 'check_freeze').read_text().split('forge=')[1].split(';')[0]
++        (self.state / ('evidence/critic-iter-%s.md' % iteration)).write_text(
++            'ITERATION|' + str(iteration) + '\nARTIFACT|' + artifact + '\nPLAN|' + frozen + '\n'
++            + findings + 'CLEAR|reviewed the declared finite scope\n')
++
++    def close(self, dry='yes', env=None, findings='', refresh_critic=True):
++        if dry == 'yes' and refresh_critic:
++            self.critic(findings)
++        return self.call(CTL, 'close-iteration', '--task', 'T1', '--files', 'algorithm.py',
++                         '--checks-pass', '1', '--checks-fail', '0', '--checks-unverifiable', '0',
++                         '--progress', 'yes', '--exit-signal', 'yes', '--adversarial', 'clear',
++                         '--adversarial-note', 'checked finite input domain against independent reference',
++                         '--dry', dry, '--no-gate', env=env)
++
++    def report(self, iteration):
++        rows = [line[7:] for line in (self.state / ('evidence/raw/%s.txt' % iteration)).read_text().splitlines()
++                if line.startswith('FORGE: ')]
++        self.assertEqual(len(rows), 1)
++        return json.loads(rows[0])
++
++    def test_stamp_requires_a_declared_probe_scope_before_any_commit(self):
++        self.plan_path.unlink()
++        before = (self.state / 'store/commits/current').read_bytes()
++        self.call(CTL, 'stamp', '--auto', expected=2)
++        self.assertEqual(before, (self.state / 'store/commits/current').read_bytes())
++
++    def test_repeated_clear_records_stability_and_explicit_blind_spots(self):
++        self.stamp()
++        scope = (self.state / 'evidence/raw/0.txt').read_text()
++        self.assertTrue(scope.startswith('FORGE-SCOPE: '))
++        frozen = json.loads(scope[13:])
++        self.assertEqual(frozen['definition'], self.plan)
++        self.assertIn('negative.json', frozen['files'])
++        for _ in range(3):
++            self.close()
++        first, repeated = self.report(1), self.report(3)
++        self.assertEqual(first['new_cases'], 2)
++        self.assertEqual(repeated['new_cases'], 0)
++        self.assertEqual(repeated['repeated_cases'], 2)
++        self.assertEqual(repeated['remaining'], [])
++        self.assertEqual(repeated['blind_spots'], self.plan['blind_spots'])
++        gate = self.call(GATE, '--check')
++        self.assertIn('coverage=declared', gate.stdout)
++
++    def test_clear_receipts_without_dry_probes_never_complete_forge(self):
++        self.stamp()
++        for _ in range(3):
++            self.close(dry='no')
++        self.assertIn('not-dry', self.call(GATE, '--check', expected=2).stderr)
++        self.assertFalse(any('FORGE: ' in p.read_text() for p in (self.state / 'evidence/raw').glob('*.txt')))
++
++    def test_open_critic_finding_and_stale_critic_cannot_earn_dry_credit(self):
++        self.stamp()
++        self.close(findings='FINDING|size|large instances remain unproven|probe five items\n')
++        report = self.report(1)
++        self.assertFalse(report['qualified'])
++        self.assertEqual(report['reason'], 'critic-has-findings')
++        self.assertEqual(report['cases'], [])
++        self.assertIn('dry_streak=0', (self.state / 'state.rec').read_text())
++        self.critic()
++        stale = self.state / 'evidence/critic-iter-2.md'
++        stale.write_text(stale.read_text().replace('ITERATION|2', 'ITERATION|1'))
++        self.close(refresh_critic=False)
++        self.assertEqual(self.report(2)['reason'], 'critic evidence is stale or unbound')
++        self.close(refresh_critic=False)
++        self.assertEqual(self.report(3)['reason'], 'critic-evidence-missing')
++
++    def test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe(self):
++        (self.root / 'algorithm.py').write_text('def dedupe(items):\n    return sorted({x for x in items if x >= 0})\n')
++        self.stamp()
++        for _ in range(3):
++            self.close()
++        report = self.report(3)
++        self.assertFalse(report['qualified'])
++        self.assertEqual(report['cases'][0]['result'], 0)
++        self.assertEqual(report['cases'][1]['result'], 1)
++        self.assertIn('expected', report['cases'][1]['stdout'])
++        self.assertIn('dry_streak=0', (self.state / 'state.rec').read_text())
++        self.call(GATE, '--check', expected=2)
++
++    def test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope(self):
++        self.stamp()
++        before = (self.state / 'store/commits/current').read_bytes()
++        (self.root / 'negative.json').write_text('[2]')
++        self.close()
++        self.assertFalse(self.report(1)['qualified'])
++        self.assertIn('dry_streak=0', (self.state / 'state.rec').read_text())
++        self.assertNotEqual(before, (self.state / 'store/commits/current').read_bytes())
++        self.call(GATE, '--check', expected=2)
++
++    def test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit(self):
++        self.stamp()
++        (self.state / 'evidence/slow').touch()
++        self.close(env=dict(os.environ, GOAL_RUNNER_MONOTONIC_END=str(time.monotonic() + .8)))
++        report = self.report(1)
++        self.assertFalse(report['qualified'])
++        self.assertTrue(report['remaining'])
++        self.assertIn('dry_streak=0', (self.state / 'state.rec').read_text())
++
++    def test_failed_floor_skips_probe_spend_and_cannot_become_dry(self):
++        self.stamp()
++        (self.root / 'algorithm.py').write_text('x = 1\n')
++        self.close()
++        report = self.report(1)
++        self.assertFalse(report['qualified'])
++        self.assertEqual(report['cases'], [])
++        self.assertEqual(report['reason'], 'floor-verification-incomplete')
++        self.assertIn('dry_streak=0', (self.state / 'state.rec').read_text())
++
++    def test_renamed_duplicate_probe_does_not_earn_new_coverage(self):
++        duplicate = dict(self.plan['cases'][0], id='renamed', dimension='renamed-dimension')
++        self.plan['cases'][1] = duplicate
++        self.plan_path.write_text(json.dumps(self.plan))
++        self.stamp()
++        self.close()
++        report = self.report(1)
++        self.assertTrue(report['qualified'])
++        self.assertEqual(report['new_cases'], 1)
++        self.assertEqual(report['repeated_cases'], 1)
++
++    def test_probe_ledger_mutation_leaves_a_recoverable_pending_transaction(self):
++        probe = self.root / 'probe.py'
++        probe.write_text(probe.read_text() + '\n')  # actual mutating instrument must be frozen
++        source = probe.read_text().replace('sys.exit(0 if expected == actual else 1)',
++                                          'Path(".goal/state.rec").write_text("corrupted\\n")')
++        probe.write_text(source)
++        self.stamp()
++        self.critic()
++        head = (self.state / 'store/commits/current').read_bytes()
++        result = self.call(CTL, 'close-iteration', '--task', 'T1', '--files', 'algorithm.py',
++                           '--checks-pass', '1', '--checks-fail', '0', '--checks-unverifiable', '0',
++                           '--progress', 'yes', '--exit-signal', 'no', '--adversarial', 'clear',
++                           '--adversarial-note', 'read raw results', '--dry', 'yes', '--no-gate', expected=4)
++        self.assertTrue((self.state / 'store/pending').exists(), result.stdout + result.stderr)
++        self.assertEqual(head, (self.state / 'store/commits/current').read_bytes())
++        self.assertEqual(self.report(1)['reason'], 'probe-changed-ledger')
++        self.call(CTL, 'recover')
++        self.assertIn('iteration=0', (self.state / 'state.rec').read_text())
++        self.assertFalse((self.state / 'store/pending').exists())
++
++    def test_legacy_forge_migration_retains_history_and_requires_new_probe_evidence(self):
++        self.stamp()
++        for _ in range(3):
++            self.close()
++        # Create an unversioned legacy fixture with the old raw evidence shape.
++        # Existing history remains readable, but has no executed probe receipts.
++        archive = tempfile.TemporaryDirectory(prefix='goal-forge-legacy-')
++        self.addCleanup(archive.cleanup)
++        legacy = Path(archive.name) / 'state'
++        self.state.rename(legacy)
++        shutil.copytree(legacy, self.state, ignore=shutil.ignore_patterns('store', 'runner.lock'))
++        freeze = (self.state / 'check_freeze').read_text()
++        (self.state / 'check_freeze').write_text(freeze.split('forge=')[0] + '\n')
++        for number in range(4):
++            path = self.state / ('evidence/raw/%s.txt' % number)
++            if path.exists():
++                rows = [line for line in path.read_text().splitlines() if not line.startswith(('FORGE: ', 'FORGE-SCOPE: '))]
++                path.write_text('\n'.join(rows) + '\n')
++        history = (self.state / 'loop-log.md').read_bytes()
++        self.call(CTL, 'migrate')
++        self.assertEqual(history, (self.state / 'loop-log.md').read_bytes())
++        self.assertIn('dry_streak=0', (self.state / 'state.rec').read_text())
++        self.call(GATE, '--check', expected=2)
++        for _ in range(3):
++            self.close()
++        self.assertIn('coverage=declared', self.call(GATE, '--check').stdout)
++        head = (self.state / 'store/commits/current').read_bytes()
++        self.plan['blind_spots'] = []
++        self.plan_path.write_text(json.dumps(self.plan))
++        self.call(CTL, 'migrate', expected=4)
++        self.assertEqual(head, (self.state / 'store/commits/current').read_bytes())
++
++    def test_coverage_can_grow_without_dropping_earlier_cases_or_failures(self):
++        self.stamp()
++        self.close()
++        old_history = (self.state / 'loop-log.md').read_bytes()
++        (self.root / 'zero.json').write_text('[0,0,0]')
++        self.plan['cases'].append(dict(id='zero', dimension='integer-sign', input='zero.json',
++                                       command=[sys.executable, '-B', 'probe.py']))
++        self.plan_path.write_text(json.dumps(self.plan))
++        self.call(CTL, 'migrate')
++        self.assertEqual(old_history, (self.state / 'loop-log.md').read_bytes())
++        self.assertIn('dry_streak=0', (self.state / 'state.rec').read_text())
++        self.close()
++        report = self.report(2)
++        self.assertEqual(len(report['cases']), 3)
++        self.assertEqual(report['new_cases'], 1)
++        self.assertEqual(report['repeated_cases'], 2)
++        self.assertTrue(report['qualified'])
++
++    def test_acceptance_check_cannot_replace_the_archived_scope_during_close(self):
++        goal = self.state / 'goal.md'
++        text = goal.read_text().replace('grep -q dedupe algorithm.py',
++            'if test -f .goal/evidence/tamper; then echo corrupted > .goal/evidence/raw/0.txt; fi; grep -q dedupe algorithm.py')
++        goal.write_text(text)
++        self.stamp()
++        self.critic()
++        head = (self.state / 'store/commits/current').read_bytes()
++        archive = (self.state / 'evidence/raw/0.txt').read_bytes()
++        (self.state / 'evidence/tamper').touch()
++        self.call(CTL, 'close-iteration', '--task', 'T1', '--files', 'algorithm.py',
++                  '--checks-pass', '1', '--checks-fail', '0', '--checks-unverifiable', '0',
++                  '--progress', 'yes', '--exit-signal', 'no', '--dry', 'yes', '--no-gate', expected=4)
++        self.assertEqual(head, (self.state / 'store/commits/current').read_bytes())
++        self.assertTrue((self.state / 'store/pending').exists())
++        self.call(CTL, 'recover')
++        self.assertEqual(archive, (self.state / 'evidence/raw/0.txt').read_bytes())
++
++
++if __name__ == '__main__':
++    unittest.main()
+--- a/tests/test_incumbent.py
++++ b/tests/test_incumbent.py
+@@ -149,6 +149,12 @@
+         (self.project / 'score.txt').write_text('10\n')
+         (self.project / 'good.txt').write_text('ready\n')
+         (self.project / 'bad.txt').write_text('broken\n')
++        (self.project / 'probe-input.txt').write_text('ready\n')
++        (self.project / 'probe.sh').write_text('#!/usr/bin/env bash\ntest "$(cat)" = ready\n')
++        (self.state / 'forge-plan.json').write_text(json.dumps(
++            dict(version=1, instruments=['probe.sh'], cases=[
++                dict(id='ready', dimension='readiness', input='probe-input.txt', command=['bash', 'probe.sh'])],
++                 blind_spots=['single readiness fixture'])))
+         self.ctl('stamp', '--auto')
+         (self.state / 'work-plan.md').write_text('- [ ] T2 further exploration | files=artifact.txt\n')
+         self.book()
+--- a/tests/cases.inc.sh
++++ b/tests/cases.inc.sh
+@@ -91,8 +91,9 @@
+ out=$(bash "$GATE" --check --project "$T/t13" 2>&1); assert_rc "13 forge not-dry -> rc2" 2 $?
+ assert_has "13 reason not-dry" 'not-dry' "$out"
+ 
+-# 14 forge GO at dry_streak >= limit
+-sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/t13/.goal/state.rec"
++# 14 forge GO after three executed dry rounds.
++close_iter t13 --dry yes
++close_iter t13 --dry yes
+ out=$(bash "$GATE" --check --project "$T/t13" 2>&1); assert_rc "14 forge GO -> rc0" 0 $?
+ assert_has "14 GO line says mode=forge" 'mode=forge' "$out"
+ 
+@@ -297,12 +298,13 @@
+ assert_rc "40 stamp without baseline refused rc2" 2 $?
+ grep -qE '^approved: [0-9a-f]{6,}' "$T/h40/.goal/goal.md" && no "40 stamped despite refusal" || ok "40 goal.md left unstamped"
+ 
+-# 41 valid baseline -> stamp ok -> forge GO (dry_streak forced to limit)
++# 41 valid baseline -> stamp ok -> forge GO after executed dry rounds.
+ printf 'AC-1 | observed=7 | repeats=3 | cmd=echo 7\n' > "$T/h40/.goal/baseline.md"
+ bash "$CTL" stamp --project "$T/h40" --auto >/dev/null 2>&1
+ assert_rc "41 stamp with baseline ok" 0 $?
+ echo x > "$T/h40/a.txt"; close_iter h40 --dry yes
+-sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/h40/.goal/state.rec"
++close_iter h40 --dry yes
++close_iter h40 --dry yes
+ bash "$GATE" --check --project "$T/h40" >/dev/null 2>&1
+ assert_rc "41 forge GO with baseline satisfied" 0 $?
+ 
+@@ -317,7 +319,9 @@
+ NOSTAMP=1 mkproj h43 >/dev/null; FORGE=1 NOSTAMP=1 contract h43 "- AC-1 | m | check: \`echo 7\` | baseline: abs | expected: >=5"
+ bash "$CTL" stamp --project "$T/h43" --auto >/dev/null 2>&1
+ assert_rc "43 abs stamp ok without baseline" 0 $?
+-close_iter h43 --dry yes; sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/h43/.goal/state.rec"
++close_iter h43 --dry yes
++close_iter h43 --dry yes
++close_iter h43 --dry yes
+ bash "$GATE" --check --project "$T/h43" >/dev/null 2>&1
+ assert_rc "43 abs forge GO" 0 $?
+ 
+@@ -969,6 +973,9 @@
+ close_iter t89
+ out=$(bash "$GATE" --check --project "$T/t89" 2>&1); rc89=$?
+ [ "$rc89" -ne 0 ] && ok "89 ledger-mutating check never ends GO (rc=$rc89)" || no "89 ledger-mutating check ended GO"
++# A refused mutation now leaves a rollback journal. Recover that transaction
++# before exercising the next independent checker defect.
++if [ -f "$T/t89/.goal/store/pending" ]; then bash "$CTL" recover --project "$T/t89" >/dev/null; fi
+ # --verify mode must also refuse a self-rewriting check in-run
+ printf '# Goal contract - test\n\n## Objective\n\nt\n\n## Exit policy\n\nexit: threshold\n\n## Acceptance criteria\n\n- AC-1 | mutates | check: `sed "s/PENDING/PENX/" .goal/goal.md > .goal/goal.md.mt && mv .goal/goal.md.mt .goal/goal.md` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n' > "$T/t89/.goal/goal.md"
+ out=$(bash "$GATE" --verify --project "$T/t89" 2>&1); assert_rc "89b verify self-rewrite caught" 2 $?
+@@ -1094,6 +1101,7 @@
+ close_iter t96 --dry yes          # dry_streak 1
+ close_iter t96 --dry yes          # dry_streak 2
+ two_pass t96
++forge_critic t96
+ out=$(bash "$CTL" close-iteration --project "$T/t96" --task T1 --files a.txt \
+   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+   --dry yes --exit-signal yes 2>&1); rc96=$?
+@@ -1104,6 +1112,7 @@
+ # reset with a fix round, then claim too early (dry=1 < 3)
+ close_iter t96 --dry no           # dry_streak 0
+ close_iter t96 --dry yes          # dry_streak 1
++forge_critic t96
+ out=$(bash "$CTL" close-iteration --project "$T/t96" --task T1 --files a.txt \
+   --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+   --dry yes --exit-signal yes 2>&1); rc96=$?
+@@ -2919,3 +2928,12 @@
+ bash "$CTL" stamp --project "$T/t160e" --auto >/dev/null
+ close_iter t160e --strategy verify --score 123
+ assert_has "160 broken sensor stderr does not set a water mark" '^best_score=none$' "$(cat "$T/t160e/.goal/state.rec")"
++
++# 161 The dry counter alone cannot manufacture executed coverage.
++mkproj t161
++FORGE=1 contract t161 "- AC-1 | ready | check: \`test -f a.txt\` | expected: exit=0"
++close_iter t161 --dry yes
++sed_in 's/^dry_streak=.*/dry_streak=3/' "$T/t161/.goal/state.rec"
++out=$(bash "$GATE" --check --project "$T/t161" 2>&1); rc=$?
++assert_rc "161 inflated dry count without recorded rounds refuses GO" 2 $rc
++assert_has "161 missing executed coverage named" 'forge-coverage-unverified' "$out"
+--- a/tests/lib.sh
++++ b/tests/lib.sh
+@@ -39,6 +39,11 @@
+     for l in "$@"; do printf '%s\n' "$l"; done
+     printf '\n%s\n\n## Out of scope\n\n- nothing\n\n## Approval\n\napproved: PENDING\n' "$forge_line"
+   } > "$p/.goal/goal.md"
++  if [ "${FORGE:-0}" = 1 ]; then
++    printf 'fixture\n' > "$p/forge-input.txt"
++    printf '#!/usr/bin/env bash\ntest "$(cat)" = fixture\n' > "$p/forge-probe.sh"
++    printf '%s\n' '{"version":1,"instruments":["forge-probe.sh"],"cases":[{"id":"fixture","dimension":"fixture","input":"forge-input.txt","command":["bash","forge-probe.sh"]}],"blind_spots":["toy fixture covers its declared input"]}' > "$p/.goal/forge-plan.json"
++  fi
+   [ "${NOSTAMP:-0}" = 1 ] || bash "$CTL" stamp --project "$p" --auto ${TB:+--time-budget=$TB} >/dev/null
+ }
+ 
+@@ -51,10 +56,24 @@
+ close_iter(){ # $1 proj NAME under $T, rest passed to close-iteration (--no-gate implied)
+   local name="$1" p="$T/$1"; shift
+   : > "$p/a.txt"
++  forge_critic "$name"
+   bash "$CTL" close-iteration --project "$p" --task T1 --files a.txt \
+     --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes \
+     --exit-signal yes "$@" --no-gate >/dev/null 2>&1
+   two_pass "$name"
++}
++
++forge_critic(){ # Explicit critic fixture bound to the next production close.
++  local p="$T/$1" it digest fingerprint
++  grep -q '^exit: forge' "$p/.goal/goal.md" || return 0
++  [ -f "$p/.goal/forge-plan.json" ] || return 0
++  it=$(awk -F= '$1=="iteration"{print $2+1}' "$p/.goal/state.rec")
++  digest=$(bash "$GATE" --digest --project "$p") || return 1
++  fingerprint=$(python3 -I "$here/scripts/goal_forge.py" freeze --project "$p") || return 1
++  fingerprint=${fingerprint#forge=}; fingerprint=${fingerprint%;}
++  mkdir -p "$p/.goal/evidence"
++  printf 'ITERATION|%s\nARTIFACT|%s\nPLAN|%s\nCLEAR|finite input fixture inspected\n' "$it" "$digest" "$fingerprint" \
++    > "$p/.goal/evidence/critic-iter-$it.md"
+ }
+ 
+ # Plant claim-time two-pass artifacts for the latest iteration (adversarial
+--- a/agents/goal-critic.md
++++ b/agents/goal-critic.md
+@@ -36,11 +36,15 @@
+ 4. Write your answer to .goal/evidence/critic-iter-<N>.md (that file write
+    is your ONLY write). Format:
+ 
++   ITERATION|<next iteration number>
++   ARTIFACT|<current v2 content digest>
++   PLAN|<approved forge scope SHA-256>
+    FINDING|<dimension>|<one-line gap>|<probe>
+    (zero or more lines, then:)
+    CLEAR|<one line: why nothing else is worth probing this round>
+ 
+-An empty FINDING list + a substantive CLEAR line is the round's dry
+-evidence. Rubber-stamping CLEAR is the forge-mode equivalent of a false
+-PASS - the two-strikes false-complete breaker applies to the loop that
+-relied on it.
++Use the approved scope and prior executed probe records when deciding what
++remains unproven. The controller archives this bound conclusion and executes
++the declared probes before giving a round dry credit. Additional probes can
++extend the scope through migration while preserving its earlier cases and
++materials. A CLEAR conclusion is tied to the current scope and artifact.
+--- a/references/packs/gradient.md
++++ b/references/packs/gradient.md
+@@ -1,6 +1,6 @@
+ # Pack: gradient (GRADIENT)
+ 
+-**Open when:** contract has `objective:` · `exit: forge` · horizon / `horizon-waived:` · CLI uses `--strategy` · you are reading EFFICIENCY output.
++**Open when:** contract has `objective:` · `exit: forge` · horizon / `horizon-waived:` · CLI uses `--strategy` · comparing policy costs or autonomous promotion · you are reading EFFICIENCY output.
+ 
+ **Invariant: GRADIENT** — optimization never delivers below the water mark; blind spots are declared; waves are labeled for attribution.
+ **Also touches FENCE** — `progress=no` must carry `strategy_delta=` (honest next direction).
+@@ -13,7 +13,7 @@
+ 
+ - Contract line: `objective: maximize AC-N` or `objective: minimize AC-N` (primary score AC).
+ - `best_score` is the water mark: high-water for maximize, low-water for minimize.
+-- Claim refuses a score worse than the water mark in that direction (`score-regressed`). A number is not a recoverable artifact: before a risky candidate, retain a scoped patch/artifact of the incumbent and its digest under evidence; restore only owned files if it loses.
++- Claim refuses a score worse than the water mark in that direction (`score-regressed`). Before changing a qualified artifact, save its owned files with `goal_store.py incumbent save`. Use `--intermediate` during exploration after floors and horizon pass. Capture the trial's exact output before rollback. The [checkpoint procedure](../../docs/transaction-state.md#accepted-artifact-checkpoints) explains how to recover and recheck the restored artifact.
+ - `tolerance:` (and data-driven `sd:`/`var:` bands from `packs/instrument.md`) widen the compare so noise is “holds”, not “regressed”.
+ - Band math uses `|best|*tol` so negative water marks do not flip direction.
+ 
+@@ -48,11 +48,46 @@
+ - Metric ACs default `baseline: delta`; stamp requires `.goal/baseline.md` (pre-stamp smoke run **is** the baseline measurement, repeats≥2).
+ - Threshold exit (default) is the other policy: deliver when every AC floor passes. Exit policy is a **contract field**, not a mode matrix.
+ 
++Before stamping a forge contract, declare `.goal/forge-plan.json`. Each case
++names a dimension, a frozen input file, and a command that reads that input
++from stdin. List the probe instruments and the remaining blind spots.
++
++```json
++{
++  "version": 1,
++  "instruments": ["probe.py"],
++  "cases": [
++    {"id": "signed", "dimension": "integer-sign", "input": "cases/signed.json",
++     "command": ["python3", "-B", "probe.py"]}
++  ],
++  "blind_spots": ["Inputs outside the declared cases"]
++}
++```
++
++Give goal-critic the next iteration, current artifact digest, approved probe
++scope digest, and recent raw results. Its existing
++`critic-iter-<N>.md` file now carries `ITERATION`, `ARTIFACT`, and `PLAN`
++bindings before FINDING/CLEAR. On `--dry yes`, the controller archives the
++critic and runs the declared probes under the remaining budget. A missing
++critic, a finding, a failed floor, or an incomplete probe batch earns no dry
++credit. Repeated successful inputs count as stability checks. New coverage is
++reported separately. Final GO includes `coverage=declared`.
++
++Stamp archives the plan and input/instrument bytes in
++`evidence/raw/0.txt`. Each dry attempt keeps its actual inputs' identities,
++outputs, elapsed time, failures, remaining cases and blind spots in its
++canonical raw record. Use `status` for the latest bounded result.
++For an older forge run, author the plan and run `goal_ctl.sh migrate`.
++Migration preserves history and starts fresh dry evidence. The same entry
++point can add probes while retaining all earlier cases and materials.
++
+ ## 6 EFFICIENCY / STRATEGY-PICK / eval-gap / promote
+ 
+ Printed by `ctl status` when optimizing or stalled. **Advisory to the gate** — never changes gate rc or hint. **STRATEGY-PICK is what the next wave uses** (brief + replan/delta NEXT text).
+ 
+-- **EFFICIENCY** — one kernel (`scripts/goal_strategy.awk`) computes both display and pick. Score at t is AFTER wave t: `delta(t) = score(t) - score(t-1)` belongs to label(t), including its entry wave. First recorded score is an anchor, not credited gain. Missing/non-numeric scores or ledger gaps break the chain; only the latest contiguous measured suffix counts.
++- **EFFICIENCY** — one kernel (`scripts/goal_strategy.awk`) computes both display and pick. For a newly observed artifact, score at t is the AFTER measurement: `delta(t) = score(t) - score(t-1)` belongs to label(t), including its entry wave. First recorded score is an anchor, not credited gain. Missing/non-numeric scores, missing artifact identities, unchanged/restored artifacts or ledger gaps break attribution; only the latest eligible measured suffix counts.
++- **EVENTS** — status separates observed artifact versions, acceptance claims, unchanged-artifact rounds, restorations and new score readings. Unchanged/restored artifacts do not earn fresh artifact-strategy gain or role-promotion credit. Artifact stagnation is derived from content identities, not reset by a self-reported `progress=yes`. A changed reading on unchanged bytes is information, not evidence of a successful artifact edit. Legacy digests are marked unverified; these counts cannot observe failed worker attempts that left no new artifact or replace missing duration/cost telemetry.
++- **RUNTIME** — actual supervised command spans under `.goal/evidence/runtime/`, with input artifact, contract/checker identities, parent span, elapsed time and result. Timeout/cancelled spans remain in the data; interrupted/incomplete traces and unavailable costs stay unknown. Executor/measurement durations include nested work and are not summed as wall time. Runtime observations do not count as artifact gains, and transitive/external inputs may still be unknown. Missing telemetry is not zero cost; crew decisions must wait for usable comparable samples.
+ - **STRATEGY-PICK** — latest window for each label supersedes its history. Prefer the greatest direction-adjusted gain per measured wave beyond `tolerance:`; avoid regressions or ≥3 flat deltas (whole observed range inside band). Unmeasured/oscillating is `prefer=none`, not invented confidence. Ties use first appearance. A label cannot be both prefer and avoid. Historical EFFICIENCY lines describe history; use the pick for current routing.
+ - Paste the pick into every wave brief. `avoid` means change the hypothesis before a deliberate retry; record the counterevidence in `strategy_delta`, rather than rename the same tactic. After retry, new evidence supersedes the old window.
+ - **eval-gap** — latest three adjacent measured rounds flat while stalled: inspect raw failures first, then ask goal-critic for candidate AC proposals in `.goal/proposals/`. Plateau alone does not prove the metric is wrong. Contract changes require approval.
+@@ -70,3 +105,24 @@
+ ## 7 Breaker (direction honesty)
+ 
+ `CLOSED → HALF_OPEN (progress=no) → OPEN → BLOCKED`. Progress=yes resets. Every HALF_OPEN landing owes a `strategy_delta`. Two gate-caught false claims → BLOCKED (see GATE / ratchet in `gate.md`).
++
++## 8 Executable local policy experiments
++
++Use the [paired protocol](../../examples/evolution-dedupe/README.md) when a
++worker proposes a reusable Python policy with a frozen independent evaluator.
++Run `goal_evolve.py protocol.json --state .goal/proposals/evolution`. Version 1
++takes standalone programs. Version 2 also takes `--project` and a matched
++incumbent/candidate checkpoint pair, so it can compare multiple owned files,
++including additions and removals. Keep shared dependencies inside the recorded
++scope and use a separate state directory per policy scope.
++
++The runner gives both variants the same input in fresh workspaces and measures
++setup, worker, and grading under a single trial allowance. Promotion requires
++complete paired development and fresh holdout evidence above the preset floor
++and horizon. An underpowered holdout is skipped before dispatch. A verified
++regression can withdraw the active candidate. An instrument failure or an
++inconclusive timeout preserves the active selection. Route later tasks in this
++scope through `goal_evolve.py run-enabled --state … --seconds …`. To restore
++owned files in the live project, use the [checkpoint restore procedure](../../docs/transaction-state.md#accepted-artifact-checkpoints)
++and run a fresh gate. Candidate generation and cross-task transfer still
++require an agent and independent task evidence.
+--- a/references/gate.md
++++ b/references/gate.md
+@@ -19,6 +19,14 @@
+ the committed snapshot after that point, without replaying tools. A journal
+ whose baseline/operation conflicts with the current commit is refused. Keep
+ the journal for diagnosis; never clear it merely to make a gate run.
++
++Readers now verify managed text views against the immutable commit snapshot.
++`ledger-view-mismatch` also requires controller recovery, even without pending.
++For an older unversioned ledger, use `goal_ctl.sh migrate --project DIR` after
++`ledger-migration-required`; migration refuses contradictory history. Do not
++use migration to bless edits to an already versioned ledger. Author the goal
++and work-plan through the existing workflow; state/log/scores, verdicts, frozen
++checker records and managed raw receipts are controller projections.
+ 
+ ## 1 Schemas
+ 
+@@ -168,7 +176,7 @@
+ mutated the tree -> NO-GO.
+ The tree digest is blind to `.goal/`, so the ledger gets its own before/after
+ digest (`ledger_digest`, over goal.md/state.rec/loop-log.md/verdicts.rec/
+-scores.rec/work-plan.md/baseline.md/interfaces.md/runner.deadline/runner.clock) - a check that rewrites
++scores.rec/work-plan.md/baseline.md/interfaces.md/runner.deadline/runner.clock/runner.json) - a check that rewrites
+ the contract or a state file mid-rerun trips `check-mutated-ledger`; only
+ `.goal/evidence/` is fair game for checks (R6). Peer-notes (v2.8 protocol,
+ see crew.md §4) live under `.goal/evidence/peer-notes/` - invisible to both
+@@ -214,6 +222,8 @@
+ 9  judged UNVERIFIABLE *3 <= total            else 2 unverifiable-excessive [R4]
+ 10 digest unchanged after rerun batch         else 2 check-mutated-tree
+ 11 forge: dry_streak >= dry_limit             else 2 not-dry
++   + last K canonical raw records contain complete executed scope and bound
++     empty critic conclusions                 else 2 forge-coverage-unverified
+ 12 breaker=HALF_OPEN: strategy_delta set      else 2 missing-strategy-delta [R10]
+ 13 objective score vs best_score by direction else 2 score-regressed [R11]
+    (band = sd/var spread z2 or tolerance, wider wins; noise inside = holds)
+@@ -221,6 +231,12 @@
+    advisory NOTEs on GO: tautology-suspect / metric-flat (never block)
+ GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
+ ```
++
++`--checkpoint` qualifies the latest booked artifact for a reversible trial.
++It requires all ACs verified within the active budget and retains the frozen
++contract, calibration, adversarial evidence, and water-mark checks. Remaining
++work items, dry rounds, and a final claim are delivery conditions. The
++checkpoint receipt says `CHECKPOINT-OK`. See the [restore procedure](../docs/transaction-state.md#accepted-artifact-checkpoints).
+ 
+ ## 4 Invariants + legacy index
+ 

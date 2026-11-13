@@ -1,0 +1,8 @@
+uid=65534(nobody) gid=65534(nogroup) groups=65534(nogroup)
+Linux 0e10e38d6d35 6.12.76-linuxkit #1 SMP Sun Mar  8 14:41:59 UTC 2026 aarch64 GNU/Linux
+Python 3.12.14
+git version 2.47.3
+ShellCheck - shell script analysis tool
+version: 0.10.0
+license: GNU General Public License, version 3
+website: https://www.shellcheck.net

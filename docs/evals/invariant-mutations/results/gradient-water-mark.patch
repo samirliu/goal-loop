@@ -1,0 +1,11 @@
+--- a/scripts/goal_gate.sh
++++ b/scripts/goal_gate.sh
+@@ -794,7 +794,7 @@
+   else
+     band="$tol"; src="tol=$tol"
+   fi
+-  if [ -n "$best" ] && [ "$best" != "none" ]; then
++  if false; then
+     # Noise band = b +/- |b|*t. Multiplying (1-t)*b flips the band on
+     # NEGATIVE water marks (b=-10,t=.1 -> band -9, so -10 reads "regressed");
+     # absolute value keeps the band on the correct side in every sign.

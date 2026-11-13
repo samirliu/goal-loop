@@ -1,0 +1,5 @@
+Command: python3.12 -m pytest -q -s tests/test_evolve.py
+Exit: 0
+..EVOLVE_HOLDOUT_REJECTION {"status": "holdout-rejected", "development_gain": 0.5, "holdout_gain": -0.5, "holdout_pairs": 8, "holdout_alpha": 0.008333333333333333, "pointer_unchanged": true, "incumbent_sha256": "b1b5ba90c098a185c4d07e423f324505bd5a7ec2b15b8037aac61d5a5e3c4f4d", "history_preserved": true, "run_enabled_exit": 0, "run_enabled_stdout": "candidate\n"}
+.........
+11 passed in 1.12s

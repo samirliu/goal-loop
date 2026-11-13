@@ -1,0 +1,372 @@
+{
+  "version": 1,
+  "controller": "/root/w5_controller",
+  "cohort": "native-v3-20261112",
+  "workload": "auditlog-v1",
+  "suite_seconds": 1800,
+  "origin": {
+    "backend": "work",
+    "session": "/root/w5_controller",
+    "kind": "tool",
+    "epoch": 1794451592.774278,
+    "monotonic": 1637167.370485708,
+    "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a"
+  },
+  "deadline_epoch": 1794453392,
+  "deadline_monotonic": 1638966.5958887732,
+  "project": "/private/tmp/goal-native-v3-20261112/single-1/work",
+  "base": "/tmp/goal-native-v3-20261112",
+  "order": [
+    "single-1",
+    "crew-1",
+    "crew-2",
+    "single-2",
+    "single-3",
+    "crew-3"
+  ],
+  "matched_pairs": [
+    [
+      "single-1",
+      "crew-1"
+    ],
+    [
+      "single-2",
+      "crew-2"
+    ],
+    [
+      "single-3",
+      "crew-3"
+    ]
+  ],
+  "state": "stopped-at-original-deadline",
+  "samples": [
+    {
+      "case": "single-1",
+      "mode": "fused",
+      "wave": "66e2c72c0e2f42008efea6a3c1a7c97e",
+      "quality": true,
+      "elapsed": 298.35058024991304,
+      "worker_seconds": 285.0422128329519,
+      "stage_seconds": {
+        "conflict": 0,
+        "coordination": 56.51178687484935,
+        "join": 228.64033495890908,
+        "recovery": 0,
+        "revalidation": 0.2586205000989139
+      },
+      "startup_queue_seconds": {
+        "T1": 147.80081545794383
+      },
+      "final_result": 0,
+      "final_checks": 21,
+      "controller_checks": {
+        "passed": 2,
+        "failed": 0,
+        "unverifiable": 0
+      },
+      "gate": "GO",
+      "evidence": "single-1/result.json",
+      "review": "single-1/review.json",
+      "tokens": null,
+      "money": null,
+      "status": "validated"
+    },
+    {
+      "case": "crew-1",
+      "mode": "crew",
+      "wave": "35864240d9cc4bb78a1711fdb046a09e",
+      "quality": true,
+      "elapsed": 299.09121991693974,
+      "worker_seconds": 509.11218433408067,
+      "stage_seconds": {
+        "conflict": 0,
+        "coordination": 56.90780287492089,
+        "join": 241.13975379196927,
+        "recovery": 0,
+        "revalidation": 0.25111225014552474
+      },
+      "startup_queue_seconds": {
+        "T1": 149.7902009158861,
+        "T2": 163.82703412487172
+      },
+      "final_result": 0,
+      "final_checks": 21,
+      "controller_checks": {
+        "passed": 3,
+        "failed": 0,
+        "unverifiable": 0
+      },
+      "gate": "GO",
+      "evidence": "crew-1/result.json",
+      "review": "crew-1/review.json",
+      "tokens": null,
+      "money": null,
+      "status": "validated"
+    },
+    {
+      "case": "crew-2",
+      "mode": "crew",
+      "wave": "769b80e30d7f47c7878738953ace558c",
+      "quality": true,
+      "elapsed": 263.33055275003426,
+      "worker_seconds": 474.64319299999624,
+      "stage_seconds": {
+        "conflict": 0,
+        "coordination": 46.09963229112327,
+        "join": 216.14661054080352,
+        "recovery": 0,
+        "revalidation": 0.2868821669835597
+      },
+      "startup_queue_seconds": {
+        "T1": 143.45585229201242,
+        "T2": 142.63773999991827
+      },
+      "final_result": 0,
+      "final_checks": 21,
+      "controller_checks": {
+        "passed": 3,
+        "failed": 0,
+        "unverifiable": 0
+      },
+      "gate": "GO",
+      "evidence": "crew-2/result.json",
+      "review": "crew-2/review.json",
+      "tokens": null,
+      "money": null,
+      "status": "validated"
+    },
+    {
+      "case": "single-2",
+      "mode": "fused",
+      "wave": "b0a8bf1a0d1a4a36ad8b13439859a82c",
+      "quality": true,
+      "elapsed": 263.13346249982715,
+      "worker_seconds": 261.8166642920114,
+      "stage_seconds": {
+        "conflict": 0,
+        "coordination": 32.880290624918416,
+        "join": 229.05712370807305,
+        "recovery": 0,
+        "revalidation": 0.2752037080936134
+      },
+      "startup_queue_seconds": {
+        "T1": 81.94123395788483
+      },
+      "final_result": 0,
+      "final_checks": 21,
+      "controller_checks": {
+        "passed": 2,
+        "failed": 0,
+        "unverifiable": 0
+      },
+      "gate": "GO",
+      "evidence": "single-2/result.json",
+      "review": "single-2/review.json",
+      "tokens": null,
+      "money": null,
+      "status": "validated"
+    },
+    {
+      "case": "single-3",
+      "mode": "fused",
+      "status": "deadline-limited",
+      "wave": "23f478388964442589abb471634c455c",
+      "quality": false,
+      "elapsed": 341.744609417161,
+      "worker_seconds": 309.06947095808573,
+      "stage_seconds": {
+        "conflict": 0,
+        "coordination": 28.380881999852136,
+        "join": 280.8137147920206,
+        "recovery": 0,
+        "revalidation": 0.053413083078339696
+      },
+      "startup_queue_seconds": {
+        "T1": 140.62558462494053
+      },
+      "native_status": "returned",
+      "adopted": false,
+      "controller_job_results": [
+        124
+      ],
+      "final_result": 124,
+      "final_checks": null,
+      "controller_checks": {
+        "passed": 0,
+        "failed": 0,
+        "unverifiable": 2
+      },
+      "gate": "BLOCKED reason=time-budget-exhausted",
+      "evidence": "single-3/result.json",
+      "review": "single-3/review.json",
+      "tokens": null,
+      "money": null
+    },
+    {
+      "case": "crew-3",
+      "mode": "crew",
+      "status": "not-attempted",
+      "wave": null,
+      "quality": null,
+      "elapsed": null,
+      "worker_seconds": null,
+      "stage_seconds": null,
+      "reason": "original whole-suite deadline exhausted before dispatch",
+      "evidence": "crew-3/not-attempted.json",
+      "tokens": null,
+      "money": null
+    }
+  ],
+  "failures": [
+    {
+      "case": "single-3",
+      "kind": "deadline-limited-controller-settlement",
+      "native_worker_completed": true,
+      "worker_public_check_result": 0,
+      "controller_job_result": 124,
+      "adoption_refused": true,
+      "final_result": 124,
+      "source_behavior_failure_proven": false,
+      "retry": false,
+      "replacement": false,
+      "evidence": [
+        "single-3/settlement-failure.json",
+        "single-3/result.json",
+        "single-3/close.json"
+      ]
+    }
+  ],
+  "tokens": null,
+  "money": null,
+  "limitations": [
+    "One workload and three ordered pairs cannot establish universal advantage.",
+    "Token and monetary telemetry is unavailable.",
+    "Earlier root-controlled v2 samples are excluded by the controller condition.",
+    "single-3's worker public check passed before cutoff, but independent final acceptance did not; it remains a failed-quality sample.",
+    "The paired elapsed differences are descriptive observations from two completed pairs, not a confidence interval or universal score.",
+    "The suite did not complete its requested three matched pairs."
+  ],
+  "plan": {
+    "executed": false,
+    "reason": "Stopped cohort has five actual samples and one unstarted case, not the required six archived original samples; the approved restoration helper's latest-quality guard is also unmet. Original deadline is exhausted.",
+    "observer_transport_required": "python-api",
+    "helper": "/tmp/goal_native_v3_plan.py"
+  },
+  "methodology": {
+    "timing": "Wave elapsed runs from native crew.begin to seal completion; worker_seconds sum ticket dispatch to observed structured native terminal. These include observed host startup, tool work and controller polling delay and are not model compute time.",
+    "suite_origin_to_first_prepare_seconds": 230.60838913917542,
+    "comparison_scope": "Same isolated project, frozen workload/inputs/final grader and original 1800-second suite deadline. Inter-wave review/gate/report time remains part of suite cost but is outside individual sealed wave elapsed.",
+    "unknowns": {
+      "tokens": null,
+      "money": null,
+      "provider_inference_seconds": null,
+      "controller_reasoning_seconds": null
+    },
+    "closure_counts": "Only controller job validations plus the independent final command are counted in --checks-pass. Worker fixed checks and gate reruns are retained separately."
+  },
+  "objective_met": false,
+  "attempted_cases": 5,
+  "validated_cases": 4,
+  "complete_matched_pairs": 2,
+  "requested_matched_pairs": 3,
+  "failure_costs": {
+    "failed_wave_elapsed_seconds": 341.744609417161,
+    "failed_wave_worker_seconds": 309.06947095808573,
+    "native_terminal_failures": 0,
+    "worker_fixed_check_failures": 0,
+    "controller_unverifiable_checks": 2,
+    "additional_recovery_seconds": 0,
+    "recovery_performed": false,
+    "controller_inspection_error": "One concatenated JSON inspection parse failed and was corrected; elapsed cost unknown, see controller-observations.json.",
+    "tokens": null,
+    "money": null
+  },
+  "raw_worker_checks": {
+    "count": 7,
+    "passed": 7,
+    "failed": 0,
+    "evidence": "runtime-worker-checks.json"
+  },
+  "deadline_accounting": {
+    "original_deadline_epoch": 1794453392,
+    "deadline_extended": false,
+    "last_worker_public_check_finished_epoch": 1794453334.034326,
+    "last_worker_public_check_margin_seconds": 57.96567392349243,
+    "last_seal_epoch": 1794453461.651653,
+    "origin_to_last_seal_seconds": 1868.877375125885,
+    "post_cutoff_settlement_seconds": 69.65165305137634,
+    "interpretation": "Post-cutoff actions retained receipts, refused adoption, sealed the timeout result and booked a blocked ledger entry. No replacement worker or new workload check with extended allowance was run. The elapsed values include controller observation/settlement delay; they are not pure execution times."
+  },
+  "final_status": {
+    "all_7_host_attempts_terminal": true,
+    "native_status_receipt": "final-native-status.json",
+    "host_attempts": "terminal-host-attempts.json",
+    "active_native_workers": 0,
+    "cancellation": "not needed: all actually dispatched workers had structured completed status",
+    "conflict": "explicit skip in every sealed wave",
+    "recovery": "explicit skip in every sealed wave"
+  },
+  "conditions": {
+    "same_project": true,
+    "same_run": true,
+    "same_original_deadline": true,
+    "all_five_source_manifests_match": true,
+    "frozen_inputs_and_graders": "retained in first project's control and each sealed observation",
+    "older_v2_samples_pooled": false,
+    "repository_source_code_changed_by_controller": false
+  },
+  "decisions": [
+    {
+      "action": "retain all five attempted cases and sixth unstarted case",
+      "reason": "No cherry-picking, retry or replacement."
+    },
+    {
+      "action": "stop",
+      "reason": "Original 1800-second suite deadline exhausted."
+    },
+    {
+      "action": "do not adopt single-3",
+      "reason": "Controller validation returned 124 and adoption gate refused stale/failed evidence."
+    },
+    {
+      "action": "do not dispatch crew-3",
+      "reason": "No remaining dispatch allowance."
+    },
+    {
+      "action": "do not claim a crew advantage",
+      "reason": "Only two matched pairs qualified; both were effectively tied in observed elapsed and crews used more worker-seconds."
+    }
+  ],
+  "baseline_restoration": {
+    "performed": false,
+    "reason": "Latest sealed case failed quality; approved helper's restoration guard requires a quality-passing latest adopted artifact and explicit recovery review otherwise. Artifacts and current failed bytes retained."
+  },
+  "remaining_requirements": [
+    "A new explicitly authorized bounded cohort would be required to obtain a third complete matched pair; this suite must not be resumed or given a new deadline.",
+    "Same-transport planner advice has not been executed because the stopped-cohort/restoration preconditions were not met."
+  ],
+  "completed_pairs": [
+    {
+      "single": "single-1",
+      "crew": "crew-1",
+      "both_quality_pass": true,
+      "single_elapsed": 298.35058024991304,
+      "crew_elapsed": 299.09121991693974,
+      "crew_elapsed_minus_single": 0.7406396670266986,
+      "single_worker_seconds": 285.0422128329519,
+      "crew_worker_seconds": 509.11218433408067,
+      "crew_worker_ratio": 1.7860939938480067
+    },
+    {
+      "single": "single-2",
+      "crew": "crew-2",
+      "both_quality_pass": true,
+      "single_elapsed": 263.13346249982715,
+      "crew_elapsed": 263.33055275003426,
+      "crew_elapsed_minus_single": 0.19709025020711124,
+      "single_worker_seconds": 261.8166642920114,
+      "crew_worker_seconds": 474.64319299999624,
+      "crew_worker_ratio": 1.8128838142655943
+    }
+  ]
+}

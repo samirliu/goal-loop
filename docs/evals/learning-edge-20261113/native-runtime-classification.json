@@ -1,0 +1,617 @@
+[
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/325dfbb24ef34d669ed489754bc0d7fe.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/325dfbb24ef34d669ed489754bc0d7fe.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/8f0fe9a749bf4d0a98a39adbb5703a41.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/8f0fe9a749bf4d0a98a39adbb5703a41.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/3f79eaa2d85f428c940bd8fb525edf87.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/3f79eaa2d85f428c940bd8fb525edf87.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/6f07d05a1473437f90e4f3fa41f92503.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/6f07d05a1473437f90e4f3fa41f92503.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/6adeb66b7c8a4e76befe12ce262dc202.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/6adeb66b7c8a4e76befe12ce262dc202.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/950be04bf64646538337a57749a69f5d.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/950be04bf64646538337a57749a69f5d.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/7b94ea6d34cc4ab385a37ede52db6dab.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/7b94ea6d34cc4ab385a37ede52db6dab.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/c83576512b2f4282b00885679dc5fe81.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/c83576512b2f4282b00885679dc5fe81.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/76e994f378964ad3a2bc7498bc2b9c8c.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/76e994f378964ad3a2bc7498bc2b9c8c.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/b434cac50a9b4393a9a14be9c66388e5.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/b434cac50a9b4393a9a14be9c66388e5.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/13bbc045b39a40b8a56a308a8bdf62e2.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/13bbc045b39a40b8a56a308a8bdf62e2.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/b9bc89b82a5e497eb42a62bb5bbaa2c4.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/b9bc89b82a5e497eb42a62bb5bbaa2c4.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/4ed26b9bbdd54d418af1bda937faed14.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/4ed26b9bbdd54d418af1bda937faed14.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/94d7eba93152441fb8ac1ba5d7f99cda.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/94d7eba93152441fb8ac1ba5d7f99cda.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/0f636f4506cd4f2a9d774de2c259d4e3.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/0f636f4506cd4f2a9d774de2c259d4e3.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/4bd964d6b2754f21b66f34802ad0c836.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/4bd964d6b2754f21b66f34802ad0c836.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/ed17057e21de419ba006ecef0b0e0b17.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/ed17057e21de419ba006ecef0b0e0b17.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/7d4af0c316da4664b34ec4c7696994f4.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/7d4af0c316da4664b34ec4c7696994f4.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/4084ce7fe2ce448db0929e2ab9ec7362.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/4084ce7fe2ce448db0929e2ab9ec7362.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/2b76bb242e48441d8c26dce9de288f0c.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/2b76bb242e48441d8c26dce9de288f0c.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/f7e821c0fee443bf9e29709dcb7900df.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/f7e821c0fee443bf9e29709dcb7900df.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/8c0355ec9a724ea08bc1a841346683aa.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/8c0355ec9a724ea08bc1a841346683aa.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/d81dd8e703c245af9a58ddf2f6d85a0d.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/d81dd8e703c245af9a58ddf2f6d85a0d.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/9d4e3818f73447c59c1adb2416466e40.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/9d4e3818f73447c59c1adb2416466e40.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/c113331f2764476bbd3da7778d732c63.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/c113331f2764476bbd3da7778d732c63.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/b4433feb965d4ae583cbb69a157dae9e.json",
+    "archive_path": "native/trials/4-before/work/.goal/evidence/runtime/b4433feb965d4ae583cbb69a157dae9e.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/88bd0e3e07764e7f820f2fa5ee939f9d.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/88bd0e3e07764e7f820f2fa5ee939f9d.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/199e933bec28400c882827d03f246e06.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/199e933bec28400c882827d03f246e06.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/4-before/work/.goal/evidence/runtime/02bb99b3058c416f826efa8ce2e5b9e6.json",
+    "archive_path": "posthoc/trials/4-before/work/.goal/evidence/runtime/02bb99b3058c416f826efa8ce2e5b9e6.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/c0c9006f135641ca98302d549124933d.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/c0c9006f135641ca98302d549124933d.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/afc1c08519824f31997e2ba6388d10d1.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/afc1c08519824f31997e2ba6388d10d1.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/08be71005f90465db8ec28fe3723c49c.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/08be71005f90465db8ec28fe3723c49c.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/2c3b04f8d4304e48ac3d656fa951bc64.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/2c3b04f8d4304e48ac3d656fa951bc64.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/dc94158577384a1f96bdde211f3edbf2.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/dc94158577384a1f96bdde211f3edbf2.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/02990e556b1f45398dbbc9354817105f.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/02990e556b1f45398dbbc9354817105f.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/7578f71651f141f0b6d264ec8bae7541.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/7578f71651f141f0b6d264ec8bae7541.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/0c7268f23adc48a1ab1bc934d753552e.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/0c7268f23adc48a1ab1bc934d753552e.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/d630c59ad5dd4163b60dc03bd8d37946.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/d630c59ad5dd4163b60dc03bd8d37946.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/6ff17f06f27f4432b2ddf91d1e36dd05.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/6ff17f06f27f4432b2ddf91d1e36dd05.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/1b2a2ea825cf478e83340ed7e132ee40.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/1b2a2ea825cf478e83340ed7e132ee40.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/b14bc43c80c34856a73612edbc64811b.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/b14bc43c80c34856a73612edbc64811b.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/ab0b99bc591c47e08f6491d8d684acd7.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/ab0b99bc591c47e08f6491d8d684acd7.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/651088acd7a14499b4b84409e035bd04.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/651088acd7a14499b4b84409e035bd04.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/2d516355e26849cea02e3e3b1e17a825.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/2d516355e26849cea02e3e3b1e17a825.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/819f6629878f4e9393fc18f7694704f5.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/819f6629878f4e9393fc18f7694704f5.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/757b236b7bbc4416848cada2225cf495.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/757b236b7bbc4416848cada2225cf495.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/0426847c990c4c459540822949bb5d38.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/0426847c990c4c459540822949bb5d38.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/855b370fc8824819a1c4a19ccfc8c391.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/855b370fc8824819a1c4a19ccfc8c391.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/65c700ba06884d12a2e7bda49df83cf5.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/65c700ba06884d12a2e7bda49df83cf5.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/723764c8d5a24064a5cf867f5d7024f8.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/723764c8d5a24064a5cf867f5d7024f8.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/1d1d1ab38c5542dd91dde0ca60a37cc0.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/1d1d1ab38c5542dd91dde0ca60a37cc0.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/7ee5f23628444d6a8d83d6925af9721f.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/7ee5f23628444d6a8d83d6925af9721f.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/d70b17521ccd4f3cb4fc13a8f2765c0b.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/d70b17521ccd4f3cb4fc13a8f2765c0b.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/9ecead1eabd949048b296eef1263a578.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/9ecead1eabd949048b296eef1263a578.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/6bb966c05fb7483eaa602b7528eb6003.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/6bb966c05fb7483eaa602b7528eb6003.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/23a52877f77b4389b548ab911ecba515.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/23a52877f77b4389b548ab911ecba515.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/c430a143dfd447fd97f16a676a4d472a.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/c430a143dfd447fd97f16a676a4d472a.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/d040d523eaaa421fbb4a6af235f9d943.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/d040d523eaaa421fbb4a6af235f9d943.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/6f79523a34424429858214c28c5a5b3b.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/6f79523a34424429858214c28c5a5b3b.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/dfcc4d1c0a0b4f22b440eb048d605946.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/dfcc4d1c0a0b4f22b440eb048d605946.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/09390ea543c7463a9fb3cfbf6eec49e3.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/09390ea543c7463a9fb3cfbf6eec49e3.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/61fd596b63224e55803d9e159ba7477e.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/61fd596b63224e55803d9e159ba7477e.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/d063767f3fb54639b2b95b9aa35f8f3a.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/d063767f3fb54639b2b95b9aa35f8f3a.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/6f1a279ff9f84aa7b2a643c0b8f94619.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/6f1a279ff9f84aa7b2a643c0b8f94619.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/7f6b7f5453b34bd5974b7df97c32a6a1.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/7f6b7f5453b34bd5974b7df97c32a6a1.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/6a72aac1b2924a9ab98870f05b9b04d8.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/6a72aac1b2924a9ab98870f05b9b04d8.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/0e0ad3bca3444645b4dae85927d329ed.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/0e0ad3bca3444645b4dae85927d329ed.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/472b328fb08e4a769e65e053d0ed8368.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/472b328fb08e4a769e65e053d0ed8368.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/35926211b34a4b0ca521133464af0a43.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/35926211b34a4b0ca521133464af0a43.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/387f0c24c105425190ebd356317e71bf.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/387f0c24c105425190ebd356317e71bf.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/af8ed8c182034b1d91122bd3bd29cdfb.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/af8ed8c182034b1d91122bd3bd29cdfb.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/bd14220223004aed92fea26f7fa59b39.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/bd14220223004aed92fea26f7fa59b39.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/ffb9abf88abf4f869fa64b180d8c4c01.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/ffb9abf88abf4f869fa64b180d8c4c01.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/36c7ce29e95042b5a53d7c92bc062f63.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/36c7ce29e95042b5a53d7c92bc062f63.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/d2d5d56ae89b45648b635adfe55d7600.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/d2d5d56ae89b45648b635adfe55d7600.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/f9aa3988b7144193949547d2fd24c30b.json",
+    "archive_path": "native/trials/2-after/work/.goal/evidence/runtime/f9aa3988b7144193949547d2fd24c30b.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/e5dffc8a7fe74ae197eb52b679d2dddb.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/e5dffc8a7fe74ae197eb52b679d2dddb.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/fb6d18af716b423dac2a5d1788e0fb90.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/fb6d18af716b423dac2a5d1788e0fb90.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/2-after/work/.goal/evidence/runtime/620a12bb72494254a56284abd1bf72cb.json",
+    "archive_path": "posthoc/trials/2-after/work/.goal/evidence/runtime/620a12bb72494254a56284abd1bf72cb.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/a05b6358b341469ba07e1167ca8e0947.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/a05b6358b341469ba07e1167ca8e0947.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/9394d0e69cc546e78d6c1c6d620a2a33.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/9394d0e69cc546e78d6c1c6d620a2a33.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/2f45f51ef0c549068d7034a5f6b637a1.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/2f45f51ef0c549068d7034a5f6b637a1.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/6d1f20fbdc354e0ab6f65f691422c946.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/6d1f20fbdc354e0ab6f65f691422c946.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/973b1e4ab12b4d5982b2717ef1ff8cfb.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/973b1e4ab12b4d5982b2717ef1ff8cfb.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/f5ff9051a1694969aee62897c6fa2288.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/f5ff9051a1694969aee62897c6fa2288.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/f537a0b39c3a49bb83aac72127c5fac5.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/f537a0b39c3a49bb83aac72127c5fac5.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/aa9d8adb95d94610a01f012549cb0fe8.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/aa9d8adb95d94610a01f012549cb0fe8.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/7d68e4808a254f6f81aad96919923702.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/7d68e4808a254f6f81aad96919923702.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/614692753dd741528c81db0975cc3fc6.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/614692753dd741528c81db0975cc3fc6.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/d400389fd4f647cb85022268932c76c4.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/d400389fd4f647cb85022268932c76c4.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/bbbacd1a024a4ca88e42e34266c5c882.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/bbbacd1a024a4ca88e42e34266c5c882.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/710cf4583f264fb9a538600f9647d735.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/710cf4583f264fb9a538600f9647d735.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/ff977b4b2e304113a1aa016153cf5292.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/ff977b4b2e304113a1aa016153cf5292.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/09df951c40094a6b9539a728e6bd7892.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/09df951c40094a6b9539a728e6bd7892.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/9b1c2b3f4621438dac952d20fa876f4b.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/9b1c2b3f4621438dac952d20fa876f4b.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/35ad99b2e44c4e0fafa3f240fe540639.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/35ad99b2e44c4e0fafa3f240fe540639.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/fd66c70ddb6f4cf39210ac3c326dd635.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/fd66c70ddb6f4cf39210ac3c326dd635.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/bc7fe48ab86e4134973b599bd53a04e9.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/bc7fe48ab86e4134973b599bd53a04e9.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/7bf779fc43154faba354f9ba43af9d7f.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/7bf779fc43154faba354f9ba43af9d7f.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/934592a6c3e74c788b2121cc2d21f77e.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/934592a6c3e74c788b2121cc2d21f77e.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/85ea6a6b21bd4a49a1929c65d6c01338.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/85ea6a6b21bd4a49a1929c65d6c01338.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/702dca52da084dd6a775f7b1b0cc7bd2.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/702dca52da084dd6a775f7b1b0cc7bd2.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/d04b2ff8607f4253939b748209f7e3f2.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/d04b2ff8607f4253939b748209f7e3f2.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/ff4efd9512374136bc2975c34f2cf409.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/ff4efd9512374136bc2975c34f2cf409.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/048aad0d7f6941ffbcf43b3d0d8febbe.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/048aad0d7f6941ffbcf43b3d0d8febbe.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/8e89404d5c1b4c2797ab5cda693ecb18.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/8e89404d5c1b4c2797ab5cda693ecb18.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/34028735611e424c86b5b0b328c7db3c.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/34028735611e424c86b5b0b328c7db3c.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/7fd84d6f53c74509847139c7d7564305.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/7fd84d6f53c74509847139c7d7564305.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/3c016977421f43c79dd3fecaff710b8e.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/3c016977421f43c79dd3fecaff710b8e.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/20812243a10d4eaa98876c44172d098b.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/20812243a10d4eaa98876c44172d098b.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/ccd649ce97f64474a553a7944380f12e.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/ccd649ce97f64474a553a7944380f12e.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/e84c0fd6dff54b28a45624dda28d68d8.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/e84c0fd6dff54b28a45624dda28d68d8.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/7be699f49c8d4c55ae70b9c2e9e28c11.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/7be699f49c8d4c55ae70b9c2e9e28c11.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/f04ef672e4ad41b2ad161dc6c3e38d11.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/f04ef672e4ad41b2ad161dc6c3e38d11.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/24c39556887a4e11917fea1796024c19.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/24c39556887a4e11917fea1796024c19.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/faf775a82a404237b446b346dcf9c5e2.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/faf775a82a404237b446b346dcf9c5e2.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/bb3b529ea448431b8afd43223405afb2.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/bb3b529ea448431b8afd43223405afb2.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/ecde629c74834bf9a01fcf3a33c24c85.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/ecde629c74834bf9a01fcf3a33c24c85.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/49406ca44d944f0eaf890b9992f38478.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/49406ca44d944f0eaf890b9992f38478.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/5746179cbd2e4c5fb6b70abc7ed7bc4f.json",
+    "archive_path": "native/trials/1-before/work/.goal/evidence/runtime/5746179cbd2e4c5fb6b70abc7ed7bc4f.json",
+    "posthoc": false
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/a00393d240c9427a856db704a2335ee6.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/a00393d240c9427a856db704a2335ee6.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/2f561a74cc40445c8c58db4ad6a6d454.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/2f561a74cc40445c8c58db4ad6a6d454.json",
+    "posthoc": true
+  },
+  {
+    "path": "trials/1-before/work/.goal/evidence/runtime/dca5a1a28d1347c7b4bfc7a533166814.json",
+    "archive_path": "posthoc/trials/1-before/work/.goal/evidence/runtime/dca5a1a28d1347c7b4bfc7a533166814.json",
+    "posthoc": true
+  }
+]

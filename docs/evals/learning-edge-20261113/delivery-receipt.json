@@ -1,0 +1,297 @@
+{
+  "archive_verification": "archive-member-verification.json",
+  "checks": {
+    "linux_core": {
+      "log": "linux-matrix-275/python.txt",
+      "result": "passed",
+      "seconds": 870.654,
+      "sha256": "4c66ede3e7b9c89425c0867d0b4bb722e8c3988a6859b01cce40dd1c030e0c74",
+      "skipped": 2,
+      "tests": 275
+    },
+    "linux_core_other_results": {
+      "docs": "0",
+      "forge": "0",
+      "parser": "0",
+      "python": "0",
+      "shell": "0",
+      "shellcheck": "0"
+    },
+    "linux_final_delta": {
+      "log": "linux-bootstrap-18/tests.log",
+      "result": "passed",
+      "seconds": 25.814,
+      "sha256": "9e999377a6b7c0cbd4d58235526ca51fdb8581574a9756bbbb2d68f056e5db34",
+      "skipped": 0,
+      "tests": 18
+    },
+    "mac_final": {
+      "log": "mac-full-final-277.log",
+      "result": "passed",
+      "seconds": 590.826,
+      "sha256": "c058520a455a8cad9b3d53513b7a44e254bbfbd2ef803f708fca7a2f595e73e7",
+      "skipped": 0,
+      "tests": 277
+    }
+  },
+  "conclusion": "implementation and bounded verification delivered; no general efficiency or evolution-utility claim",
+  "counterexamples": {
+    "source": "counterexamples-portable.json",
+    "verified": true
+  },
+  "delivery_checks": {
+    "developer-help": {
+      "command": [
+        "python3",
+        "-B",
+        "devtools/evaluate_entry.py",
+        "--help"
+      ],
+      "log": "developer-help.log",
+      "result": 0,
+      "sha256": "0e6d872d261ea1407cd83fa1133d323e2893f8f29f3d4865f43444f58bae6781"
+    },
+    "diff-check": {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "log": "diff-check.log",
+      "result": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "docs-delivery": {
+      "command": [
+        "bash",
+        "tests/docs_consistency.sh"
+      ],
+      "log": "docs-delivery.log",
+      "result": 0,
+      "sha256": "bd3d582709cc6a78a799f0492ef0f575ea2eaa47ff98c017b7846537cc9b191a"
+    },
+    "skill-validation": {
+      "command": [
+        "/opt/homebrew/bin/python3.12",
+        "-B",
+        "/Users/m/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+        "."
+      ],
+      "log": "skill-validation.log",
+      "result": 0,
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0"
+    }
+  },
+  "implementation": {
+    "changes": "source-check.json",
+    "developer_only_delta": "developer-permission-delta.patch",
+    "manifest": "final-source-manifest.json",
+    "source_entries": 149,
+    "tested_source": "source-final149.tar.xz"
+  },
+  "kind": "evidence-derived delivery receipt; not a replacement for project Gate",
+  "mechanism": {
+    "checks": {
+      "audit": {
+        "result": 0,
+        "stdout": "AUDIT: clean (controller ledger hygiene OK)\n"
+      },
+      "gate": {
+        "result": 0,
+        "stdout": "GATE: GO digest=v2-12c51fca4f07cc8b238187fd3faa61a2a4b418427fbc87b0c3527a9cc8225f2f iter=1 ac=1 pass=1 unverified=0 mode=threshold\n"
+      }
+    },
+    "completion_verified": true,
+    "head": "39583dd11cc49e76b0996fb6f54583d345d8b2698dc85f1758589c0f2e8f91b3",
+    "policies": [
+      {
+        "decision": {
+          "choice": "serial",
+          "match": true,
+          "reason": "scoped startup-cost hypothesis"
+        },
+        "input_sha256": "614e284a02d0828c688dc8b13641b82449b1ddd3c435bb97998100c32e11112f",
+        "selection": {
+          "policy": "2fece5c96df63e69a1ad247f4e5965608bc816422520794351676f86ee23444f",
+          "program": "policies/2fece5c96df63e69a1ad247f4e5965608bc816422520794351676f86ee23444f.py",
+          "protocol": "738d55db6c89329d0f43fa90ecf74681a7c6a870b772a11fc288afa6b9e7dc80",
+          "run": "2e3510cbe2334eeab9de55749e7853d4",
+          "version": 1
+        },
+        "wave": "50a6a3e9586c445f84e2f8214481c964"
+      },
+      {
+        "decision": {
+          "choice": "baseline",
+          "match": false,
+          "reason": "incumbent"
+        },
+        "input_sha256": "614e284a02d0828c688dc8b13641b82449b1ddd3c435bb97998100c32e11112f",
+        "selection": {
+          "policy": "c1da8d7bd49aeba77e6bffd3ef9d33152ba98490072ddd0f3ae5979f0190eacd",
+          "program": "policies/c1da8d7bd49aeba77e6bffd3ef9d33152ba98490072ddd0f3ae5979f0190eacd.py",
+          "protocol": "62c98c5a5bc27065dd8590521fdc2247bccd076d5a42b5da919971d5ebf9ede0",
+          "run": "e30049450f4b450baedc065384fdb9e6",
+          "version": 1
+        },
+        "wave": "89d5ebe417d245a8890f5cf1d4c9d6b5"
+      },
+      {
+        "decision": {
+          "choice": "serial",
+          "match": true,
+          "reason": "scoped startup-cost hypothesis"
+        },
+        "input_sha256": "9e35a16d39ed0c6b44b96959008c773ff99cad218b836af4d1899ebdc36ec587",
+        "selection": {
+          "policy": "2fece5c96df63e69a1ad247f4e5965608bc816422520794351676f86ee23444f",
+          "program": "policies/2fece5c96df63e69a1ad247f4e5965608bc816422520794351676f86ee23444f.py",
+          "protocol": "738d55db6c89329d0f43fa90ecf74681a7c6a870b772a11fc288afa6b9e7dc80",
+          "run": "2e3510cbe2334eeab9de55749e7853d4",
+          "version": 1
+        },
+        "wave": "9d65bc72d496409b8e2b9d93482f0b1a"
+      }
+    ],
+    "result": {
+      "ablation": {
+        "bad": {
+          "audit": 0,
+          "gate": 2
+        },
+        "bad_combined": {
+          "audit": 0,
+          "gate": 2
+        },
+        "combined_public_entries": 1,
+        "deterministic_checks_in_both": 2,
+        "good": {
+          "audit": 0,
+          "gate": 0
+        },
+        "scope": "entry API calls only; no model efficiency claim",
+        "separate_public_entries": 2
+      },
+      "agent_utility": "unproven",
+      "enabled": "2fece5c96df63e69a1ad247f4e5965608bc816422520794351676f86ee23444f",
+      "final_gate": 0,
+      "first_rejected": true,
+      "kind": "mechanism demonstration with controlled policy trial telemetry",
+      "money": null,
+      "repair_dispatched": [
+        "T2"
+      ],
+      "reused": {
+        "unit": "b2b4efae21800f5bba70aed5580f07b618a153b5227e96a8df6aa59c4e64bb8b",
+        "wave": "7123577abdfa495d9deeef340be9c77f"
+      },
+      "serial_enforced": true,
+      "stale_dispatch_refused": true,
+      "tokens": null,
+      "withdrawn": "c1da8d7bd49aeba77e6bffd3ef9d33152ba98490072ddd0f3ae5979f0190eacd"
+    },
+    "reused_units": [
+      {
+        "source": {
+          "unit": "b2b4efae21800f5bba70aed5580f07b618a153b5227e96a8df6aa59c4e64bb8b",
+          "wave": "7123577abdfa495d9deeef340be9c77f"
+        },
+        "task": "T1",
+        "wave": "9126a8d1434b4f6787d751db6f0c4388"
+      }
+    ],
+    "source": "mechanism-run.tar.xz:mechanism/receipt.json"
+  },
+  "money": null,
+  "native": {
+    "accepted": 3,
+    "independent": "native-portable-replay.json",
+    "maximum_calls": 4,
+    "model_calls_after_pilot": 0,
+    "model_calls_used": 4,
+    "normal_deliveries": 3,
+    "source": "native-four.tar.xz",
+    "totals": {
+      "after": {
+        "accepted": 1,
+        "all_trial_wall_per_accepted": 662.6485735420138,
+        "attempted": 2,
+        "normal_deliveries": 1,
+        "total_observed_wall_seconds": 662.6485735420138
+      },
+      "before": {
+        "accepted": 2,
+        "all_trial_wall_per_accepted": 282.86570714542177,
+        "attempted": 2,
+        "normal_deliveries": 2,
+        "total_observed_wall_seconds": 565.7314142908435
+      }
+    },
+    "trace_metrics": "native-trace-metrics.json",
+    "trials": [
+      {
+        "accepted": true,
+        "cli_seconds": 264.7485039578751,
+        "final_checked_seconds": 265.90010520792566,
+        "independent_replay_result": 0,
+        "normal_final_delivery": true,
+        "position": 1,
+        "seed": 911221,
+        "tool_errors": 2,
+        "tools": 68,
+        "variant": "before"
+      },
+      {
+        "accepted": true,
+        "cli_seconds": 316.1428164578974,
+        "final_checked_seconds": 317.4127533750143,
+        "independent_replay_result": 0,
+        "normal_final_delivery": true,
+        "position": 2,
+        "seed": 911221,
+        "tool_errors": 1,
+        "tools": 47,
+        "variant": "after"
+      },
+      {
+        "accepted": false,
+        "cli_seconds": 345.0205893749371,
+        "final_checked_seconds": 345.2358201669995,
+        "independent_replay_result": 0,
+        "normal_final_delivery": false,
+        "position": 3,
+        "seed": 911222,
+        "tool_errors": 1,
+        "tools": 25,
+        "variant": "after"
+      },
+      {
+        "accepted": true,
+        "cli_seconds": 298.71048204111867,
+        "final_checked_seconds": 299.83130908291787,
+        "independent_replay_result": 0,
+        "normal_final_delivery": true,
+        "position": 4,
+        "seed": 911222,
+        "tool_errors": 1,
+        "tools": 52,
+        "variant": "before"
+      }
+    ],
+    "verified": true
+  },
+  "request": {
+    "path": "task-request.txt",
+    "sha256": "90a8e26d567c69e5506f376431515d3921668e5998bfd4d81cc56435de5410d7"
+  },
+  "stopped": true,
+  "tokens": null,
+  "unresolved": [
+    "overall efficiency gain is not established; after had one timeout",
+    "bootstrap fix has deterministic and macOS full regression evidence, no post-fix model run",
+    "controlled policy trial telemetry proves mechanism, not cross-task agent utility",
+    "latest Linux complete matrix is core275 plus final18 delta; hosted CI not run",
+    "advantage over bare native /goal, actual billing and unobservable server compute are unknown"
+  ],
+  "version": 1
+}

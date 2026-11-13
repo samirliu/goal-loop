@@ -46,14 +46,18 @@ run bad-window-no-external 1 window-external
 run bad-objective-target 1 objective-target
 
 # CRLF fixture
-crlf="$FIX/_crlf-threshold.md"
-tr -d '\r' < "$FIX/good-threshold.md" | sed 's/$/\r/' > "$crlf"
+crlf=$(mktemp "${TMPDIR:-/tmp}/goal-forge-crlf.XXXXXX") \
+  || { echo "FAIL crlf-threshold temporary-file"; exit 1; }
+trap 'rm -f -- "$crlf"' EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+(set -o pipefail; tr -d '\r' < "$FIX/good-threshold.md" | sed 's/$/\r/') > "$crlf" \
+  || { echo "FAIL crlf-threshold temporary-write"; exit 1; }
 out=$(bash "$LINT" "$crlf" 2>&1); rc=$?
 if [ "$rc" -eq 0 ]; then echo "ok   crlf-threshold"; pass=$((pass+1)); else
   echo "FAIL crlf-threshold rc=$rc"; echo "$out" | sed 's/^/  /'; fail=$((fail+1))
 fi
-rm -f "$crlf"
-
 echo "== fixtures: pass=$pass fail=$fail =="
 [ "$fail" -eq 0 ] || exit 1
 exit 0

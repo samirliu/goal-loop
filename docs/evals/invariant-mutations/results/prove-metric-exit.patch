@@ -1,0 +1,11 @@
+--- a/scripts/goal_gate.sh
++++ b/scripts/goal_gate.sh
+@@ -304,7 +304,7 @@
+   [ -n "$err_tail" ] || err_tail=""
+   case "$cls" in
+     metric\ *|maximize|minimize)
+-      [ "$rc" -eq 0 ] || { printf '%s|BROKEN|measurement command did not finish successfully (rc=%s) %s\n' "$id" "$rc" "$err_tail"; return; } ;;
++      [ "$rc" -ge 0 ] || { printf '%s|BROKEN|measurement command did not finish successfully (rc=%s) %s\n' "$id" "$rc" "$err_tail"; return; } ;;
+   esac
+   out=$(printf '%s\n' "$out" | r)                    # CR scrub: Windows-native checks print CRLF
+   metric=$(ac_metric_re "$id")

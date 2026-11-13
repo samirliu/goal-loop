@@ -1,0 +1,414 @@
+{
+  "scope": "Recorded fixture reconstruction only; int/str/list oracle; no policy/model execution.",
+  "verifier_sha256": "6dce55331e40e0dd6c73d2116b73bfddc05cafb25088058496e4f7a7f5874716",
+  "previous_verifier_sha256": "b7e4e0461ec44d06270e3b505bd5f74a9c618d990fae1011e5323b561020b69b",
+  "preserved_before": "/tmp/goal-p0-followup-b6x8tybz/results.json",
+  "modes": {
+    "normal": {
+      "original": {
+        "path": "/tmp/goal-real-evolution-20261111",
+        "verifier_exit": 0,
+        "stderr": "",
+        "result": {
+          "verified": true,
+          "attempts": 4,
+          "pairs": 98,
+          "raw_outputs": 196,
+          "measured_inputs": 98,
+          "holdout_evaluations": [
+            1,
+            2,
+            3
+          ],
+          "selected": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+          "transitions": [
+            {
+              "run": "1349e45a1ba242b79d4fa1c92e89a008",
+              "prior": null,
+              "status": "enabled",
+              "enabled": "6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5",
+              "phases": {
+                "development": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.5045883895806631,
+                  "one_sided_sign_p": 0.015625,
+                  "reverse_sign_p": 1.0,
+                  "quality_sign_p": 1.0
+                },
+                "holdout": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.6583116841452026,
+                  "one_sided_sign_p": 0.015625,
+                  "reverse_sign_p": 1.0,
+                  "quality_sign_p": 1.0
+                }
+              }
+            },
+            {
+              "run": "b153ebc1c1cd459b8a6a817bf7699134",
+              "prior": "6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5",
+              "status": "withdrawn",
+              "enabled": "3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e",
+              "phases": {
+                "development": {
+                  "pass_": false,
+                  "regressed": true,
+                  "complete": true,
+                  "cost_gain": -0.7510357134147685,
+                  "one_sided_sign_p": 1.0,
+                  "reverse_sign_p": 0.015625,
+                  "quality_sign_p": 1.0
+                }
+              }
+            },
+            {
+              "run": "be509e33ea6948908b0dca966baa99f2",
+              "prior": "3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e",
+              "status": "enabled",
+              "enabled": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+              "phases": {
+                "development": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.6370327171170055,
+                  "one_sided_sign_p": 2.002716064453125e-05,
+                  "reverse_sign_p": 0.9999990463256836,
+                  "quality_sign_p": 1.0
+                },
+                "holdout": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.7311167394259347,
+                  "one_sided_sign_p": 2.002716064453125e-05,
+                  "reverse_sign_p": 0.9999990463256836,
+                  "quality_sign_p": 1.0
+                }
+              }
+            },
+            {
+              "run": "446e56fe51b84b3a9bd9f2f70a3d28aa",
+              "prior": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+              "status": "enabled",
+              "enabled": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+              "phases": {
+                "development": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.687022152242417,
+                  "one_sided_sign_p": 9.5367431640625e-07,
+                  "reverse_sign_p": 1.0,
+                  "quality_sign_p": 1.0
+                },
+                "holdout": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.7781439860151237,
+                  "one_sided_sign_p": 0.00020122528076171875,
+                  "reverse_sign_p": 0.9999799728393555,
+                  "quality_sign_p": 1.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "candidate_identity_substitution": {
+        "path": "/tmp/goal-p0-followup-b6x8tybz/recordings/goal-real-evolution-20261111",
+        "verifier_exit": 1,
+        "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 261, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 181, in verify\n    protocol = frozen_protocol(run, report, state)\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 70, in frozen_protocol\n    require(report['policies'][side] == files[name], side + ' policy does not match frozen program')\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 24, in require\n    raise VerificationError(message)\nVerificationError: candidate policy does not match frozen program\n",
+        "stdout": ""
+      },
+      "unjustified_10_percent_withdrawal": {
+        "path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-auditor-counterexample-zv6v4no7/recorded-run",
+        "verifier_exit": 1,
+        "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 261, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 241, in verify\n    require((report['status'], report['enabled']) == (status, selected), 'policy transition mismatch: expected ' + status)\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 24, in require\n    raise VerificationError(message)\nVerificationError: policy transition mismatch: expected retained-insufficient-counterevidence\n",
+        "stdout": ""
+      }
+    },
+    "-O": {
+      "original": {
+        "path": "/tmp/goal-real-evolution-20261111",
+        "verifier_exit": 0,
+        "stderr": "",
+        "result": {
+          "verified": true,
+          "attempts": 4,
+          "pairs": 98,
+          "raw_outputs": 196,
+          "measured_inputs": 98,
+          "holdout_evaluations": [
+            1,
+            2,
+            3
+          ],
+          "selected": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+          "transitions": [
+            {
+              "run": "1349e45a1ba242b79d4fa1c92e89a008",
+              "prior": null,
+              "status": "enabled",
+              "enabled": "6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5",
+              "phases": {
+                "development": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.5045883895806631,
+                  "one_sided_sign_p": 0.015625,
+                  "reverse_sign_p": 1.0,
+                  "quality_sign_p": 1.0
+                },
+                "holdout": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.6583116841452026,
+                  "one_sided_sign_p": 0.015625,
+                  "reverse_sign_p": 1.0,
+                  "quality_sign_p": 1.0
+                }
+              }
+            },
+            {
+              "run": "b153ebc1c1cd459b8a6a817bf7699134",
+              "prior": "6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5",
+              "status": "withdrawn",
+              "enabled": "3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e",
+              "phases": {
+                "development": {
+                  "pass_": false,
+                  "regressed": true,
+                  "complete": true,
+                  "cost_gain": -0.7510357134147685,
+                  "one_sided_sign_p": 1.0,
+                  "reverse_sign_p": 0.015625,
+                  "quality_sign_p": 1.0
+                }
+              }
+            },
+            {
+              "run": "be509e33ea6948908b0dca966baa99f2",
+              "prior": "3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e",
+              "status": "enabled",
+              "enabled": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+              "phases": {
+                "development": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.6370327171170055,
+                  "one_sided_sign_p": 2.002716064453125e-05,
+                  "reverse_sign_p": 0.9999990463256836,
+                  "quality_sign_p": 1.0
+                },
+                "holdout": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.7311167394259347,
+                  "one_sided_sign_p": 2.002716064453125e-05,
+                  "reverse_sign_p": 0.9999990463256836,
+                  "quality_sign_p": 1.0
+                }
+              }
+            },
+            {
+              "run": "446e56fe51b84b3a9bd9f2f70a3d28aa",
+              "prior": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+              "status": "enabled",
+              "enabled": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+              "phases": {
+                "development": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.687022152242417,
+                  "one_sided_sign_p": 9.5367431640625e-07,
+                  "reverse_sign_p": 1.0,
+                  "quality_sign_p": 1.0
+                },
+                "holdout": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.7781439860151237,
+                  "one_sided_sign_p": 0.00020122528076171875,
+                  "reverse_sign_p": 0.9999799728393555,
+                  "quality_sign_p": 1.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "candidate_identity_substitution": {
+        "path": "/tmp/goal-p0-followup-b6x8tybz/recordings/goal-real-evolution-20261111",
+        "verifier_exit": 1,
+        "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 261, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 181, in verify\n    protocol = frozen_protocol(run, report, state)\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 70, in frozen_protocol\n    require(report['policies'][side] == files[name], side + ' policy does not match frozen program')\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 24, in require\n    raise VerificationError(message)\nVerificationError: candidate policy does not match frozen program\n",
+        "stdout": ""
+      },
+      "unjustified_10_percent_withdrawal": {
+        "path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-auditor-counterexample-zv6v4no7/recorded-run",
+        "verifier_exit": 1,
+        "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 261, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 241, in verify\n    require((report['status'], report['enabled']) == (status, selected), 'policy transition mismatch: expected ' + status)\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 24, in require\n    raise VerificationError(message)\nVerificationError: policy transition mismatch: expected retained-insufficient-counterevidence\n",
+        "stdout": ""
+      }
+    },
+    "PYTHONOPTIMIZE=1": {
+      "original": {
+        "path": "/tmp/goal-real-evolution-20261111",
+        "verifier_exit": 0,
+        "stderr": "",
+        "result": {
+          "verified": true,
+          "attempts": 4,
+          "pairs": 98,
+          "raw_outputs": 196,
+          "measured_inputs": 98,
+          "holdout_evaluations": [
+            1,
+            2,
+            3
+          ],
+          "selected": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+          "transitions": [
+            {
+              "run": "1349e45a1ba242b79d4fa1c92e89a008",
+              "prior": null,
+              "status": "enabled",
+              "enabled": "6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5",
+              "phases": {
+                "development": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.5045883895806631,
+                  "one_sided_sign_p": 0.015625,
+                  "reverse_sign_p": 1.0,
+                  "quality_sign_p": 1.0
+                },
+                "holdout": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.6583116841452026,
+                  "one_sided_sign_p": 0.015625,
+                  "reverse_sign_p": 1.0,
+                  "quality_sign_p": 1.0
+                }
+              }
+            },
+            {
+              "run": "b153ebc1c1cd459b8a6a817bf7699134",
+              "prior": "6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5",
+              "status": "withdrawn",
+              "enabled": "3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e",
+              "phases": {
+                "development": {
+                  "pass_": false,
+                  "regressed": true,
+                  "complete": true,
+                  "cost_gain": -0.7510357134147685,
+                  "one_sided_sign_p": 1.0,
+                  "reverse_sign_p": 0.015625,
+                  "quality_sign_p": 1.0
+                }
+              }
+            },
+            {
+              "run": "be509e33ea6948908b0dca966baa99f2",
+              "prior": "3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e",
+              "status": "enabled",
+              "enabled": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+              "phases": {
+                "development": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.6370327171170055,
+                  "one_sided_sign_p": 2.002716064453125e-05,
+                  "reverse_sign_p": 0.9999990463256836,
+                  "quality_sign_p": 1.0
+                },
+                "holdout": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.7311167394259347,
+                  "one_sided_sign_p": 2.002716064453125e-05,
+                  "reverse_sign_p": 0.9999990463256836,
+                  "quality_sign_p": 1.0
+                }
+              }
+            },
+            {
+              "run": "446e56fe51b84b3a9bd9f2f70a3d28aa",
+              "prior": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+              "status": "enabled",
+              "enabled": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+              "phases": {
+                "development": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.687022152242417,
+                  "one_sided_sign_p": 9.5367431640625e-07,
+                  "reverse_sign_p": 1.0,
+                  "quality_sign_p": 1.0
+                },
+                "holdout": {
+                  "pass_": true,
+                  "regressed": false,
+                  "complete": true,
+                  "cost_gain": 0.7781439860151237,
+                  "one_sided_sign_p": 0.00020122528076171875,
+                  "reverse_sign_p": 0.9999799728393555,
+                  "quality_sign_p": 1.0
+                }
+              }
+            }
+          ]
+        }
+      },
+      "candidate_identity_substitution": {
+        "path": "/tmp/goal-p0-followup-b6x8tybz/recordings/goal-real-evolution-20261111",
+        "verifier_exit": 1,
+        "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 261, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 181, in verify\n    protocol = frozen_protocol(run, report, state)\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 70, in frozen_protocol\n    require(report['policies'][side] == files[name], side + ' policy does not match frozen program')\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 24, in require\n    raise VerificationError(message)\nVerificationError: candidate policy does not match frozen program\n",
+        "stdout": ""
+      },
+      "unjustified_10_percent_withdrawal": {
+        "path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-auditor-counterexample-zv6v4no7/recorded-run",
+        "verifier_exit": 1,
+        "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 261, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 241, in verify\n    require((report['status'], report['enabled']) == (status, selected), 'policy transition mismatch: expected ' + status)\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 24, in require\n    raise VerificationError(message)\nVerificationError: policy transition mismatch: expected retained-insufficient-counterevidence\n",
+        "stdout": ""
+      }
+    }
+  },
+  "condition_conversion": {
+    "original_asserts": 57,
+    "explicit_checks": 57,
+    "conditions_identical": true,
+    "remaining_asserts": 0,
+    "existing_messages_preserved": true
+  },
+  "original_manifest_files_checked": 701,
+  "original_manifest_changed_files": [],
+  "raw_archive_sha256": "05f6f845711c1baa7517f025a3f16d5192adfeabf93a9b1318b19109aa05f553",
+  "raw_archive_unchanged": true,
+  "preserved_before_sha256": "ea4bab090128843cbb3edf8d78e097757108135f9335e1297ec5b9cabe21dd27",
+  "preserved_before_unchanged": true,
+  "focused_tests": {
+    "command": "python3 -B tests/test_evolution_verifier.py",
+    "tests": 15,
+    "failures": 0,
+    "seconds": 18.776
+  }
+}

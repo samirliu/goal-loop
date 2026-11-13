@@ -1,0 +1,49 @@
+{
+  "captured_utc": "2026-11-12T08:51:49.842068+00:00",
+  "files": [
+    {
+      "category": "post-full-namespace-followup",
+      "current_mtime_ns": 1794472164718457512,
+      "current_sha256": "e36378fbc9c44db142d171ceb4303e5614cef87f2ee030040a61dfeda7b98dde",
+      "full_snapshot_sha256": "928c23c5c7fd2f11a9ff597bbe892e6fb820f675377db35d9f98da9fa240bd72",
+      "path": ".claude-plugin/plugin.json"
+    },
+    {
+      "category": "post-full-namespace-followup",
+      "current_mtime_ns": 1794472164759166720,
+      "current_sha256": "5978ddc28ddcd2032e9de2633d02d4ea39cafc28904c8edf8bb143e28ab26013",
+      "full_snapshot_sha256": "f4a935d253654a0d422281550e04b4f1bc308b1fb8076d4c28563dbfb75ca4d3",
+      "path": "references/host.md"
+    },
+    {
+      "category": "post-full-namespace-followup",
+      "current_mtime_ns": 1794472164741011447,
+      "current_sha256": "7cd29cccfbc59672a4393e68e0561bf54e9034a307a111e41949683f08879570",
+      "full_snapshot_sha256": "dc2d56902aa9e3e1b42dd016029d46eed5c2af5ceeed4889075015fc474b082d",
+      "path": "scripts/goal_host.py"
+    },
+    {
+      "category": "test-fixture-followup",
+      "current_mtime_ns": 1794471117231573560,
+      "current_sha256": "996a578f6f582057cf788bacddb8e1837cc3c9ca15aeb3d63697d1a904d5c8fc",
+      "full_snapshot_sha256": "647d8c1b7450b26feba469c583a807a43ab760d1f2a608d0f8b770f22586f180",
+      "path": "tests/test_gate_entry_budget.py"
+    },
+    {
+      "category": "post-full-namespace-followup",
+      "current_mtime_ns": 1794472181300118171,
+      "current_sha256": "1819aca0f08da9dca9cc0e56c0e19cbb1f181d36a3b02c2451ff7c7b48ecc1c5",
+      "full_snapshot_sha256": "2f595e9b03707d440999436fbe4d9ac78ad6a80ed30f08861b2b292128451a22",
+      "path": "tests/test_host.py"
+    },
+    {
+      "category": "test-fixture-followup",
+      "current_mtime_ns": 1794471954580306916,
+      "current_sha256": "63ccbe2d2a124cb25b24fedb5174ae9d5bdeacd8a704ab061c5e38364ce38d14",
+      "full_snapshot_sha256": "189f4106ab2692ded4a4194cddf82a5fc180a1458312adb3fa1c6b92eb3a9872",
+      "path": "tests/test_owner_watch_guard.py"
+    }
+  ],
+  "full_snapshot_manifest_sha256": "5d49822d87450192530fdd3612c5ae17b53cf771178981a5da065498ca0cb0e2",
+  "scope": "These six changed files are a separately captured post-full delta. The source139 full matrix does not validate this combined head."
+}

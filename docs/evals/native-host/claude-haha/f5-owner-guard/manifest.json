@@ -1,0 +1,75 @@
+{
+  "scope": "F5 FD-inventory fix only; actual macOS process evidence. Existing CLI/model evidence is owned by the root agent.",
+  "owner_watch_before_sha256": "d0d8bc8d5511f6b3394f56b16a468e0349f15c65eaa0eade3e24166505a17644",
+  "owner_watch_after_sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+  "test_guard_sha256": "189f4106ab2692ded4a4194cddf82a5fc180a1458312adb3fa1c6b92eb3a9872",
+  "causal_fixed_bounded_sha256": "1c0825e9d3af649e997c294ce704f3de41b2edc6defd431be9de64aeeb79d5f6",
+  "causal_fixed_trace_sha256": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb",
+  "root_current_bounded_sha256": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c",
+  "before_after_test_scope": "Before log is the original four new guard tests. After log adds the inventories-unavailable case and the existing ownerwatch tests; counts are not an efficiency comparison. The causal-pair command/input/dependencies are identical except for owner_watch.",
+  "tests_after": {
+    "passed": 12,
+    "skipped": 2,
+    "subtests_passed": 6,
+    "seconds": 4.3
+  },
+  "linux_infinity_measured": false,
+  "files": {
+    "README.md": {
+      "sha256": "8d83b578caf1247f3e67baec5061148caeace6b4cf61c0ce2c4a6f241845cdd7",
+      "bytes": 2064
+    },
+    "after-goal_owner_watch.py.txt": {
+      "sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+      "bytes": 14672
+    },
+    "after-tests.log": {
+      "sha256": "1709b50d7b580cee78e8d8b6888b5e9fd6aa574d61619cc98d145794c77a29ce",
+      "bytes": 2400
+    },
+    "before-goal_owner_watch.py.txt": {
+      "sha256": "d0d8bc8d5511f6b3394f56b16a468e0349f15c65eaa0eade3e24166505a17644",
+      "bytes": 13918
+    },
+    "before-normal.json": {
+      "sha256": "6953a778b2284dd99a3e43a799ca3a7f16b4e2149994f1853298602bdc289d1e",
+      "bytes": 975
+    },
+    "before-tests.log": {
+      "sha256": "b307f24115386003702d499e12a994503cdad19bb9ccb47677be457109861e90",
+      "bytes": 8033
+    },
+    "causal-pair-source.tar.xz": {
+      "sha256": "860cc5ca8b42412779b851b1d23c344f3c7d8384db4a1cba4c971a867d0ef6d7",
+      "bytes": 8480
+    },
+    "owner-watch-guard.patch": {
+      "sha256": "4f936cecbc58565ff5e49eaede4d516e3a0112c262918382b07da46523548b4f",
+      "bytes": 10990
+    },
+    "paired-after.json": {
+      "sha256": "45a4b076522e5125c830e83fdafa64fcaa9903f77b07cabc9c3c11373b33e260",
+      "bytes": 948
+    },
+    "paired-before.json": {
+      "sha256": "32fc6b71eae376ab620c2da197675dbe655ddde1141d68f2efd3e4c5e6b1bab7",
+      "bytes": 1075
+    },
+    "paired-manifest.json": {
+      "sha256": "7daaa3f44e041d39772595f2d150e0b98d91c4145f8dc0500da2c05bd94bcae0",
+      "bytes": 528
+    },
+    "summary.json": {
+      "sha256": "870d6b75caa03b6b05e96218febdbc6f00e8886c86b71ac277f8b0dedd93b636",
+      "bytes": 2179
+    },
+    "test_owner_watch.py.txt": {
+      "sha256": "a7396cfc5daf23d73fa7e0b32617d4a694c9c0fb92a79ddc643eda3756b1f4e2",
+      "bytes": 8553
+    },
+    "test_owner_watch_guard.py.txt": {
+      "sha256": "189f4106ab2692ded4a4194cddf82a5fc180a1458312adb3fa1c6b92eb3a9872",
+      "bytes": 9193
+    }
+  }
+}

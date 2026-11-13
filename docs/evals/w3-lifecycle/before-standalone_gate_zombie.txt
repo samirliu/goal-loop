@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_standalone_gate_zombie_cannot_leave_check_running (__main__.Lifecycle.test_standalone_gate_zombie_cannot_leave_check_running)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-w3-baseline-35zj3b8y/tests/test_runner_lifecycle.py", line 207, in test_standalone_gate_zombie_cannot_leave_check_running
+    self.assertFalse((self.state / 'evidence/leak').exists())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 1 test in 2.810s
+
+FAILED (failures=1)

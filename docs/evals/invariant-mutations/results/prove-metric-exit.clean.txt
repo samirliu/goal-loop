@@ -1,0 +1,11 @@
+  ok   - 160 a numeric line from a failed command cannot deliver GO (rc=2)
+  ok   - 160 nonzero metric exit is broken
+  ok   - 160 malformed objective reading is refused (rc=2)
+  ok   - 160 malformed decimal is broken
+  ok   - 160 per-check timeout refuses partial numeric output (rc=2)
+  ok   - 160 timed out measurement is broken
+  ok   - 160 signed decimal and explicit expected nonzero still pass (rc=0)
+  ok   - 160 signed decimal is recorded in score grammar
+  ok   - 160 broken sensor stderr does not set a water mark
+== results: pass=9 fail=0 ==
+== total: pass=9 fail=0 shards=1 ==

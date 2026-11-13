@@ -1,0 +1,208 @@
+"""Independent outcome checks. Workers receive TASK.md and public.py only."""
+import argparse
+import copy
+import hashlib
+import importlib
+import json
+from pathlib import Path
+import random
+import re
+import subprocess
+import sys
+import tempfile
+import time
+
+sys.dont_write_bytecode = True
+
+
+def grade(project, family, seed):
+    sys.path.insert(0, str(project))
+    checks = []
+    rng = random.Random(seed)
+
+    def check(name, passed):
+        checks.append(dict(name=name, pass_=bool(passed)))
+
+    def rejects(name, function, *args):
+        try:
+            function(*args)
+        except ValueError:
+            check(name, True)
+        else:
+            check(name, False)
+
+    if family == 'small':
+        function = importlib.import_module('solution').merge_ranges
+        for index in range(36):
+            intervals = [sorted([rng.randrange(-15, 16), rng.randrange(-15, 16)]) for _ in range(index)]
+            original = copy.deepcopy(intervals)
+            occupied = sorted({x for a, b in intervals for x in range(a, b)})
+            expected = []
+            for x in occupied:
+                if expected and expected[-1][1] == x:
+                    expected[-1][1] = x + 1
+                else:
+                    expected.append([x, x + 1])
+            check('finite-union-%s' % index, function(intervals) == expected and intervals == original)
+        for index, bad in enumerate(([[2, 1]], [[True, 4]], [[0, 1.0]], [[1]], [[1, 2, 3]])):
+            rejects('invalid-%s' % index, function, bad)
+        check('large-bounds', function([[-10**40, -10**40+2], [10**40, 10**40+1]]) ==
+              [[-10**40, -10**40+2], [10**40, 10**40+1]])
+    elif family == 'medium':
+        parse = importlib.import_module('auditlog.codec').parse_line
+        summarize = importlib.import_module('auditlog.aggregate').summarize
+        rows = [dict(key=rng.choice(['a', 'b', '中', ' k ']), amount=rng.randrange(-1000, 1001)) for _ in range(70)]
+        for index, row in enumerate(rows[:8]):
+            check('parser-%s' % index, parse(json.dumps(dict(row, extra=index))) == row)
+        for index, bad in enumerate(('[]', '{}', '{"key":"","amount":1}', '{"key":"x","amount":true}',
+                                     '{"key":"x","amount":1.5}', '{bad', '{"key":3,"amount":2}')):
+            rejects('invalid-%s' % index, parse, bad)
+        expected = []
+        for key in sorted({row['key'] for row in rows}):
+            values = [row['amount'] for row in rows if row['key'] == key]
+            expected.append(dict(key=key, count=len(values), total=sum(values), min=min(values), max=max(values)))
+        check('aggregation', summarize(iter(rows)) == expected)
+        check('empty-aggregation', summarize(iter([])) == [])
+        with tempfile.TemporaryDirectory() as tmp:
+            source, output = Path(tmp) / 'input', Path(tmp) / 'output'
+            command = [sys.executable, '-B', '-m', 'auditlog', '--input', str(source), '--output', str(output)]
+            source.write_text('\n'.join(json.dumps(row) for row in rows) + '\n')
+            result = subprocess.run(command, cwd=project, capture_output=True, text=True, timeout=8)
+            actual = [json.loads(line) for line in output.read_text().splitlines()] if output.exists() else []
+            check('cli-groups', result.returncode == 0 and actual == expected)
+            source.write_text('\n' + json.dumps(rows[0]) + '\nnot-json\n')
+            output.write_text('original\n')
+            result = subprocess.run(command, cwd=project, capture_output=True, text=True, timeout=8)
+            check('strict-atomic-line', result.returncode == 2 and '3' in result.stderr and output.read_text() == 'original\n')
+            result = subprocess.run(command + ['--skip-bad'], cwd=project, capture_output=True, text=True, timeout=8)
+            actual = [json.loads(line) for line in output.read_text().splitlines()]
+            check('skip-bad', result.returncode == 0 and len(actual) == 1 and actual[0]['count'] == 1
+                  and json.loads(result.stderr) == {'skipped': 1})
+            source.write_text('\n \n')
+            result = subprocess.run(command, cwd=project, capture_output=True, text=True, timeout=8)
+            check('empty-cli', result.returncode == 0 and output.read_bytes() == b'')
+            source.unlink()
+            result = subprocess.run(command, cwd=project, capture_output=True, text=True, timeout=8)
+            check('cli-missing-input', result.returncode == 2)
+            source.write_text('\n'.join(['', '{"key":"x","amount":7}'] + [''] * 10 + ['not-json']) + '\n',
+                              encoding='utf-8')
+            output.write_text('original\n')
+            result = subprocess.run(command, cwd=project, capture_output=True, text=True, timeout=8)
+            check('strict-physical-line-13', result.returncode == 2 and output.read_bytes() == b'original\n'
+                  and re.search(r'(?<!\d)13(?!\d)', result.stderr) is not None)
+            source.write_text('{"key":"b","amount":7}\nnot-json\n{"key":"a","amount":true}\n'
+                              '{"key":"b","amount":-2}\n{"key":"a","amount":4}\n', encoding='utf-8')
+            result = subprocess.run(command + ['--skip-bad'], cwd=project, capture_output=True, text=True, timeout=8)
+            actual = [json.loads(line) for line in output.read_text().splitlines()]
+            check('skip-bad-complete-groups', result.returncode == 0 and json.loads(result.stderr) == {'skipped': 2}
+                  and actual == [dict(key='a', count=1, total=4, min=4, max=4),
+                                 dict(key='b', count=2, total=5, min=-2, max=7)])
+            source.write_text('{"key":"中","amount":7}\n', encoding='utf-8')
+            result = subprocess.run(command, cwd=project, capture_output=True, text=True, timeout=8)
+            actual = [json.loads(line) for line in output.read_text().splitlines()]
+            check('cli-literal-utf8', result.returncode == 0
+                  and actual == [dict(key='中', count=1, total=7, min=7, max=7)])
+        exact = [{'key': 'small', 'amount': 2}, {'key': 'large', 'amount': 2**53 + 1}]
+        parsed = [parse(json.dumps(row)) for row in exact]
+        check('parser-original-integer', parsed == exact and all(type(row['amount']) is int for row in parsed))
+        rejects('invalid-false-amount', parse, '{"key":"x","amount":false}')
+        generator_rows = [dict(key='x', amount=2**53 + 1), dict(key='x', amount=-1), dict(key='a', amount=3)]
+        check('aggregation-generator-large', summarize(row for row in generator_rows) == [
+            dict(key='a', count=1, total=3, min=3, max=3),
+            dict(key='x', count=2, total=2**53, min=-1, max=2**53 + 1)])
+        # The strict failure probes preserve existing output after invalid
+        # input; publication-time failure/visibility atomicity remains untested.
+    elif family == 'optimization':
+        function = importlib.import_module('solution').count_cover
+        for index in range(30):
+            intervals = [sorted([rng.randrange(-25, 26), rng.randrange(-25, 26)]) for _ in range(index)]
+            points = [rng.randrange(-30, 31) for _ in range(30)]
+            original = copy.deepcopy((intervals, points))
+            expected = [sum(a <= p < b for a, b in intervals) for p in points]
+            check('half-open-%s' % index, function(intervals, points) == expected and (intervals, points) == original)
+        for index, (intervals, points) in enumerate((([[2, 1]], [0]), ([[False, 2]], [0]),
+                                                    ([[0, 2]], [True]), ([[0, 2, 4]], [0]))):
+            rejects('invalid-%s' % index, function, intervals, points)
+        intervals = [sorted([rng.randrange(-10000, 10000), rng.randrange(-10000, 10000)]) for _ in range(3200)]
+        points = [rng.randrange(-10000, 10000) for _ in range(1400)]
+        start = time.perf_counter()
+        expected = [sum(a <= p < b for a, b in intervals) for p in points]
+        reference = time.perf_counter() - start
+        samples = []
+        for _ in range(5):
+            start = time.perf_counter()
+            actual = function(intervals, points)
+            samples.append(time.perf_counter() - start)
+            check('large-correctness-%s' % len(samples), actual == expected)
+        check('speedup-at-least-five', reference / sorted(samples)[2] >= 5)
+        check('measurement-retained', (project / 'BENCHMARK.md').is_file() and (project / 'BENCHMARK.md').stat().st_size > 40)
+    elif family == 'recovery':
+        job = importlib.import_module('job')
+        with tempfile.TemporaryDirectory() as tmp:
+            source, output, state = [Path(tmp) / name for name in ('input', 'output', 'state')]
+            rows = [dict(id=i, text=rng.choice(['abc', 'Straße', '中', 'mixEd']) + str(i)) for i in range(18)]
+            source.write_text(''.join(json.dumps(row) + '\n' for row in rows))
+            expected = [dict(id=row['id'], text=row['text'].upper()) for row in rows]
+            prefix = ''.join(json.dumps(row) + '\n' for row in expected[:3]).encode()
+            output.write_bytes(prefix + b'{"torn":')
+            state.write_text(json.dumps(dict(next=3, offset=len(prefix), source_sha256=hashlib.sha256(source.read_bytes()).hexdigest())))
+            calls, transform = [], job.transform
+            def observed(row):
+                calls.append(row['id'])
+                return transform(row)
+            job.transform = observed
+            job.run(source, output, state)
+            job.run(source, output, state)
+            check('resume-only-uncommitted', calls == list(range(3, 18)))
+            check('exact-output', [json.loads(line) for line in output.read_text().splitlines()] == expected)
+            check('prefix-preserved', output.read_bytes().startswith(prefix))
+            frozen = output.read_bytes(), state.read_bytes()
+            source.write_text(source.read_text() + '{}\n')
+            rejects('changed-source', job.run, source, output, state)
+            check('changed-source-no-writes', frozen == (output.read_bytes(), state.read_bytes()))
+            source.write_text(''.join(json.dumps(row) + '\n' for row in rows))
+            output.write_bytes(b'')
+            rejects('short-output', job.run, source, output, state)
+            output.unlink()
+            state.unlink()
+            worker = 'import sys;sys.path.insert(0,sys.argv[1]);import job;job.run(*sys.argv[2:])'
+            args = [sys.executable, '-I', '-B', '-c', worker, str(project), str(source), str(output), str(state)]
+            first = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            second = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            one, two = first.communicate(timeout=8), second.communicate(timeout=8)
+            check('concurrent-runs', first.returncode == second.returncode == 0)
+            check('concurrent-exact-output', [json.loads(line) for line in output.read_text().splitlines()] == expected)
+            output.unlink()
+            state.unlink()
+            crash = ('import sys,os;sys.path.insert(0,sys.argv[1]);import job;original=job.transform;calls=[0]\n'
+                     'def transform(row):\n calls[0]+=1\n if calls[0]==5: os._exit(73)\n return original(row)\n'
+                     'job.transform=transform\njob.run(*sys.argv[2:])')
+            failed = subprocess.run([sys.executable, '-I', '-B', '-c', crash, str(project), str(source), str(output), str(state)],
+                                    capture_output=True, timeout=8)
+            resumed = subprocess.run(args, capture_output=True, timeout=8)
+            check('real-process-crash', failed.returncode == 73 and resumed.returncode == 0)
+            check('crash-exact-output', [json.loads(line) for line in output.read_text().splitlines()] == expected)
+        seed_output = project / 'seed-data/output.jsonl'
+        seed_source = project / 'seed-data/source.jsonl'
+        wanted = [dict(id=row['id'], text=row['text'].upper()) for row in map(json.loads, seed_source.read_text().splitlines())]
+        check('seed-recovered', [json.loads(line) for line in seed_output.read_text().splitlines()] == wanted)
+    else:
+        raise ValueError('unknown family')
+    return checks
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--project', type=Path, required=True)
+    parser.add_argument('--family', required=True)
+    parser.add_argument('--seed', type=int, required=True)
+    args = parser.parse_args()
+    started = time.monotonic()
+    try:
+        checks = grade(args.project.resolve(), args.family, args.seed)
+        result = dict(ok=bool(checks) and all(row['pass_'] for row in checks), checks=checks, error=None)
+    except Exception as exc:
+        result = dict(ok=False, checks=[], error=type(exc).__name__ + ': ' + str(exc))
+    result['elapsed'] = time.monotonic() - started
+    print(json.dumps(result, ensure_ascii=True))
+    sys.exit(0 if result['ok'] else 1)

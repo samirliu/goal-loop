@@ -1,0 +1,10 @@
+{
+  "command": "python3 -B tests/test_worktree_scope.py WorktreeScope.test_nested_gitlinks_bind_content_and_commit_with_awkward_names WorktreeScope.test_unmaterialized_replaced_or_cyclic_gitlink_fails_closed WorktreeScope.test_shell_fallback_refuses_gitlink_instead_of_partial_digest WorktreeScope.test_gitlink_edit_invalidates_prior_judged_evidence",
+  "result": {
+    "chunk_id": "925619",
+    "wall_time_seconds": 6.30097825,
+    "exit_code": 0,
+    "original_token_count": 26,
+    "output": "....\n----------------------------------------------------------------------\nRan 4 tests in 6.357s\n\nOK\n"
+  }
+}

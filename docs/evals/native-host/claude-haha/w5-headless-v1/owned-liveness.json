@@ -1,0 +1,11 @@
+{
+  "observed_epoch": 1794477581.880272,
+  "scope": "Read-only exact CLI session identities and recorded supervisor PIDs; no remote service inference assertion",
+  "recorded_supervisor_pids": [
+    11581,
+    13022
+  ],
+  "recorded_pids_still_present": [],
+  "matching_session_processes": [],
+  "cohort_status": "finished"
+}

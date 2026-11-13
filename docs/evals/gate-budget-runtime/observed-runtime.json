@@ -1,0 +1,192 @@
+[
+  {
+    "artifact": null,
+    "check_freeze_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+      "--check",
+      "--project",
+      "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-runtime-evidence-zcap1dy4"
+    ],
+    "command_sha256": "588472b8085c8ce434cde1f383553fa3bf468e4221af4d6f621477eb3dbcfeee",
+    "contract_sha256": "c8004785ad58c0df0f7834b8aac979fc947bd23fde0e1a7575bbf6d8c7f8fc1a",
+    "elapsed": 0.8544414590578526,
+    "finished": 1794327107.107905,
+    "id": "035e86ccae6d439aa1a0083a9a5eac86",
+    "input_coverage": "artifact-and-command; external and transitive inputs unknown",
+    "instruments": {
+      "goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+      "goal_gate.sh": "429b7e2ee8470b4ac14e361f3e31f4ed42ae85727698c4ecac3f43bf2d57c62d",
+      "goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6"
+    },
+    "kind": "acceptance",
+    "label": "check",
+    "money": null,
+    "parent": null,
+    "result": 0,
+    "run": null,
+    "start_monotonic": 1512680.740179041,
+    "started": 1794327106.2534652,
+    "state": "complete",
+    "tokens": null,
+    "version": 1
+  },
+  {
+    "artifact": "v2-450a0a6811405c92277f6427e5e0d2acfaf6242046b190cc4d0173259422f6c6",
+    "check_freeze_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "command": [
+      "bash",
+      "-c",
+      "python3 -c \"import time; time.sleep(.06)\""
+    ],
+    "command_sha256": "20936b251b24b8ffc8f592fab3304c26b48ebfc1901d44e4e60d814d6882dd94",
+    "contract_sha256": "c8004785ad58c0df0f7834b8aac979fc947bd23fde0e1a7575bbf6d8c7f8fc1a",
+    "elapsed": 0.08951604086905718,
+    "finished": 1794327105.927107,
+    "id": "2aa4596a6bfe48928f94a46d47b0bdc6",
+    "input_coverage": "artifact-and-command; external and transitive inputs unknown",
+    "instruments": {
+      "goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+      "goal_gate.sh": "429b7e2ee8470b4ac14e361f3e31f4ed42ae85727698c4ecac3f43bf2d57c62d",
+      "goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6"
+    },
+    "kind": "measurement",
+    "label": "check:AC-2",
+    "money": null,
+    "parent": "bfb35d832c91449eb3c7fab17e66ea1c",
+    "result": 0,
+    "run": null,
+    "start_monotonic": 1512680.324305,
+    "started": 1794327105.8375921,
+    "state": "complete",
+    "tokens": null,
+    "version": 1
+  },
+  {
+    "artifact": "v2-450a0a6811405c92277f6427e5e0d2acfaf6242046b190cc4d0173259422f6c6",
+    "check_freeze_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "command": [
+      "bash",
+      "-c",
+      "python3 -c \"import time; time.sleep(.06)\""
+    ],
+    "command_sha256": "20936b251b24b8ffc8f592fab3304c26b48ebfc1901d44e4e60d814d6882dd94",
+    "contract_sha256": "c8004785ad58c0df0f7834b8aac979fc947bd23fde0e1a7575bbf6d8c7f8fc1a",
+    "elapsed": 0.09019062505103648,
+    "finished": 1794327106.921172,
+    "id": "5189e9eaeeca467e8429eabc3bdb7480",
+    "input_coverage": "artifact-and-command; external and transitive inputs unknown",
+    "instruments": {
+      "goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+      "goal_gate.sh": "429b7e2ee8470b4ac14e361f3e31f4ed42ae85727698c4ecac3f43bf2d57c62d",
+      "goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6"
+    },
+    "kind": "measurement",
+    "label": "check:AC-2",
+    "money": null,
+    "parent": "035e86ccae6d439aa1a0083a9a5eac86",
+    "result": 0,
+    "run": null,
+    "start_monotonic": 1512681.31769575,
+    "started": 1794327106.830981,
+    "state": "complete",
+    "tokens": null,
+    "version": 1
+  },
+  {
+    "artifact": "v2-450a0a6811405c92277f6427e5e0d2acfaf6242046b190cc4d0173259422f6c6",
+    "check_freeze_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "command": [
+      "bash",
+      "-c",
+      "grep -qx reference artifact.txt"
+    ],
+    "command_sha256": "28f868d98d97a0edde83a87b747e0a08a639495524aaecd12dff82ca05d9aecc",
+    "contract_sha256": "c8004785ad58c0df0f7834b8aac979fc947bd23fde0e1a7575bbf6d8c7f8fc1a",
+    "elapsed": 0.00657041696831584,
+    "finished": 1794327106.731346,
+    "id": "640a10e0240e4d199736c5a4e8742f78",
+    "input_coverage": "artifact-and-command; external and transitive inputs unknown",
+    "instruments": {
+      "goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+      "goal_gate.sh": "429b7e2ee8470b4ac14e361f3e31f4ed42ae85727698c4ecac3f43bf2d57c62d",
+      "goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6"
+    },
+    "kind": "measurement",
+    "label": "check:AC-1",
+    "money": null,
+    "parent": "035e86ccae6d439aa1a0083a9a5eac86",
+    "result": 0,
+    "run": null,
+    "start_monotonic": 1512681.211489958,
+    "started": 1794327106.7247748,
+    "state": "complete",
+    "tokens": null,
+    "version": 1
+  },
+  {
+    "artifact": "v2-450a0a6811405c92277f6427e5e0d2acfaf6242046b190cc4d0173259422f6c6",
+    "check_freeze_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "command": [
+      "bash",
+      "-c",
+      "grep -qx reference artifact.txt"
+    ],
+    "command_sha256": "28f868d98d97a0edde83a87b747e0a08a639495524aaecd12dff82ca05d9aecc",
+    "contract_sha256": "c8004785ad58c0df0f7834b8aac979fc947bd23fde0e1a7575bbf6d8c7f8fc1a",
+    "elapsed": 0.006527917226776481,
+    "finished": 1794327105.750226,
+    "id": "88fd264b188e4277a033bffe438f5c39",
+    "input_coverage": "artifact-and-command; external and transitive inputs unknown",
+    "instruments": {
+      "goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+      "goal_gate.sh": "429b7e2ee8470b4ac14e361f3e31f4ed42ae85727698c4ecac3f43bf2d57c62d",
+      "goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6"
+    },
+    "kind": "measurement",
+    "label": "check:AC-1",
+    "money": null,
+    "parent": "bfb35d832c91449eb3c7fab17e66ea1c",
+    "result": 0,
+    "run": null,
+    "start_monotonic": 1512680.230411708,
+    "started": 1794327105.7436988,
+    "state": "complete",
+    "tokens": null,
+    "version": 1
+  },
+  {
+    "artifact": null,
+    "check_freeze_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+      "--verify",
+      "--project",
+      "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-runtime-evidence-zcap1dy4"
+    ],
+    "command_sha256": "8b319d94a86c0f6cf4048cc0c1274bd9cfb209002a68b254496257876abe59ae",
+    "contract_sha256": "c8004785ad58c0df0f7834b8aac979fc947bd23fde0e1a7575bbf6d8c7f8fc1a",
+    "elapsed": 0.6114778339397162,
+    "finished": 1794327106.057427,
+    "id": "bfb35d832c91449eb3c7fab17e66ea1c",
+    "input_coverage": "artifact-and-command; external and transitive inputs unknown",
+    "instruments": {
+      "goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+      "goal_gate.sh": "429b7e2ee8470b4ac14e361f3e31f4ed42ae85727698c4ecac3f43bf2d57c62d",
+      "goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6"
+    },
+    "kind": "verification",
+    "label": "verify",
+    "money": null,
+    "parent": null,
+    "result": 0,
+    "run": null,
+    "start_monotonic": 1512679.932663291,
+    "started": 1794327105.44595,
+    "state": "complete",
+    "tokens": null,
+    "version": 1
+  }
+]

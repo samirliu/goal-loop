@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [{"hooks": [{"type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/scripts/goal_host.py\" hook --backend claude", "timeout": 5}]}],
+    "PreToolUse": [{"hooks": [{"type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/scripts/goal_host.py\" hook --backend claude", "timeout": 5}]}],
+    "PostToolUse": [{"hooks": [{"type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/scripts/goal_host.py\" hook --backend claude", "timeout": 5}]}],
+    "PostToolUseFailure": [{"hooks": [{"type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/scripts/goal_host.py\" hook --backend claude", "timeout": 5}]}],
+    "SubagentStart": [{"hooks": [{"type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/scripts/goal_host.py\" hook --backend claude", "timeout": 5}]}],
+    "SubagentStop": [{"hooks": [{"type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/scripts/goal_host.py\" hook --backend claude", "timeout": 5}]}],
+    "Stop": [{"hooks": [{"type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/scripts/goal_host.py\" hook --backend claude", "timeout": 5}]}],
+    "SessionEnd": [{"hooks": [{"type": "command", "command": "python3 -I \"${CLAUDE_PLUGIN_ROOT}/scripts/goal_host.py\" hook --backend claude", "timeout": 1}] }]
+  }
+}

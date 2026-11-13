@@ -1,6 +1,7 @@
 ---
 name: goal-mech-worker
-description: Mechanical production worker of the goal-loop skill. Bulk,
+description: >-
+  Mechanical production worker of the goal-loop skill. Bulk,
   well-specified, low-judgment work: file transforms, format conversion,
   boilerplate, data extraction to a fixed schema. One bounded task, exact
   output paths, evidence in the report. Never spawns sub-agents; never makes

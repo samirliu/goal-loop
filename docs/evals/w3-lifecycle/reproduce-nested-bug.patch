@@ -1,0 +1,14 @@
+--- a/scripts/goal_bounded.py
++++ b/scripts/goal_bounded.py
+@@ -43,11 +43,6 @@
+         # Nested checks share the same finite settlement, rather than the
+         # expired search budget or a new three seconds per AC.
+         os.environ['GOAL_RUNNER_MONOTONIC_END'] = str(time.monotonic() + seconds)
+-    # Nested command supervisors must survive their owner's group being
+-    # cancelled. Otherwise outer killpg kills the supervisor itself while its
+-    # separately sessioned check group continues running without supervision.
+-    if os.getsid(0) != os.getpid():
+-        os.setsid()
+     retained = ()
+     if os.environ.get('GOAL_RUNNER_FD'):
+         fd = int(os.environ['GOAL_RUNNER_FD'])

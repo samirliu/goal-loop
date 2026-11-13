@@ -1,0 +1,38 @@
+{
+  "captured_utc": "2026-11-12T08:51:49.842068+00:00",
+  "excluded_unmanifested_files": [
+    {
+      "bytes": 7656,
+      "path": "scripts/__pycache__/goal_bounded.cpython-314.pyc",
+      "sha256": "1179c910efa7b145c51da463ad12854a95c1c5127914aab41f72f9a71502fad2"
+    },
+    {
+      "bytes": 61508,
+      "path": "scripts/__pycache__/goal_evolve.cpython-314.pyc",
+      "sha256": "25d5ece5b597590418433270b05d44c3d116281980a0f2cee336788132967af0"
+    },
+    {
+      "bytes": 39392,
+      "path": "scripts/__pycache__/goal_owner_watch.cpython-314.pyc",
+      "sha256": "0a92b3e6f8a99b424da887b326a85b9b66ba8f079e221e1a06843c0cbd38a17d"
+    },
+    {
+      "bytes": 32167,
+      "path": "scripts/__pycache__/goal_runner.cpython-314.pyc",
+      "sha256": "27153fcc8146d38993586bdc6574684281d61ec4c4adcd8e42814a1400b2b946"
+    },
+    {
+      "bytes": 113085,
+      "path": "scripts/__pycache__/goal_store.cpython-314.pyc",
+      "sha256": "b2d9055108c3e64d15cdcb330629de70258411e8e007cf039fa4bae51f4bfba5"
+    },
+    {
+      "bytes": 21389,
+      "path": "tests/__pycache__/test_evolve.cpython-314.pyc",
+      "sha256": "5ba18b6e0b83dfb12733644801408bf7a034865fe03bd8d80ccd022c6bf4f932"
+    }
+  ],
+  "exclusion": "Only named manifest bytes are archived; no source-directory files were changed or removed.",
+  "mismatches": [],
+  "verified_manifest_files": 139
+}

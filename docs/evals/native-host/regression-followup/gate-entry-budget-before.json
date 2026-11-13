@@ -1,0 +1,15 @@
+{
+  "command": "python3 -B tests/test_gate_entry_budget.py GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement",
+  "source_hashes": {
+    "goal_store": "9f170dfab248f882f7a952522ff73c355cefad0ccd67f043b2de67e56c651929",
+    "goal_runner": "826f077d38e1f8a28c0bc150a3cf901636405c6c5c9b9a173a6a2ca4af779154",
+    "unchanged_test_gate_budget": "1cdb2a65200462028d9cf7b464f131c06078ddbecca353b8b682fafbc029534e"
+  },
+  "result": {
+    "chunk_id": "8601ed",
+    "wall_time_seconds": 7.392118416,
+    "exit_code": 1,
+    "original_token_count": 457,
+    "output": "GATE_ENTRY_OBSERVATION {\"case\": \"__main__.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement\", \"completed\": [\"0\", \"1\"], \"contexts\": [[\"missing\", \"1651057.261126083\"], [\"missing\", \"1651057.261126083\"], [\"missing\", \"1651057.261126083\"]], \"elapsed\": 5.839658624958247, \"returncode\": 2, \"stderr\": \"GATE: NO-GO reason=verification-time-budget-exhausted\\n\", \"stdout\": \"GATE: VERIFY AC-1|PASS|exit=0\\nGATE: VERIFY AC-2|PASS|exit=0\\n\", \"view_read\": {\"finished\": 1651054.171960541, \"real_views_verified\": true, \"started\": 1651052.155562375}}\nF\n======================================================================\nFAIL: test_slow_real_view_preflight_spends_the_same_settlement (__main__.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/tests/test_gate_entry_budget.py\", line 99, in test_slow_real_view_preflight_spends_the_same_settlement\n    self.assertLess(observed['elapsed'], 4.2, observed)\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 5.839658624958247 not less than 4.2 : {'case': '__main__.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement', 'elapsed': 5.839658624958247, 'returncode': 2, 'contexts': [['missing', '1651057.261126083'], ['missing', '1651057.261126083'], ['missing', '1651057.261126083']], 'completed': ['0', '1'], 'stdout': 'GATE: VERIFY AC-1|PASS|exit=0\\nGATE: VERIFY AC-2|PASS|exit=0\\n', 'stderr': 'GATE: NO-GO reason=verification-time-budget-exhausted\\n', 'view_read': {'started': 1651052.155562375, 'finished': 1651054.171960541, 'real_views_verified': True}}\n\n----------------------------------------------------------------------\nRan 1 test in 7.451s\n\nFAILED (failures=1)\n"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "baseline_commit": "cf198829f9c8efe740d7d30a09de5d0251303b62",
+  "replay_order": [
+    "../crew-cost/implementation.patch",
+    "../incumbent/implementation.patch",
+    "../checkpoint-evolution/implementation.patch",
+    "../intermediate-checkpoint/implementation.patch",
+    "../linux/lint.patch",
+    "implementation.patch"
+  ],
+  "sources": {
+    "scripts/goal_forge.py": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb",
+    "scripts/goal_ctl.sh": "1d223f8c1d0f064e549481e07430b04992729d38e161432d604cf12e17f5e50e",
+    "scripts/goal_gate.sh": "cc17d6f4177598a5c42365e641261f1c769ab6626fea79811300d713d780baa7",
+    "scripts/goal_store.py": "3600716797f59fe482ee4e3f0caf7dd7afa17b7327aa28d2e868160c8b74db3f",
+    "tests/test_forge.py": "5e49ee511d41f7eccfea7ca5701b1a0701cda637e6f7850638b3dd6201a81fc3",
+    "tests/test_incumbent.py": "91588886f603fba58c9cab6cb1d5a884401b3ecb4dac17dfbecc8e210d04ae94",
+    "tests/lib.sh": "2283f838b9be1383c667e3d331ef51aa8d6e8a0d4588a622dcc4d16a4d473260",
+    "tests/cases.inc.sh": "f37cca3e1ac0e52216173e209889aedf807d144f9fa12e37a19490ed584df8e7",
+    "agents/goal-critic.md": "d3034a768937c08f2766bbcdccb2b276df669d950f0f143bca40188a378b5544",
+    "references/packs/gradient.md": "fc3304262fc9e7eb9a6146d43497f797f8b15ed20f44a206a419004eb5b04211",
+    "references/gate.md": "5b95f4349293a6de7cb2454c72ce1b634563b6366374964575e72a678eb5fca7"
+  },
+  "evidence": {
+    "README.md": "5d1a88d2e6450fecf3a347b3d0cc4dd697652f6c6f7886d905019fcddd53044c",
+    "bare-counter-before.txt": "9203b72fa371cd59db687e0a4755e49d2e8115cd7b0acee77ab09fe3240a2b4e",
+    "before.txt": "9f652d78abea011103543d12c9aa26608fca68cf065ac97bcd5e7c7b61a5333a",
+    "harness-development.txt": "ded9c2807980012d5fac42cbedda1a58ac349e2edf546d9a81d8658e5cb706e6",
+    "implementation.patch": "c91877dfba5f8e1b178b673ea66bf93d899c7abbcd6e196b30455fdeff818d97",
+    "linux/dependencies.txt": "c40ad146f7818ef698c8cb534dfaec9e94a389d202bb7cae03d40865be409c72",
+    "linux/environment.txt": "f8658009b93a70d8cc3d637da63a396cedaaaeafddeb8428e6e2fc8e8986f8b8",
+    "linux/python.txt": "1dbfb0c6ea31ffa225d30308560fe7388c9174582b367545c2fcdf6d7f816330",
+    "linux/result.txt": "3ae87cdc1ebfd959581ab6df0b5c6a9a45441648399cbbaa887c2601e5c11441",
+    "linux/shell.txt": "fd5fc05746437dcfccfbd17011e1ea8309c0f02469a407148dc0ca0cdd58f1f1",
+    "linux-before/dependencies.txt": "2d363dbb7a858e6977635d24e9cf53557c6aca4968d10818e7654993d0865581",
+    "linux-before/environment.txt": "7ac9bbafe0a18028380b5be0e4cd5ab7a98b5250ab1d3af5690e234420b03730",
+    "linux-before/python.txt": "07e1e414ff7ee73c572da78739d7244eec859677c08aec42d28163f6f3e0bea1",
+    "linux-before/result.txt": "561ec6338e7c5c5fd64fb9f301882534b08b13f46f33c93fc67513b420f54d3f",
+    "linux-before/shell.txt": "34efdf96a7666d28b738192e0a53f2ca2cdf54947b1876ca7f3de5c64a8dd8f1",
+    "linux-before/sources.json": "3dbf4bb46a870e3caa06945cdfa0c92451352b747312f56608013a875fc3e859",
+    "macos/python.txt": "090058511f229b172812d608c89643dd4dd1c649e34c0fd08fd1b16025d8036e",
+    "macos/shell.txt": "71c444570847d387bb5230e8794ea1814029b0aa0b712428590cd7ab1530afed",
+    "macos-before/python.txt": "d69a6d7caf2699e8ccd1b8f084e9304513a0c51851bdba46bb3929e7bfd84fe2",
+    "macos-before/shell.txt": "63ce706eea11ab6946394df5f32ec6a2c4788b306b92c2298e15dc30db34c161",
+    "raw-trials.tar.gz": "393c7794c4b3b7df36e678949698c65398880c407b789df75400a7acbabd9cf1",
+    "reconstructed-tests.txt": "e354d2e4030496b65973a2e226b06f1c5d4b5b371f523ec02b38c71511595201",
+    "run.py": "642fe3cc82c52f5d13b0fd8da4a414937618601557cf7fa758b6220960a9d6b9",
+    "scope-mutation-before.txt": "a20ae91869eee16560bd8cee37116403fce1444a4906a9fa036577edacd49107",
+    "verify.py": "5706c92e4deb0b640d17547fa45a0305d2c434c72377f3a122fe42f27b75ac07"
+  },
+  "regression": {
+    "macos_python": 142,
+    "macos_shell": 603,
+    "linux_python": 142,
+    "linux_shell": 603,
+    "reconstructed_forge_tests": 13
+  },
+  "recorded_at_utc": "2026-11-11T03:53:47.117970+00:00"
+}

@@ -1,0 +1,23 @@
+{
+  "baseline": "../crew-cost/manifest.json",
+  "patch_sha256": "d62311df3bc215a1fd2737f52c433ecc2c887707829b251d08b6ef894c481dc6",
+  "sources": {
+    "scripts/goal_store.py": "a6ad466669b6d9dcc1b283a197fe22e233696587e871d139dd1745eb9fa45dae",
+    "scripts/goal_ctl.sh": "e71f7ead39d05109891050f7a88a3b25aca9d2436c1b04453947b043ae97304e",
+    "tests/test_incumbent.py": "656a492188eff466052a3333c58f27983b4c7a664f6f38abf5c030d917308d84"
+  },
+  "restored_test_exit": 0,
+  "restored_test_count": 4,
+  "checks": {
+    "python": {
+      "log": "python-regression.txt",
+      "sha256": "e5af3ab566fc4c9d666e76d403e8be3189e5e6cae2a81385cb7dbd3f8cb97a2e",
+      "count": 121
+    },
+    "shell": {
+      "log": "shell-regression.txt",
+      "sha256": "4a21424f271be461582cc2b8f814cb50d7fba64e12b9eaafff3a4db89cf43b2f",
+      "count": 592
+    }
+  }
+}

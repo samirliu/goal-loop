@@ -1,0 +1,80 @@
+--- before/tests/test_evolve.py
++++ after/tests/test_evolve.py
+@@ -2,6 +2,8 @@
+ import importlib.util
+ import json
+ from pathlib import Path
++import subprocess
++import sys
+ import tempfile
+ import unittest
+ from unittest import mock
+@@ -82,6 +84,68 @@
+         self.assertEqual(withdrawn['enabled'], withdrawn['policies']['baseline'])
+         self.assertTrue((self.state / selected['program']).is_file())  # rollback preserves candidate history
+ 
++    def test_development_gain_then_complete_holdout_regression_keeps_incumbent(self):
++        first = self.protocol('incumbent')
++        with mock.patch.object(evolve, 'trial', side_effect=self.telemetry):
++            initial = evolve.experiment(first, self.state)
++        pointer = (self.state / 'enabled.json').read_bytes()
++        selected = json.loads(pointer)
++        old_program = (self.state / selected['program']).read_bytes()
++        preserved = {path: path.read_bytes() for path in (
++            self.state / initial['run'] / 'report.json',
++            self.state / initial['run'] / 'trials.jsonl', self.state / selected['program'])}
++        exposed = set(json.loads((self.state / 'used-holdout.json').read_bytes()))
++
++        fresh = self.protocol('new-candidate', offset=1000)
++        (fresh.parent / 'baseline.py').write_bytes(old_program)
++        (fresh.parent / 'candidate.py').write_bytes(b'print("candidate-v2")\n')
++        config = json.loads(fresh.read_bytes())
++        # The second alpha is .00833: keep the original budget/thresholds,
++        # and provide enough fresh pairs to execute the entire holdout.
++        for index in (6, 7):
++            name = 'holdout-%s.json' % index
++            (fresh.parent / name).write_text(json.dumps({'task': 1100 + index}))
++            config['holdout'].append({'input': name, 'expected': name})
++        fresh.write_text(json.dumps(config))
++
++        def split_telemetry(program, grader, task, expected, seconds, deadline):
++            # Controlled branch evidence; this does not measure policy utility.
++            candidate = program != old_program
++            held_out = json.loads(task)['task'] >= 1100
++            elapsed = (3 if held_out else 1) if candidate else 2
++            return {'ok': True, 'floor': True, 'horizon': True, 'score': 1,
++                    'regression': False, 'elapsed': elapsed}, b'observed-output'
++
++        with mock.patch.object(evolve, 'trial', side_effect=split_telemetry):
++            result = evolve.experiment(fresh, self.state)
++        development, holdout = (result['phases'][name] for name in ('development', 'holdout'))
++        self.assertTrue(development['decision']['pass'])
++        self.assertEqual(len(holdout['pairs']), holdout['scheduled_pairs'])
++        self.assertEqual(len(holdout['pairs']), 8)
++        self.assertFalse(holdout['decision']['pass'])
++        self.assertTrue(holdout['decision']['regressed'])
++        self.assertEqual(result['status'], 'holdout-rejected')
++        self.assertEqual(result['enabled'], initial['enabled'])
++        self.assertNotEqual(result['enabled'], result['policies']['candidate'])
++        self.assertEqual((self.state / 'enabled.json').read_bytes(), pointer)
++        self.assertEqual(json.loads((self.state / result['run'] / 'report.json').read_bytes()),
++                         json.loads(evolve.encode(result)))
++        self.assertEqual(json.loads((self.state / 'statistical-budget.json').read_bytes())['evaluations'], 2)
++        self.assertTrue(exposed.issubset(json.loads((self.state / 'used-holdout.json').read_bytes())))
++        self.assertEqual({path: path.read_bytes() for path in preserved}, preserved)
++        self.assertFalse((self.state / evolve.PENDING).exists())
++        executed = subprocess.run([sys.executable, '-I', str(SCRIPT), 'run-enabled',
++                                   '--state', str(self.state), '--seconds', '2'],
++                                  input=b'{}', capture_output=True, timeout=5)
++        self.assertEqual(executed.returncode, 0, executed.stderr)
++        self.assertEqual(executed.stdout, b'candidate\n')
++        print('EVOLVE_HOLDOUT_REJECTION ' + json.dumps(dict(
++            status=result['status'], development_gain=development['decision']['cost_gain'],
++            holdout_gain=holdout['decision']['cost_gain'], holdout_pairs=len(holdout['pairs']),
++            holdout_alpha=result['holdout_alpha'], pointer_unchanged=True,
++            incumbent_sha256=evolve.digest(old_program), history_preserved=True,
++            run_enabled_exit=executed.returncode, run_enabled_stdout=executed.stdout.decode())))
++
+     def test_noop_or_overlapping_tasks_refused_before_state_creation(self):
+         protocol = self.protocol('bad')
+         (protocol.parent / 'candidate.py').write_bytes((protocol.parent / 'baseline.py').read_bytes())

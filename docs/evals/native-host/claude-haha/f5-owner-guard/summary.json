@@ -1,0 +1,49 @@
+{
+  "scope": "Actual local macOS child-process reproduction and targeted tests only; no model, cohort, full suite, Docker or new permission request.",
+  "uid": 501,
+  "platform": "darwin",
+  "python": "/opt/homebrew/opt/python@3.12/bin/python3.12",
+  "capabilities": {
+    "waitid": false,
+    "WNOWAIT": true
+  },
+  "before": {
+    "normal_command_exit": 7,
+    "wrapper_exit": 4,
+    "guard_error": "Python int too large to convert to C int",
+    "cleanup_error": "Darwin killpg EPERM",
+    "guard_alive_under_infinity": false,
+    "late_writes_observed": false
+  },
+  "after": {
+    "normal_result": 7,
+    "timeout_result": 124,
+    "cancel_result": 130,
+    "command_start_errors": false,
+    "late_writes_observed": false,
+    "guard_alive_under_infinity": true,
+    "stdout_eof_while_parent_alive": true,
+    "fd_2000_lock_released_while_parent_alive": true,
+    "both_inventories_unavailable": {
+      "fault_injected": true,
+      "result": 4,
+      "user_command_executed": false
+    }
+  },
+  "tests": {
+    "command": "python3.12 -m pytest -q -s tests/test_owner_watch_guard.py tests/test_owner_watch.py",
+    "passed": 12,
+    "skipped": 2,
+    "subtests_passed": 6,
+    "seconds": 4.3,
+    "skip_reason": "Existing waitid/WNOWAIT owner-zombie tests unsupported by this macOS Python; infinity branches actually ran."
+  },
+  "linux": "No Linux execution in this task. Infinity tests skip when the actual inherited hard limit is finite; no mocked infinity is represented as measurement.",
+  "causal_isolation": "paired-before/after use identical frozen goal_bounded.py and goal_trace.py; only owner_watch changes. Root separately changed bounded trace-finalization, captured by current_root_bounded_sha256 in paired-manifest.json.",
+  "source_sha256": {
+    "scripts/goal_owner_watch.py": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+    "tests/test_owner_watch_guard.py": "189f4106ab2692ded4a4194cddf82a5fc180a1458312adb3fa1c6b92eb3a9872",
+    "tests/test_owner_watch.py": "a7396cfc5daf23d73fa7e0b32617d4a694c9c0fb92a79ddc643eda3756b1f4e2",
+    "scripts/goal_bounded.py": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c"
+  }
+}

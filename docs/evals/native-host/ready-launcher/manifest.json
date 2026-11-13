@@ -1,0 +1,30 @@
+{
+  "after-goal_host.py.txt": {
+    "bytes": 35065,
+    "sha256": "6cd50115f5e0ac78e89b9287a2475026a6aa9a3db7a2245a4efe9e9d8c2eb060"
+  },
+  "after-test_host.py.txt": {
+    "bytes": 30653,
+    "sha256": "76a4be36a263a703f2c613c873b97fd8ce11ec1b32031d96e013b23fb887f864"
+  },
+  "before-goal_host.py.txt": {
+    "bytes": 33484,
+    "sha256": "a33b910a23954aa2f08ce86863a16433d113f582c127723aeaed238c94065e3d"
+  },
+  "before-test_host.py.txt": {
+    "bytes": 27190,
+    "sha256": "ab8fff931a51c728153912cdc6d50d50bc3394f56edd7302b20a7b680c733489"
+  },
+  "goal_host.py.patch": {
+    "bytes": 5603,
+    "sha256": "7d5f6ef62f9591904cee19e06b5ee62df6733d3d1e68940795eb513ca749e66e"
+  },
+  "targeted-tool-receipt.json": {
+    "bytes": 470,
+    "sha256": "4f58dd33d5bee7a5fc6e23d4b59638c40393345d5619006dbaecea4a26624c53"
+  },
+  "test_host.py.patch": {
+    "bytes": 3998,
+    "sha256": "1703a26752c9c7936e5d2991be8d6e72c50a29786c89a9f043c010156510851f"
+  }
+}

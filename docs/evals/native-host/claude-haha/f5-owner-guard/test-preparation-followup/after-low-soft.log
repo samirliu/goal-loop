@@ -1,0 +1,5 @@
+Command: ['/opt/homebrew/opt/python@3.12/bin/python3.12', '-B', '-c', 'import resource,pytest; soft,hard=resource.getrlimit(resource.RLIMIT_NOFILE); resource.setrlimit(resource.RLIMIT_NOFILE,(1024,hard)); raise SystemExit(pytest.main(["-q","-s","tests/test_owner_watch_guard.py","-k","guard_drops_stdout"]))']
+OWNER_GUARD_FDS {"guard_alive": true, "guard_wait": [0, 0], "high_fd": 2000, "infinite_requested": false, "lock_released_while_parent_alive": true, "nofile": [2001, 9223372036854775807], "nofile_before_fd_setup": [1024, 9223372036854775807], "parent_alive": true, "stderr": "", "stdout": "", "stdout_eof_while_parent_alive": true}
+.
+1 passed, 4 deselected in 0.15s
+Exit: 0

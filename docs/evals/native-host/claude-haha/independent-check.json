@@ -1,0 +1,257 @@
+{
+  "verified": true,
+  "checker_sha256": "90fcfb4a81b2d0bffe90ebf475307434870a1911ff47ad2dba2abfddd2f5c60a",
+  "scope": "two retained real integration recordings, not a performance cohort",
+  "before": {
+    "recording": "/private/tmp/goal-claude-hooks-live-0knur70e",
+    "raw_inventory": {
+      "files": 68,
+      "sha256": "d2874bc63aeb9c4a51de5cff6e7fefcabb2dd75caca0840288e7801a177b6db8"
+    },
+    "session": "536d3a83-2c9f-4127-9e27-051e0028cddf",
+    "native_call_id": "call_c9bab6f86e5c4a8abaaba4e5",
+    "native_agent_id": "a8ae920c14b5a21a9",
+    "runtime": "999.0.0-local",
+    "model": "MiniMax-M3.1-Flash",
+    "plugin": "goal-loop-host@inline",
+    "cli_sha256": "1acd6aef485ab28117e7445b47110e4cfeccd9f94068d596f84b54d0a03dd7ce",
+    "project_skill_link": "/Users/m/repo/goal-loop/SKILL.md",
+    "current_skill_sha256": "ec03584de0cfbeb69dec7ee011178fb6b5126ac273b0f47a38f5ae40a1ceb840",
+    "skill_text_selection": "current root body not proven selected; local loader puts distinct user skill before project skill",
+    "recorded_namespaced_root_skill": false,
+    "artifact_sha256": "3dfa3fb239f56c778a1e9b33eb31328349edd155a95806dac4378904e88527e5",
+    "grader_sha256": "ad524844a1830c428fbd35fd83f9ce46b8340d3f35412dd0c760b9b251ca0b8d",
+    "owned_executions": 25,
+    "successful_owned_executions": 0,
+    "unfinished_or_failed_owned": [
+      {
+        "id": "c2adf4a607004498b1bfe9631a6210fa",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "1ca496c1880f463b8d8ff15d9c3ba89c",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "0dae7fb236364b8d88ff544d9ec4f320",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "689b04b55d084b57829355795bcb4b44",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "c7c6943c1478483183b3ec287bb49b4c",
+        "label": "host-worker-check",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "b069b35d4c0e42e5ad7b5f15dbe59c65",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "b21a04872a56412a9bd4d70464697db3",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "a1046e02bdd546ed96e95e5438e448ec",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "08541317f06448d2a2cfae5db7e6848a",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "cd1c452cdcd34594a75bb420abe0fc19",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "e93966caee1e499aa3bd5ebb8921a1cf",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "344163af2a454e7ca9ac6c72a46258bb",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "52540fc84bd04844a5a9213ff286c06d",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "8b7271206ee6417c989ad96b2191389b",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "a8efd56666834b53afe9b8d4c3e2a208",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "bc7c1efc585a473a88e7b8c1286fcfa2",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "b2bec28d823342bcaa6c104316667259",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "6347d17e916c4c82be9da4f60b292e80",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "d7ade5532e7b410f86b5db90f5c54594",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "0b175eb3a6494db8854fcab70a1020ad",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "ba4dfb3655704889be776af4a2a6ac2e",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "674cf9ba77364250bfa58d19a296c193",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "2b77ec731cea40c6993a450c6fc9ffad",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "71e2e9c26e604ba98a3881d6bd0acd24",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      },
+      {
+        "id": "20cbed2978994dae9c7bc16a8bf9bca5",
+        "label": "host-owned-tool",
+        "state": "running",
+        "result": null
+      }
+    ],
+    "unknown_lifecycle_events": [
+      "Stop",
+      "SubagentStop",
+      "SessionEnd",
+      "SubagentStart"
+    ],
+    "session_end": "persisted host event; not emitted in captured stream",
+    "session_start": "observed stream hook; not registered or credited to this plugin",
+    "retained_tool_errors": [],
+    "captured_cli_elapsed": 145.972422957886,
+    "timeline_seconds_from_cli_start": {
+      "cached_prompt": 1.120635542087257,
+      "dispatch": 9.544338207924739,
+      "native_start": 9.665752250002697,
+      "ready": 12.569367124931887,
+      "post_tool": 143.6866808331106,
+      "native_completion": 143.6875304169953,
+      "parent_validation": 145.9729924169369,
+      "first_valid": 146.04729041690007,
+      "adopted": 146.0480075830128,
+      "final_validated": 146.12873749993742
+    },
+    "structured_hook_body": "not retained in full; stream call/agent/completion, post-hook, sealed host receipts cross-checked",
+    "clean_owned_execution": false
+  },
+  "after": {
+    "recording": "/private/tmp/goal-claude-hooks-live-0ch9wkfr",
+    "raw_inventory": {
+      "files": 47,
+      "sha256": "5f382e89b3d7ecb831ee3d17f8844ad269ef204942f7277c5e0e805f4a2f5a78"
+    },
+    "session": "9f39dc59-0e82-46b1-9e7c-dbea2af54110",
+    "native_call_id": "call_SuoYpcapOlfWVhCqFQCes6cn",
+    "native_agent_id": "abeff7593bd888d71",
+    "runtime": "999.0.0-local",
+    "model": "MiniMax-M3.1-Flash",
+    "plugin": "goal-loop-host@inline",
+    "cli_sha256": "1acd6aef485ab28117e7445b47110e4cfeccd9f94068d596f84b54d0a03dd7ce",
+    "project_skill_link": "/Users/m/repo/goal-loop/SKILL.md",
+    "current_skill_sha256": "ec03584de0cfbeb69dec7ee011178fb6b5126ac273b0f47a38f5ae40a1ceb840",
+    "skill_text_selection": "current root body not proven selected; local loader puts distinct user skill before project skill",
+    "recorded_namespaced_root_skill": false,
+    "artifact_sha256": "3dfa3fb239f56c778a1e9b33eb31328349edd155a95806dac4378904e88527e5",
+    "grader_sha256": "ad524844a1830c428fbd35fd83f9ce46b8340d3f35412dd0c760b9b251ca0b8d",
+    "owned_executions": 4,
+    "successful_owned_executions": 4,
+    "unfinished_or_failed_owned": [],
+    "unknown_lifecycle_events": [
+      "SubagentStart",
+      "SubagentStop",
+      "Stop",
+      "SessionEnd"
+    ],
+    "session_end": "persisted host event; not emitted in captured stream",
+    "session_start": "observed stream hook; not registered or credited to this plugin",
+    "retained_tool_errors": [
+      {
+        "type": "tool_result",
+        "content": "<tool_use_error>Error: No such tool available: Read</tool_use_error>",
+        "is_error": true,
+        "tool_use_id": "call_01a1cec66c2d759096750b2f"
+      }
+    ],
+    "captured_cli_elapsed": 30.363018499920145,
+    "timeline_seconds_from_cli_start": {
+      "cached_prompt": 1.0356549581047148,
+      "dispatch": 9.183730167103931,
+      "native_start": 9.304090958088636,
+      "ready": 11.68288845801726,
+      "post_tool": 27.863683457951993,
+      "native_completion": 27.864093292038888,
+      "parent_validation": 30.363659708062187,
+      "first_valid": 30.438117833109573,
+      "adopted": 30.438862124923617,
+      "final_validated": 30.51252679200843
+    },
+    "structured_hook_body": "not retained in full; stream call/agent/completion, post-hook, sealed host receipts cross-checked",
+    "clean_owned_execution": true
+  }
+}

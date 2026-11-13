@@ -1,0 +1,73 @@
+{
+  "scope": "Test preparation only; production and original full-run logs unchanged",
+  "production_sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+  "before_test_sha256": "189f4106ab2692ded4a4194cddf82a5fc180a1458312adb3fa1c6b92eb3a9872",
+  "after_test_sha256": "63ccbe2d2a124cb25b24fedb5174ae9d5bdeacd8a704ab061c5e38364ce38d14",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2197,
+      "sha256": "6f737cf1add5709ef61c90c75adc505cba37a7ba9b55396a5719ee47033f5705"
+    },
+    {
+      "path": "after-insufficient-hard.json",
+      "bytes": 955,
+      "sha256": "ef8cea93bf315a24a046227356a16287ee66904522a2ca08da80c8022ccbfd82"
+    },
+    {
+      "path": "after-insufficient-hard.log",
+      "bytes": 406,
+      "sha256": "7e022a8558f7af22a73085fac13c816703fe880f1dd59eeb418c36d92d6cfa94"
+    },
+    {
+      "path": "after-low-soft.json",
+      "bytes": 1192,
+      "sha256": "66d4b8a3479e194d00f37008947ed585a1cc7c609e42f21dc9c47727cdc71269"
+    },
+    {
+      "path": "after-low-soft.log",
+      "bytes": 683,
+      "sha256": "c5ede567792c4fc4542f7b0b748e44eb7b59487b673d26e9825091a36275c623"
+    },
+    {
+      "path": "after-targeted.log",
+      "bytes": 2531,
+      "sha256": "a5170ed2bbf6105cc9db5b76daee0d0695c6239c62eb2f56fa16d2fd68fb194b"
+    },
+    {
+      "path": "after-test_owner_watch_guard.py.txt",
+      "bytes": 10221,
+      "sha256": "63ccbe2d2a124cb25b24fedb5174ae9d5bdeacd8a704ab061c5e38364ce38d14"
+    },
+    {
+      "path": "before-low-soft.json",
+      "bytes": 1706,
+      "sha256": "24a4dc6b666026e945f1e9d2e16130328c7909959a50eff44fc4cbaa7ee9ff54"
+    },
+    {
+      "path": "before-low-soft.log",
+      "bytes": 925,
+      "sha256": "92d0272f83521b36ee57d5e86731cb91433af53429f5e4e8188445dcf27d5e4f"
+    },
+    {
+      "path": "before-test_owner_watch_guard.py.txt",
+      "bytes": 9193,
+      "sha256": "189f4106ab2692ded4a4194cddf82a5fc180a1458312adb3fa1c6b92eb3a9872"
+    },
+    {
+      "path": "linux-original-setup-diagnostic.json",
+      "bytes": 202,
+      "sha256": "c3e091831007d6bc27379cafdc8df2cb544141370072a73903e22bf983a2d9f8"
+    },
+    {
+      "path": "linux-original-setup-diagnostic.py.txt",
+      "bytes": 747,
+      "sha256": "0a025c19df078cc90a35409130819dd4617809024042ed26ae35bb03f556b73d"
+    },
+    {
+      "path": "test-preparation.patch",
+      "bytes": 3532,
+      "sha256": "72748a4f2f2eabc0dbeb33313e5e4eeb917d9881170398df9cb96403c2118ebe"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "uid": 501,
+  "before": {
+    "returncode": 1,
+    "fixtures_pass": 9,
+    "fixtures_fail": 1,
+    "script_sha256": "9ff211ac41f680d2382019e09cf68a37917c86b05a405f26d92dce94cc8ff0d1"
+  },
+  "after": {
+    "returncode": 0,
+    "fixtures_pass": 10,
+    "fixtures_fail": 0,
+    "script_sha256": "341b527a6bd33aefc0ffd91b68008eb17d48663733bfb8d9f53dcdf822c989c7",
+    "source_added_paths": [],
+    "source_unchanged": true,
+    "temporary_inventory_unchanged": true,
+    "inputs_and_linter_identical_to_before": true
+  },
+  "scope": "Only the fixture runner temporary-file handling changed; no model, Docker or full-suite execution. Earlier frozen archives/results remain historical.",
+  "syntax_returncode": 0,
+  "diff_check_returncode": 0
+}

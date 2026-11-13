@@ -1,0 +1,60 @@
+{
+  "backend": "claude",
+  "project": "/tmp/goal-host-claude-followup-lpv7si8e",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-I",
+    "/Users/m/repo/goal-loop/scripts/goal_bounded.py",
+    "--owner",
+    "42691",
+    "--seconds",
+    "60",
+    "--deadline-epoch",
+    "1794467554.94431",
+    "--",
+    "claude",
+    "--plugin-dir",
+    "/Users/m/repo/goal-loop",
+    "--print",
+    "--no-session-persistence",
+    "--output-format",
+    "json",
+    "--max-turns",
+    "1",
+    "--max-budget-usd",
+    "0.10",
+    "--tools",
+    "",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "/tmp/goal-host-claude-followup-lpv7si8e/mcp.json",
+    "--",
+    "Print exactly READY and stop."
+  ],
+  "started_epoch": 1794467494.94431,
+  "elapsed": 2.47047366714105,
+  "result": 1,
+  "ready": false,
+  "subtype": "success",
+  "error": true,
+  "usage": {
+    "input_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 0,
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "",
+    "iterations": [],
+    "speed": "standard"
+  },
+  "cost_usd": 0,
+  "plugin_scope": "per-command; no global config changes"
+}

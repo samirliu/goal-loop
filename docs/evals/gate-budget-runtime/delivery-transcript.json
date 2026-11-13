@@ -1,0 +1,72 @@
+[
+  {
+    "script": "goal_ctl.sh",
+    "args": [
+      "init"
+    ],
+    "exit": 0,
+    "elapsed": 0.1436024170834571,
+    "stdout": "CTL: INIT ok operation=init-49a1860fa1cf4669aa633afe4f73f5a7 - fill /var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-runtime-evidence-zcap1dy4/.goal/goal.md, then: goal_ctl.sh stamp --project /var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-runtime-evidence-zcap1dy4\n",
+    "stderr": ""
+  },
+  {
+    "script": "goal_ctl.sh",
+    "args": [
+      "stamp",
+      "--auto"
+    ],
+    "exit": 0,
+    "elapsed": 0.25830254098400474,
+    "stdout": "approved: 8a13340e 2026-11-11 auto\n",
+    "stderr": ""
+  },
+  {
+    "script": "goal_ctl.sh",
+    "args": [
+      "close-iteration",
+      "--task",
+      "T1",
+      "--files",
+      "artifact.txt",
+      "--checks-pass",
+      "2",
+      "--checks-fail",
+      "0",
+      "--checks-unverifiable",
+      "0",
+      "--progress",
+      "yes",
+      "--exit-signal",
+      "yes",
+      "--adversarial",
+      "clear",
+      "--adversarial-note",
+      "independent byte comparison reviewed",
+      "--no-gate"
+    ],
+    "exit": 0,
+    "elapsed": 1.1667402910534292,
+    "stdout": "CTL: CLOSE ok iter=1 digest=v2-450a0a6811405c92277f6427e5e0d2acfaf6242046b190cc4d0173259422f6c6 operation=89d53134f66744e7b7b03d3373378c97\n",
+    "stderr": ""
+  },
+  {
+    "script": "goal_gate.sh",
+    "args": [
+      "--check"
+    ],
+    "exit": 0,
+    "elapsed": 1.0014057501684874,
+    "stdout": "GATE: GO digest=v2-450a0a6811405c92277f6427e5e0d2acfaf6242046b190cc4d0173259422f6c6 iter=1 ac=2 pass=2 unverified=0 mode=threshold\n",
+    "stderr": ""
+  },
+  {
+    "script": "goal_ctl.sh",
+    "args": [
+      "status"
+    ],
+    "exit": 0,
+    "elapsed": 0.17167762503959239,
+    "stdout": "CTL: STEP 4-branch: last block claims done - run gate --check, then deliver or follow NEXT (stamped=1 blocks=1 claim=1)\nCTL: STATUS iter=1/12 breaker=CLOSED dry_streak=0/3 best_score=none time_left=off\nCTL: LAST task=T1[crew:1] checks=2 pass / 0 fail / 0 unverifiable progress=yes digest=v2-450a0a6811405c92277f6427e5e0d2acfaf6242046b190cc4d0173259422f6c6\nCTL: OPEN none (all tasks closed)\nCTL: NEXT (nothing pending at last gate check - claim when ready)\nCTL: EVENTS artifact-versions=1 acceptance-claims=1 unchanged-artifact-rounds=0 restorations=0 unknown-artifact-rounds=0 artifact-stagnation=0 measurement-revisions=0 digest-scope=content-v2\nCTL: RUNTIME observed-spans=6 complete=6 unfinished=0 executor-span-seconds=unknown measurement-span-seconds=0.192805 wall=not-summed tokens=unknown money=unknown coverage=observed\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,15 @@
+F
+======================================================================
+FAIL: test_bind_batch_is_all_or_nothing_and_input_is_part_of_identity (__main__.MutationCommit.test_bind_batch_is_all_or_nothing_and_input_is_part_of_identity)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-invariant-mutations-1cvu1cyn/fence-rejected-batch/tests/test_mutation_commit.py", line 122, in test_bind_batch_is_all_or_nothing_and_input_is_part_of_identity
+    self.assertEqual(before, self.all_files(project))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'loo[475 chars]': b'', 'store/commits/writer.lock': b'', 'sto[1730 chars]:1}'} != {'loo[475 chars]': b'AC-1|PASS|1|digest|cmd|first\n', 'store/c[1760 chars]:1}'}
+Diff is 40874 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 1 test in 0.237s
+
+FAILED (failures=1)

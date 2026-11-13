@@ -1,0 +1,26 @@
+command: python3 -B -u /var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-watermark-review-qpo4yiv8/repro_refused_basis.py
+exit: 1
+BEFORE best_score=100
+best_score_basis=quality-v1:774cedd69f139e29557dc1481aabcb4eff1562d9d624b914c937d7009ac794c8
+REFUSED-QUALIFICATION ('CTL: NOTE legacy-watermark-unqualified:value=100\nCTL: QUALITY not-qualified result=2 reason=GATE: NO-GO reason=contract-tampered:stam=69cd62a4 recomputed=21bf2e74 hint=proposal-to-user\nCTL: BIND ok appended=1 skipped=0 operation=refused-edit\n', '')
+AFTER REFUSAL best_score=100
+best_score_basis=quality-v1:774cedd69f139e29557dc1481aabcb4eff1562d9d624b914c937d7009ac794c8
+AFTER RESTORE best_score=100
+best_score_basis=quality-v1:774cedd69f139e29557dc1481aabcb4eff1562d9d624b914c937d7009ac794c8
+Traceback (most recent call last):
+  File "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-watermark-review-qpo4yiv8/repro_refused_basis.py", line 16, in <module>
+    print('GATE',q.gate('--check'))
+                 ~~~~~~^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 34, in gate
+    return self.run_entry(['bash', str(SCRIPTS / 'goal_gate.sh')], *args, **kwargs)
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 27, in run_entry
+    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/case.py", line 925, in assertEqual
+    assertion_func(first, second, msg=msg)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/case.py", line 918, in _baseAssertEqual
+    raise self.failureException(msg)
+AssertionError: 2 != 0 : GATE: NO-GO reason=score-regressed:current=10 best=100 dir=maximize tol=0 (restore the best-scoring state or do not claim) hint=restore-best
+

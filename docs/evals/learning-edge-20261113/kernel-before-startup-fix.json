@@ -1,0 +1,8 @@
+{
+  "scripts/goal_gate.sh": true,
+  "scripts/goal_store.py": true,
+  "scripts/goal_runner.py": true,
+  "scripts/goal_bounded.py": true,
+  "scripts/goal_owner_watch.py": true,
+  "scripts/goal_parse.sh": true
+}

@@ -1,0 +1,23 @@
+Command: python3.12 -m pytest -q -s tests/test_host.py -k structured_leaf_symlink
+Exit: 1
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-b8qyhyer/1.out", "response": {}, "tool": "Write"}
+F
+=================================== FAILURES ===================================
+_______ Host.test_structured_leaf_symlink_escape_and_parent_permissions ________
+
+self = <test_host.Host testMethod=test_structured_leaf_symlink_escape_and_parent_permissions>
+
+    def test_structured_leaf_symlink_escape_and_parent_permissions(self):
+        self.structured_write_worker()
+        with tempfile.TemporaryDirectory(prefix='goal-write-outside-') as outside:
+            leaf = self.project / '1.out'
+            leaf.symlink_to(Path(outside) / 'not-created')
+            for tool in ('Write', 'Edit'):
+>               self.assertEqual(self.structured_write_hook(tool, str(leaf))[
+                    'hookSpecificOutput']['permissionDecision'], 'deny')
+E               KeyError: 'hookSpecificOutput'
+
+tests/test_host.py:428: KeyError
+=========================== short test summary info ============================
+FAILED tests/test_host.py::Host::test_structured_leaf_symlink_escape_and_parent_permissions
+1 failed, 15 deselected in 0.86s

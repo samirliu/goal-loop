@@ -1,0 +1,226 @@
+{
+  "command": [
+    "bash",
+    "/tmp/goal-forge-readonly-followup-lfyel4n8/after-readonly/tests/run_fixtures.sh"
+  ],
+  "cwd": "/tmp/goal-forge-readonly-followup-lfyel4n8/after-readonly",
+  "uid": 501,
+  "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+  "returncode": 0,
+  "seconds": 0.9963521249592304,
+  "source_script_sha256": "341b527a6bd33aefc0ffd91b68008eb17d48663733bfb8d9f53dcdf822c989c7",
+  "read_only_directory_mode": "0o555",
+  "source_inventory_before": {
+    "SKILL.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "a820504b7b60f7eeabafc6cfb7bf1ef93d77f29eadd31ed6a5861485187daba3"
+    },
+    "assets": {
+      "mode": "0o555",
+      "kind": "directory"
+    },
+    "assets/contract.draft.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "28fa697ae8c8093c499c69d195f15a05196997672bb90fbe240c46d06f63a063"
+    },
+    "references": {
+      "mode": "0o555",
+      "kind": "directory"
+    },
+    "references/ac-shapes.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "02785659cda4e3d226840ad82bd02e99515829f625a1087f28e3c240e7e72dc8"
+    },
+    "references/interview-tree.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "fd383d4c470cd806f1a321b5f71b18a4101d860a382c596b976e70b36eb0737d"
+    },
+    "references/stamp-checklist.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "706dbc8f4b784fcc079f3700334f6803cf6ca93a63d59f914f28ebbab4cd6bd5"
+    },
+    "scripts": {
+      "mode": "0o555",
+      "kind": "directory"
+    },
+    "scripts/lint_contract.sh": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "6a0a322c3a6c300222f4a31b654f60c7e79da369e72b919b54121c576384ff66"
+    },
+    "tests": {
+      "mode": "0o555",
+      "kind": "directory"
+    },
+    "tests/fixtures": {
+      "mode": "0o555",
+      "kind": "directory"
+    },
+    "tests/fixtures/bad-calib-on-metric.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "0c8af67a2e69737dd5d2c09dab4efdaf5afee739aa8871945ee864a3565bde35"
+    },
+    "tests/fixtures/bad-no-horizon.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "cf7fbff5b4d6dc04d2bf7fdc9392cdfbd7459d99ee4db351b55d3611ff2deead"
+    },
+    "tests/fixtures/bad-objective-target.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "64c23f6de242f893b7e0b370a395c216761b55debc0bdb1ddc861e2c7e0d5dd2"
+    },
+    "tests/fixtures/bad-pipe-spec.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "38e4d067ff7fb289ab89a73a61ec4870d27c05023be175cc7427026e48cef3e0"
+    },
+    "tests/fixtures/bad-window-no-external.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "89b2518b877a6a22a04a585fdfa87bbf397b0cbe3c2602cabfe90e33f17504f7"
+    },
+    "tests/fixtures/good-objective-forge.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "4e7abb8d1c68945c8fed7d9b68e7e447d040d59178556bdeab6a11e99c469522"
+    },
+    "tests/fixtures/good-pipe-in-backtick.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "7d7d83d17f633ade2b67d7dc2c9c5b0a89b7d565f1cb0010feecde4869124554"
+    },
+    "tests/fixtures/good-threshold.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "e7d922f5605790fca24a499342f6df2894e4152dc2081f434d6cfd6260f4276a"
+    },
+    "tests/run_fixtures.sh": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "341b527a6bd33aefc0ffd91b68008eb17d48663733bfb8d9f53dcdf822c989c7"
+    }
+  },
+  "source_inventory_after": {
+    "SKILL.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "a820504b7b60f7eeabafc6cfb7bf1ef93d77f29eadd31ed6a5861485187daba3"
+    },
+    "assets": {
+      "mode": "0o555",
+      "kind": "directory"
+    },
+    "assets/contract.draft.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "28fa697ae8c8093c499c69d195f15a05196997672bb90fbe240c46d06f63a063"
+    },
+    "references": {
+      "mode": "0o555",
+      "kind": "directory"
+    },
+    "references/ac-shapes.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "02785659cda4e3d226840ad82bd02e99515829f625a1087f28e3c240e7e72dc8"
+    },
+    "references/interview-tree.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "fd383d4c470cd806f1a321b5f71b18a4101d860a382c596b976e70b36eb0737d"
+    },
+    "references/stamp-checklist.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "706dbc8f4b784fcc079f3700334f6803cf6ca93a63d59f914f28ebbab4cd6bd5"
+    },
+    "scripts": {
+      "mode": "0o555",
+      "kind": "directory"
+    },
+    "scripts/lint_contract.sh": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "6a0a322c3a6c300222f4a31b654f60c7e79da369e72b919b54121c576384ff66"
+    },
+    "tests": {
+      "mode": "0o555",
+      "kind": "directory"
+    },
+    "tests/fixtures": {
+      "mode": "0o555",
+      "kind": "directory"
+    },
+    "tests/fixtures/bad-calib-on-metric.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "0c8af67a2e69737dd5d2c09dab4efdaf5afee739aa8871945ee864a3565bde35"
+    },
+    "tests/fixtures/bad-no-horizon.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "cf7fbff5b4d6dc04d2bf7fdc9392cdfbd7459d99ee4db351b55d3611ff2deead"
+    },
+    "tests/fixtures/bad-objective-target.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "64c23f6de242f893b7e0b370a395c216761b55debc0bdb1ddc861e2c7e0d5dd2"
+    },
+    "tests/fixtures/bad-pipe-spec.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "38e4d067ff7fb289ab89a73a61ec4870d27c05023be175cc7427026e48cef3e0"
+    },
+    "tests/fixtures/bad-window-no-external.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "89b2518b877a6a22a04a585fdfa87bbf397b0cbe3c2602cabfe90e33f17504f7"
+    },
+    "tests/fixtures/good-objective-forge.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "4e7abb8d1c68945c8fed7d9b68e7e447d040d59178556bdeab6a11e99c469522"
+    },
+    "tests/fixtures/good-pipe-in-backtick.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "7d7d83d17f633ade2b67d7dc2c9c5b0a89b7d565f1cb0010feecde4869124554"
+    },
+    "tests/fixtures/good-threshold.md": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "e7d922f5605790fca24a499342f6df2894e4152dc2081f434d6cfd6260f4276a"
+    },
+    "tests/run_fixtures.sh": {
+      "mode": "0o444",
+      "kind": "file",
+      "sha256": "341b527a6bd33aefc0ffd91b68008eb17d48663733bfb8d9f53dcdf822c989c7"
+    }
+  },
+  "source_unchanged": true,
+  "source_added_paths": [],
+  "tmpdir": "/tmp/goal-forge-readonly-followup-lfyel4n8/temporary ' quoted $() space",
+  "temporary_inventory_before": {
+    "keep.txt": {
+      "mode": "0o644",
+      "kind": "file",
+      "sha256": "98db886d0fdc759f8575e0a42ff4a7e36c96c3426dc855b98abb2fafd7fc3f0b"
+    }
+  },
+  "temporary_inventory_after": {
+    "keep.txt": {
+      "mode": "0o644",
+      "kind": "file",
+      "sha256": "98db886d0fdc759f8575e0a42ff4a7e36c96c3426dc855b98abb2fafd7fc3f0b"
+    }
+  },
+  "temporary_inventory_unchanged": true,
+  "inputs_and_linter_identical_to_before": true
+}

@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/opt/homebrew/opt/python@3.12/bin/python3.12",
+    "-B",
+    "-c",
+    "import resource,pytest; resource.setrlimit(resource.RLIMIT_NOFILE,(1024,1024)); raise SystemExit(pytest.main([\"-q\",\"-s\",\"tests/test_owner_watch_guard.py\",\"-k\",\"guard_drops_stdout\"]))"
+  ],
+  "uid": 501,
+  "platform": "darwin",
+  "python": "3.12.13 (main, Mar  3 2026, 12:39:30) [Clang 17.0.0 (clang-1700.6.3.2)]",
+  "inherited_nofile": [
+    4096,
+    9223372036854775807
+  ],
+  "requested_test_process_limits": [
+    1024,
+    1024
+  ],
+  "result": 0,
+  "stdout": "OWNER_GUARD_FD_CAPABILITY {\"nofile\": [1024, 1024], \"required_minimum_fd\": 2000, \"high_fd_measured\": false}\ns\n1 skipped, 4 deselected in 0.01s\n",
+  "stderr": "",
+  "high_fd_measurement_claim": false,
+  "production_sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+  "test_sha256": "63ccbe2d2a124cb25b24fedb5174ae9d5bdeacd8a704ab061c5e38364ce38d14"
+}

@@ -1,0 +1,10 @@
+{
+  "command": "python3 -B tests/test_policy_transition.py PolicyTransition.test_pointer_write_failure_blocks_old_policy_until_real_recovery PolicyTransition.test_process_crashes_before_after_switch_report_and_ack_recover_without_replay PolicyTransition.test_intent_creation_failure_after_regression_retains_evaluation_guard",
+  "result": {
+    "chunk_id": "35adce",
+    "wall_time_seconds": 2.823108292,
+    "exit_code": 0,
+    "original_token_count": 26,
+    "output": "...\n----------------------------------------------------------------------\nRan 3 tests in 2.841s\n\nOK\n"
+  }
+}

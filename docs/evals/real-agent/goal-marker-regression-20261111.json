@@ -1,0 +1,7 @@
+{
+  "source_trial": "/tmp/goal-agent-pilot-v2-20261111/trials/cf5f7217ac74458b82d66d7aaff9b89d",
+  "only_removed": "DONE.json",
+  "result": 0,
+  "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-32331b97b65c51b49a03b630c914d2e4d2ffc6b3ee46cd613d95c984edb327ed iter=1 ac=1 pass=1 unverified=0 mode=threshold\n",
+  "stderr": ""
+}

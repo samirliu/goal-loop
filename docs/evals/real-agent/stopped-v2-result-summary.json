@@ -1,0 +1,135 @@
+{
+  "cohort_status": "user-stopped",
+  "stop_reason": "User explicitly changed priority and requested immediate stop; not timeout or product failure.",
+  "total_preregistered": 36,
+  "dispatched": 10,
+  "completed": 9,
+  "user_stopped_attempts": 1,
+  "prepared_undispatched": 26,
+  "accepted_completed": 9,
+  "protocol_compliant_completed": 7,
+  "current": null,
+  "results": [
+    {
+      "n": 1,
+      "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/601d7cbb24d142df8a9aab666c7973dc",
+      "family": "small",
+      "arm": "plain",
+      "terminal": "returned",
+      "accepted": true,
+      "timely": true,
+      "protocol_compliant": true,
+      "independent_finished_seconds": 139.8476342081558
+    },
+    {
+      "n": 2,
+      "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/defad5bb4f054f8c83d5d9a151236851",
+      "family": "small",
+      "arm": "skill",
+      "terminal": "returned",
+      "accepted": true,
+      "timely": true,
+      "protocol_compliant": true,
+      "independent_finished_seconds": 232.35937987500802
+    },
+    {
+      "n": 3,
+      "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/945e9bf2babd4e1f94621a632f259d9d",
+      "family": "small",
+      "arm": "native",
+      "terminal": "returned",
+      "accepted": true,
+      "timely": true,
+      "protocol_compliant": false,
+      "independent_finished_seconds": 155.57455649995245
+    },
+    {
+      "n": 4,
+      "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/8323e503369b407fad57ea6d209f8713",
+      "family": "small",
+      "arm": "skill",
+      "terminal": "returned",
+      "accepted": true,
+      "timely": true,
+      "protocol_compliant": true,
+      "independent_finished_seconds": 367.8647861671634
+    },
+    {
+      "n": 5,
+      "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/0a6df7da8392486b9fda2062b3f110bf",
+      "family": "small",
+      "arm": "native",
+      "terminal": "returned",
+      "accepted": true,
+      "timely": true,
+      "protocol_compliant": true,
+      "independent_finished_seconds": 247.3504293751903
+    },
+    {
+      "n": 6,
+      "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/e17952877f204704a9c0fc16e4aae4b4",
+      "family": "small",
+      "arm": "plain",
+      "terminal": "returned",
+      "accepted": true,
+      "timely": true,
+      "protocol_compliant": true,
+      "independent_finished_seconds": 321.0981460828334
+    },
+    {
+      "n": 7,
+      "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/be10cc1891974a37b2a349d6e2fb8fba",
+      "family": "small",
+      "arm": "native",
+      "terminal": "returned",
+      "accepted": true,
+      "timely": true,
+      "protocol_compliant": false,
+      "independent_finished_seconds": 241.34165354189463
+    },
+    {
+      "n": 8,
+      "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/f76123585c984c398deb914f9bb85f50",
+      "family": "small",
+      "arm": "plain",
+      "terminal": "returned",
+      "accepted": true,
+      "timely": true,
+      "protocol_compliant": true,
+      "independent_finished_seconds": 231.92137941601686
+    },
+    {
+      "n": 9,
+      "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/0b843e810b694cc8b1a2785053acaf3b",
+      "family": "small",
+      "arm": "skill",
+      "terminal": "returned",
+      "accepted": true,
+      "timely": true,
+      "protocol_compliant": true,
+      "independent_finished_seconds": 458.11335154110566
+    },
+    {
+      "n": 10,
+      "trial": "/private/tmp/goal-agent-cohort-v2-20261111/trials/7e8eacf5202b4f7598f785df70b83e7a",
+      "family": "medium",
+      "arm": "skill",
+      "terminal": "user-stopped",
+      "accepted": false,
+      "timely": true,
+      "protocol_compliant": false,
+      "independent_finished_seconds": 205.0848184588831
+    }
+  ],
+  "updated_time": 1794398174.205733,
+  "updated_monotonic": 1583748.779916208,
+  "worker": "/root/cohort_v2_controller/r10_skill",
+  "monitor_session_id": 95250,
+  "monitor_termination_receipt": {
+    "exit_code": 130,
+    "write_stdin_chars": "Ctrl-C",
+    "output": ""
+  },
+  "native_goal_receipt_exists": false,
+  "raw_report": "final-report.json"
+}

@@ -1,0 +1,58 @@
+{
+  "scope": "Known Claude structured Write/Edit fence; original row.files anchor, no OS/shell sandbox claim",
+  "before_production_sha256": "7cd29cccfbc59672a4393e68e0561bf54e9034a307a111e41949683f08879570",
+  "after_production_sha256": "a33b910a23954aa2f08ce86863a16433d113f582c127723aeaed238c94065e3d",
+  "same_tests_in_before_and_after_sha256": "ab8fff931a51c728153912cdc6d50d50bc3394f56edd7302b20a7b680c733489",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 3465,
+      "sha256": "3597089147977095fc24ec73f07f79e2080ab8c3f54e23ac0710c61ddf08a0be"
+    },
+    {
+      "path": "actual-w5-outside-write-metadata.json",
+      "bytes": 1420,
+      "sha256": "9a0eadd07ee32750680886cc7c22a45a02f62d7800c888091c0ddbd6e7613305"
+    },
+    {
+      "path": "after-goal_host.py.txt",
+      "bytes": 33484,
+      "sha256": "a33b910a23954aa2f08ce86863a16433d113f582c127723aeaed238c94065e3d"
+    },
+    {
+      "path": "after-targeted.log",
+      "bytes": 9189,
+      "sha256": "52cc2617f99744691e1126508f500b41b21a2741f3d8809c6660781be5956981"
+    },
+    {
+      "path": "after-test_host.py.txt",
+      "bytes": 27190,
+      "sha256": "ab8fff931a51c728153912cdc6d50d50bc3394f56edd7302b20a7b680c733489"
+    },
+    {
+      "path": "before-goal_host.py.txt",
+      "bytes": 32384,
+      "sha256": "7cd29cccfbc59672a4393e68e0561bf54e9034a307a111e41949683f08879570"
+    },
+    {
+      "path": "before-targeted.log",
+      "bytes": 1306,
+      "sha256": "442940ad005c1e08df1f41e203c1941d9313ce73f9fc57a0d528798801c96924"
+    },
+    {
+      "path": "before-test_host.py.txt",
+      "bytes": 21687,
+      "sha256": "1819aca0f08da9dca9cc0e56c0e19cbb1f181d36a3b02c2451ff7c7b48ecc1c5"
+    },
+    {
+      "path": "implementation.patch",
+      "bytes": 7601,
+      "sha256": "cae08f4e1172d966f0f0a4ebf8a4f6d844e00685098811fa53fead40e61abfa9"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 661,
+      "sha256": "2713782b283e30529ba1a4b169eb8a7acd0602e79a879bc8c0f868f2bd1f068d"
+    }
+  ]
+}

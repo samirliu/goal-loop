@@ -1,0 +1,447 @@
+--- a/scripts/goal_gate.sh
++++ b/scripts/goal_gate.sh
+@@ -11,10 +11,11 @@
+ #   bash goal_gate.sh --digest [--project DIR]              # print tree digest
+ #   bash goal_gate.sh --verify [--project DIR] [AC-ID ...]  # rerun deterministic checks; 0 all-pass / 2 FAIL-or-broken / 4 state error
+ #   bash goal_gate.sh --baseline-check [--project DIR]      # forge contracts: baseline.md covers every delta metric AC; 0 ok / 2 problem
++#   bash goal_gate.sh --checkpoint [--project DIR]          # qualify an intermediate artifact without a completion claim
+ set -u
+ export LC_ALL=C.UTF-8
+ 
+-usage(){ sed -n '2,13p' "$0"; }
++usage(){ sed -n '2,14p' "$0"; }
+ 
+ project="." mode="" positional=""
+ _goal_gate_args=("$@")
+@@ -24,6 +25,7 @@
+     --digest) mode=digest ;;
+     --verify) mode=verify ;;
+     --baseline-check) mode=baseline ;;
++    --checkpoint) mode=checkpoint ;;
+     --project) [ $# -ge 2 ] || { echo "GATE: NO-GO reason=missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
+     --help|-h) usage; exit 0 ;;
+     -*) echo "GATE: NO-GO reason=unknown-flag:$1" >&2; exit 4 ;;
+@@ -32,7 +34,7 @@
+   shift
+ done
+ 
+-[ -n "$mode" ] || { echo "GATE: NO-GO reason=no-mode (use --check, --digest, --verify or --baseline-check)" >&2; exit 4; }
++[ -n "$mode" ] || { echo "GATE: NO-GO reason=no-mode (use --check, --digest, --verify, --baseline-check or --checkpoint)" >&2; exit 4; }
+ [ -z "${positional# }" ] || [ "$mode" = verify ] || { echo "GATE: NO-GO reason=unknown-arg:$positional" >&2; exit 4; }
+ 
+ sd="$project/.goal"
+@@ -300,6 +302,10 @@
+   err_tail=$(r < "$gate_err" | tail -3 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-160)
+   rm -f "$gate_err"
+   [ -n "$err_tail" ] || err_tail=""
++  case "$cls" in
++    metric\ *|maximize|minimize)
++      [ "$rc" -eq 0 ] || { printf '%s|BROKEN|measurement command did not finish successfully (rc=%s) %s\n' "$id" "$rc" "$err_tail"; return; } ;;
++  esac
+   out=$(printf '%s\n' "$out" | r)                    # CR scrub: Windows-native checks print CRLF
+   metric=$(ac_metric_re "$id")
+   clean=$(printf '%s\n' "$out" | strip_ansi)
+@@ -334,52 +340,32 @@
+       elif [ "$rc" -eq 124 ] && [ "$want" != 124 ]; then line="$id|BROKEN|timed out (rc=124) $err_tail"
+       elif [ "$rc" -eq 127 ] && [ "$want" != 127 ]; then line="$id|BROKEN|check not executable (rc=127) $err_tail"
+       else line="$id|FAIL|exit=$rc expect=exit=$want $err_tail"; fi ;;
+-    metric\ *)
++    metric\ *|maximize|minimize)
+       last="$mval"
+       if [ -z "$last" ] && [ -n "$metric" ]; then
+         printf '%s|BROKEN|metric regex matched nothing: %s %s\n' "$id" "$metric" "$err_tail"; return
+       fi
+       if [ -z "$last" ]; then
+-        last=$(printf '%s\n' "$out" | strip_ansi | grep -vE '^[[:space:]]*$' | tail -1)
++        last=$(printf '%s\n' "$clean" | grep -vE '^[[:space:]]*$' | tail -1)
+       fi
++      if ! [[ "$last" =~ ^-?([0-9]+(\.[0-9]*)?|\.[0-9]+)$ ]]; then
++        printf '%s|BROKEN|no number in output: %s %s\n' "$id" "${last:-<empty>}" "$err_tail"; return
++      fi
++      # The raw decimal may omit a leading or trailing zero. Keep the
++      # persisted score in the same grammar as scores.rec and CLI scores.
+       case "$last" in
+-        ''|*[!0-9.\-]*)
+-          printf '%s|BROKEN|no number in output (metric or last line): %s\n' "$id" "${last:-<empty>}"; return ;;
++        .*) last="0$last" ;;
++        -.*) last="-0${last#-}" ;;
++        *.) last="${last%.}" ;;
+       esac
+-      v=$(awk -v a="$last" -v b="$m_num" -v o="$m_op" \
+-          'BEGIN{ok=(o==">=")?(a>=b):(o=="<=")?(a<=b):(o==">")?(a>b):(o=="<")?(a<b):(o=="==")?(a==b):(a!=b); print ok?"PASS":"FAIL"}')
+-      line="$id|$v|observed=$last expect=$m_op$m_num" ;;
+-    maximize)
+-      last="$mval"
+-      if [ -z "$last" ] && [ -n "$metric" ]; then
+-        printf '%s|BROKEN|metric regex matched nothing: %s %s\n' "$id" "$metric" "$err_tail"; return
++      if [ "$cls" = maximize ] || [ "$cls" = minimize ]; then
++        line="$id|PASS|observed=$last${spread:+ spread=$spread} expect=$cls"
++      else
++        v=$(awk -v a="$last" -v b="$m_num" -v o="$m_op" \
++            'BEGIN{ok=(o==">=")?(a>=b):(o=="<=")?(a<=b):(o==">")?(a>b):(o=="<")?(a<b):(o=="==")?(a==b):(a!=b); print ok?"PASS":"FAIL"}')
++        line="$id|$v|observed=$last expect=$m_op$m_num"
+       fi
+-      if [ -z "$last" ]; then
+-        last=$(printf '%s\n' "$out" | strip_ansi | grep -vE '^[[:space:]]*$' | tail -1)
+-      fi
+-      case "$last" in
+-        ''|*[!0-9.\-]*)
+-          printf '%s|BROKEN|no number in output: %s %s\n' "$id" "${last:-<empty>}" "$err_tail"; return ;;
+-      esac
+-      # maximize is the objective, not a floor: numeric = PASS. The score
+-      # itself is compared to best_score by the caller (score-regressed).
+-      # spread rides along in the detail (run_one_check returns via subshell).
+-      line="$id|PASS|observed=$last${spread:+ spread=$spread} expect=maximize" ;;
+-    minimize)
+-      last="$mval"
+-      if [ -z "$last" ] && [ -n "$metric" ]; then
+-        printf '%s|BROKEN|metric regex matched nothing: %s %s\n' "$id" "$metric" "$err_tail"; return
+-      fi
+-      if [ -z "$last" ]; then
+-        last=$(printf '%s\n' "$out" | strip_ansi | grep -vE '^[[:space:]]*$' | tail -1)
+-      fi
+-      case "$last" in
+-        ''|*[!0-9.\-]*)
+-          printf '%s|BROKEN|no number in output: %s %s\n' "$id" "${last:-<empty>}" "$err_tail"; return ;;
+-      esac
+-      # minimize: the objective is to push the number DOWN. Numeric = PASS;
+-      # the low-water mark is enforced by the caller (score-regressed).
+-      line="$id|PASS|observed=$last${spread:+ spread=$spread} expect=minimize" ;;
++      ;;
+     *)
+       printf '%s|BROKEN|unroutable expectation class\n' "$id"; return ;;
+   esac
+@@ -408,6 +394,9 @@
+   # per AC. An inherited envelope also caps a nested gate's final settlement.
+   gate_budget=$(python3 -I "$here/goal_runner.py" gate-limit "$sd") || state_err budget-unavailable
+   read -r gate_cap deadline_expired <<< "$gate_budget"
++  if [ "$mode" = checkpoint ] && [ "$deadline_expired" = 1 ]; then
++    blocked time-budget-exhausted
++  fi
+   if [ "$gate_cap" != none ]; then
+     export GOAL_RUNNER_MONOTONIC_END="$gate_cap"
+   fi
+@@ -418,7 +407,7 @@
+       GOAL_GATE_SUPERVISED=1 python3 -I "$here/goal_bounded.py" --owner "$$" \
+         --kind "$gate_kind" --label "$mode" -- bash "$here/goal_gate.sh" "${_goal_gate_args[@]}"; gate_rc=$?
+       if [ "$gate_rc" -eq 124 ]; then
+-        if [ "$mode" = check ]; then blocked time-budget-exhausted; fi
++        if [ "$mode" = check ] || [ "$mode" = checkpoint ]; then blocked time-budget-exhausted; fi
+         echo 'GATE: NO-GO reason=verification-time-budget-exhausted' >&2; exit 2
+       fi
+       exit "$gate_rc"
+@@ -553,6 +542,9 @@
+      # fail() escalates to BLOCKED, a green claim still GO (see fail/GO).
+      [ "$now" -gt "$dl" ] && deadline_expired=1 ;;
+ esac
++if [ "$mode" = checkpoint ] && [ "${deadline_expired:-0}" = 1 ]; then
++  blocked time-budget-exhausted
++fi
+ if [ "$exit_mode" = forge ]; then
+   [ "${iter:-0}" -le "${maxit:-12}" ] || blocked "budget-fuse:iter=$iter max=$maxit (forge: budget is a fuse - extend it or deliver best-so-far)"
+   baseline_validate                                   # belt+braces: baseline.md must still cover every delta metric AC
+@@ -588,7 +580,7 @@
+ done
+ [ -z "$missing_lk" ] || echo "GATE: NOTE loop-log-missing-keys:${missing_lk# }" >&2
+ claim=$(printf '%s\n' "$lb" | grep -E '^exit_signal=' | tail -1 | cut -d= -f2-)
+-[ "$claim" = yes ] || fail "not-claimed"
++[ "$claim" = yes ] || [ "$mode" = checkpoint ] || fail "not-claimed"
+ # (5c/5d two-pass + raw run immediately before GO - after mechanical ACs)
+ # R12 tooth at the arbiter (v2.7): the CLAIMING block must carry a schema-valid
+ # task= id. ctl enforces this at write time, but a hand-written ledger block
+@@ -749,6 +741,9 @@
+   fi
+ done
+ [ $((unv*3)) -le "$total" ] || fail "unverifiable-excessive:unv=$unv total=$total"
++if [ "$mode" = checkpoint ] && [ "$unv" -gt 0 ]; then
++  fail "checkpoint-unverifiable:unv=$unv"
++fi
+ 
+ # -10. guard against checks that mutated the tree mid-verification --------
+ digest2=$(tree_digest)
+@@ -762,7 +757,7 @@
+ [ "$ld_check0" = "$ld2" ] || fail "check-mutated-ledger:before=$ld_check0 after=$ld2 (a check wrote the ledger mid-run - only .goal/evidence/ is fair game)"
+ 
+ # -11. forge: floors alone are not an exit; exhaustion is -----------------
+-if [ "$exit_mode" = forge ]; then
++if [ "$exit_mode" = forge ] && [ "$mode" != checkpoint ]; then
+   dry=$(state_get dry_streak); dl=$(state_get dry_limit)
+   [ "${dry:-0}" -ge "${dl:-3}" ] || fail "not-dry:dry_streak=${dry:-0} limit=$dl (forge exits on verification exhaustion, not on floors alone)"
+ fi
+@@ -880,7 +875,7 @@
+   wp_open=$(grep -cE '^- \[ \]' "$sd/work-plan.md" 2>/dev/null || echo 0)
+   case "$wp_open" in ''|*[!0-9]*) wp_open=0 ;; esac
+ fi
+-[ "$wp_open" -eq 0 ] \
++[ "$wp_open" -eq 0 ] || [ "$mode" = checkpoint ] \
+   || fail "open-items:$wp_open (work-plan still has unticked item(s): finish them, or close them with a recorded fault - close-iteration --fault CLASS --fault-outcome OUTCOME)"
+ 
+ # -5c. two-pass adversarial (harness engineering): a claim needs a second
+@@ -916,10 +911,12 @@
+ rawf="$sd/evidence/raw/${claim_iter}.txt"
+ [ -s "$rawf" ] || fail "raw-evidence-missing:need non-empty .goal/evidence/raw/${claim_iter}.txt with the real check output"
+ 
++outcome=GO
++[ "$mode" != checkpoint ] || outcome=CHECKPOINT-OK
+ if [ -n "$primary" ]; then
+-  echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}"
++  echo "GATE: $outcome digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}"
+   exit 0
+ fi
+ 
+-echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode"
++echo "GATE: $outcome digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode"
+ exit 0
+--- a/scripts/goal_store.py
++++ b/scripts/goal_store.py
+@@ -1131,11 +1131,13 @@
+     parser.add_argument('--file', action='append', default=[])
+     parser.add_argument('--base')
+     parser.add_argument('--candidate')
++    parser.add_argument('--intermediate', action='store_true', help='save after checkpoint qualification, before GO')
+     args = parser.parse_args(argv)
+     if args.action == 'save':
+         valid = args.file and args.base is None and args.candidate is None
+     else:
+-        valid = not args.file and args.base and (args.candidate if args.action == 'restore' else args.candidate is None)
++        valid = (not args.file and not args.intermediate and args.base
++                 and (args.candidate if args.action == 'restore' else args.candidate is None))
+     if not valid:
+         raise StoreError('save requires --file, candidate requires --base, restore requires both checkpoint IDs')
+     project = Path(args.project).resolve(strict=True)
+@@ -1172,17 +1174,24 @@
+             raise StoreError('candidate requires a checkpoint of the same frozen contract')
+         paths = _incumbent_scope(project, args.file if baseline is None else baseline['files'])
+         files = {name: _incumbent_file(path) for name, path in paths.items()}
+-        artifact = subprocess.check_output(command + ['--digest']).decode('ascii').strip()
+         proof = None
+         if baseline is None:
+             env = {k: v for k, v in os.environ.items() if not k.startswith(('GOAL_ACCESS_', 'GOAL_CLOSE_', 'GOAL_WRITER_', 'GOAL_GATE_'))}
+             env.update(GOAL_ACCESS_FD=str(fd), GOAL_ACCESS_OWNER_PID=str(os.getpid()),
+                        GOAL_ACCESS_MODE='exclusive-read')
+-            check = subprocess.run(command + ['--check'], env=env, pass_fds=(fd,), capture_output=True)
++            mode = '--checkpoint' if args.intermediate else '--check'
++            check = subprocess.run(command + [mode], env=env, pass_fds=(fd,), capture_output=True)
+             if check.returncode != 0:
+                 print((check.stdout + check.stderr).decode('utf-8', 'replace'), file=sys.stderr, end='')
+                 raise StoreError('incumbent must pass a fresh gate')
++            outcome = b'CHECKPOINT-OK' if args.intermediate else b'GO'
++            receipts = re.findall(rb'^GATE: ' + outcome + rb' digest=(v2-[0-9a-f]{64}) ', check.stdout, re.M)
++            if len(receipts) != 1:
++                raise StoreError('missing artifact identity in gate receipt')
++            artifact = receipts[0].decode('ascii')
+             proof = base64.b64encode(check.stdout + check.stderr).decode('ascii')
++        else:
++            artifact = subprocess.check_output(command + ['--digest']).decode('ascii').strip()
+         if (verify_views(state) != head or _incumbent_context(state) != context
+                 or {name: _incumbent_file(path) for name, path in paths.items()} != files
+                 or subprocess.check_output(command + ['--digest']).decode('ascii').strip() != artifact):
+--- a/scripts/goal_ctl.sh
++++ b/scripts/goal_ctl.sh
+@@ -446,9 +446,10 @@
+     obj_dir=$(gp_objective_dir "$project")
+     [ -n "$obj_dir" ] || obj_dir=maximize
+     if [ -n "$obj_ac" ] && [ -n "$score" ]; then
+-      vline=$(bash "$here/goal_gate.sh" --verify "$obj_ac" --project "$project" 2>/dev/null \
+-              | grep -E "^GATE: VERIFY $obj_ac\|" | tail -1)
+-      mobs=$(printf '%s' "$vline" | sed -nE 's/.*observed=([0-9.\-]+).*/\1/p')
++      mobs=""
++      if measured=$(bash "$here/goal_gate.sh" --verify "$obj_ac" --project "$project" 2>/dev/null); then
++        mobs=$(printf '%s\n' "$measured" | sed -nE "s/^GATE: VERIFY $obj_ac[|]PASS[|]observed=([-0-9.]+) .*$/\1/p")
++      fi
+       if [ -n "$mobs" ]; then
+         [ "$mobs" = "$score" ] || echo "CTL: NOTE score-measured-override (claimed=$score measured=$mobs)" >&2
+         score="$mobs"
+--- a/tests/test_incumbent.py
++++ b/tests/test_incumbent.py
+@@ -1,4 +1,6 @@
+ """Exercise scoped rollback through the production gate and recovery command."""
++import base64
++import hashlib
+ import json
+ import os
+ from pathlib import Path
+@@ -10,13 +12,34 @@
+ SCRIPTS = Path(__file__).resolve().parents[1] / 'scripts'
+ 
+ 
+-class Incumbent(unittest.TestCase):
++class ProjectCase(unittest.TestCase):
+     def setUp(self):
+         tmp = tempfile.TemporaryDirectory(prefix='goal-incumbent-')
+         self.addCleanup(tmp.cleanup)
+         self.project = Path(tmp.name)
+         self.state = self.project / '.goal'
+         self.ctl('init')
++
++    def run_entry(self, cmd, *args, expected=0, env=None, input=None):
++        result = subprocess.run([*cmd, *args, '--project', str(self.project)],
++                                capture_output=True, text=True, timeout=15, env=env, input=input)
++        self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
++        return result.stdout, result.stderr
++
++    def ctl(self, *args, **kwargs):
++        return self.run_entry(['bash', str(SCRIPTS / 'goal_ctl.sh')], *args, **kwargs)
++
++    def gate(self, *args, **kwargs):
++        return self.run_entry(['bash', str(SCRIPTS / 'goal_gate.sh')], *args, **kwargs)
++
++    def checkpoint(self, *args, **kwargs):
++        return self.run_entry([sys.executable, '-I', str(SCRIPTS / 'goal_store.py'), 'incumbent'],
++                              *args, **kwargs)
++
++
++class Incumbent(ProjectCase):
++    def setUp(self):
++        super().setUp()
+         (self.state / 'goal.md').write_text(
+             '# Goal\n\n## Acceptance criteria\n\n'
+             '- AC-1 | good bytes | check: `grep -qx good a.txt` | expected: exit=0\n\n'
+@@ -32,22 +55,6 @@
+                  '--checks-pass', '1', '--checks-fail', '0', '--checks-unverifiable', '0',
+                  '--progress', 'yes', '--exit-signal', 'yes', '--adversarial', 'clear',
+                  '--adversarial-note', 'exact bytes checked', '--no-gate')
+-
+-    def run_entry(self, cmd, *args, expected=0, env=None):
+-        result = subprocess.run([*cmd, *args, '--project', str(self.project)],
+-                                capture_output=True, text=True, timeout=15, env=env)
+-        self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+-        return result.stdout, result.stderr
+-
+-    def ctl(self, *args, **kwargs):
+-        return self.run_entry(['bash', str(SCRIPTS / 'goal_ctl.sh')], *args, **kwargs)
+-
+-    def gate(self, *args, **kwargs):
+-        return self.run_entry(['bash', str(SCRIPTS / 'goal_gate.sh')], *args, **kwargs)
+-
+-    def checkpoint(self, *args, **kwargs):
+-        return self.run_entry([sys.executable, '-I', str(SCRIPTS / 'goal_store.py'), 'incumbent'],
+-                              *args, **kwargs)
+ 
+     def pair(self):
+         base = self.checkpoint('save', '--file', 'a.txt', '--file', 'b.txt', '--file', 'new.txt')[0].strip()
+@@ -127,5 +134,82 @@
+         self.assertFalse(trial_state.exists())
+ 
+ 
++class IntermediateCheckpoint(ProjectCase):
++    def setUp(self):
++        super().setUp()
++        (self.state / 'goal.md').write_text(
++            '# Goal\n\n## Objective\n\nexit: forge\nobjective: maximize AC-1\n\n'
++            '## Acceptance criteria\n\n'
++            '- AC-1 | score | check: `cat score.txt` | baseline: abs | expected: maximize\n'
++            '- AC-2 | floor | check: `grep -qx ready artifact.txt` | expected: exit=0\n'
++            '- AC-3 | horizon | check: `cat artifact.txt` | calib: good=good.txt bad=bad.txt | expected: judged\n\n'
++            '## Approval\n\napproved: PENDING\n')
++        self.artifact = self.project / 'artifact.txt'
++        self.artifact.write_text('ready\n')
++        (self.project / 'score.txt').write_text('10\n')
++        (self.project / 'good.txt').write_text('ready\n')
++        (self.project / 'bad.txt').write_text('broken\n')
++        self.ctl('stamp', '--auto')
++        (self.state / 'work-plan.md').write_text('- [ ] T2 further exploration | files=artifact.txt\n')
++        self.book()
++
++    def book(self):
++        self.ctl('close-iteration', '--task', 'T1', '--files', 'artifact.txt,score.txt',
++                 '--checks-pass', '2', '--checks-fail', '0', '--checks-unverifiable', '0',
++                 '--progress', 'yes', '--exit-signal', 'no', '--adversarial', 'clear',
++                 '--adversarial-note', 'reviewed raw floor results', '--no-gate', '--dry', 'no',
++                 '--strategy', 'baseline', '--score', '10', '--judge-score', '1')
++
++    def bind(self, horizon='PASS', calibrate=True):
++        digest = self.gate('--digest')[0].strip()
++        iteration = next(line.split('=')[1] for line in (self.state / 'state.rec').read_text().splitlines()
++                         if line.startswith('iteration='))
++        sha = hashlib.sha256(self.artifact.read_bytes()).hexdigest()
++        evidence = f'artifact: artifact.txt digest: {sha}' if horizon == 'PASS' else 'PROBE=inspect REASON=missing'
++        rows = [f'AC-3|{horizon}|{iteration}|{digest}|cat artifact.txt|{evidence}']
++        if calibrate:
++            rows.extend([f'AC-3#good|PASS|{iteration}|{digest}|cat good.txt|good.txt',
++                         f'AC-3#bad|FAIL|{iteration}|{digest}|cat bad.txt|bad.txt'])
++        self.ctl('bind', input='\n'.join(rows) + '\n')
++
++    def save(self, **kwargs):
++        return self.checkpoint('save', '--intermediate', '--file', 'artifact.txt', '--file', 'score.txt', **kwargs)
++
++    def test_intermediate_restore_requalifies_without_claiming_completion(self):
++        self.bind()
++        self.assertIn('not-claimed', self.gate('--check', expected=2)[1])
++        self.checkpoint('save', '--file', 'artifact.txt', expected=4)
++        base = self.save()[0].strip()
++        proof = json.loads((self.state / 'store/incumbents' / (base + '.json')).read_bytes())['proof']
++        self.assertIn(b'GATE: CHECKPOINT-OK', base64.b64decode(proof))
++        self.assertNotIn(b'GATE: GO', base64.b64decode(proof))
++        self.artifact.write_text('broken\n')
++        candidate = self.checkpoint('candidate', '--base', base)[0].strip()
++        self.checkpoint('restore', '--base', base, '--candidate', candidate)
++        self.assertIn('GATE: CHECKPOINT-OK', self.gate('--checkpoint')[0])
++        self.assertIn('not-claimed', self.gate('--check', expected=2)[1])
++
++    def test_checkpoint_refuses_missing_uncalibrated_and_unverifiable_horizon(self):
++        self.assertIn('not-covered:AC-3', self.save(expected=4)[1])
++        self.bind(horizon='UNVERIFIABLE', calibrate=False)
++        self.assertIn('checkpoint-unverifiable', self.save(expected=4)[1])
++        self.book()
++        self.bind(calibrate=False)
++        self.assertIn('calibration-missing:AC-3/good', self.save(expected=4)[1])
++        self.assertFalse((self.state / 'store/incumbents').exists())
++
++    def test_checkpoint_reruns_floor_and_honors_inherited_deadline(self):
++        self.artifact.write_text('broken\n')
++        self.book()
++        self.bind()
++        self.assertIn('open-FAIL:AC-2', self.save(expected=4)[1])
++        self.artifact.write_text('ready\n')
++        self.book()
++        self.bind()
++        env = dict(os.environ, GOAL_RUNNER_MONOTONIC_END='0')
++        self.assertIn('time-budget-exhausted', self.save(expected=4, env=env)[1])
++        self.assertFalse((self.state / 'store/incumbents').exists())
++
++
+ if __name__ == '__main__':
+     unittest.main()
+--- a/tests/cases.inc.sh
++++ b/tests/cases.inc.sh
+@@ -2883,3 +2883,39 @@
+ out=$(bash "$GATE" --verify --project "$p" 2>&1); rc=$?
+ assert_rc "159 clock mutation refuses verification" 2 $rc
+ assert_has "159 clock mutation names ledger guard" 'check-mutated-ledger' "$out"
++
++# 160 A metric must finish successfully and yield a valid numeric value.
++mkproj t160
++contract t160 "- AC-1 | score | check: \`printf '10\\n'; exit 7\` | expected: >=1"
++close_iter t160
++out=$(bash "$GATE" --check --project "$T/t160" 2>&1); rc=$?
++assert_rc "160 a numeric line from a failed command cannot deliver GO" 2 $rc
++assert_has "160 nonzero metric exit is broken" 'check-broken:AC-1.*rc=7' "$out"
++
++mkproj t160b
++contract t160b "- AC-1 | score | check: \`printf '1.2.3\\n'\` | expected: maximize"
++out=$(bash "$GATE" --verify --project "$T/t160b" 2>&1); rc=$?
++assert_rc "160 malformed objective reading is refused" 2 $rc
++assert_has "160 malformed decimal is broken" 'AC-1\|BROKEN\|no number' "$out"
++
++mkproj t160c
++NOSTAMP=1 contract t160c "- AC-1 | score | check: \`printf '10\\n'; sleep 3\` | expected: >=1"
++printf '\ncheck_timeout=1\n' >> "$T/t160c/.goal/goal.md"
++bash "$CTL" stamp --project "$T/t160c" --auto >/dev/null
++out=$(bash "$GATE" --verify --project "$T/t160c" 2>&1); rc=$?
++assert_rc "160 per-check timeout refuses partial numeric output" 2 $rc
++assert_has "160 timed out measurement is broken" 'AC-1\|BROKEN\|.*rc=124' "$out"
++
++mkproj t160d
++contract t160d "- AC-1 | score | check: \`printf '%s\\n' '-.5'\` | expected: minimize" \
++  "- AC-2 | error contract | check: \`exit 7\` | expected: exit=7"
++out=$(bash "$GATE" --verify --project "$T/t160d" 2>&1); rc=$?
++assert_rc "160 signed decimal and explicit expected nonzero still pass" 0 $rc
++assert_has "160 signed decimal is recorded in score grammar" 'AC-1\|PASS\|observed=-0[.]5' "$out"
++
++mkproj t160e
++NOSTAMP=1 contract t160e "- AC-1 | score | check: \`printf 'observed=123\\n' >&2; exit 7\` | expected: maximize"
++printf '\nobjective: maximize AC-1\nhorizon-waived: synthetic metric fixture\n' >> "$T/t160e/.goal/goal.md"
++bash "$CTL" stamp --project "$T/t160e" --auto >/dev/null
++close_iter t160e --strategy verify --score 123
++assert_has "160 broken sensor stderr does not set a water mark" '^best_score=none$' "$(cat "$T/t160e/.goal/state.rec")"

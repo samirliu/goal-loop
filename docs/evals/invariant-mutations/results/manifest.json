@@ -1,0 +1,131 @@
+{
+  "sources": {
+    "assets/evidence_cache.sh": "c03dbb8ccb2ed8b0101199f33700b66abff23fac2cadeded86436deccb41db9a",
+    "assets/goal.contract.md": "a1b065ecb9c8d5d93ed1fd5cbf31d1fb51e0e6471e078441cc8422d542287ac3",
+    "assets/pre-reg.template.md": "3f17b602e9bc31149816cecae5812ae1fdc010d4345a39e28766f0ddbc276b7e",
+    "scripts/goal_audit.sh": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb",
+    "scripts/goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+    "scripts/goal_crew.py": "9c7857b963cdb379260cf7ebf66ed3b6d4b8c5d56a07a708983ef1ca14c39b0f",
+    "scripts/goal_ctl.sh": "d3434cf669ec3b2a806de5026422fe9694aebf383d72bef0116c6cda37406fb9",
+    "scripts/goal_evolve.py": "fabae22d1506b52177e93fa9a5d6b1230a70e7653f39579baecc51c44dcdf4fa",
+    "scripts/goal_gate.sh": "97ac3e67a816882c4091f9e8fab3c7d6a14acd15d98816b542ca2a6d71249c1a",
+    "scripts/goal_hook.sh": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87",
+    "scripts/goal_loop.sh": "da68f631e0d4f6b3312e7f0015521fb366806c617e4a023abb572e361c35db11",
+    "scripts/goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6",
+    "scripts/goal_parse.sh": "42dc2241e2ab33e2e135d7185ea59d413ffbcbc573ee19b026685b097258e193",
+    "scripts/goal_runner.py": "d50a3c75997f79e7c6cad21318f7f29bba8b78ca10051c98e6ecf7508b3b73a4",
+    "scripts/goal_store.py": "03bce8731fab96bd76c60ff59984b303f9dd532be8c3dce209ed5dba82941b9c",
+    "scripts/goal_strategy.awk": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+    "scripts/goal_trace.py": "bf7072b2d3cda49dd091c070f2631783848908799a695208b579ea54135ee3b3",
+    "scripts/goal_tree_digest.py": "278d31ee556181063e3664bc7b51e63f7ed278bcdde2664d4ca2c5de44218268",
+    "tests/benchmark_tree_digest.py": "1df259197fdda021fbffddb06d54639ea4da743a7c9ad4f0cdbe071f2ecb8da6",
+    "tests/cases.inc.sh": "6688da5a4360c245c68ba65f3facbff792a2298ce382856fa140342414d2d791",
+    "tests/docs_consistency.sh": "ec9ef27dd43faa4b17bec6825ad905c186ef855e2bf6eb41f191962d9b1e09a0",
+    "tests/lib.sh": "0abdc7e059ef794b086fdaadbe92c954960325e9ac3003fae7346fc78819944e",
+    "tests/run_tests.sh": "220109f22352d6173fba19fbcab8b69cb852bc39f2c7b9f8564572c03e4d03e1",
+    "tests/test_budget.py": "e02018c250847764f31f8faf51af9330571c14fe7fab1b60f1687fbfd2bc8266",
+    "tests/test_close_commit.py": "9282d0aab953f16ef10a9403604e1ddb6708b680ecdf2e4c9f856da536687364",
+    "tests/test_controller_writers.py": "3829e339be60e50bc0eb5439d9a0332c201dd99b7d4ef89e53d8bb62d0eb5f09",
+    "tests/test_crew.py": "08825a585f4f19c2be1c7ca37427cb4895ac14c66a388a92b9cdebf27eaaf66e",
+    "tests/test_evolve.py": "be23b98a69cd8de4684487f9103c94c2117f72818ec5b3b2345be70663b3be32",
+    "tests/test_gate_budget.py": "1cdb2a65200462028d9cf7b464f131c06078ddbecca353b8b682fafbc029534e",
+    "tests/test_goal_store.py": "b0138f123286c721fe41b12ece655f0f77d9ddd5c797b6ccf22013d2dd0a6795",
+    "tests/test_incumbent.py": "8b6efadf34c76d5a74bba9690010c271d4b74ec8cd26b498186275a5450af3c1",
+    "tests/test_ledger_access.py": "6885b221205f9d62a4343ebb9fcab8ff1eb5a56dbefccdc276a095a20161d9ac",
+    "tests/test_mutation_commit.py": "935c4b7951e16debbb88fc7e7e9d01bd417c1f38a75697e09f864f089c3dcd57",
+    "tests/test_owner_watch.py": "a7396cfc5daf23d73fa7e0b32617d4a694c9c0fb92a79ddc643eda3756b1f4e2",
+    "tests/test_parse.sh": "0832ed9ee3a6754f0109217003ab538a3b16d756a6a66e8c7d543261ad339349",
+    "tests/test_runner_lifecycle.py": "646fefcfb82bf3bcb7ee6d7956a3d144861c831fd12fe071430123dbcae67145",
+    "tests/test_runtime_trace.py": "f89efde64499f9090c66c91e3aed12a8db3ca9a5f7f73dd6e43ede7cf4f1e3dd",
+    "tests/test_strategy_events.py": "7b9bdb04316ff080dbd0765f2370d99f34a25d5412dfb625315828287af21dfa",
+    "tests/test_view_authority.py": "6c5bef2f55d4a99307df7cc1ef5d57154edfb19ba9bae20885e6d9d50a984156",
+    "tests/test_worktree_scope.py": "265e0bb76b81addf118f80ee8b77691906878f4256b96b07478fc11efbba9539",
+    "tests/view_fixture.py": "e588c57170b32b57935e95284ee9cca6bf19bcd1e47922c17e8ff58066e1f029"
+  },
+  "mutations": [
+    {
+      "name": "gate-claim",
+      "path": "scripts/goal_gate.sh",
+      "command": [
+        "bash",
+        "tests/run_tests.sh",
+        "--only",
+        "04"
+      ],
+      "clean": 0,
+      "mutated": 1,
+      "expected_failure": "FAIL - 04 not-claimed -> rc2 (want rc=2 got rc=0)",
+      "detected": true
+    },
+    {
+      "name": "bind-content",
+      "path": "scripts/goal_tree_digest.py",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "tests/test_worktree_scope.py",
+        "WorktreeScope.test_linked_worktree_uses_the_selected_worktree_bytes"
+      ],
+      "clean": 0,
+      "mutated": 1,
+      "expected_failure": "AssertionError:",
+      "detected": true
+    },
+    {
+      "name": "prove-metric-exit",
+      "path": "scripts/goal_gate.sh",
+      "command": [
+        "bash",
+        "tests/run_tests.sh",
+        "--only",
+        "160"
+      ],
+      "clean": 0,
+      "mutated": 1,
+      "expected_failure": "FAIL - 160 a numeric line from a failed command cannot deliver GO (want rc=2 got rc=0)",
+      "detected": true
+    },
+    {
+      "name": "gradient-water-mark",
+      "path": "scripts/goal_gate.sh",
+      "command": [
+        "bash",
+        "tests/run_tests.sh",
+        "--only",
+        "54"
+      ],
+      "clean": 0,
+      "mutated": 1,
+      "expected_failure": "FAIL - 54 score-regressed -> rc2 (want rc=2 got rc=0)",
+      "detected": true
+    },
+    {
+      "name": "fence-rejected-batch",
+      "path": "scripts/goal_store.py",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "tests/test_mutation_commit.py",
+        "MutationCommit.test_bind_batch_is_all_or_nothing_and_input_is_part_of_identity"
+      ],
+      "clean": 0,
+      "mutated": 1,
+      "expected_failure": "self.assertEqual(before, self.all_files(project))",
+      "detected": true
+    },
+    {
+      "name": "shared-deadline",
+      "path": "scripts/goal_runner.py",
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "tests/test_gate_budget.py",
+        "GateBudget.test_expired_standalone_batch_does_not_give_every_ac_new_time"
+      ],
+      "clean": 0,
+      "mutated": 1,
+      "expected_failure": "AssertionError: 0 != 2",
+      "detected": true
+    }
+  ]
+}

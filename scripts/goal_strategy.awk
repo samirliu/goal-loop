@@ -19,7 +19,7 @@ FILENAME == ARGV[1] {
     if (line ~ /^## iteration/) {
         num=line; sub(/^[^0-9]+/, "", num); num+=0
         if (!(cur>0 && ORD[cur]==num)) cur++
-        STRAT[cur]="none"; TASK[cur]=""; ORD[cur]=num; blk=cur
+        STRAT[cur]="none"; TASK[cur]=""; ART[cur]=""; CLAIM[cur]=0; ORD[cur]=num; blk=cur
         next
     }
     p=index(line, "=")
@@ -28,9 +28,28 @@ FILENAME == ARGV[1] {
         sub(/^ +/, "", v); sub(/ +$/, "", v)
         if (k=="strategy") STRAT[cur]=(v=="" ? "none" : v)
         if (k=="task") TASK[cur]=v
+        if (k=="digest") ART[cur]=v
+        if (k=="exit_signal") CLAIM[cur]=(v=="yes")
     }
 }
 END {
+    last=""; versions=0; unchanged=0; restored=0; unknown=0; claims=0; artifact_stall=0; information=0; legacy=0
+    for (q=1; q<=blk; q++) {
+        claims+=CLAIM[q]
+        d=ART[q]
+        if (d=="") { unknown++; last=""; NEW[q]=0; continue }
+        if (d !~ /^v2-[0-9a-f]{64}$/) legacy=1
+        if (last==d) {
+            unchanged++; artifact_stall++; NEW[q]=0
+            if ((ORD[q] in SC) && (ORD[q-1] in SC) && SC[ORD[q]]!=SC[ORD[q-1]]) information++
+        } else if (d in SEEN_ART && last!="") { restored++; artifact_stall++; NEW[q]=0 }
+        else if (d in SEEN_ART) { unknown++; NEW[q]=0 }
+        else { versions++; SEEN_ART[d]=1; artifact_stall=0; NEW[q]=1 }
+        last=d
+    }
+    printf "CTL: EVENTS artifact-versions=%d acceptance-claims=%d unchanged-artifact-rounds=%d restorations=%d unknown-artifact-rounds=%d artifact-stagnation=%d measurement-revisions=%d digest-scope=%s\n", versions, claims, unchanged, restored, unknown, artifact_stall, information, (legacy ? "legacy-unverified" : (unknown ? "incomplete" : "content-v2"))
+    # Event accounting is always useful; policy advice remains conditional.
+    if (obj=="none" && !(stalled+0)) exit
     for (k in SC) sn++
     if (!sn) advice="CTL: EFFICIENCY score-data: none recorded\n"
     for (i=1; i<=blk; i=j+1) {
@@ -45,7 +64,10 @@ END {
         n=0; gain=0; start=0; finish=0
         for (q=i; q<=j; q++) {
             it=ORD[q]
-            if (q>1 && ORD[q-1]==it-1 && (it in SC) && ((it-1) in SC)) {
+            # No new artifact means no artifact-strategy credit. Score changes
+            # can be new information; a restored artifact is recovery, not a
+            # fresh policy win. Missing identities break attribution as well.
+            if (q>1 && NEW[q] && ART[q-1]!="" && ORD[q-1]==it-1 && (it in SC) && ((it-1) in SC)) {
                 if (!n) { start=SC[it-1]; lo=start; hi=start }
                 finish=SC[it]; gain+=finish-SC[it-1]; n++
                 if (finish<lo) lo=finish
@@ -80,7 +102,7 @@ END {
         # Only the latest THREE ADJACENT ledger rounds can establish flatness.
         if (obj!="none" && blk>=3) {
             ia=ORD[blk-2]; ib=ORD[blk-1]; ic=ORD[blk]
-            if (ib==ia+1 && ic==ib+1 && (ia in SC) && (ib in SC) && (ic in SC)) {
+            if (NEW[blk-2] && NEW[blk-1] && NEW[blk] && ib==ia+1 && ic==ib+1 && (ia in SC) && (ib in SC) && (ic in SC)) {
                 lo=SC[ia]; hi=lo
                 if (SC[ib]<lo) lo=SC[ib]
                 if (SC[ib]>hi) hi=SC[ib]
@@ -93,7 +115,7 @@ END {
         prev=""; run=0
         for (q=1; q<=blk; q++) {
             id=TASK[q]; sub(/\[.*/, "", id)
-            if (id ~ /^T[0-9]+$/) {
+            if (NEW[q] && id ~ /^T[0-9]+$/) {
                 if (id==prev) run++; else { prev=id; run=1 }
                 if (run==3) print "CTL: promote: " id " (3 consecutive waves) - consider a role-card promotion for this task domain"
             } else { prev=""; run=0 }

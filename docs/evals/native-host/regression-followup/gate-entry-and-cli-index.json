@@ -1,0 +1,91 @@
+{
+  "source_scope": "Existing files copied only; no production/test edits or new CLI/model/suite calls.",
+  "previous_source_archive": "../final-regression/source.tar.xz",
+  "previous_source_files": 137,
+  "current_frozen_source_files": 138,
+  "source_hashes": {
+    "scripts/goal_store.py": {
+      "previous": "9f170dfab248f882f7a952522ff73c355cefad0ccd67f043b2de67e56c651929",
+      "current": "13d4250e70d406d030eace9d7c2b12c6fc0a0dd4cff11fcd536671ae4d0ee8f3"
+    },
+    "scripts/goal_runner.py": {
+      "previous": "826f077d38e1f8a28c0bc150a3cf901636405c6c5c9b9a173a6a2ca4af779154",
+      "current": "09c14fe4f348bc768ee66605353df80267017caf494b046b37f0fb8716ff39aa"
+    },
+    "tests/test_gate_entry_budget.py": {
+      "previous": null,
+      "current": "1123414cf146c56190abe1057defcd74a1d4976cc903222cb4c12f8313142905"
+    },
+    "tests/test_gate_budget.py": {
+      "previous": "1cdb2a65200462028d9cf7b464f131c06078ddbecca353b8b682fafbc029534e",
+      "current": "1cdb2a65200462028d9cf7b464f131c06078ddbecca353b8b682fafbc029534e"
+    },
+    "tests/test_runner_lifecycle.py": {
+      "previous": "646fefcfb82bf3bcb7ee6d7956a3d144861c831fd12fe071430123dbcae67145",
+      "current": "da8c07bfbbf62ccd4de6798ab5fc128c2b63d0dae7303d2d60ebec64d546b23c"
+    },
+    "tests/test_host_budget.py": {
+      "previous": "871a93b717493de600adfa878dadaa7ec649d79403e2416729a2b931399ef81d",
+      "current": "871a93b717493de600adfa878dadaa7ec649d79403e2416729a2b931399ef81d"
+    }
+  },
+  "gate_entry_outputs": "The .output.txt files are verbatim output fields extracted from the retained tool-result JSON, not separately redirected raw process logs.",
+  "cli_copy_policy": "All existing regular files copied byte-for-byte after checking nonempty reasoning/credential JSON fields. No excluded fields found; stdin CLI events were already limited to status metadata.",
+  "cli_origins": {
+    "cli-claude-argument-error": "/tmp/goal-host-claude-followup-n5xxr_mu",
+    "cli-claude-forbidden": "/tmp/goal-host-claude-followup-lpv7si8e",
+    "cli-codex-no-ready": "/tmp/goal-host-cli-stdin.my59r0g4"
+  },
+  "cli_interpretation": {
+    "cli-claude-argument-error": {
+      "parameter_failure": true,
+      "model_executed": false,
+      "product_failure": false,
+      "ready": false
+    },
+    "cli-claude-forbidden": {
+      "exit": 1,
+      "is_error": true,
+      "ready": false,
+      "api_status": 403,
+      "note": "subtype=success does not override is_error=true. Raw response reports Failed to authenticate; prior authenticated configuration context is not proof of successful model execution."
+    },
+    "cli-codex-no-ready": {
+      "exit": 124,
+      "budget_seconds": 60,
+      "ready": false,
+      "thread_started": true,
+      "turn_started": true,
+      "error_event_seconds": 47.98463529185392,
+      "error_cause": "unknown; no detail is present in retained event metadata"
+    }
+  },
+  "artifacts": [
+    "gate-entry-budget-index.json",
+    "gate-entry-budget-before.json",
+    "gate-entry-budget-before.output.txt",
+    "gate-entry-budget-after-minimal.json",
+    "gate-entry-budget-after-minimal.output.txt",
+    "gate-entry-budget-after-all.json",
+    "gate-entry-budget-after-all.output.txt",
+    "gate-entry-budget-test.py.txt",
+    "gate-entry-source-manifest.json",
+    "lifecycle-check-clock-before.py.txt",
+    "lifecycle-check-clock-after.py.txt",
+    "lifecycle-check-clock.patch",
+    "gate-entry-budget-production.patch",
+    "cli-claude-argument-error/mcp.json",
+    "cli-claude-argument-error/response.json",
+    "cli-claude-argument-error/result.json",
+    "cli-claude-argument-error/stderr.txt",
+    "cli-claude-forbidden/mcp.json",
+    "cli-claude-forbidden/response.json",
+    "cli-claude-forbidden/result.json",
+    "cli-claude-forbidden/stderr.txt",
+    "cli-codex-no-ready/TASK.md",
+    "cli-codex-no-ready/events.json",
+    "cli-codex-no-ready/result.json",
+    "cli-codex-no-ready/started.json",
+    "cli-codex-no-ready/stderr.txt"
+  ]
+}

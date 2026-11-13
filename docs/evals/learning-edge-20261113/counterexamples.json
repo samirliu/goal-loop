@@ -1,0 +1,33 @@
+{
+  "after": {
+    "dependency_error": "dependency evidence is stale; repair the producer",
+    "entry_result": 4,
+    "entry_stderr": "GOAL_LOOP: external runner moved to the repository devtools/goal_loop.sh; opt in there explicitly. Use goal_ctl.sh and host-native tools in a skill session.\n",
+    "entry_stdout": "",
+    "installed_entry_invoked_client": false,
+    "stale_parent_refused": true
+  },
+  "before": {
+    "dependency_error": null,
+    "entry_result": 3,
+    "entry_stderr": "GATE: NO-GO reason=empty-loop-log hint=write-ledger-block\nGOAL_LOOP: RESULT outcome=incomplete timing=incomplete scope=script-entry\nGOAL_LOOP: BLOCKED iterations-exhausted after 1\n",
+    "entry_stdout": "GOAL_LOOP: no-go iter=1 (reason above); next round\n",
+    "installed_entry_invoked_client": true,
+    "stale_parent_refused": false
+  },
+  "borrowed_context": {
+    "after": {
+      "approved": false,
+      "result": 4,
+      "stderr": "CONTEXT: ERROR nested-writer\n",
+      "stdout": ""
+    },
+    "before": {
+      "approved": true,
+      "result": 0,
+      "stderr": "",
+      "stdout": "approved: a04c938e 2026-11-12 auto\n"
+    }
+  },
+  "verified": true
+}

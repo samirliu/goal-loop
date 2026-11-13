@@ -1,0 +1,13 @@
+{
+  "uid": 65534,
+  "nofile": [
+    1024,
+    1048576
+  ],
+  "requested_minimum_fd": 2000,
+  "duplicate_error": {
+    "type": "OSError",
+    "errno": 22,
+    "text": "[Errno 22] Invalid argument"
+  }
+}

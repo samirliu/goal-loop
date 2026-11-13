@@ -11,10 +11,11 @@
 #   bash goal_gate.sh --digest [--project DIR]              # print tree digest
 #   bash goal_gate.sh --verify [--project DIR] [AC-ID ...]  # rerun deterministic checks; 0 all-pass / 2 FAIL-or-broken / 4 state error
 #   bash goal_gate.sh --baseline-check [--project DIR]      # forge contracts: baseline.md covers every delta metric AC; 0 ok / 2 problem
+#   bash goal_gate.sh --checkpoint [--project DIR]          # qualify an intermediate artifact without a completion claim
 set -u
 export LC_ALL=C.UTF-8
 
-usage(){ sed -n '2,13p' "$0"; }
+usage(){ sed -n '2,14p' "$0"; }
 
 project="." mode="" positional=""
 _goal_gate_args=("$@")
@@ -24,6 +25,8 @@ while [ $# -gt 0 ]; do
     --digest) mode=digest ;;
     --verify) mode=verify ;;
     --baseline-check) mode=baseline ;;
+    --checkpoint) mode=checkpoint ;;
+    --quality) mode=quality ;;
     --project) [ $# -ge 2 ] || { echo "GATE: NO-GO reason=missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
     --help|-h) usage; exit 0 ;;
     -*) echo "GATE: NO-GO reason=unknown-flag:$1" >&2; exit 4 ;;
@@ -32,11 +35,29 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-[ -n "$mode" ] || { echo "GATE: NO-GO reason=no-mode (use --check, --digest, --verify or --baseline-check)" >&2; exit 4; }
+[ -n "$mode" ] || { echo "GATE: NO-GO reason=no-mode (use --check, --digest, --verify, --baseline-check or --checkpoint)" >&2; exit 4; }
 [ -z "${positional# }" ] || [ "$mode" = verify ] || { echo "GATE: NO-GO reason=unknown-arg:$positional" >&2; exit 4; }
 
 sd="$project/.goal"
 here=$(cd "$(dirname "$0")" && pwd)
+if [ "$mode" != digest ] && { [ "${GOAL_ACCESS_EXEC_PID:-}" != "$$" ] || [ -z "${GOAL_GATE_SHELL_EPOCH:-}" ]; }; then
+  # Capture before the lock interpreter starts. GNU date has fractional time;
+  # BSD date uses the system zsh clock, or the already-required Python. Avoid
+  # rounding a three-second settlement down by a whole second. The lock's
+  # same-PID exec retains this observation; supervised child re-entry is
+  # additionally capped by GOAL_RUNNER_MONOTONIC_END.
+  _goal_gate_shell_epoch=$(date +%s.%N) || exit 4
+  case "$_goal_gate_shell_epoch" in
+    *[!0-9.]*|'')
+      if [ -x /bin/zsh ]; then
+        _goal_gate_shell_epoch=$(/bin/zsh -fc 'zmodload zsh/datetime; print -r -- $EPOCHREALTIME') || exit 4
+      else
+        _goal_gate_shell_epoch=$(python3 -I -S -c 'import time; print(time.time())') || exit 4
+      fi ;;
+  esac
+  GOAL_GATE_SHELL_EPOCH=$_goal_gate_shell_epoch
+  export GOAL_GATE_SHELL_EPOCH
+fi
 if [ "$mode" != digest ] && [ -d "$sd" ] && [ "${GOAL_ACCESS_EXEC_PID:-}" != "$$" ]; then
   exec python3 -I "$here/goal_store.py" access-exec "$sd" gate "$here/goal_gate.sh" "${_goal_gate_args[@]}"
 fi
@@ -52,7 +73,12 @@ drop_check_locks(){
     eval "exec ${check_fd}<&-"
   done
 }
-check_run(){ drop_check_locks; exec "$@"; }
+check_run(){
+  local phase=$1 ac=$2; shift 2
+  drop_check_locks
+  exec python3 -I "$here/goal_bounded.py" --owner "$$" --seconds "$tmo" --kind measurement \
+    --label "$phase:$ac" --artifact "$digest" -- "$@"
+}
 if [ "$mode" != digest ] && [ -e "$sd/store/pending" ] && [ "${GOAL_ACCESS_MODE:-}" != write ]; then
   echo 'GATE: ERROR reason=recovery-required' >&2
   exit 4
@@ -68,15 +94,10 @@ tree_digest(){ gp_tree_digest "$project"; }
 ac_body_hash(){ gp_ac_body_hash "$project"; }       # R3 frozen surface - single definition
 state_get(){ gp_state_get "$project" "$1"; }
 
-ledger_digest(){                                       # 8 hex over the LEDGER state files
-  # Checks may write evidence (.goal/evidence/) but nothing else under
-  # .goal/ (R6). The tree digest is blind to .goal, so the ledger gets its
-  # own before/after guard - a check editing goal.md/state/verdicts mid-run
-  # would otherwise measure one state and report another.
-  { for f in goal.md state.rec loop-log.md verdicts.rec scores.rec work-plan.md baseline.md interfaces.md runner.deadline runner.clock; do
-      [ -f "$sd/$f" ] && { printf '%s\n' "$f"; r < "$sd/$f"; }
-    done
-  } | hash_std | cut -c1-8
+ledger_digest(){
+  # Canonical evidence shares the managed-view capture path. Only the raw
+  # stream currently being written by the owning controller is excluded.
+  python3 -I "$here/goal_store.py" guard-digest "$sd"
 }
 
 last_block(){                                          # last loop-log block as key=value lines
@@ -255,11 +276,7 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
       ext_state=DEFERRED; ext_note="not-ready ${ct:+$(( now - ct ))}s ago (window=${win}s)"
     else
       ec_err=$(mktemp "${TMPDIR:-/tmp}/goal-ecmd-err.XXXXXX" 2>/dev/null) || ec_err=/tmp/ecmd-err.$$
-      if command -v timeout >/dev/null 2>&1; then
-        (cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$ecmd" >/dev/null 2>"$ec_err"); ec_rc=$?
-      else
-        (cd "$project" 2>/dev/null && check_run bash -c "$ecmd" >/dev/null 2>"$ec_err"); ec_rc=$?
-      fi
+      (cd "$project" 2>/dev/null && check_run external "$id" bash -c "$ecmd" >/dev/null 2>"$ec_err"); ec_rc=$?
       ec_tail=$(r < "$ec_err" | tail -3 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-160)
       rm -f "$ec_err"
       case "$ec_rc" in
@@ -281,11 +298,7 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
     pcmd=$(ac_probe_cmd "$id")
     if [ -n "$pcmd" ]; then
       perr=$(mktemp "${TMPDIR:-/tmp}/goal-probe-err.XXXXXX" 2>/dev/null) || perr=/tmp/probe-err.$$
-      if command -v timeout >/dev/null 2>&1; then
-        ( cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$pcmd" >/dev/null 2>"$perr" )
-      else
-        ( cd "$project" 2>/dev/null && check_run bash -c "$pcmd" >/dev/null 2>"$perr" )
-      fi
+      ( cd "$project" 2>/dev/null && check_run probe "$id" bash -c "$pcmd" >/dev/null 2>"$perr" )
       prc=$?
       perr_tail=$(r < "$perr" | tail -2 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-120)
       rm -f "$perr"
@@ -299,14 +312,14 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   # a failure is never diagnosed by guessing (an eval system that says "failed"
   # with no reason violates fail-loud). Streams stay separated on purpose.
   gate_err=$(mktemp "${TMPDIR:-/tmp}/goal-gate-err.XXXXXX" 2>/dev/null) || gate_err=/tmp/gate-err.$$
-  if command -v timeout >/dev/null 2>&1; then
-    out=$(cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$cmd" 2>"$gate_err"); rc=$?
-  else
-    out=$(cd "$project" 2>/dev/null && check_run bash -c "$cmd" 2>"$gate_err"); rc=$?   # without coreutils timeout a hang hangs; documented
-  fi
+  out=$(cd "$project" 2>/dev/null && check_run check "$id" bash -c "$cmd" 2>"$gate_err"); rc=$?
   err_tail=$(r < "$gate_err" | tail -3 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-160)
   rm -f "$gate_err"
   [ -n "$err_tail" ] || err_tail=""
+  case "$cls" in
+    metric\ *|maximize|minimize)
+      [ "$rc" -eq 0 ] || { printf '%s|BROKEN|measurement command did not finish successfully (rc=%s) %s\n' "$id" "$rc" "$err_tail"; return; } ;;
+  esac
   out=$(printf '%s\n' "$out" | r)                    # CR scrub: Windows-native checks print CRLF
   metric=$(ac_metric_re "$id")
   clean=$(printf '%s\n' "$out" | strip_ansi)
@@ -341,52 +354,32 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
       elif [ "$rc" -eq 124 ] && [ "$want" != 124 ]; then line="$id|BROKEN|timed out (rc=124) $err_tail"
       elif [ "$rc" -eq 127 ] && [ "$want" != 127 ]; then line="$id|BROKEN|check not executable (rc=127) $err_tail"
       else line="$id|FAIL|exit=$rc expect=exit=$want $err_tail"; fi ;;
-    metric\ *)
+    metric\ *|maximize|minimize)
       last="$mval"
       if [ -z "$last" ] && [ -n "$metric" ]; then
         printf '%s|BROKEN|metric regex matched nothing: %s %s\n' "$id" "$metric" "$err_tail"; return
       fi
       if [ -z "$last" ]; then
-        last=$(printf '%s\n' "$out" | strip_ansi | grep -vE '^[[:space:]]*$' | tail -1)
+        last=$(printf '%s\n' "$clean" | grep -vE '^[[:space:]]*$' | tail -1)
       fi
+      if ! [[ "$last" =~ ^-?([0-9]+(\.[0-9]*)?|\.[0-9]+)$ ]]; then
+        printf '%s|BROKEN|no number in output: %s %s\n' "$id" "${last:-<empty>}" "$err_tail"; return
+      fi
+      # The raw decimal may omit a leading or trailing zero. Keep the
+      # persisted score in the same grammar as scores.rec and CLI scores.
       case "$last" in
-        ''|*[!0-9.\-]*)
-          printf '%s|BROKEN|no number in output (metric or last line): %s\n' "$id" "${last:-<empty>}"; return ;;
+        .*) last="0$last" ;;
+        -.*) last="-0${last#-}" ;;
+        *.) last="${last%.}" ;;
       esac
-      v=$(awk -v a="$last" -v b="$m_num" -v o="$m_op" \
-          'BEGIN{ok=(o==">=")?(a>=b):(o=="<=")?(a<=b):(o==">")?(a>b):(o=="<")?(a<b):(o=="==")?(a==b):(a!=b); print ok?"PASS":"FAIL"}')
-      line="$id|$v|observed=$last expect=$m_op$m_num" ;;
-    maximize)
-      last="$mval"
-      if [ -z "$last" ] && [ -n "$metric" ]; then
-        printf '%s|BROKEN|metric regex matched nothing: %s %s\n' "$id" "$metric" "$err_tail"; return
+      if [ "$cls" = maximize ] || [ "$cls" = minimize ]; then
+        line="$id|PASS|observed=$last${spread:+ spread=$spread} expect=$cls"
+      else
+        v=$(awk -v a="$last" -v b="$m_num" -v o="$m_op" \
+            'BEGIN{ok=(o==">=")?(a>=b):(o=="<=")?(a<=b):(o==">")?(a>b):(o=="<")?(a<b):(o=="==")?(a==b):(a!=b); print ok?"PASS":"FAIL"}')
+        line="$id|$v|observed=$last expect=$m_op$m_num"
       fi
-      if [ -z "$last" ]; then
-        last=$(printf '%s\n' "$out" | strip_ansi | grep -vE '^[[:space:]]*$' | tail -1)
-      fi
-      case "$last" in
-        ''|*[!0-9.\-]*)
-          printf '%s|BROKEN|no number in output: %s %s\n' "$id" "${last:-<empty>}" "$err_tail"; return ;;
-      esac
-      # maximize is the objective, not a floor: numeric = PASS. The score
-      # itself is compared to best_score by the caller (score-regressed).
-      # spread rides along in the detail (run_one_check returns via subshell).
-      line="$id|PASS|observed=$last${spread:+ spread=$spread} expect=maximize" ;;
-    minimize)
-      last="$mval"
-      if [ -z "$last" ] && [ -n "$metric" ]; then
-        printf '%s|BROKEN|metric regex matched nothing: %s %s\n' "$id" "$metric" "$err_tail"; return
-      fi
-      if [ -z "$last" ]; then
-        last=$(printf '%s\n' "$out" | strip_ansi | grep -vE '^[[:space:]]*$' | tail -1)
-      fi
-      case "$last" in
-        ''|*[!0-9.\-]*)
-          printf '%s|BROKEN|no number in output: %s %s\n' "$id" "${last:-<empty>}" "$err_tail"; return ;;
-      esac
-      # minimize: the objective is to push the number DOWN. Numeric = PASS;
-      # the low-water mark is enforced by the caller (score-regressed).
-      line="$id|PASS|observed=$last${spread:+ spread=$spread} expect=minimize" ;;
+      ;;
     *)
       printf '%s|BROKEN|unroutable expectation class\n' "$id"; return ;;
   esac
@@ -409,11 +402,36 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
 if [ "$mode" != digest ]; then
   [ -d "$sd" ] || state_err "no-goal-dir"
   [ -f "$sd/goal.md" ] || state_err "no-goal-md"
+  GOAL_TRACE_PROJECT=$(cd "$project" && pwd) || state_err invalid-project
+  export GOAL_TRACE_PROJECT
+  # Establish one envelope before hashing/preparation, not a fresh timeout
+  # per AC. An inherited envelope also caps a nested gate's final settlement.
+  gate_budget=$(python3 -I "$here/goal_runner.py" gate-limit "$sd") || state_err budget-unavailable
+  read -r gate_cap deadline_expired <<< "$gate_budget"
+  if { [ "$mode" = checkpoint ] || [ "$mode" = quality ]; } && [ "$deadline_expired" = 1 ]; then
+    blocked time-budget-exhausted
+  fi
+  if [ "$gate_cap" != none ]; then
+    export GOAL_RUNNER_MONOTONIC_END="$gate_cap"
+  fi
+  if [ "${GOAL_GATE_SUPERVISED:-}" != 1 ]; then
+      # Retain access descriptors with the supervisor; its child acquires a
+      # validated borrowed context. Fresh access clears ambient bypass markers.
+      gate_kind=verification; [ "$mode" != check ] || gate_kind=acceptance
+      GOAL_GATE_SUPERVISED=1 python3 -I "$here/goal_bounded.py" --owner "$$" \
+        --kind "$gate_kind" --label "$mode" -- bash "$here/goal_gate.sh" "${_goal_gate_args[@]}"; gate_rc=$?
+      if [ "$gate_rc" -eq 124 ]; then
+        if [ "$mode" = check ] || [ "$mode" = checkpoint ] || [ "$mode" = quality ]; then blocked time-budget-exhausted; fi
+        echo 'GATE: NO-GO reason=verification-time-budget-exhausted' >&2; exit 2
+      fi
+      exit "$gate_rc"
+  fi
 fi
 
 digest=$(tree_digest) || state_err "unreadable-project"
 # ledger state before the rerun batch (the tree guard is blind to .goal/)
-[ -d "$sd" ] && ld_check0=$(ledger_digest) || ld_check0=none
+ld_check0=none
+if [ -d "$sd" ] && [ "$mode" != digest ]; then ld_check0=$(ledger_digest) || state_err unreadable-ledger; fi
 if [ "$mode" = digest ]; then echo "$digest"; exit 0; fi
 
 [ -f "$sd/goal.md" ] || state_err "no-goal-md"
@@ -429,7 +447,8 @@ if [ "$mode" = verify ]; then
       || { echo "GATE: NO-GO reason=unknown-ac-id:$rid (no such AC in the contract)" >&2; exit 4; }
   done
   want="$positional "
-  d0="$digest"; ld0=$(ledger_digest); nfail=0; nbroken=0; nchecked=0; npending=0
+  d0="$digest"; ld0=$(ledger_digest) || state_err unreadable-ledger
+  nfail=0; nbroken=0; nchecked=0; npending=0
   for id in $(all_ac_ids); do
     if [ -n "${want// /}" ]; then case "$want" in *" $id "*) ;; *) continue ;; esac; fi
     cls=$(classify_expected "$(ac_expected "$id")")
@@ -448,7 +467,7 @@ if [ "$mode" = verify ]; then
   # the ledger is digest-excluded from the tree, so a check editing goal.md /
   # state.rec / verdicts.rec mid-rerun is invisible to the tree guard: same
   # before/after rule, over the LEDGER state files (evidence/ stays free).
-  ld1=$(ledger_digest)
+  ld1=$(ledger_digest) || state_err unreadable-ledger
   [ "$ld0" = "$ld1" ] || { echo "GATE: NO-GO reason=check-mutated-ledger:before=$ld0 after=$ld1 (a check wrote the ledger mid-run - only .goal/evidence/ is fair game)" >&2; exit 2; }
   [ "$nchecked" -gt 0 ] || { echo "GATE: VERIFY-OK nothing-deterministic"; exit 0; }
   if [ $((nfail+nbroken)) -eq 0 ]; then
@@ -522,6 +541,10 @@ if [ -f "$sd/goal.md" ]; then
 fi
 freeze_st=""
 [ -f "$sd/check_freeze" ] && freeze_st=$(r < "$sd/check_freeze")
+if [ "$exit_mode" = forge ]; then
+  forge_freeze=$(python3 -I "$here/goal_forge.py" freeze --project "$project") || fail "forge-plan-invalid:see probe scope"
+  freeze_now="$freeze_now$forge_freeze"
+fi
 norm_freeze(){ printf '%s' "$1" | tr ';' '\n' | sed '/^$/d' | sort | tr '\n' ';'; }
 if [ "$(norm_freeze "$freeze_now")" != "$(norm_freeze "$freeze_st")" ]; then
   fail "check-script-tampered:stamped=$(norm_freeze "$freeze_st") now=$(norm_freeze "$freeze_now")"
@@ -539,6 +562,9 @@ case "$dl" in
      # fail() escalates to BLOCKED, a green claim still GO (see fail/GO).
      [ "$now" -gt "$dl" ] && deadline_expired=1 ;;
 esac
+if { [ "$mode" = checkpoint ] || [ "$mode" = quality ]; } && [ "${deadline_expired:-0}" = 1 ]; then
+  blocked time-budget-exhausted
+fi
 if [ "$exit_mode" = forge ]; then
   [ "${iter:-0}" -le "${maxit:-12}" ] || blocked "budget-fuse:iter=$iter max=$maxit (forge: budget is a fuse - extend it or deliver best-so-far)"
   baseline_validate                                   # belt+braces: baseline.md must still cover every delta metric AC
@@ -574,7 +600,7 @@ for k in $loop_keys; do
 done
 [ -z "$missing_lk" ] || echo "GATE: NOTE loop-log-missing-keys:${missing_lk# }" >&2
 claim=$(printf '%s\n' "$lb" | grep -E '^exit_signal=' | tail -1 | cut -d= -f2-)
-[ "$claim" = yes ] || fail "not-claimed"
+[ "$claim" = yes ] || [ "$mode" = checkpoint ] || [ "$mode" = quality ] || fail "not-claimed"
 # (5c/5d two-pass + raw run immediately before GO - after mechanical ACs)
 # R12 tooth at the arbiter (v2.7): the CLAIMING block must carry a schema-valid
 # task= id. ctl enforces this at write time, but a hand-written ledger block
@@ -735,6 +761,9 @@ for id in $ac_ids; do
   fi
 done
 [ $((unv*3)) -le "$total" ] || fail "unverifiable-excessive:unv=$unv total=$total"
+if { [ "$mode" = checkpoint ] || [ "$mode" = quality ]; } && [ "$unv" -gt 0 ]; then
+  fail "checkpoint-unverifiable:unv=$unv"
+fi
 
 # -10. guard against checks that mutated the tree mid-verification --------
 digest2=$(tree_digest)
@@ -744,11 +773,11 @@ digest2=$(tree_digest)
 # state and report another while leaving the tree pristine. The ledger gets
 # its own before/after digest; evidence/ is the only directory checks may
 # write (R6), so it stays out of the hash.
-ld2=$(ledger_digest)
+ld2=$(ledger_digest) || state_err unreadable-ledger
 [ "$ld_check0" = "$ld2" ] || fail "check-mutated-ledger:before=$ld_check0 after=$ld2 (a check wrote the ledger mid-run - only .goal/evidence/ is fair game)"
 
 # -11. forge: floors alone are not an exit; exhaustion is -----------------
-if [ "$exit_mode" = forge ]; then
+if [ "$exit_mode" = forge ] && [ "$mode" != checkpoint ] && [ "$mode" != quality ]; then
   dry=$(state_get dry_streak); dl=$(state_get dry_limit)
   [ "${dry:-0}" -ge "${dl:-3}" ] || fail "not-dry:dry_streak=${dry:-0} limit=$dl (forge exits on verification exhaustion, not on floors alone)"
 fi
@@ -768,6 +797,11 @@ fi
 if [ -n "$primary" ]; then
   [ -n "$observed_score" ] || fail "score-missing:$primary (objective score needs a numeric observed score)"
   best=$(state_get best_score)
+  basis=$(python3 -I "$here/goal_store.py" watermark-basis "$sd") || state_err watermark-basis-unavailable
+  if [ "$(state_get best_score_basis)" != "$basis" ]; then
+    case "$best" in ''|none) : ;; *) echo "GATE: NOTE legacy-watermark-unqualified:value=$best" >&2 ;; esac
+    best=none
+  fi
   pdir=$(objective_dir); [ -n "$pdir" ] || pdir=maximize
   # Relative tolerance absorbs benchmark noise (same code varies +-5% across
   # runs; an exact water-mark would false-alarm "regressed" every round and
@@ -785,7 +819,7 @@ if [ -n "$primary" ]; then
   else
     band="$tol"; src="tol=$tol"
   fi
-  if [ -n "$best" ] && [ "$best" != "none" ]; then
+  if [ "$mode" != quality ] && [ -n "$best" ] && [ "$best" != "none" ]; then
     # Noise band = b +/- |b|*t. Multiplying (1-t)*b flips the band on
     # NEGATIVE water marks (b=-10,t=.1 -> band -9, so -10 reads "regressed");
     # absolute value keeps the band on the correct side in every sign.
@@ -800,8 +834,9 @@ if [ -n "$primary" ]; then
 fi
 
 # -14. score<->judge divergence (R13): the objective may improve while the
-# cold seat falls - that is optimizing the wrong thing. Compare the last two
-# comparable points in .goal/scores.rec (iter|score|judge, both numeric).
+# cold seat falls - that is optimizing the wrong thing. Objective contracts
+# compare against the latest qualified pair; raw failed attempts cannot
+# contaminate recovery. Legacy non-objective records retain the raw-pair rule.
 # Quality direction: maximize -> higher score is better; minimize -> lower
 # score is better. Judge score is always higher-is-better. Opposite quality
 # directions -> refuse the claim. Flat is "unverified movement", not
@@ -813,6 +848,19 @@ if [ -f "$sd/scores.rec" ]; then
       s1=s2; j1=j2; s2=$2+0; j2=$3+0; n++
     }
     END { if (n >= 2) printf "%s %s %s %s\n", s1, j1, s2, j2 }')
+  # Objective comparisons use the latest qualified pair. Failed attempts remain
+  # visible in scores.rec but cannot make a valid rollback look divergent.
+  if [ -n "$primary" ]; then
+    pair=""
+    qs=$(state_get last_quality_score)
+    bj=$(state_get last_quality_judge)
+    cj=$(r < "$sd/scores.rec" | awk -F'|' -v i="$iter" '$1==i {j=$3} END{print j}')
+    [ "$(state_get best_score_basis)" = "$basis" ] || qs=none
+    if printf '%s\n' "${qs:-none}" "${bj:-none}" "${cj:-none}" | awk '
+      $0 !~ /^-?[0-9]+(\.[0-9]+)?$/ {bad=1} END{exit bad}'; then
+      pair="$qs $bj $observed_score $cj"
+    fi
+  fi
   if [ -n "$pair" ]; then
     set -- $pair
     awk -v s1="$1" -v j1="$2" -v s2="$3" -v j2="$4" -v d="$rdir" \
@@ -823,6 +871,13 @@ if [ -f "$sd/scores.rec" ]; then
       }' \
       && fail "DIVERGENCE:score-vs-judge score:$1->$3 judge:$2->$4 dir=$rdir (objective and cold-seat moving apart - the metric is pulling away from perceived quality; redesign the AC or the direction)"
   fi
+fi
+
+if [ "$mode" = quality ]; then
+  [ -n "$primary" ] && [ -n "$observed_score" ] || fail "quality-objective-required"
+  [ "${deadline_expired:-0}" != 1 ] || blocked time-budget-exhausted
+  echo "GATE: QUALITY-OK digest=$digest iter=$iter score=$observed_score"
+  exit 0
 fi
 
 if [ "${deadline_expired:-0}" = 1 ]; then
@@ -866,7 +921,7 @@ if [ -f "$sd/work-plan.md" ]; then
   wp_open=$(grep -cE '^- \[ \]' "$sd/work-plan.md" 2>/dev/null || echo 0)
   case "$wp_open" in ''|*[!0-9]*) wp_open=0 ;; esac
 fi
-[ "$wp_open" -eq 0 ] \
+[ "$wp_open" -eq 0 ] || [ "$mode" = checkpoint ] \
   || fail "open-items:$wp_open (work-plan still has unticked item(s): finish them, or close them with a recorded fault - close-iteration --fault CLASS --fault-outcome OUTCOME)"
 
 # -5c. two-pass adversarial (harness engineering): a claim needs a second
@@ -902,10 +957,18 @@ fi
 rawf="$sd/evidence/raw/${claim_iter}.txt"
 [ -s "$rawf" ] || fail "raw-evidence-missing:need non-empty .goal/evidence/raw/${claim_iter}.txt with the real check output"
 
+coverage=""
+if [ "$exit_mode" = forge ] && [ "$mode" != checkpoint ]; then
+  python3 -I "$here/goal_forge.py" audit --project "$project" --iteration "$iter" --limit "$dl" --artifact "$digest" \
+    || fail "forge-coverage-unverified:see executed probe scope"
+  coverage=" coverage=declared"
+fi
+outcome=GO
+[ "$mode" != checkpoint ] || outcome=CHECKPOINT-OK
 if [ -n "$primary" ]; then
-  echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}"
+  echo "GATE: $outcome digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}$coverage"
   exit 0
 fi
 
-echo "GATE: GO digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode"
+echo "GATE: $outcome digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode$coverage"
 exit 0

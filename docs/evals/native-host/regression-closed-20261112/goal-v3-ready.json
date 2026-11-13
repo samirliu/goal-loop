@@ -1,0 +1,70 @@
+{
+  "status": "ready",
+  "full_suites_terminal": true,
+  "full_suites_all_green": true,
+  "owner_watch_sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+  "host_sha256": "6cd50115f5e0ac78e89b9287a2475026a6aa9a3db7a2245a4efe9e9d8c2eb060",
+  "evidence": "/Users/m/repo/goal-loop/docs/evals/native-host/claude-haha/f5-owner-guard/manifest.json",
+  "source_manifest": "/tmp/goal-p1-final-20261112-closed/source-manifest.json",
+  "source_manifest_sha256": "db9793740d657e25a1c95b62ce4c38e326ef3e7b6ed6a7100ef0675546b7ebcc",
+  "macos": {
+    "python": {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "returncode": 0,
+      "seconds": 632.7336739590392
+    },
+    "shell": {
+      "command": [
+        "bash",
+        "tests/run_tests.sh"
+      ],
+      "returncode": 0,
+      "seconds": 111.55913450010121
+    },
+    "docs": {
+      "command": [
+        "bash",
+        "tests/docs_consistency.sh"
+      ],
+      "returncode": 0,
+      "seconds": 0.5235130831133574
+    },
+    "parser": {
+      "command": [
+        "bash",
+        "tests/test_parse.sh"
+      ],
+      "returncode": 0,
+      "seconds": 0.3093224579934031
+    },
+    "forge": {
+      "command": [
+        "bash",
+        "companions/contract-forge/tests/run_fixtures.sh"
+      ],
+      "returncode": 0,
+      "seconds": 1.143548916094005
+    }
+  },
+  "linux": {
+    "python": "0",
+    "shell": "0",
+    "shellcheck": "0",
+    "docs": "0",
+    "parser": "0",
+    "forge": "0"
+  },
+  "matched_source_files": 139,
+  "scope": "New v3 cohort only; old v1/v2 failed runs remain stopped"
+}

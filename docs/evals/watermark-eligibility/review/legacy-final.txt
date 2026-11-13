@@ -1,0 +1,6 @@
+CTL: BIND ok appended=1 skipped=0 operation=legacy-bind-once
+MIGRATE ('CTL: MIGRATE ok\n', '')
+REPLAY ('CTL: REPLAY operation=legacy-bind-once command=bind historical-result=0 (not a fresh GO)\n', '')
+POINTER-PUBLISHED RECOVER ('CTL: RECOVER ok (checks were not replayed)\n', '')
+MIGRATE ('CTL: MIGRATE ok\n', '')
+REPLAY ('CTL: REPLAY operation=legacy-bind-once command=bind historical-result=0 (not a fresh GO)\n', '')

@@ -1,0 +1,30 @@
+{
+  "scope": "Actual unreadable in-scope directory, original independent fixture",
+  "results": [
+    {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+        "--digest",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 4,
+      "stdout": "",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\nGATE: ERROR incomplete-git-inventory\nGATE: ERROR reason=unreadable-project\n"
+    },
+    {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+        "--check",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 4,
+      "stdout": "",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\nGATE: ERROR incomplete-git-inventory\nGATE: ERROR reason=unreadable-project\n"
+    }
+  ],
+  "focused_tests": "19 passed in 23.520s"
+}

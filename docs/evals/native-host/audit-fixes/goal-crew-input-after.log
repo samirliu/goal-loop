@@ -1,0 +1,6 @@
+python3 -B tests/test_crew.py (outside sandbox; real kern.boottime available)
+..................
+----------------------------------------------------------------------
+Ran 18 tests in 27.092s
+
+OK

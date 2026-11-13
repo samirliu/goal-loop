@@ -1,0 +1,6 @@
+GATE_ENTRY_OBSERVATION {"case": "__main__.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement", "completed": [], "contexts": [["1651302.804707666", "1651305.804707666"]], "elapsed": 4.170477665960789, "returncode": 2, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": "", "view_read": {"finished": 1651304.819588041, "real_views_verified": true, "started": 1651302.804836541}}
+.
+----------------------------------------------------------------------
+Ran 1 test in 5.785s
+
+OK

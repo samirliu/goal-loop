@@ -114,7 +114,10 @@ gp_watch_validate(){
     cd "$1" || exit 4
     local tmp path
     tmp=$(mktemp "${TMPDIR:-/tmp}/goal-watch.XXXXXX") || exit 4
-    trap 'rm -f -- "$tmp"' EXIT
+    # Bash 3 may unwind function locals before the subshell EXIT trap. Freeze
+    # the shell-quoted path now; never expand a vanished local during cleanup.
+    # shellcheck disable=SC2064
+    trap "$(printf 'rm -f -- %q' "$tmp")" EXIT
     gp_watch_paths . > "$tmp" || exit 4
     while IFS= read -r -d '' path; do
       gp_watch_path_ok "$path" || { echo 'CTL: ERROR unsafe-watch-path' >&2; exit 4; }
@@ -129,7 +132,8 @@ gp_tree_digest(){
     local tmp path file mode content prune p i missing_ok watched
     local -a args
     tmp=$(mktemp -d "${TMPDIR:-/tmp}/goal-tree.XXXXXX") || exit 4
-    trap 'rm -rf -- "$tmp"' EXIT
+    # shellcheck disable=SC2064
+    trap "$(printf 'rm -rf -- %q' "$tmp")" EXIT
     # A command can exit successfully while returning empty or constant data.
     # Known-answer checks detect common dead/misconfigured hash instruments.
     content=$(printf '' | gp_tree_hash_stream) || exit 4
@@ -137,10 +141,23 @@ gp_tree_digest(){
     content=$(printf 'abc' | gp_tree_hash_stream) || exit 4
     [ "$content" = ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad ] || { echo 'GATE: ERROR sha256-self-test-failed' >&2; exit 4; }
     if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      git ls-files --cached --others --exclude-standard -z > "$tmp/paths" || exit 4
-      git ls-files --deleted -z > "$tmp/deleted" || exit 4
+      # Git may return zero after skipping an unreadable directory. Its
+      # warnings therefore invalidate discovery in both hashing backends.
+      for mode in paths deleted index; do
+        case "$mode" in
+          paths) args=( --cached --others --exclude-standard ) ;;
+          deleted) args=( --deleted ) ;;
+          index) args=( --stage ) ;;
+        esac
+        if ! git ls-files "${args[@]}" -z > "$tmp/$mode" 2> "$tmp/git-error" || [ -s "$tmp/git-error" ]; then
+          cat "$tmp/git-error" >&2
+          echo 'GATE: ERROR incomplete-git-inventory' >&2
+          exit 4
+        fi
+      done
     else
       : > "$tmp/deleted" || exit 4
+      : > "$tmp/index" || exit 4
       prune=${GOAL_PRUNE:-}
       [ -n "$prune" ] || prune='node_modules venv .venv __pycache__ dist build target out vendor .mypy_cache .pytest_cache'
       [ ! -f .goalignore ] || prune="$prune $(grep -vE '^[[:space:]]*(#|$)' .goalignore | tr '\n' ' ')"
@@ -170,14 +187,18 @@ gp_tree_digest(){
     while IFS= read -r -d '' path; do printf '%s\0' "${path#./}" >> "$tmp/normalized" || exit 4; done < "$tmp/paths"
     LC_ALL=C sort -zu "$tmp/normalized" > "$tmp/sorted" || exit 4
     : > "$tmp/records" || exit 4
-    # Prefer a single-process accelerator where Python supports safe POSIX
-    # opens. The shell path remains the portability fallback; both emit the
-    # same versioned records. A runtime hashing error never falls back.
+    # Python also expands initialized Gitlinks, binding their HEAD and actual
+    # worktree bytes. The shell fallback supports ordinary entries only; it
+    # must refuse repositories rather than hash them as empty directories.
+    # A runtime hashing error never falls back.
     if command -v python3 >/dev/null 2>&1 && [ -f "$_gp_parse_dir/goal_tree_digest.py" ] && \
        python3 -I -c 'import os,sys; sys.exit(0 if os.name == "posix" and hasattr(os,"O_NOFOLLOW") else 1)' 2>/dev/null; then
-      python3 -I "$_gp_parse_dir/goal_tree_digest.py" "$tmp/sorted" "$tmp/watch-missing" "$tmp/deleted"
+      python3 -I "$_gp_parse_dir/goal_tree_digest.py" "$tmp/sorted" "$tmp/watch-missing" "$tmp/deleted" "$tmp/index"
       exit $?
     fi
+    while IFS= read -r -d '' path; do
+      case "$path" in 160000\ *) echo 'GATE: ERROR gitlink-requires-python' >&2; exit 4 ;; esac
+    done < "$tmp/index"
     while IFS= read -r -d '' path; do
       path=${path#./}
       case "$path" in .goal|.goal/*|.git|.git/*) continue ;; esac
@@ -193,6 +214,9 @@ gp_tree_digest(){
         content=$(gp_tree_hash_stream < "$file") || exit 4
         printf 'file\0%s\0%s\0%s\0' "$path" "$mode" "$content" >> "$tmp/records" || exit 4
       elif [ -d "$file" ]; then
+        if [ -e "$file/.git" ] || [ -L "$file/.git" ]; then
+          echo 'GATE: ERROR gitlink-requires-python' >&2; exit 4
+        fi
         mode=$(stat -c '%a' "$file" 2>/dev/null || stat -f '%Lp' "$file" 2>/dev/null) || exit 4
         printf 'dir\0%s\0%s\0' "$path" "$mode" >> "$tmp/records" || exit 4
       elif [ ! -e "$file" ]; then
@@ -311,11 +335,12 @@ gp_objective_dir(){ gp_goal_r "$1" | sed -nE 's/^objective: *(maximize|minimize)
 # R3 frozen surface: AC section body + exit: + objective: lines. ctl stamp and
 # gate check MUST hash the same thing or every legitimate run trips
 # contract-tampered. This is that one definition.
-gp_ac_body_hash(){
+gp_ac_body(){
   { gp_goal_r "$1" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
     gp_goal_r "$1" | grep -E '^(exit|objective|horizon-waived):' || true
-  } | gp_hash_std | cut -c1-8
+  }
 }
+gp_ac_body_hash(){ gp_ac_body "$1" | gp_hash_std | cut -c1-8; }
 
 # expected token -> a routing class the gate understands
 gp_classify_expected(){

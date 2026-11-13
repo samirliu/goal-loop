@@ -1,0 +1,58 @@
+{
+  "baseline_commit": "cf198829f9c8efe740d7d30a09de5d0251303b62",
+  "captured_at": "2026-11-10T16:11:31.897552+00:00",
+  "platform": "darwin",
+  "sources": {
+    "scripts/goal_ctl.sh": "ba8cd4a1b1d4524611eaa8dfabf18f151cec0f10ad964caddc95cbe7cf806693",
+    "scripts/goal_gate.sh": "429b7e2ee8470b4ac14e361f3e31f4ed42ae85727698c4ecac3f43bf2d57c62d",
+    "scripts/goal_loop.sh": "da68f631e0d4f6b3312e7f0015521fb366806c617e4a023abb572e361c35db11",
+    "scripts/goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6",
+    "scripts/goal_parse.sh": "42dc2241e2ab33e2e135d7185ea59d413ffbcbc573ee19b026685b097258e193",
+    "scripts/goal_store.py": "089fa9f474aa5ff3d67784449cc30117c8d7ad4287846977ef479ae8c677ac12",
+    "scripts/goal_strategy.awk": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+    "tests/cases.inc.sh": "dc7324371d37cd899629398670fbd6a986f62331c39e37136718045cc93170e5",
+    "tests/lib.sh": "0abdc7e059ef794b086fdaadbe92c954960325e9ac3003fae7346fc78819944e",
+    "tests/test_budget.py": "e02018c250847764f31f8faf51af9330571c14fe7fab1b60f1687fbfd2bc8266",
+    "tests/test_ledger_access.py": "6885b221205f9d62a4343ebb9fcab8ff1eb5a56dbefccdc276a095a20161d9ac",
+    "tests/test_owner_watch.py": "a7396cfc5daf23d73fa7e0b32617d4a694c9c0fb92a79ddc643eda3756b1f4e2",
+    "examples/evolution-dedupe/README.md": "0023728cdcb75876f7c469f3d84ff2a2912baa07464345fa55d75d6c2c7cad52",
+    "examples/evolution-dedupe/run.py": "048a04d6ac90c434e1922fbd1cce2237c84328c179d873a735907b03706f0870",
+    "scripts/goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+    "scripts/goal_evolve.py": "b7d4b7f528723def0b54446b214c3adaa9d156d8df882a0266e3dd666b387467",
+    "scripts/goal_runner.py": "e31d8c6d059f210ddadcfccecc735b3f2f7848528f7db83e5d2e03e849a22060",
+    "scripts/goal_trace.py": "bf7072b2d3cda49dd091c070f2631783848908799a695208b579ea54135ee3b3",
+    "tests/test_evolve.py": "f5b54de77cfa60987143314eda54d1d6ee528348e982b5b359e062e53069f2d5",
+    "tests/test_gate_budget.py": "1cdb2a65200462028d9cf7b464f131c06078ddbecca353b8b682fafbc029534e",
+    "tests/test_mutation_commit.py": "935c4b7951e16debbb88fc7e7e9d01bd417c1f38a75697e09f864f089c3dcd57",
+    "tests/test_runner_lifecycle.py": "646fefcfb82bf3bcb7ee6d7956a3d144861c831fd12fe071430123dbcae67145",
+    "tests/test_runtime_trace.py": "f89efde64499f9090c66c91e3aed12a8db3ca9a5f7f73dd6e43ede7cf4f1e3dd",
+    "tests/test_strategy_events.py": "7b9bdb04316ff080dbd0765f2370d99f34a25d5412dfb625315828287af21dfa",
+    "tests/test_view_authority.py": "6c5bef2f55d4a99307df7cc1ef5d57154edfb19ba9bae20885e6d9d50a984156",
+    "tests/test_worktree_scope.py": "265e0bb76b81addf118f80ee8b77691906878f4256b96b07478fc11efbba9539",
+    "tests/view_fixture.py": "e588c57170b32b57935e95284ee9cca6bf19bcd1e47922c17e8ff58066e1f029"
+  },
+  "implementation_patch_sha256": "83942612c36eae64b2d9996bb177d81318c301d245e2d4bca84d172c527b4c2e",
+  "checks": {
+    "python": {
+      "tests": 104,
+      "failures": 0,
+      "sha256": "57267abc0e110b80de4a67bb3f0573af841cc8157c550f7e23663a5f1239e4c0"
+    },
+    "shell": {
+      "assertions": 592,
+      "failures": 0,
+      "sha256": "4a21424f271be461582cc2b8f814cb50d7fba64e12b9eaafff3a4db89cf43b2f"
+    }
+  },
+  "before_implementation": {
+    "baseline_commit": "cf198829f9c8efe740d7d30a09de5d0251303b62",
+    "patch": "../w3-lifecycle/implementation.patch",
+    "sha256": "7e5d78cee88a30d5a4ec046db82f590505e35fcb834cdf456f184117741d2452"
+  },
+  "case": {
+    "selector": "expired_standalone",
+    "before_exit": 1,
+    "after_exit": 0
+  },
+  "observed_spans": 6
+}

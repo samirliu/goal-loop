@@ -1,0 +1,8 @@
+{
+  "evidence_type": "returned-tool-receipt",
+  "command": "python3 -B tests/test_ledger_access.py -k background_check",
+  "platform": "macOS",
+  "exit_code": 0,
+  "output": ".\n----------------------------------------------------------------------\nRan 1 test in 2.335s\n\nOK\n",
+  "note": "Focused macOS check only, not a Linux full-case rerun."
+}

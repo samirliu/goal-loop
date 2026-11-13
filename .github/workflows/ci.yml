@@ -16,11 +16,11 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install shellcheck gawk  # macOS ships BSD awk; the scripts require gawk (see README)
       - name: Shellcheck the shipped scripts
-        run: shellcheck --severity=warning scripts/*.sh  # info-level style hints stay in logs; warnings+errors block (parity with tests/run_tests.sh #33)
+        run: shellcheck --severity=warning scripts/*.sh devtools/*.sh  # developer runner retains the same lint coverage
       - name: Bash syntax check (bash -n)
         run: |
           echo "Running bash -n on all shipped scripts"
-          for s in scripts/*.sh assets/*.sh companions/contract-forge/scripts/*.sh companions/contract-forge/tests/*.sh; do
+          for s in scripts/*.sh devtools/*.sh assets/*.sh companions/contract-forge/scripts/*.sh companions/contract-forge/tests/*.sh; do
             bash -n "$s" || exit 1
           done
           echo "All shipped scripts passed bash -n"

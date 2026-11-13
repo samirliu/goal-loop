@@ -1,0 +1,4 @@
+  FAIL - 161 inflated dry count without recorded rounds refuses GO (want rc=2 got rc=0)
+  FAIL - 161 missing executed coverage named
+== results: pass=0 fail=2 ==
+== total: pass=0 fail=2 shards=1 ==

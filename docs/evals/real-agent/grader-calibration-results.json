@@ -1,0 +1,58 @@
+[
+  {
+    "family": "small",
+    "mode": "bad",
+    "rc": 1,
+    "ok": false,
+    "error": "NotImplementedError: "
+  },
+  {
+    "family": "small",
+    "mode": "good",
+    "rc": 0,
+    "ok": true,
+    "error": null
+  },
+  {
+    "family": "medium",
+    "mode": "bad",
+    "rc": 1,
+    "ok": false,
+    "error": "NotImplementedError: "
+  },
+  {
+    "family": "medium",
+    "mode": "good",
+    "rc": 0,
+    "ok": true,
+    "error": null
+  },
+  {
+    "family": "optimization",
+    "mode": "bad",
+    "rc": 1,
+    "ok": false,
+    "error": null
+  },
+  {
+    "family": "optimization",
+    "mode": "good",
+    "rc": 0,
+    "ok": true,
+    "error": null
+  },
+  {
+    "family": "recovery",
+    "mode": "bad",
+    "rc": 1,
+    "ok": false,
+    "error": "NotImplementedError: resume the committed prefix safely"
+  },
+  {
+    "family": "recovery",
+    "mode": "good",
+    "rc": 0,
+    "ok": true,
+    "error": null
+  }
+]

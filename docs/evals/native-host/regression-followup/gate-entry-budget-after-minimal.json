@@ -1,0 +1,10 @@
+{
+  "command": "python3 -B tests/test_gate_entry_budget.py GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement",
+  "result": {
+    "chunk_id": "70fa16",
+    "wall_time_seconds": 5.776723166,
+    "exit_code": 0,
+    "original_token_count": 132,
+    "output": "GATE_ENTRY_OBSERVATION {\"case\": \"__main__.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement\", \"completed\": [], \"contexts\": [[\"1651302.804707666\", \"1651305.804707666\"]], \"elapsed\": 4.170477665960789, \"returncode\": 2, \"stderr\": \"GATE: NO-GO reason=verification-time-budget-exhausted\\n\", \"stdout\": \"\", \"view_read\": {\"finished\": 1651304.819588041, \"real_views_verified\": true, \"started\": 1651302.804836541}}\n.\n----------------------------------------------------------------------\nRan 1 test in 5.785s\n\nOK\n"
+  }
+}

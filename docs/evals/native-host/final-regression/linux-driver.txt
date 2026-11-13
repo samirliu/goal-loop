@@ -1,0 +1,26 @@
+#!/bin/bash
+set -u
+if [ "${1:-}" != --tests ]; then
+  apt-get update > /results/dependencies.txt 2>&1 || exit 3
+  apt-get install -y --no-install-recommends git gawk shellcheck procps util-linux xz-utils >> /results/dependencies.txt 2>&1 || exit 3
+  chmod 777 /results
+  exec runuser -u nobody -- bash /ci-linux.sh --tests
+fi
+cd /src || exit 3
+export PYTHONDONTWRITEBYTECODE=1
+{ id; uname -a; python3 --version; git --version; shellcheck --version; } > /results/environment.txt 2>&1
+python3 -B -m unittest discover -s tests -p 'test_*.py' -v > /results/python.txt 2>&1
+python_status=$?
+bash tests/run_tests.sh > /results/shell.txt 2>&1
+shell_status=$?
+shellcheck --severity=warning scripts/*.sh > /results/shellcheck.txt 2>&1
+lint_status=$?
+bash tests/docs_consistency.sh > /results/docs.txt 2>&1
+docs_status=$?
+bash tests/test_parse.sh > /results/parser.txt 2>&1
+parser_status=$?
+bash companions/contract-forge/tests/run_fixtures.sh > /results/forge.txt 2>&1
+forge_status=$?
+printf 'python=%s\nshell=%s\nshellcheck=%s\ndocs=%s\nparser=%s\nforge=%s\n' "$python_status" "$shell_status" "$lint_status" "$docs_status" "$parser_status" "$forge_status" > /results/result.txt
+cat /results/result.txt
+test "$python_status$shell_status$lint_status$docs_status$parser_status$forge_status" = 000000

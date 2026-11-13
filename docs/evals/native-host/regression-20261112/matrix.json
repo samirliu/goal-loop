@@ -1,0 +1,93 @@
+{
+  "captured_utc": "2026-11-12T08:51:49.842068+00:00",
+  "full_matrix_green": false,
+  "limits": "Targeted results do not rewrite either failed full result and do not establish a green full run for the post-full namespace delta. No models or full suite were executed during archival.",
+  "linux": {
+    "docs": {
+      "returncode": 0
+    },
+    "forge": {
+      "passed": 10,
+      "returncode": 0
+    },
+    "parser": {
+      "passed": 78,
+      "returncode": 0
+    },
+    "python": {
+      "failing_test": "test_owner_watch_guard.GroupGuard.test_guard_drops_stdout_and_high_lock_descriptor",
+      "failures": 1,
+      "observation": "Child inherited soft 1024/hard 1048576; F_DUPFD minimum 2000 failed before production guard call.",
+      "returncode": 1,
+      "skipped": 2,
+      "tests": 248,
+      "unittest_seconds": 831.007
+    },
+    "shell": {
+      "passed": 603,
+      "returncode": 0
+    },
+    "shellcheck": {
+      "returncode": 0
+    }
+  },
+  "macos": {
+    "docs": {
+      "returncode": 0
+    },
+    "forge": {
+      "passed": 10,
+      "returncode": 0
+    },
+    "parser": {
+      "passed": 78,
+      "returncode": 0
+    },
+    "python": {
+      "failing_test": "test_gate_entry_budget.GateEntryBudget.test_fresh_future_origin_and_supervision_marker_cannot_grant_time",
+      "failures": 1,
+      "observation": "Caller elapsed 4.250748541904613 exceeded unchanged 4.2 threshold; later fixture records a separate actual access-entry clock.",
+      "returncode": 1,
+      "skipped": 0,
+      "tests": 248,
+      "unittest_seconds": 596.695
+    },
+    "shell": {
+      "passed": 603,
+      "returncode": 0
+    },
+    "shellcheck": "No macOS shellcheck run claimed"
+  },
+  "source_files": 139,
+  "source_manifest_sha256": "5d49822d87450192530fdd3612c5ae17b53cf771178981a5da065498ca0cb0e2",
+  "targeted_followups": {
+    "gate_entry": {
+      "negative_controls": {
+        "legacy_access_elapsed": 5.101530583808199,
+        "legacy_read_then_new_3_seconds_rejected": true,
+        "origin_reset_rejected_even_with_zero_dispatch": true,
+        "zero_dispatch_control_passed": true
+      },
+      "returncode": 0,
+      "test_sha256": "996a578f6f582057cf788bacddb8e1837cc3c9ca15aeb3d63697d1a904d5c8fc",
+      "tests": 5,
+      "unchanged_threshold": 4.2
+    },
+    "owner_guard_linux": {
+      "elapsed_seconds": 2.367257250996772,
+      "errors": 0,
+      "failures": 0,
+      "inherited_nofile": [
+        1024,
+        1048576
+      ],
+      "production_sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+      "reporting_error": "First wrapper returned 1 on JSON serialization after test success; retained transcript is not a raw stderr file.",
+      "returncode": 0,
+      "skipped": 2,
+      "test_sha256": "63ccbe2d2a124cb25b24fedb5174ae9d5bdeacd8a704ab061c5e38364ce38d14",
+      "tests": 5,
+      "uid": 65534
+    }
+  }
+}

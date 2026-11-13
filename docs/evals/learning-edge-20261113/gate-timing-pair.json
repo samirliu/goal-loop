@@ -1,0 +1,30 @@
+[
+  {
+    "variant": "before",
+    "index": 0,
+    "outcome": "pass",
+    "error": null,
+    "method_elapsed": 3.8414583329577
+  },
+  {
+    "variant": "before",
+    "index": 1,
+    "outcome": "pass",
+    "error": null,
+    "method_elapsed": 4.125665416009724
+  },
+  {
+    "variant": "after",
+    "index": 0,
+    "outcome": "pass",
+    "error": null,
+    "method_elapsed": 3.485630000010133
+  },
+  {
+    "variant": "after",
+    "index": 1,
+    "outcome": "pass",
+    "error": null,
+    "method_elapsed": 4.066380208125338
+  }
+]

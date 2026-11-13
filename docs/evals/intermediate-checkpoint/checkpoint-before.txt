@@ -1,0 +1,80 @@
+test_checkpoint_refuses_missing_uncalibrated_and_unverifiable_horizon (__main__.IntermediateCheckpoint.test_checkpoint_refuses_missing_uncalibrated_and_unverifiable_horizon) ... FAIL
+test_checkpoint_reruns_floor_and_honors_inherited_deadline (__main__.IntermediateCheckpoint.test_checkpoint_reruns_floor_and_honors_inherited_deadline) ... FAIL
+test_intermediate_restore_requalifies_without_claiming_completion (__main__.IntermediateCheckpoint.test_intermediate_restore_requalifies_without_claiming_completion) ... FAIL
+
+======================================================================
+FAIL: test_checkpoint_refuses_missing_uncalibrated_and_unverifiable_horizon (__main__.IntermediateCheckpoint.test_checkpoint_refuses_missing_uncalibrated_and_unverifiable_horizon)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 193, in test_checkpoint_refuses_missing_uncalibrated_and_unverifiable_horizon
+    self.assertIn('not-covered:AC-3', self.save(expected=4)[1])
+                                      ~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 176, in save
+    return self.checkpoint('save', '--intermediate', '--file', 'artifact.txt', '--file', 'score.txt', **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 36, in checkpoint
+    return self.run_entry([sys.executable, '-I', str(SCRIPTS / 'goal_store.py'), 'incumbent'],
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          *args, **kwargs)
+                          ^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 26, in run_entry
+    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 4 : usage: goal_store.py [-h] [--project PROJECT] [--file FILE] [--base BASE]
+                     [--candidate CANDIDATE]
+                     {save,candidate,restore}
+goal_store.py: error: unrecognized arguments: --intermediate
+
+
+======================================================================
+FAIL: test_checkpoint_reruns_floor_and_honors_inherited_deadline (__main__.IntermediateCheckpoint.test_checkpoint_reruns_floor_and_honors_inherited_deadline)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 205, in test_checkpoint_reruns_floor_and_honors_inherited_deadline
+    self.assertIn('open-FAIL:AC-2', self.save(expected=4)[1])
+                                    ~~~~~~~~~^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 176, in save
+    return self.checkpoint('save', '--intermediate', '--file', 'artifact.txt', '--file', 'score.txt', **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 36, in checkpoint
+    return self.run_entry([sys.executable, '-I', str(SCRIPTS / 'goal_store.py'), 'incumbent'],
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          *args, **kwargs)
+                          ^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 26, in run_entry
+    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 4 : usage: goal_store.py [-h] [--project PROJECT] [--file FILE] [--base BASE]
+                     [--candidate CANDIDATE]
+                     {save,candidate,restore}
+goal_store.py: error: unrecognized arguments: --intermediate
+
+
+======================================================================
+FAIL: test_intermediate_restore_requalifies_without_claiming_completion (__main__.IntermediateCheckpoint.test_intermediate_restore_requalifies_without_claiming_completion)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 182, in test_intermediate_restore_requalifies_without_claiming_completion
+    base = self.save()[0].strip()
+           ~~~~~~~~~^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 176, in save
+    return self.checkpoint('save', '--intermediate', '--file', 'artifact.txt', '--file', 'score.txt', **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 36, in checkpoint
+    return self.run_entry([sys.executable, '-I', str(SCRIPTS / 'goal_store.py'), 'incumbent'],
+           ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          *args, **kwargs)
+                          ^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_incumbent.py", line 26, in run_entry
+    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : usage: goal_store.py [-h] [--project PROJECT] [--file FILE] [--base BASE]
+                     [--candidate CANDIDATE]
+                     {save,candidate,restore}
+goal_store.py: error: unrecognized arguments: --intermediate
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 10.846s
+
+FAILED (failures=3)

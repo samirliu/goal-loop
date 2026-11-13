@@ -1,0 +1,424 @@
+#!/usr/bin/env python3
+"""Crew cost observations and conservative DAG advice; not a worker scheduler.
+
+The host dispatches its existing Agent/tool workers. This helper timestamps
+observed lifecycle events, verifies outputs before adoption, and keeps all
+outcomes. No work queue, agent service or acceptance authority is introduced.
+"""
+import argparse
+import contextlib
+import functools
+import importlib.util
+import json
+import math
+import os
+from pathlib import Path
+import re
+import stat
+import subprocess
+import sys
+import time
+import uuid
+
+sys.dont_write_bytecode = True
+spec = importlib.util.spec_from_file_location('crew_budget', Path(__file__).with_name('goal_runner.py'))
+budget = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(budget)
+store = budget.store
+boot = functools.lru_cache(maxsize=1)(budget.boot_identity)
+STAGES = {'coordination', 'join', 'conflict', 'revalidation', 'recovery'}
+ID = re.compile(r'^[0-9a-f]{32}$')
+
+
+def require(ok, message):
+    if not ok:
+        raise ValueError(message)
+
+
+def command(value):
+    return isinstance(value, list) and bool(value) and all(isinstance(s, str) and '\0' not in s for s in value)
+
+
+def safe_file(name):
+    return (isinstance(name, str) and store._valid_name(name) and
+            name.split('/')[0] not in ('.goal', '.git') and not name.startswith('/'))
+
+
+def load_graph(path):
+    path = Path(path).resolve(strict=True)
+    graph = json.loads(path.read_bytes())
+    require(isinstance(graph, dict) and set(graph) == {'version', 'context', 'capacity', 'jobs', 'final_check', 'instruments', 'inputs'},
+            'unknown crew graph fields')
+    require(type(graph['version']) is int and graph['version'] == 1 and isinstance(graph['context'], dict), 'invalid graph version/context')
+    json.dumps(graph['context'], allow_nan=False)
+    require(type(graph['capacity']) is int and 1 <= graph['capacity'] <= 128, 'invalid observed host capacity')
+    require(command(graph['final_check']) and isinstance(graph['instruments'], list) and isinstance(graph['inputs'], list), 'invalid grader/input declarations')
+    require(isinstance(graph['jobs'], list) and bool(graph['jobs']), 'empty graph')
+    names = set()
+    for job in graph['jobs']:
+        require(isinstance(job, dict) and set(job) == {'id', 'files', 'deps', 'check'}, 'unknown job fields')
+        require(isinstance(job['id'], str) and re.fullmatch(r'T[1-9][0-9]*', job['id']) and job['id'] not in names, 'invalid/duplicate task id')
+        names.add(job['id'])
+        require(isinstance(job['files'], list) and bool(job['files']) and all(safe_file(n) for n in job['files'])
+                and len(set(job['files'])) == len(job['files']), 'invalid owned file scope')
+        require(isinstance(job['deps'], list) and all(isinstance(n, str) for n in job['deps'])
+                and len(set(job['deps'])) == len(job['deps']) and command(job['check']), 'invalid dependency/check')
+    for job in graph['jobs']:
+        require(set(job['deps']) <= names and job['id'] not in job['deps'], 'unknown/self dependency')
+    ordered, left = [], list(graph['jobs'])
+    while left:
+        ready = [j for j in left if set(j['deps']) <= {x['id'] for x in ordered}]
+        require(bool(ready), 'cyclic dependency graph')
+        ordered.extend(ready)
+        left = [j for j in left if j not in ready]
+    # Overlapping writes acquire an explicit precedence in topological order.
+    # File count is never evidence that concurrent work is independent.
+    def overlaps(a, b):
+        return any(x == y or x.startswith(y + '/') or y.startswith(x + '/') for x in a for y in b)
+    edges = {j['id']: set(j['deps']) for j in ordered}
+    for i, job in enumerate(ordered):
+        edges[job['id']].update(old['id'] for old in ordered[:i] if overlaps(job['files'], old['files']))
+    instruments, instrument_paths = {}, {}
+    for name in graph['instruments']:
+        require(isinstance(name, str), 'invalid instrument path')
+        source = (path.parent / name).resolve(strict=True)
+        require(source.is_file(), 'instrument is not a file')
+        instruments[name] = store._hash(source.read_bytes())
+        instrument_paths[name] = str(source)
+    graph['instrument_hashes'] = instruments
+    graph['instrument_paths'] = instrument_paths
+    return graph, ordered, edges
+
+
+def condition_key(graph, baseline, state):
+    # Absolute local instrument locations are bindings, not task difficulty.
+    # Actual bytes, declared context/shape and the initial owned artifact are
+    # still part of the comparison condition; trial identities are separate.
+    definition = {k: v for k, v in graph.items() if k != 'instrument_paths'}
+    value = dict(graph=definition, baseline=baseline, approval=store.current_approval(state),
+                 contract=store._hash((state / 'goal.md').read_bytes()), observer=store._hash(Path(__file__).read_bytes()),
+                 check_freeze=store._hash((state / 'check_freeze').read_bytes()) if (state / 'check_freeze').exists() else None)
+    return store._hash(store._encode(value))
+
+
+def scope_digest(project, files):
+    result = {}
+    for name in files:
+        require(safe_file(name), 'invalid scope path')
+        path = store._close_path(project, name)
+        if not path.exists():
+            result[name] = None
+        else:
+            info = path.lstat()
+            require(stat.S_ISREG(info.st_mode), 'scope must name regular files')
+            result[name] = [stat.S_IMODE(info.st_mode), store._hash(path.read_bytes())]
+    return result
+
+
+@contextlib.contextmanager
+def read_ledger(project):
+    state = Path(project).resolve(strict=True) / '.goal'
+    fd = os.open(str(state), os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        store.fcntl.flock(fd, store.fcntl.LOCK_SH | store.fcntl.LOCK_NB)
+        require(not (state / 'store/pending').exists(), 'recovery-required')
+        store.verify_views(state)
+        yield state, fd
+    finally:
+        os.close(fd)
+
+
+def folder(project, create=False):
+    project = Path(project).resolve(strict=True)
+    path = project / '.goal'
+    for part in ('evidence', 'crew'):
+        require(not path.is_symlink(), 'symlink crew path')
+        path = path / part
+        if create:
+            path.mkdir(exist_ok=True)
+    require(path.is_dir() and not path.is_symlink(), 'missing/invalid crew observation directory')
+    return path
+
+
+def save(path, value):
+    store._atomic(path, store._encode({'payload': value, 'sha256': store._hash(store._encode(value))}))
+
+
+def load(path):
+    require(path.is_file() and not path.is_symlink(), 'invalid observation file')
+    obj = json.loads(path.read_bytes())
+    require(isinstance(obj, dict) and set(obj) == {'payload', 'sha256'} and obj['sha256'] == store._hash(store._encode(obj['payload'])),
+            'crew observation checksum mismatch')
+    value = obj['payload']
+    require(isinstance(value, dict) and type(value.get('version')) is int and value['version'] == 1, 'unknown crew observation version')
+    require(isinstance(value.get('id'), str) and ID.fullmatch(value['id']) and path.stem == value['id'], 'observation identity/path mismatch')
+    return value
+
+
+def begin(project, graph_path, mode, trial):
+    require(mode in ('inline', 'crew') and isinstance(trial, str) and bool(trial), 'invalid mode/trial identity')
+    project = Path(project).resolve(strict=True)
+    graph, ordered, edges = load_graph(graph_path)
+    with read_ledger(project) as (state, _):
+        cap, expired = budget.gate_limit(state)
+        require(not expired and (cap is None or cap > time.monotonic()), 'time-budget-exhausted; no dispatch')
+        baseline = scope_digest(project, [n for j in ordered for n in j['files']])
+        inputs = scope_digest(project, graph['inputs'])
+        key = condition_key(graph, baseline, state)
+    identity = uuid.uuid4().hex
+    value = dict(version=1, id=identity, mode=mode, trial=trial, graph=graph, edges={k: sorted(v) for k, v in edges.items()},
+                 condition=key, baseline=baseline, inputs=inputs,
+                 boot=boot(), started=time.time(), origin=time.monotonic(), clock=time.time(), deadline=cap,
+                 jobs={j['id']: dict(dispatch=None, started=None, returned=None, result=None, fault=None,
+                                     validations=[], first_valid=None, adopted=None, adopted_digest=None,
+                                     adoption_version=None) for j in ordered},
+                 stages=[], finished=None, elapsed=None, quality=None, final_validation=None, tokens=None, money=None)
+    path = folder(project, create=True) / (identity + '.json')
+    save(path, value)
+    return identity
+
+
+class Wave:
+    def __init__(self, project, identity):
+        require(isinstance(identity, str) and bool(ID.fullmatch(identity)), 'invalid wave identity')
+        self.project = Path(project).resolve(strict=True)
+        self.folder = folder(project)
+        self.path = self.folder / (identity + '.json')
+
+    @contextlib.contextmanager
+    def locked(self):
+        fd = os.open(str(self.folder), os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            store.fcntl.flock(fd, store.fcntl.LOCK_EX | store.fcntl.LOCK_NB)
+            value = load(self.path)
+            require(value['finished'] is None, 'wave already finished')
+            require(value['boot'] == boot() and time.time() >= value['clock'], 'clock/boot changed during wave')
+            value['clock'] = time.time()
+            yield value
+            save(self.path, value)
+        finally:
+            os.close(fd)
+
+    def now(self, value):
+        return time.monotonic() - value['origin']
+
+    def event(self, task, event, result=None, note=None):
+        require(event in ('dispatch', 'started', 'returned', 'fault', 'adopt'), 'unknown worker event')
+        with self.locked() as value:
+            require(task in value['jobs'], 'unknown worker')
+            row = value['jobs'][task]
+            now = self.now(value)
+            if event == 'dispatch':
+                require(row['dispatch'] is None, 'duplicate dispatch')
+                require(value['deadline'] is None or time.monotonic() < value['deadline'], 'time-budget-exhausted; no dispatch')
+                require(all(value['jobs'][d]['adopted'] is not None for d in value['edges'][task]), 'dependency not adopted')
+                active = [r for r in value['jobs'].values() if r['dispatch'] is not None and r['returned'] is None]
+                limit = 1 if value['mode'] == 'inline' else value['graph']['capacity']
+                require(len(active) < limit, 'host capacity exceeded')
+                row['dispatch'] = now
+            elif event == 'started':
+                require(row['dispatch'] is not None and row['started'] is None and row['returned'] is None, 'invalid started event')
+                row['started'] = now
+            elif event in ('returned', 'fault'):
+                require(row['dispatch'] is not None and row['returned'] is None, 'invalid terminal event')
+                if event == 'returned':
+                    require(type(result) is int and 0 <= result <= 255, 'invalid worker result')
+                    row['result'] = result
+                    if result:
+                        row['fault'] = dict(kind='death' if result >= 128 else 'tool-error', note='nonzero worker result')
+                else:
+                    require(isinstance(note, str) and bool(note), 'fault needs observed reason')
+                    row['fault'] = dict(kind='death', note=note)
+                row['returned'] = now
+            else:
+                require(row['returned'] is not None and row['validations'], 'adoption needs terminal worker and validation')
+                latest = row['validations'][-1]
+                job = next(j for j in value['graph']['jobs'] if j['id'] == task)
+                require(latest['result'] == 0 and scope_digest(self.project, job['files']) == latest['digest'], 'adoption evidence is stale/failed')
+                version = len(row['validations'])-1
+                require(row['adoption_version'] is None or row['adoption_version'] < version, 'duplicate adoption')
+                row.update(adopted=now, adopted_digest=latest['digest'], adoption_version=version)
+
+    def _instruments(self, value):
+        for name, expected in value['graph']['instrument_hashes'].items():
+            require(store._hash(Path(value['graph']['instrument_paths'][name]).read_bytes()) == expected,
+                    'frozen instrument changed')
+
+    def _check(self, value, cmd, files):
+        self._instruments(value)
+        started = self.now(value)
+        before = scope_digest(self.project, files)
+        seconds = 120
+        if value['deadline'] is not None:
+            seconds = min(seconds, max(0, value['deadline'] + 3 - time.monotonic()))
+        with read_ledger(self.project) as (_, fd):
+            env = dict(os.environ, GOAL_ACCESS_FD=str(fd), GOAL_ACCESS_OWNER_PID=str(os.getpid()), GOAL_ACCESS_MODE='read',
+                       GOAL_TRACE_PROJECT=str(self.project))
+            env.pop('GOAL_ACCESS_EXEC_PID', None)
+            args = [s.replace('{project}', str(self.project)) for s in cmd]
+            result = subprocess.run([sys.executable, '-I', str(Path(__file__).with_name('goal_bounded.py')),
+                                     '--owner', str(os.getpid()), '--seconds', str(seconds), '--kind', 'measurement',
+                                     '--label', 'crew-validation', '--', *args], cwd=self.project, env=env,
+                                    pass_fds=(fd,), capture_output=True, timeout=seconds+2)
+            store.verify_views(self.project / '.goal')
+        after = scope_digest(self.project, files)
+        self._instruments(value)
+        require(before == after, 'grader changed owned output')
+        return dict(start=started, end=self.now(value), result=result.returncode, digest=after,
+                    command_sha256=store._hash(store._encode(cmd)), stdout=result.stdout.decode('utf-8', 'replace'),
+                    stderr=result.stderr.decode('utf-8', 'replace'))
+
+    def validate(self, task):
+        with self.locked() as value:
+            require(task in value['jobs'] and value['jobs'][task]['dispatch'] is not None, 'worker not dispatched')
+            job = next(j for j in value['graph']['jobs'] if j['id'] == task)
+            row = self._check(value, job['check'], job['files'])
+            value['jobs'][task]['validations'].append(row)
+            if row['result'] == 0 and value['jobs'][task]['first_valid'] is None:
+                value['jobs'][task]['first_valid'] = row['end']
+            return row['result']
+
+    def stage(self, name, action):
+        require(name in STAGES and action in ('begin', 'end', 'skip'), 'invalid controller stage')
+        with self.locked() as value:
+            active = [r for r in value['stages'] if r['name'] == name and r['end'] is None]
+            if action == 'skip':
+                require(not any(r['name'] == name for r in value['stages']), 'stage already observed')
+                now = self.now(value)
+                value['stages'].append(dict(name=name, start=now, end=now, skipped='no operation performed'))
+            elif action == 'begin':
+                require(not active, 'stage already active')
+                value['stages'].append(dict(name=name, start=self.now(value), end=None))
+            else:
+                require(len(active) == 1, 'stage was not started')
+                active[0]['end'] = self.now(value)
+
+    def finish(self):
+        with self.locked() as value:
+            require(all(r['returned'] is not None for r in value['jobs'].values()), 'worker still pending; record actual fault first')
+            require(all(r['end'] is not None for r in value['stages']), 'controller stage still active')
+            files = list(value['baseline'])
+            value['final_validation'] = self._check(value, value['graph']['final_check'], files)
+            expected = {}
+            for task in value['edges']:
+                expected.update(value['jobs'][task]['adopted_digest'] or {})
+            value['quality'] = (value['final_validation']['result'] == 0
+                                and all(r['adopted'] is not None for r in value['jobs'].values())
+                                and expected == value['final_validation']['digest'])
+            value['elapsed'] = self.now(value)
+            value['finished'] = time.time()
+            value['worker_seconds'] = sum(r['returned']-r['dispatch'] for r in value['jobs'].values())
+            value['stage_seconds'] = {name: sum(r['end']-r['start'] for r in value['stages'] if r['name'] == name)
+                                      if any(r['name'] == name for r in value['stages']) else None for name in STAGES}
+            for task, row in value['jobs'].items():
+                ready = max([value['jobs'][d]['adopted'] for d in value['edges'][task]] or [0])
+                row['dependency_queue_seconds'] = row['dispatch']-ready
+                row['startup_queue_seconds'] = None if row['started'] is None else row['started']-row['dispatch']
+        return value
+
+
+def union_length(intervals):
+    end, total = 0, 0
+    for start, stop in sorted(intervals):
+        total += max(0, stop - max(start, end))
+        end = max(end, stop)
+    return total
+
+
+def plan(project, graph_path, history=None):
+    graph, jobs, edges = load_graph(graph_path)
+    with read_ledger(project) as (state, _):
+        baseline = scope_digest(Path(project).resolve(), [n for j in jobs for n in j['files']])
+        key = condition_key(graph, baseline, state)
+        cap, expired = budget.gate_limit(state)
+    report = dict(choice='serial', reason='insufficient-observed-costs', condition=key, serial_lower=None, crew_upper=None,
+                  observations=0, failures=0, pending=0, tokens=None, money=None, budget_fit='unknown')
+    report['effective_dependencies'] = {k: sorted(v) for k, v in edges.items()}
+    if expired or cap is not None and cap <= time.monotonic():
+        report.update(choice='stop', reason='time-budget-exhausted')
+        return report
+    try:
+        directory = Path(history) if history else folder(project)
+    except ValueError:
+        return report
+    rows = []
+    for path in directory.glob('*.json'):
+        value = load(path)
+        if value.get('condition') == key:
+            rows.append(value)
+    report.update(observations=len(rows), failures=sum(r.get('quality') is False for r in rows),
+                  pending=sum(r.get('finished') is None for r in rows))
+    trials = [(r['mode'], r['trial']) for r in rows]
+    if len(set(trials)) != len(trials):
+        report['reason'] = 'duplicate-trial-identity'
+        return report
+    # A fixed latest window retains failures, never cherry-picks fast successes.
+    by_mode = {mode: sorted([r for r in rows if r.get('mode') == mode], key=lambda r: r['started'])[-3:]
+               for mode in ('inline', 'crew')}
+    if any(len(v) < 3 for v in by_mode.values()):
+        return report
+    if any(not r.get('quality') or any(j['fault'] or j['started'] is None for j in r['jobs'].values())
+           for group in by_mode.values() for r in group):
+        report['reason'] = 'failure-or-unknown-startup-in-latest-window'
+        return report
+    def overhead(row):
+        return max(0, row['elapsed'] - union_length([(j['dispatch'], j['returned']) for j in row['jobs'].values()]))
+    inline, crew = by_mode['inline'], by_mode['crew']
+    serial = sum(min(r['jobs'][j['id']]['returned']-r['jobs'][j['id']]['dispatch'] for r in inline) for j in jobs) + min(map(overhead, inline))
+    durations = {j['id']: max(r['jobs'][j['id']]['returned']-r['jobs'][j['id']]['dispatch'] for r in crew) for j in jobs}
+    slots, ends = [0.0]*graph['capacity'], {}
+    for job in jobs:
+        earliest = max([ends[d] for d in edges[job['id']]] or [0])
+        slot = min(range(len(slots)), key=slots.__getitem__)
+        ends[job['id']] = max(earliest, slots[slot]) + durations[job['id']]
+        slots[slot] = ends[job['id']]
+    parallel = max(max(ends.values()) + max(map(overhead, crew)), max(r['elapsed'] for r in crew))
+    report.update(serial_lower=serial, crew_upper=parallel, budget_fit='yes' if cap is None or serial < cap-time.monotonic() else 'no',
+                  serial_worker_seconds_lower=sum(min(r['jobs'][j['id']]['returned']-r['jobs'][j['id']]['dispatch'] for r in inline) for j in jobs),
+                  crew_worker_seconds_upper=sum(durations.values()),
+                  reason='startup-coordination-or-dependency-cost', uncertainty='observed-range; not a confidence interval')
+    if graph['capacity'] > 1 and serial-parallel > max(0.05, serial*0.1):
+        if cap is None or parallel < cap-time.monotonic():
+            report.update(choice='crew', reason='observed-latency-benefit', budget_fit='yes')
+    return report
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('action', choices=('begin', 'event', 'validate', 'stage', 'finish', 'plan'))
+    parser.add_argument('--project', default='.')
+    parser.add_argument('--graph')
+    parser.add_argument('--wave')
+    parser.add_argument('--mode', choices=('inline', 'crew'))
+    parser.add_argument('--trial')
+    parser.add_argument('--task')
+    parser.add_argument('--event')
+    parser.add_argument('--result', type=int)
+    parser.add_argument('--note')
+    parser.add_argument('--stage')
+    parser.add_argument('--phase', choices=('begin', 'end', 'skip'))
+    parser.add_argument('--history')
+    args = parser.parse_args()
+    if args.action == 'begin':
+        print(begin(args.project, args.graph, args.mode, args.trial))
+    elif args.action == 'plan':
+        print(json.dumps(plan(args.project, args.graph, args.history), sort_keys=True))
+    else:
+        wave = Wave(args.project, args.wave)
+        if args.action == 'event':
+            wave.event(args.task, args.event, args.result, args.note)
+        elif args.action == 'validate':
+            return wave.validate(args.task)
+        elif args.action == 'stage':
+            wave.stage(args.stage, args.phase)
+        elif args.action == 'finish':
+            print(json.dumps(wave.finish(), sort_keys=True))
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except (ValueError, OSError, KeyError, TypeError, store.StoreError, subprocess.SubprocessError) as exc:
+        print('CREW: ERROR %s' % exc, file=sys.stderr)
+        sys.exit(4)

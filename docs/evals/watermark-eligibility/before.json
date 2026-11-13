@@ -1,0 +1,179 @@
+[
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+      "init"
+    ],
+    "rc": 0,
+    "stdout": "CTL: INIT ok operation=init-583167574c6749da98c8923c5af1ed8c - fill /tmp/goal-qualified-watermark-repro-v2-20261111/.goal/goal.md, then: goal_ctl.sh stamp --project /tmp/goal-qualified-watermark-repro-v2-20261111\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+      "stamp",
+      "--auto"
+    ],
+    "rc": 0,
+    "stdout": "approved: 69cd62a4 2026-11-11 auto\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+      "close-iteration",
+      "--task",
+      "T1",
+      "--files",
+      "artifact.txt,score.txt",
+      "--checks-pass",
+      "1",
+      "--checks-fail",
+      "0",
+      "--checks-unverifiable",
+      "0",
+      "--progress",
+      "yes",
+      "--exit-signal",
+      "no",
+      "--adversarial",
+      "clear",
+      "--adversarial-note",
+      "read floor result",
+      "--no-gate",
+      "--strategy",
+      "baseline",
+      "--score",
+      "10"
+    ],
+    "rc": 0,
+    "stdout": "CTL: CLOSE ok iter=1 digest=v2-7024f81432019300f72ee9b0d8eb704735f63364c2752917e698caab37ec2494 operation=d9936a0bb88244bea6138f7d4a345efb\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-I",
+      "/Users/m/repo/goal-loop/scripts/goal_store.py",
+      "incumbent",
+      "save",
+      "--intermediate",
+      "--file",
+      "artifact.txt",
+      "--file",
+      "score.txt"
+    ],
+    "rc": 0,
+    "stdout": "29b74a3af3df0758cb88c2f97819865ac03f96ed29481329e48e413f4c0110a4\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+      "close-iteration",
+      "--task",
+      "T1",
+      "--files",
+      "artifact.txt,score.txt",
+      "--checks-pass",
+      "1",
+      "--checks-fail",
+      "0",
+      "--checks-unverifiable",
+      "0",
+      "--progress",
+      "yes",
+      "--exit-signal",
+      "no",
+      "--adversarial",
+      "clear",
+      "--adversarial-note",
+      "read floor result",
+      "--no-gate",
+      "--strategy",
+      "baseline",
+      "--score",
+      "100"
+    ],
+    "rc": 0,
+    "stdout": "CTL: CLOSE ok iter=2 digest=v2-0bd7b5da848f2ce0164bf6818a02c613ae0596ea2471da6da848dd7dde0c30d3 operation=3516004a627749c19e2a79e770f31afa\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-I",
+      "/Users/m/repo/goal-loop/scripts/goal_store.py",
+      "incumbent",
+      "candidate",
+      "--base",
+      "29b74a3af3df0758cb88c2f97819865ac03f96ed29481329e48e413f4c0110a4"
+    ],
+    "rc": 0,
+    "stdout": "2470656ac1c4de0cbadd1320bcc4a7c166849a9f6b20d8e30f3ea5cca96ab93e\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-I",
+      "/Users/m/repo/goal-loop/scripts/goal_store.py",
+      "incumbent",
+      "restore",
+      "--base",
+      "29b74a3af3df0758cb88c2f97819865ac03f96ed29481329e48e413f4c0110a4",
+      "--candidate",
+      "2470656ac1c4de0cbadd1320bcc4a7c166849a9f6b20d8e30f3ea5cca96ab93e"
+    ],
+    "rc": 0,
+    "stdout": "INCUMBENT: restored 29b74a3af3df0758cb88c2f97819865ac03f96ed29481329e48e413f4c0110a4 (fresh gate required)\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+      "close-iteration",
+      "--task",
+      "T1",
+      "--files",
+      "artifact.txt,score.txt",
+      "--checks-pass",
+      "1",
+      "--checks-fail",
+      "0",
+      "--checks-unverifiable",
+      "0",
+      "--progress",
+      "yes",
+      "--exit-signal",
+      "yes",
+      "--adversarial",
+      "clear",
+      "--adversarial-note",
+      "read floor result",
+      "--no-gate",
+      "--strategy",
+      "baseline",
+      "--score",
+      "10"
+    ],
+    "rc": 0,
+    "stdout": "CTL: CLOSE ok iter=3 digest=v2-7024f81432019300f72ee9b0d8eb704735f63364c2752917e698caab37ec2494 operation=025ff22314b84b899618a60cb95e8e16\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+      "--check"
+    ],
+    "rc": 2,
+    "stdout": "",
+    "stderr": "GATE: NO-GO reason=score-regressed:current=10 best=100 dir=maximize tol=0 (restore the best-scoring state or do not claim) hint=restore-best\n"
+  }
+]

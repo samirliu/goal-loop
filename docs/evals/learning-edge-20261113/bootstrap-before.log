@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_first_real_hook_entry_has_a_usable_map_before_contract_exists (__main__.LearningFlow.test_first_real_hook_entry_has_a_usable_map_before_contract_exists)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_learning_flow.py", line 258, in test_first_real_hook_entry_has_a_usable_map_before_contract_exists
+    self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4 != 0 : b"CONTEXT: ERROR [Errno 2] No such file or directory: '/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/context-first-entry-8_0wew_1/.goal/goal.md'\n"
+
+----------------------------------------------------------------------
+Ran 1 test in 0.678s
+
+FAILED (failures=1)

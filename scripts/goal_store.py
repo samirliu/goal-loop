@@ -1,8 +1,7 @@
 """Immutable, single-pointer ledger storage for POSIX hosts (Python 3 stdlib).
 
-Used by actual close commits, retry receipts, journal recovery and entrypoint
-locking. Other writer snapshots and full reader version validation remain
-unintegrated; no external action is replayed by recovery.
+Used by controller commits, retry receipts, journal recovery, runner budget
+publication and entrypoint locking. No external action is replayed by recovery.
 """
 import base64
 import contextlib
@@ -58,15 +57,19 @@ def _fsync_dir(path):
         os.close(fd)
 
 
-def _atomic(path, data):
-    fd, name = tempfile.mkstemp(prefix=_TMP_PREFIX, dir=str(path.parent))
+def _atomic(path, data, *, mode=None, staging=None):
+    fd, name = tempfile.mkstemp(prefix=_TMP_PREFIX, dir=str(staging or path.parent))
     try:
         with os.fdopen(fd, 'wb') as f:
+            if mode is not None:
+                os.fchmod(f.fileno(), mode)
             f.write(data)
             f.flush()
             os.fsync(f.fileno())
         os.replace(name, str(path))
         _fsync_dir(path.parent)
+        if staging is not None and staging != path.parent:
+            _fsync_dir(staging)
     finally:
         if os.path.exists(name):
             os.unlink(name)
@@ -332,7 +335,9 @@ def _access_exec(argv):
     The descriptor survives exec and is shared by cooperating child readers.
     Nested writers are refused, including writers launched by a check.
     """
-    if len(argv) < 3 or argv[1] not in ('read', 'write', 'gate'):
+    entered = time.monotonic()
+    write_modes = ('write', 'recover', 'migrate', 'init')
+    if len(argv) < 3 or argv[1] not in ('read', 'gate') + write_modes:
         raise StoreError('access-exec requires state, read|write|gate, script')
     state, mode, script = Path(argv[0]), argv[1], argv[2]
     if fcntl is None or not getattr(os, 'O_DIRECTORY', 0) or not getattr(os, 'O_NOFOLLOW', 0):
@@ -356,16 +361,18 @@ def _access_exec(argv):
             current = os.fstat(fd)
             if (same.st_dev, same.st_ino) != (current.st_dev, current.st_ino):
                 raise StoreError('inherited lock belongs to another ledger')
-            if mode == 'write' and (os.environ.get('GOAL_ACCESS_MODE') != 'write' or owner != os.getpid()):
+            if mode in write_modes and (os.environ.get('GOAL_ACCESS_MODE') != 'write' or owner != os.getpid()):
                 raise StoreError('nested-writer')
             os.close(fd)
             fd = existing
         else:
             try:
-                fcntl.flock(fd, (fcntl.LOCK_EX if mode == 'write' else fcntl.LOCK_SH) | fcntl.LOCK_NB)
+                fcntl.flock(fd, (fcntl.LOCK_EX if mode in write_modes else fcntl.LOCK_SH) | fcntl.LOCK_NB)
             except OSError as exc:
                 raise StoreError('ledger-busy; retry after current operation') from exc
-        actual_mode = os.environ.get('GOAL_ACCESS_MODE', 'write' if mode == 'write' else 'read')
+        actual_mode = os.environ.get('GOAL_ACCESS_MODE') if inherited is not None else ('write' if mode in write_modes else 'read')
+        if actual_mode not in ('read', 'write', 'exclusive-read'):
+            raise StoreError('invalid inherited access mode')
         # External receipts are a cache used by later decisions. Conservatively
         # serialize gates mentioning them, including a harmless text decoy.
         # Inspect only after acquiring SH, then upgrade before reading any views.
@@ -382,11 +389,28 @@ def _access_exec(argv):
                 except OSError as exc:
                     raise StoreError('ledger-busy; retry external-cache gate') from exc
                 actual_mode = 'exclusive-read'
+        pending = (state / 'store/pending').exists()
+        if actual_mode != 'write':
+            if pending:
+                raise StoreError('recovery-required')
+            verify_views(state)
+        elif not pending and mode not in ('recover', 'migrate'):
+            if mode != 'init' or Store(state / 'store/commits').read()[0] is not None or (state / 'state.rec').exists():
+                verify_views(state)
         env = os.environ.copy()
         env['GOAL_ACCESS_FD'] = str(fd)
         env['GOAL_ACCESS_EXEC_PID'] = str(os.getpid())
-        env.setdefault('GOAL_ACCESS_OWNER_PID', str(os.getpid()))
+        env['GOAL_ACCESS_OWNER_PID'] = str(owner if inherited is not None else os.getpid())
         env['GOAL_ACCESS_MODE'] = actual_mode
+        if inherited is None:
+            for key in ('GOAL_GATE_SUPERVISED', 'GOAL_GATE_MONOTONIC_START', 'GOAL_WRITER_OWNER_PID', 'GOAL_CLOSE_EXEC_PID', 'GOAL_CLOSE_LOCK_FD',
+                        'GOAL_CLOSE_OPERATION', 'GOAL_CLOSE_INTENT'):
+                env.pop(key, None)
+        if mode == 'gate' and 'GOAL_GATE_MONOTONIC_START' not in env:
+            # Fresh access owns this origin; caller environment cannot grant
+            # time. Borrowed readers retain it, including time spent here
+            # acquiring/validating the ledger before gate-limit can run.
+            env['GOAL_GATE_MONOTONIC_START'] = repr(entered)
         # Kept for the controller's internal check until its pending marker
         # check is replaced by the common lock-aware access guard.
         if env['GOAL_ACCESS_MODE'] == 'write':
@@ -411,10 +435,15 @@ _OPERATION = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$')
 _SHA256 = re.compile(r'^[0-9a-f]{64}$')
 _CLOSE_META = '.close-commit.json'
 _MUTATION_META = '.mutation-commit.json'
+_VIEW_META = '.ledger-views.json'
+_VIEW_FILES = {'state.rec', 'loop-log.md', 'scores.rec', 'verdicts.rec', 'check_freeze',
+               'evidence/adversarial.rec', 'evidence/faults.rec'}
+_RUNNER_FILES = {'runner.clock', 'runner.deadline', 'runner.json'}
 _MUTATION_FILES = {
     'init': ('state.rec', 'loop-log.md', 'verdicts.rec', 'work-plan.md'),
     'stamp': ('state.rec', 'goal.md', 'check_freeze', 'pre-reg.md'),
-    'bind': ('verdicts.rec',),
+    'bind': ('verdicts.rec', 'state.rec'),
+    'forge': ('state.rec', 'check_freeze', 'evidence/raw/0.txt'),
 }
 
 
@@ -475,7 +504,10 @@ def _close_committed(state, operation, intent, require_current=False):
                 or not isinstance(meta['missing'], list) or any(not isinstance(n, str) for n in meta['missing'])
                 or len(set(meta['missing'])) != len(meta['missing'])):
             raise StoreError('invalid close commit metadata')
-        files = {name: data for name, data in snapshot.items() if name != _CLOSE_META}
+        scope = set(_CLOSE_FILES) | {'evidence/raw/%s.txt' % meta['iteration']}
+        files = {name: data for name, data in snapshot.items() if name in scope}
+        if not set(meta['missing']).issubset(scope):
+            raise StoreError('invalid close missing-file scope')
         if set(files).intersection(meta['missing']):
             raise StoreError('conflicting close snapshot paths')
         files.update(dict.fromkeys(meta['missing']))
@@ -589,6 +621,229 @@ def _capture_files(state, names):
     return files
 
 
+def _is_view(name):
+    return name in _VIEW_FILES | _RUNNER_FILES or re.fullmatch(r'evidence/raw/(0|[1-9][0-9]*)\.txt', name) is not None
+
+
+def _view_names(state, include_runner=True):
+    names = set(_VIEW_FILES)
+    if include_runner:
+        names.update(name for name in _RUNNER_FILES if (state / name).exists() or (state / name).is_symlink())
+    raw = state / 'evidence/raw'
+    if raw.exists():
+        for path in raw.iterdir():
+            name = 'evidence/raw/' + path.name
+            if _is_view(name):
+                names.add(name)
+    return names
+
+
+def attach_views(state, snapshot):
+    """Every controller commit carries complete recoverable managed views."""
+    state = Path(state)
+    commits = Store(state / 'store/commits')
+    _, previous = commits.read()
+    previous_meta = json.loads(previous[_VIEW_META]) if _VIEW_META in previous else None
+    approved = previous_meta.get('approved') if previous_meta and previous_meta.get('version') == 2 else None
+    if 'goal.md' in snapshot:
+        current = _approval_from_text(snapshot['goal.md'].decode('utf-8'))
+        if approved is not None and current != approved:
+            raise StoreError('contract-approval-mismatch: an approved contract cannot be restamped')
+        approved = current
+    files = _capture_files(state, _view_names(state))
+    views = {name: _hash(data) if data is not None else None for name, data in files.items()}
+    snapshot.update({name: data for name, data in files.items() if data is not None})
+    for name, data in files.items():
+        if data is None:
+            snapshot.pop(name, None)
+    snapshot[_VIEW_META] = _encode({'version': 2, 'views': views, 'approved': approved})
+    return snapshot
+
+
+def _approval_from_text(text):
+    rows = re.findall(r'^approved: (.*)$', text, re.M)
+    if len(rows) > 1:
+        raise StoreError('ambiguous contract approval marker')
+    if not rows:
+        return None
+    match = re.match(r'([0-9a-f]{6,})(?:\s|$)', rows[0])
+    return match.group(1) if match else None
+
+
+def current_approval(state):
+    goal = state / 'goal.md'
+    return _approval_from_text(goal.read_text()) if goal.exists() else None
+
+
+def _assert_approval(state, snapshot):
+    meta = json.loads(snapshot[_VIEW_META])
+    if meta['version'] != 2:
+        raise StoreError('ledger-migration-required: run goal_ctl.sh migrate')
+    if current_approval(state) != meta['approved']:
+        raise StoreError('contract-approval-mismatch: restore the reviewed contract; migration cannot reapprove edits')
+
+
+def _historical_approval(commits, head):
+    observed = set()
+    while head is not None:
+        entry, files = commits._generation(head)
+        if _MUTATION_META in files:
+            meta = json.loads(files[_MUTATION_META])
+            if meta.get('kind') == 'stamp' and 'goal.md' in files:
+                approved = _approval_from_text(files['goal.md'].decode('utf-8'))
+                if approved is not None:
+                    observed.add(approved)
+        head = entry['previous']
+    if len(observed) > 1:
+        raise StoreError('contradictory historical contract approvals; migration refused')
+    return next(iter(observed)) if observed else None
+
+
+def _committed_views(snapshot):
+    try:
+        meta = json.loads(snapshot[_VIEW_META])
+    except KeyError as exc:
+        raise StoreError('ledger-migration-required: run goal_ctl.sh migrate') from exc
+    if (not isinstance(meta, dict) or type(meta.get('version')) is not int or meta['version'] not in (1, 2)
+            or set(meta) != ({'version', 'views'} if meta['version'] == 1 else {'version', 'views', 'approved'})
+            or not isinstance(meta['views'], dict) or not _VIEW_FILES.issubset(meta['views'])):
+        raise StoreError('unknown ledger view manifest')
+    if meta['version'] == 2 and meta['approved'] is not None and (
+            not isinstance(meta['approved'], str) or not re.fullmatch(r'[0-9a-f]{6,}', meta['approved'])):
+        raise StoreError('invalid committed contract approval')
+    files = {}
+    for name, checksum in meta['views'].items():
+        if not isinstance(name, str) or not _is_view(name):
+            raise StoreError('invalid ledger view path')
+        if checksum is None:
+            if name in snapshot:
+                raise StoreError('conflicting missing ledger view')
+            files[name] = None
+        elif (not isinstance(checksum, str) or not _SHA256.fullmatch(checksum)
+              or name not in snapshot or _hash(snapshot[name]) != checksum):
+            raise StoreError('ledger snapshot view checksum mismatch')
+        else:
+            files[name] = snapshot[name]
+    return files
+
+
+def verify_views(state):
+    state = Path(state)
+    head, snapshot = Store(state / 'store/commits').read()
+    if head is None:
+        raise StoreError('ledger-migration-required: run goal_ctl.sh migrate')
+    expected = _committed_views(snapshot)
+    # Legacy sidecars predate transactional runner state. Until first import,
+    # leave them untouched; runner begin validates their minimum/highwater.
+    actual = _capture_files(state, set(expected).union(_view_names(state, bool(_RUNNER_FILES.intersection(expected)))))
+    if actual != expected:
+        changed = sorted(name for name in set(actual).union(expected) if actual.get(name) != expected.get(name))
+        raise StoreError('ledger-view-mismatch: ' + ','.join(changed) + '; run goal_ctl.sh recover')
+    _assert_approval(state, snapshot)
+    return head
+
+
+def guard_digest(state):
+    state = Path(state)
+    names = _view_names(state) | {'goal.md', 'work-plan.md', 'baseline.md', 'interfaces.md',
+                                 'forge-plan.json', 'store/commits/current', 'store/pending'}
+    output_iteration = os.environ.get('GOAL_RAW_OUTPUT_ITERATION')
+    if (os.environ.get('GOAL_ACCESS_MODE') == 'write' and os.environ.get('GOAL_CLOSE_OPERATION')
+            and output_iteration is not None and re.fullmatch(r'[1-9][0-9]*', output_iteration)):
+        names.discard('evidence/raw/' + output_iteration + '.txt')
+    files = _capture_files(state, names)
+    return _hash(_encode({name: _hash(data) if data is not None else None for name, data in files.items()}))
+
+
+def restore_committed_views(state, allow_legacy=False):
+    state = Path(state)
+    head, snapshot = Store(state / 'store/commits').read()
+    if head is None:
+        raise StoreError('ledger-migration-required: run goal_ctl.sh migrate')
+    files = _committed_views(snapshot)
+    if not allow_legacy or json.loads(snapshot[_VIEW_META])['version'] == 2:
+        _assert_approval(state, snapshot)
+    # Canonical raw files added without a commit are not part of this version.
+    files.update({name: None for name in _view_names(state, bool(_RUNNER_FILES.intersection(files))) - set(files)})
+    _restore_views(state, files)
+
+
+def _restore_if_versioned(state, required=False):
+    head, snapshot = Store(state / 'store/commits').read()
+    if head is not None and _VIEW_META in snapshot:
+        restore_committed_views(state, allow_legacy=True)
+    elif head is not None and required:
+        raise StoreError('ledger-migration-required: run goal_ctl.sh migrate')
+
+
+def migrate_views(state):
+    state = Path(state)
+    commits = Store(state / 'store/commits')
+    head, snapshot = commits.read()
+    if _VIEW_META in snapshot:
+        known = _committed_views(snapshot)
+        if json.loads(snapshot[_VIEW_META])['version'] == 2:
+            verify_views(state)
+            return
+        if _capture_files(state, set(known).union(_view_names(state))) != known:
+            raise StoreError('legacy views disagree with committed history; migration refused')
+    if head is not None:
+        known = {}
+        cursor = head
+        while cursor is not None:
+            entry, files = commits._generation(cursor)
+            for meta_name in (_CLOSE_META, _MUTATION_META):
+                if meta_name in files:
+                    meta = json.loads(files[meta_name])
+                    if (not isinstance(meta, dict) or type(meta.get('version')) is not int
+                            or meta['version'] != 1 or not isinstance(meta.get('missing'), list)):
+                        raise StoreError('invalid legacy commit metadata')
+                    common = {'version', 'operation', 'intent', 'missing'}
+                    expected = common | ({'kind'} if meta_name == _MUTATION_META else {'result', 'iteration'})
+                    if (set(meta) != expected or not isinstance(meta.get('operation'), str)
+                            or not _OPERATION.fullmatch(meta['operation']) or not isinstance(meta.get('intent'), str)
+                            or not _SHA256.fullmatch(meta['intent'])):
+                        raise StoreError('unknown legacy commit metadata')
+                    if meta_name == _MUTATION_META:
+                        if meta['kind'] not in _MUTATION_FILES:
+                            raise StoreError('unknown legacy mutation kind')
+                    elif (type(meta['iteration']) is not int or meta['iteration'] <= 0
+                          or type(meta['result']) is not int or meta['result'] not in (0, 2, 3, 4)):
+                        raise StoreError('invalid legacy close metadata')
+                    for name in meta['missing']:
+                        if not isinstance(name, str):
+                            raise StoreError('invalid legacy missing-file path')
+                        if _is_view(name):
+                            known.setdefault(name, None)
+            for name, data in files.items():
+                if _is_view(name):
+                    known.setdefault(name, data)
+            cursor = entry['previous']
+        if _capture_files(state, known) != known:
+            raise StoreError('legacy views disagree with committed history; migration refused')
+    state_file = state / 'state.rec'
+    if not state_file.is_file() or not (state / 'loop-log.md').is_file() or not (state / 'verdicts.rec').is_file():
+        raise StoreError('incomplete legacy ledger')
+    values = [line[10:] for line in state_file.read_text().splitlines() if line.startswith('iteration=')]
+    if len(values) != 1 or not values[0].isascii() or not values[0].isdigit():
+        raise StoreError('invalid legacy iteration')
+    blocks = re.findall(r'^## iteration ([0-9]+)$', (state / 'loop-log.md').read_text(), re.M)
+    if [int(value) for value in blocks] != list(range(1, int(values[0]) + 1)):
+        raise StoreError('legacy state/log iteration mismatch')
+    scores = state / 'scores.rec'
+    if scores.is_file():
+        rows = [line.split('|') for line in scores.read_text().splitlines() if line]
+        if (any(len(row) not in (3, 4) or not row[0].isascii() or not row[0].isdigit() for row in rows)
+                or [int(row[0]) for row in rows] != list(range(1, int(values[0]) + 1))):
+            raise StoreError('legacy state/score iteration mismatch')
+    approved = _historical_approval(commits, head)
+    if approved is not None and current_approval(state) != approved:
+        raise StoreError('legacy contract approval disagrees with committed history; migration refused')
+    seed = {'goal.md': (state / 'goal.md').read_bytes()} if (state / 'goal.md').exists() else {}
+    commits.commit('migration-' + uuid.uuid4().hex, b'ledger view migration v1',
+                   attach_views(state, seed), expected_head=head, lock_timeout=0)
+
+
 def _encoded_files(files):
     return {name: base64.b64encode(data).decode('ascii') if data is not None else None
             for name, data in files.items()}
@@ -645,7 +900,8 @@ def _mutation_record(pending):
             or (record['base_head'] is not None and (not isinstance(record['base_head'], str)
                 or not _SHA256.fullmatch(record['base_head'])))
             or not isinstance(record['files'], dict)
-            or set(record['files']) != set(_MUTATION_FILES[record['kind']])):
+            or (set(record['files']) != set(_MUTATION_FILES[record['kind']])
+                and not (record['kind'] == 'bind' and set(record['files']) == {'verdicts.rec'}))):
         raise StoreError('invalid mutation journal fields')
     for data in record['files'].values():
         if data is not None:
@@ -673,11 +929,18 @@ def _mutation_committed(state, kind, operation, intent, require_current=False):
             or any(not isinstance(n, str) for n in meta['missing'])
             or len(set(meta['missing'])) != len(meta['missing'])):
         raise StoreError('invalid mutation commit metadata')
-    files = {name: data for name, data in snapshot.items() if name != _MUTATION_META}
+    scope = set(_MUTATION_FILES[kind])
+    # Earlier bind commits owned verdicts only. Preserve that historical
+    # scope when replaying/recovering; there was no qualified-state mutation.
+    if kind == 'bind' and 'state.rec' not in snapshot and 'state.rec' not in meta['missing']:
+        scope = {'verdicts.rec'}
+    files = {name: data for name, data in snapshot.items() if name in scope}
+    if not set(meta['missing']).issubset(scope):
+        raise StoreError('invalid mutation missing-file scope')
     if set(files).intersection(meta['missing']):
         raise StoreError('conflicting mutation snapshot paths')
     files.update(dict.fromkeys(meta['missing']))
-    if set(files) != set(_MUTATION_FILES[kind]):
+    if set(files) != scope:
         raise StoreError('invalid mutation snapshot file set')
     if meta['intent'] != intent:
         raise Conflict('operation-id reused with different arguments or input')
@@ -715,13 +978,20 @@ def mutation_journal(state, action, kind=None, args=(), intent=None, operation=N
     record = _mutation_record(pending)
     kind = record['kind']
     if action == 'finish':
+        if kind == 'bind':
+            _, previous = commits.read()
+            if _VIEW_META in previous:
+                expected = _committed_views(previous)
+                names = (set(expected) | _view_names(state, bool(_RUNNER_FILES.intersection(expected)))) - set(record['files'])
+                if _capture_files(state, names) != {name: expected.get(name) for name in names}:
+                    raise StoreError('bind modified managed evidence outside its write scope')
         _sync_views(state, record['files'])
         files = _capture_files(state, record['files'])
         snapshot = {name: data for name, data in files.items() if data is not None}
         snapshot[_MUTATION_META] = _encode({'version': 1, 'kind': kind, 'operation': record['operation'],
                                           'intent': record['intent'],
                                           'missing': sorted(name for name, data in files.items() if data is None)})
-        commits.commit(record['operation'], record['intent'].encode('ascii'), snapshot,
+        commits.commit(record['operation'], record['intent'].encode('ascii'), attach_views(state, snapshot),
                        expected_head=record['base_head'], lock_timeout=0)
     elif action == 'recover':
         with Store(state / 'store')._lock(0):
@@ -732,6 +1002,7 @@ def mutation_journal(state, action, kind=None, args=(), intent=None, operation=N
                 files = {name: base64.b64decode(data, validate=True) if data is not None else None
                          for name, data in record['files'].items()}
             _restore_views(state, files)
+            _restore_if_versioned(state)
     else:
         raise StoreError('unknown mutation journal action')
     pending.unlink()
@@ -757,8 +1028,292 @@ def bind_mutation(state, args, stdin):
     identity = mutation_journal(state, 'begin', 'bind', intent=intent, operation=operation)
     with target.open('ab') as output:
         output.write(('\n'.join(lines) + '\n').encode('utf-8'))
+    qualify_objective(state)
     mutation_journal(state, 'finish')
     print('CTL: BIND ok appended=%s skipped=0 operation=%s' % (len(lines), identity))
+
+
+def _incumbent_scope(project, names):
+    import unicodedata
+
+    if not names:
+        raise StoreError('explicit owned files required')
+    paths = {}
+    aliases = set()
+    for name in names:
+        if not _valid_name(name) or {'.goal', '.git'}.intersection(part.casefold() for part in name.split('/')):
+            raise StoreError('invalid owned file path')
+        alias = unicodedata.normalize('NFC', name).casefold()
+        if alias in aliases or any(a.startswith(alias + '/') or alias.startswith(a + '/') for a in aliases):
+            raise StoreError('overlapping owned files')
+        aliases.add(alias)
+        path = _close_path(project, name)
+        if not path.parent.is_dir():
+            raise StoreError('owned file parent must already exist')
+        paths[name] = path
+    return paths
+
+
+def _incumbent_file(path):
+    try:
+        fd = os.open(str(path), os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    except FileNotFoundError:
+        return None
+    with os.fdopen(fd, 'rb') as stream:
+        info = os.fstat(stream.fileno())
+        if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or info.st_uid != os.geteuid()
+                or stat.S_IMODE(info.st_mode) > 0o777):
+            raise StoreError('expected an owned regular file without aliases or special permissions')
+        data = stream.read()
+        after = os.fstat(stream.fileno())
+        live = path.lstat()
+        def identity(s):
+            return s.st_dev, s.st_ino, s.st_mode, s.st_size, s.st_mtime_ns, s.st_ctime_ns
+        if identity(info) != identity(after) or identity(after) != identity(live):
+            raise StoreError('owned file changed during capture')
+    return {'mode': stat.S_IMODE(info.st_mode), 'bytes': base64.b64encode(data).decode('ascii')}
+
+
+def _incumbent_context(state):
+    freeze = state / 'check_freeze'
+    return {'contract': _hash((state / 'goal.md').read_bytes()),
+            'check_freeze': _hash(freeze.read_bytes()) if freeze.exists() else None}
+
+
+def watermark_basis(state):
+    import subprocess
+    state = Path(state)
+    body = subprocess.check_output(['bash', '-c', '. "$1"; gp_ac_body "$2"', 'watermark',
+                                    str(Path(__file__).with_name('goal_parse.sh')), str(state.parent)])
+    freeze = state / 'check_freeze'
+    return 'quality-v1:' + _hash(_encode(dict(contract=_hash(body),
+        check_freeze=_hash(freeze.read_bytes()) if freeze.exists() else None)))
+
+
+def qualify_objective(state):
+    """Advance best only from current floors+horizon, inside the caller's commit."""
+    from decimal import Decimal, InvalidOperation
+    import subprocess
+
+    state = Path(state)
+    if not (state / 'goal.md').is_file():
+        return
+    objectives = re.findall(r'^objective: *(maximize|minimize) +(AC-[0-9]+).*$',
+                            (state / 'goal.md').read_text().replace('\r', ''), re.M)
+    if not objectives:
+        return
+    if os.environ.get('GOAL_ACCESS_MODE') != 'write' or not (state / 'store/pending').is_file():
+        raise StoreError('objective qualification requires an active controller transaction')
+    path = state / 'state.rec'
+    lines = path.read_text().splitlines()
+    values = dict(line.split('=', 1) for line in lines if '=' in line)
+    basis = watermark_basis(state)
+    qualified = values.get('best_score_basis') == basis
+    previous = values.get('best_score', 'none') if qualified else 'none'
+    quality_score = values.get('last_quality_score', 'none') if qualified else 'none'
+    quality_judge = values.get('last_quality_judge', 'none') if qualified else 'none'
+    if previous == 'none' and values.get('best_score', 'none') != 'none':
+        print('CTL: NOTE legacy-watermark-unqualified:value=' + values['best_score'])
+    descriptors = tuple({int(os.environ[key]) for key in ('GOAL_ACCESS_FD', 'GOAL_CLOSE_LOCK_FD', 'GOAL_RUNNER_FD')
+                         if os.environ.get(key)})
+    check = subprocess.run(['bash', str(Path(__file__).with_name('goal_gate.sh')), '--quality',
+                            '--project', str(state.parent)], pass_fds=descriptors, capture_output=True)
+    text = check.stdout.decode('utf-8', 'replace')
+    diagnostics = text + check.stderr.decode('utf-8', 'replace')
+    if check.returncode == 4 or re.search(r'reason=check-mutated-(tree|ledger)', diagnostics):
+        raise StoreError('objective qualification corrupted its input; recover before retry: ' + diagnostics.strip())
+    observed = re.findall(r'^GATE: QUALITY-OK .* score=(-?[0-9]+(?:\.[0-9]+)?)$', text, re.M)
+    best = previous
+    if check.returncode == 0 and len(observed) == 1:
+        try:
+            candidate = Decimal(observed[0])
+            current = None if previous == 'none' else Decimal(previous)
+            if not candidate.is_finite() or current is not None and not current.is_finite():
+                raise InvalidOperation()
+            if current is None or (candidate > current if objectives[-1][0] == 'maximize' else candidate < current):
+                best = observed[0]
+            rows = [line.split('|') for line in (state / 'scores.rec').read_text().splitlines()]
+            current_rows = [row for row in rows if len(row) >= 3 and row[0] == values.get('iteration')]
+            quality_score = observed[0]
+            quality_judge = current_rows[-1][2] if current_rows else 'none'
+        except InvalidOperation as exc:
+            raise StoreError('invalid qualified objective score') from exc
+        print(text.strip())
+    else:
+        reason = check.stderr.decode('utf-8', 'replace').strip().splitlines()
+        print('CTL: QUALITY not-qualified result=%s reason=%s' % (check.returncode, reason[-1] if reason else 'no receipt'))
+        return  # A failed/tampered contract cannot erase a prior qualification.
+    updated = [line for line in lines if not line.startswith(('best_score=', 'best_score_basis=', 'best_score_judge=',
+                                                             'last_quality_score=', 'last_quality_judge='))]
+    updated.extend(['best_score=' + best, 'best_score_basis=' + basis,
+                    'last_quality_score=' + quality_score, 'last_quality_judge=' + quality_judge])
+    _atomic(path, ('\n'.join(updated) + '\n').encode())
+
+
+def _incumbent_archive(state, identity):
+    if not isinstance(identity, str) or not _SHA256.fullmatch(identity):
+        raise StoreError('invalid checkpoint identity')
+    path = _close_path(state, 'store/incumbents/' + identity + '.json')
+    data = path.read_bytes()
+    if _hash(data) != identity:
+        raise StoreError('checkpoint checksum mismatch')
+    record = json.loads(data)
+    if (not isinstance(record, dict)
+            or set(record) != {'version', 'kind', 'base', 'context', 'head', 'artifact', 'proof', 'files'}
+            or type(record['version']) is not int or record['version'] != 1
+            or record['kind'] not in ('incumbent', 'candidate') or not isinstance(record['files'], dict)):
+        raise StoreError('invalid checkpoint schema')
+    _incumbent_scope(state.parent, record['files'])
+    for value in record['files'].values():
+        if value is not None:
+            if (not isinstance(value, dict) or set(value) != {'mode', 'bytes'}
+                    or type(value['mode']) is not int or not 0 <= value['mode'] <= 0o777
+                    or not isinstance(value['bytes'], str)):
+                raise StoreError('invalid checkpoint file')
+            base64.b64decode(value['bytes'], validate=True)
+    return record
+
+
+def _incumbent_pair(state, baseline, candidate):
+    best = _incumbent_archive(state, baseline)
+    trial = _incumbent_archive(state, candidate)
+    if (best['kind'] != 'incumbent' or trial['kind'] != 'candidate' or trial['base'] != baseline
+            or set(best['files']) != set(trial['files']) or best['context'] != trial['context']
+            or best['context'] != _incumbent_context(state)):
+        raise StoreError('checkpoint scope, lineage or frozen contract changed')
+    return best, trial
+
+
+def _recover_incumbent(state, envelope):
+    if set(envelope) != {'payload', 'sha256'}:
+        raise StoreError('invalid incumbent recovery envelope')
+    record = envelope['payload']
+    if (set(record) != {'version', 'base', 'candidate', 'head'} or type(record['version']) is not int
+            or record['version'] != 5 or _hash(_encode(record)) != envelope['sha256']
+            or verify_views(state) != record['head']):
+        raise StoreError('invalid or stale incumbent recovery journal')
+    best, trial = _incumbent_pair(state, record['base'], record['candidate'])
+    paths = _incumbent_scope(state.parent, best['files'])
+    staging = state / 'store/incumbents'
+    device = staging.stat().st_dev
+    for name, path in paths.items():
+        if path.parent.stat().st_dev != device:
+            raise StoreError('owned files must share a filesystem with the archive')
+        if _incumbent_file(path) not in (best['files'][name], trial['files'][name]):
+            raise StoreError('restore conflict: ' + name)
+    for name in paths:
+        path = _close_path(state.parent, name)
+        target = best['files'][name]
+        current = _incumbent_file(path)
+        if current == target:
+            continue
+        if current != trial['files'][name]:
+            raise StoreError('restore conflict: ' + name)
+        if target is None:
+            path.unlink()
+            _fsync_dir(path.parent)
+        else:
+            _atomic(path, base64.b64decode(target['bytes']), mode=target['mode'], staging=staging)
+        if os.environ.get('GOAL_INCUMBENT_FAULT') == 'first-file':
+            os._exit(91)
+    if {name: _incumbent_file(path) for name, path in paths.items()} != best['files']:
+        raise StoreError('restore verification failed')
+    pending = state / 'store/pending'
+    pending.unlink()
+    _fsync_dir(pending.parent)
+
+
+def incumbent_cli(argv):
+    import argparse
+    import subprocess
+
+    parser = argparse.ArgumentParser(description='Archive and restore an explicit owned file scope')
+    parser.add_argument('action', choices=('save', 'candidate', 'restore'))
+    parser.add_argument('--project', default='.')
+    parser.add_argument('--file', action='append', default=[])
+    parser.add_argument('--base')
+    parser.add_argument('--candidate')
+    parser.add_argument('--intermediate', action='store_true', help='save after checkpoint qualification, before GO')
+    args = parser.parse_args(argv)
+    if args.action == 'save':
+        valid = args.file and args.base is None and args.candidate is None
+    else:
+        valid = (not args.file and not args.intermediate and args.base
+                 and (args.candidate if args.action == 'restore' else args.candidate is None))
+    if not valid:
+        raise StoreError('save requires --file, candidate requires --base, restore requires both checkpoint IDs')
+    project = Path(args.project).resolve(strict=True)
+    state = project / '.goal'
+    fd = os.open(str(state), os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        pending = state / 'store/pending'
+        if pending.exists():
+            raise StoreError('recovery-required')
+        head = verify_views(state)
+        context = _incumbent_context(state)
+        if args.action == 'restore':
+            best, trial = _incumbent_pair(state, args.base, args.candidate)
+            paths = _incumbent_scope(project, best['files'])
+            actual = {name: _incumbent_file(path) for name, path in paths.items()}
+            if actual != best['files']:
+                if actual != trial['files']:
+                    raise StoreError('restore conflict: owned files changed after candidate capture')
+                device = (state / 'store/incumbents').stat().st_dev
+                if any(path.parent.stat().st_dev != device for path in paths.values()):
+                    raise StoreError('owned files must share a filesystem with the archive')
+                record = dict(version=5, base=args.base, candidate=args.candidate, head=head)
+                envelope = {'payload': record, 'sha256': _hash(_encode(record))}
+                _atomic(pending, _encode(envelope))
+                _recover_incumbent(state, envelope)
+            print('INCUMBENT: restored %s (fresh gate required)' % args.base)
+            return
+
+        script = str(Path(__file__).with_name('goal_gate.sh'))
+        command = ['bash', script, '--project', str(project)]
+        baseline = None if args.action == 'save' else _incumbent_archive(state, args.base)
+        if baseline and (baseline['kind'] != 'incumbent' or baseline['context'] != context):
+            raise StoreError('candidate requires a checkpoint of the same frozen contract')
+        paths = _incumbent_scope(project, args.file if baseline is None else baseline['files'])
+        files = {name: _incumbent_file(path) for name, path in paths.items()}
+        proof = None
+        if baseline is None:
+            env = {k: v for k, v in os.environ.items() if not k.startswith(('GOAL_ACCESS_', 'GOAL_CLOSE_', 'GOAL_WRITER_', 'GOAL_GATE_'))}
+            env.update(GOAL_ACCESS_FD=str(fd), GOAL_ACCESS_OWNER_PID=str(os.getpid()),
+                       GOAL_ACCESS_MODE='exclusive-read')
+            mode = '--checkpoint' if args.intermediate else '--check'
+            check = subprocess.run(command + [mode], env=env, pass_fds=(fd,), capture_output=True)
+            if check.returncode != 0:
+                print((check.stdout + check.stderr).decode('utf-8', 'replace'), file=sys.stderr, end='')
+                raise StoreError('incumbent must pass a fresh gate')
+            outcome = b'CHECKPOINT-OK' if args.intermediate else b'GO'
+            receipts = re.findall(rb'^GATE: ' + outcome + rb' digest=(v2-[0-9a-f]{64}) ', check.stdout, re.M)
+            if len(receipts) != 1:
+                raise StoreError('missing artifact identity in gate receipt')
+            artifact = receipts[0].decode('ascii')
+            proof = base64.b64encode(check.stdout + check.stderr).decode('ascii')
+        else:
+            artifact = subprocess.check_output(command + ['--digest']).decode('ascii').strip()
+        if (verify_views(state) != head or _incumbent_context(state) != context
+                or {name: _incumbent_file(path) for name, path in paths.items()} != files
+                or subprocess.check_output(command + ['--digest']).decode('ascii').strip() != artifact):
+            raise StoreError('project changed during checkpoint capture')
+        data = _encode(dict(version=1, kind='incumbent' if baseline is None else 'candidate',
+                            base=args.base, context=context, head=head, artifact=artifact, proof=proof, files=files))
+        identity = _hash(data)
+        path = _close_path(state, 'store/incumbents/' + identity + '.json')
+        path.parent.mkdir(exist_ok=True)
+        _fsync_dir(path.parent.parent)
+        if path.exists():
+            if path.read_bytes() != data:
+                raise StoreError('checkpoint checksum mismatch')
+        else:
+            _atomic(path, data)
+        print(identity)
+    except subprocess.CalledProcessError as exc:
+        raise StoreError('unable to bind artifact digest') from exc
+    finally:
+        os.close(fd)
 
 
 def close_journal(state, action, result=0):
@@ -770,6 +1325,9 @@ def close_journal(state, action, result=0):
         if (isinstance(envelope, dict) and isinstance(envelope.get('payload'), dict)
                 and envelope['payload'].get('version') == 4):
             return mutation_journal(state, 'recover')
+        if (isinstance(envelope, dict) and isinstance(envelope.get('payload'), dict)
+                and envelope['payload'].get('version') == 5):
+            return _recover_incumbent(state, envelope)
     if action == 'begin':
         if pending.exists():
             raise StoreError('recovery required')
@@ -822,18 +1380,24 @@ def close_journal(state, action, result=0):
                                             'intent': record['intent'], 'result': result,
                                             'iteration': iteration, 'missing': sorted(missing)})
             commits = Store(state / 'store/commits')
-            head, _ = commits.read()
+            head, previous = commits.read()
             if record['version'] == 3 and head != record['base_head']:
                 raise Conflict('close baseline committed version changed')
+            if _VIEW_META in previous:
+                expected = _committed_views(previous)
+                names = (set(expected) | _view_names(state, bool(_RUNNER_FILES.intersection(expected)))) - set(files)
+                if _capture_files(state, names) != {name: expected.get(name) for name in names}:
+                    raise StoreError('close modified managed evidence outside its write scope')
             # The atomic current pointer publication is the close commit point.
             # Its snapshot is also the source of recovery after this point.
-            commits.commit(record['operation'], record['intent'].encode('ascii'), snapshot,
+            commits.commit(record['operation'], record['intent'].encode('ascii'), attach_views(state, snapshot),
                            expected_head=head, lock_timeout=0)
         pending.unlink()
         _fsync_dir(pending.parent)
     elif action == 'recover':
         with Store(state / 'store')._lock(0):
             if not pending.exists():
+                _restore_if_versioned(state, required=True)
                 return
             record = _close_record(pending)
             files = record['files']
@@ -857,6 +1421,7 @@ def close_journal(state, action, result=0):
                     raise StoreError('committed close file set mismatch')
                 decoded = final_files
             _restore_views(state, decoded)
+            _restore_if_versioned(state)
             pending.unlink()
             _fsync_dir(pending.parent)
     else:
@@ -878,10 +1443,23 @@ if __name__ == '__main__':
                 print(identity)
         elif len(sys.argv) >= 3 and sys.argv[1] == 'bind-mutation':
             bind_mutation(sys.argv[2], sys.argv[3:], sys.stdin.buffer.read())
+        elif len(sys.argv) == 3 and sys.argv[1] == 'qualify-objective':
+            qualify_objective(sys.argv[2])
+        elif len(sys.argv) == 3 and sys.argv[1] == 'watermark-basis':
+            print(watermark_basis(sys.argv[2]))
+        elif len(sys.argv) == 3 and sys.argv[1] == 'check-views':
+            print(verify_views(sys.argv[2]))
+        elif len(sys.argv) == 3 and sys.argv[1] == 'guard-digest':
+            print(guard_digest(sys.argv[2]))
+        elif len(sys.argv) == 3 and sys.argv[1] == 'migrate-views':
+            migrate_views(sys.argv[2])
+            print('CTL: MIGRATE ok')
         elif len(sys.argv) >= 2 and sys.argv[1] == 'writer-exec':
             _writer_exec(sys.argv[2:])
         elif len(sys.argv) >= 2 and sys.argv[1] == 'access-exec':
             _access_exec(sys.argv[2:])
+        elif len(sys.argv) >= 2 and sys.argv[1] == 'incumbent':
+            incumbent_cli(sys.argv[2:])
         else:
             raise StoreError('unknown command')
     except (StoreError, OSError, ValueError, KeyError, TypeError) as exc:

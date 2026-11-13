@@ -169,6 +169,12 @@ class OwnerWatch(unittest.TestCase):
         finally:
             signal.signal(signal.SIGCHLD, previous)
 
+    def test_large_budget_does_not_overflow_process_event_wait(self):
+        owner = self.owner()
+        result = watch.supervise(owner.pid, [sys.executable, '-I', '-c', 'import sys; sys.exit(7)'],
+                                 timeout=10**10)
+        self.assertEqual(result, 7)
+
 
 if __name__ == '__main__':
     unittest.main()

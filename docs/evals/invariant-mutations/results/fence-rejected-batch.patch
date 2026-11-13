@@ -1,0 +1,11 @@
+--- a/scripts/goal_store.py
++++ b/scripts/goal_store.py
+@@ -986,6 +986,8 @@
+     for line in lines:
+         columns = line.split('|')
+         if '\x00' in line or len(columns) != 6 or columns[1] not in ('PASS', 'FAIL', 'UNVERIFIABLE'):
++            with (Path(state) / 'verdicts.rec').open('ab') as output:
++                output.write((lines[0] + '\n').encode('utf-8'))
+             raise StoreError('malformed bind row; no rows appended')
+     state = Path(state)
+     target = _close_path(state, 'verdicts.rec')

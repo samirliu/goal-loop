@@ -21,6 +21,8 @@ Legacy aliases: `R5 R9 R14 R15 R17a` → PROVE / BIND.
 
 - One capture group; ANSI stripped before matching.
 - Use when stdout carries other numbers; otherwise last non-empty line is the metric.
+- Numeric checks must exit successfully. Output from a failed or timed-out
+  measurement cannot set a score or satisfy a floor.
 - stderr rides along in verdict detail (fail-loud). A FAIL that says only “failed” is the eval system violating fail-loud.
 - Tautological checks (cannot fail across rounds) may be flagged `tautology-suspect` (advisory).
 

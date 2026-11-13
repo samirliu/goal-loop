@@ -1,0 +1,11 @@
+{
+  "reason": "user-requested-stop",
+  "worker": "/root/cohort_v2_controller/r10_skill",
+  "interrupt_receipt": {
+    "previous_status": "running"
+  },
+  "time": 1794398131.039407,
+  "monotonic": 1583705.61353775,
+  "overrun_compute": "unknown",
+  "not_timeout": true
+}

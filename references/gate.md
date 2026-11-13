@@ -20,12 +20,22 @@ the committed snapshot after that point, without replaying tools. A journal
 whose baseline/operation conflicts with the current commit is refused. Keep
 the journal for diagnosis; never clear it merely to make a gate run.
 
+Readers now verify managed text views against the immutable commit snapshot.
+`ledger-view-mismatch` also requires controller recovery, even without pending.
+For an older unversioned ledger, use `goal_ctl.sh migrate --project DIR` after
+`ledger-migration-required`; migration refuses contradictory history. Do not
+use migration to bless edits to an already versioned ledger. Author the goal
+and work-plan through the existing workflow; state/log/scores, verdicts, frozen
+checker records and managed raw receipts are controller projections.
+
 ## 1 Schemas
 
 `.goal/state.rec` keys: iteration breaker(CLOSED|HALF_OPEN|OPEN)
 false_completes replans no_progress_streak last_progress_iteration
 max_iterations no_progress_limit max_replans per_check_fail_cap panel_max
 dry_streak dry_limit check_timeout time_budget deadline best_score.
+Objective records also carry best_score_basis, last_quality_score and
+last_quality_judge. Raw failed attempts remain in scores.rec.
 `dry_streak/dry_limit` required only for `exit: forge`.
 Budget knobs written in goal.md (max_iterations, dry_limit, check_timeout,
 wallclock, ...) BIND at stamp - goal_ctl.sh stamp copies them into state.rec.
@@ -168,7 +178,7 @@ fingerprints before/after every rerun batch: a moved digest = a check
 mutated the tree -> NO-GO.
 The tree digest is blind to `.goal/`, so the ledger gets its own before/after
 digest (`ledger_digest`, over goal.md/state.rec/loop-log.md/verdicts.rec/
-scores.rec/work-plan.md/baseline.md/interfaces.md/runner.deadline/runner.clock) - a check that rewrites
+scores.rec/work-plan.md/baseline.md/interfaces.md/runner.deadline/runner.clock/runner.json) - a check that rewrites
 the contract or a state file mid-rerun trips `check-mutated-ledger`; only
 `.goal/evidence/` is fair game for checks (R6). Peer-notes (v2.8 protocol,
 see crew.md §4) live under `.goal/evidence/peer-notes/` - invisible to both
@@ -214,6 +224,8 @@ digests by construction.
 9  judged UNVERIFIABLE *3 <= total            else 2 unverifiable-excessive [R4]
 10 digest unchanged after rerun batch         else 2 check-mutated-tree
 11 forge: dry_streak >= dry_limit             else 2 not-dry
+   + last K canonical raw records contain complete executed scope and bound
+     empty critic conclusions                 else 2 forge-coverage-unverified
 12 breaker=HALF_OPEN: strategy_delta set      else 2 missing-strategy-delta [R10]
 13 objective score vs best_score by direction else 2 score-regressed [R11]
    (band = sd/var spread z2 or tolerance, wider wins; noise inside = holds)
@@ -221,6 +233,12 @@ digests by construction.
    advisory NOTEs on GO: tautology-suspect / metric-flat (never block)
 GO -> "GATE: GO ... mode=<m> [score=<s> best=<b>]"
 ```
+
+`--checkpoint` qualifies the latest booked artifact for a reversible trial.
+It requires all ACs verified within the active budget and retains the frozen
+contract, calibration, adversarial evidence, and water-mark checks. Remaining
+work items, dry rounds, and a final claim are delivery conditions. The
+checkpoint receipt says `CHECKPOINT-OK`. See the [restore procedure](../docs/transaction-state.md#accepted-artifact-checkpoints).
 
 ## 4 Invariants + legacy index
 

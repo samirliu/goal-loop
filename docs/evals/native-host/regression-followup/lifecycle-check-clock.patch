@@ -1,0 +1,40 @@
+--- previous-frozen/tests/test_runner_lifecycle.py
++++ current-frozen/tests/test_runner_lifecycle.py
+@@ -3,7 +3,9 @@
+ import os
+ from pathlib import Path
+ import signal
++import shlex
+ import subprocess
++import sys
+ import tempfile
+ import time
+ import unittest
+@@ -178,7 +180,13 @@
+         (self.state / 'evidence/slow').touch()
+ 
+     def test_standalone_gate_ignores_unbounded_timeout_tool(self):
+-        self.slow_check()
++        # This contract has a per-check timeout and no total run budget.
++        # Observe its bound from inside the actual check, independently of
++        # interpreter/ledger startup, while retaining the original 2s limit.
++        clock = shlex.quote(sys.executable) + ' -I -c ' + shlex.quote('import time; print(time.monotonic())')
++        self.contract('if test -f .goal/evidence/slow; then ' + clock + ' > .goal/evidence/ready; '
++                      '(sleep 2; echo leaked > .goal/evidence/leak) & wait; fi; true', 'check_timeout=1')
++        (self.state / 'evidence/slow').touch()
+         bindir = self.project / 'bin'
+         bindir.mkdir()
+         timeout = bindir / 'timeout'
+@@ -186,10 +194,10 @@
+         timeout.chmod(0o755)
+         env = dict(os.environ, PATH=str(bindir) + os.pathsep + os.environ['PATH'],
+                    UNSAFE_TIMEOUT_MARKER=str(self.state / 'timeout-used'))
+-        start = time.monotonic()
+         result = self.call(GATE, '--verify', env=env)
+         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+-        self.assertLess(time.monotonic()-start, 2)
++        started = float((self.state / 'evidence/ready').read_text())
++        self.assertLess(time.monotonic()-started, 2)
+         self.assertIn(b'124', result.stdout + result.stderr)
+         self.assertFalse((self.state / 'timeout-used').exists())
+         time.sleep(1.3)

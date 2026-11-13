@@ -1,0 +1,270 @@
+{
+  "planned": 36,
+  "adjudicated": 10,
+  "arms": {
+    "plain": {
+      "planned": 12,
+      "adjudicated": 3,
+      "accepted_within_budget": 3,
+      "independently_correct": 3,
+      "protocol_compliant": 3,
+      "compliant_delivery": 3,
+      "timeout": 0,
+      "unverified_completion_claims": 0,
+      "false_acceptance": 0,
+      "conditional_success_median_seconds": 231.92137941601686,
+      "conditional_success_p90_seconds": 321.0981460828334,
+      "observed_seconds_per_delivery": null,
+      "tokens": "unknown across arms; native partial accounting retained per trial",
+      "money": null,
+      "time_to_delivery": {
+        "120": 0,
+        "240": 2,
+        "360": 3,
+        "480": 3,
+        "600": 3
+      }
+    },
+    "skill": {
+      "planned": 12,
+      "adjudicated": 4,
+      "accepted_within_budget": 3,
+      "independently_correct": 3,
+      "protocol_compliant": 3,
+      "compliant_delivery": 3,
+      "timeout": 0,
+      "unverified_completion_claims": 0,
+      "false_acceptance": 0,
+      "conditional_success_median_seconds": 367.8647861671634,
+      "conditional_success_p90_seconds": 458.11335154110566,
+      "observed_seconds_per_delivery": null,
+      "tokens": "unknown across arms; native partial accounting retained per trial",
+      "money": null,
+      "time_to_delivery": {
+        "120": 0,
+        "240": 1,
+        "360": 1,
+        "480": 3,
+        "600": 3
+      }
+    },
+    "native": {
+      "planned": 12,
+      "adjudicated": 3,
+      "accepted_within_budget": 3,
+      "independently_correct": 3,
+      "protocol_compliant": 1,
+      "compliant_delivery": 1,
+      "timeout": 0,
+      "unverified_completion_claims": 0,
+      "false_acceptance": 0,
+      "conditional_success_median_seconds": 241.34165354189463,
+      "conditional_success_p90_seconds": 247.3504293751903,
+      "observed_seconds_per_delivery": null,
+      "tokens": "unknown across arms; native partial accounting retained per trial",
+      "money": null,
+      "time_to_delivery": {
+        "120": 0,
+        "240": 1,
+        "360": 3,
+        "480": 3,
+        "600": 3
+      }
+    }
+  },
+  "pairs": [
+    {
+      "family": "small",
+      "repetition": 0,
+      "comparisons": {
+        "plain": {
+          "adjudicated": true,
+          "delivery_difference": 0,
+          "seconds_difference": 92.51174566685222
+        },
+        "native": {
+          "adjudicated": true,
+          "delivery_difference": 0,
+          "seconds_difference": 76.78482337505557
+        }
+      }
+    },
+    {
+      "family": "small",
+      "repetition": 1,
+      "comparisons": {
+        "plain": {
+          "adjudicated": true,
+          "delivery_difference": 0,
+          "seconds_difference": 46.76664008432999
+        },
+        "native": {
+          "adjudicated": true,
+          "delivery_difference": 0,
+          "seconds_difference": 120.51435679197311
+        }
+      }
+    },
+    {
+      "family": "small",
+      "repetition": 2,
+      "comparisons": {
+        "plain": {
+          "adjudicated": true,
+          "delivery_difference": 0,
+          "seconds_difference": 226.1919721250888
+        },
+        "native": {
+          "adjudicated": true,
+          "delivery_difference": 0,
+          "seconds_difference": 216.77169799921103
+        }
+      }
+    },
+    {
+      "family": "medium",
+      "repetition": 0,
+      "comparisons": {
+        "plain": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        },
+        "native": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        }
+      }
+    },
+    {
+      "family": "medium",
+      "repetition": 1,
+      "comparisons": {
+        "plain": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        },
+        "native": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        }
+      }
+    },
+    {
+      "family": "medium",
+      "repetition": 2,
+      "comparisons": {
+        "plain": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        },
+        "native": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        }
+      }
+    },
+    {
+      "family": "optimization",
+      "repetition": 0,
+      "comparisons": {
+        "plain": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        },
+        "native": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        }
+      }
+    },
+    {
+      "family": "optimization",
+      "repetition": 1,
+      "comparisons": {
+        "plain": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        },
+        "native": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        }
+      }
+    },
+    {
+      "family": "optimization",
+      "repetition": 2,
+      "comparisons": {
+        "plain": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        },
+        "native": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        }
+      }
+    },
+    {
+      "family": "recovery",
+      "repetition": 0,
+      "comparisons": {
+        "plain": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        },
+        "native": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        }
+      }
+    },
+    {
+      "family": "recovery",
+      "repetition": 1,
+      "comparisons": {
+        "plain": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        },
+        "native": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        }
+      }
+    },
+    {
+      "family": "recovery",
+      "repetition": 2,
+      "comparisons": {
+        "plain": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        },
+        "native": {
+          "adjudicated": false,
+          "delivery_difference": null,
+          "seconds_difference": null
+        }
+      }
+    }
+  ],
+  "interpretation": "Descriptive matched observations; no general superiority or cross-arm token-cost inference."
+}

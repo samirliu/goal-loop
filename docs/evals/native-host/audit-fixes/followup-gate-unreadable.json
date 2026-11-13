@@ -1,0 +1,131 @@
+{
+  "steps": [
+    {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+        "init",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 0,
+      "stdout": "CTL: INIT ok operation=init-72f94b3e065a4f6b8164397067ee8c8f - fill /tmp/goal-p0-followup-b6x8tybz/flat/.goal/goal.md, then: goal_ctl.sh stamp --project /tmp/goal-p0-followup-b6x8tybz/flat\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+        "stamp",
+        "--auto",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 0,
+      "stdout": "approved: 131d40c0 2026-11-12 auto\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+        "close-iteration",
+        "--task",
+        "T1",
+        "--files",
+        "judged.txt",
+        "--checks-pass",
+        "1",
+        "--checks-fail",
+        "0",
+        "--checks-unverifiable",
+        "0",
+        "--exit-signal",
+        "yes",
+        "--adversarial",
+        "clear",
+        "--adversarial-note",
+        "local review counterexample",
+        "--no-gate",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 0,
+      "stdout": "CTL: CLOSE ok iter=1 digest=v2-1a9249796a57c8cb6599724e3f3902a6e2de1b1eda28fdabfb4e1873984c8720 operation=a847393d4d244fc9a885548a51a58917\n",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\n"
+    },
+    {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+        "--digest",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 0,
+      "stdout": "v2-1a9249796a57c8cb6599724e3f3902a6e2de1b1eda28fdabfb4e1873984c8720\n",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\n"
+    },
+    {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+        "bind",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 0,
+      "stdout": "CTL: BIND ok appended=1 skipped=0 operation=bind-7bdecfe7d1644b90b2a7ccd592c03a89\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+        "--check",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 0,
+      "stdout": "GATE: GO digest=v2-1a9249796a57c8cb6599724e3f3902a6e2de1b1eda28fdabfb4e1873984c8720 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\nGATE: NOTE judge-score-unrecorded (AC-1 claimed without a numeric judge score; R13 stays inert - record --judge-score N to activate the divergence guard)\nwarning: could not open directory 'untracked/': Permission denied\n"
+    },
+    {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+        "--check",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 0,
+      "stdout": "GATE: GO digest=v2-1a9249796a57c8cb6599724e3f3902a6e2de1b1eda28fdabfb4e1873984c8720 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\nGATE: NOTE judge-score-unrecorded (AC-1 claimed without a numeric judge score; R13 stays inert - record --judge-score N to activate the divergence guard)\nwarning: could not open directory 'untracked/': Permission denied\n"
+    }
+  ],
+  "before": {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+      "--check",
+      "--project",
+      "/tmp/goal-p0-followup-b6x8tybz/flat"
+    ],
+    "returncode": 0,
+    "stdout": "GATE: GO digest=v2-1a9249796a57c8cb6599724e3f3902a6e2de1b1eda28fdabfb4e1873984c8720 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n",
+    "stderr": "warning: could not open directory 'untracked/': Permission denied\nGATE: NOTE judge-score-unrecorded (AC-1 claimed without a numeric judge score; R13 stays inert - record --judge-score N to activate the divergence guard)\nwarning: could not open directory 'untracked/': Permission denied\n"
+  },
+  "after": {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+      "--check",
+      "--project",
+      "/tmp/goal-p0-followup-b6x8tybz/flat"
+    ],
+    "returncode": 0,
+    "stdout": "GATE: GO digest=v2-1a9249796a57c8cb6599724e3f3902a6e2de1b1eda28fdabfb4e1873984c8720 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n",
+    "stderr": "warning: could not open directory 'untracked/': Permission denied\nGATE: NOTE judge-score-unrecorded (AC-1 claimed without a numeric judge score; R13 stays inert - record --judge-score N to activate the divergence guard)\nwarning: could not open directory 'untracked/': Permission denied\n"
+  },
+  "go_survived_unreviewed_content_change": true
+}

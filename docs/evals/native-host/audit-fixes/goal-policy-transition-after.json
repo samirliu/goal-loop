@@ -1,0 +1,13 @@
+{
+  "source_sha256": "4a1a6b56fa5e6e220161887ec4110975b2e50520fd08f45056b741ea88ed1705",
+  "controlled_telemetry_fault_repro": true,
+  "phase": "transition",
+  "status_before_pointer_recovery": "candidate",
+  "old_pointer_present": true,
+  "execution_before_recovery_returncode": 4,
+  "execution_before_recovery_stderr": "EVOLVE: ERROR policy-recovery-required: run goal_evolve.py recover --state /var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-evolve-test-fnyah08z/state\n",
+  "recovery": "recovered",
+  "execution_after_recovery_returncode": 0,
+  "execution_after_recovery_stdout": "baseline\n",
+  "trials_exposure_budget_and_archives_unchanged_by_recovery": true
+}

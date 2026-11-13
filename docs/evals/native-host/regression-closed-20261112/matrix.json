@@ -1,0 +1,63 @@
+{
+  "all_recorded_checks_exit_zero": true,
+  "captured_utc": "2026-11-12T12:35:41.450308+00:00",
+  "limits": "Correctness regression evidence only; preserves earlier failed snapshots. No native W5 net-benefit or 9+ conclusion. This archival task executed no tests, models or production entrypoints.",
+  "linux": {
+    "docs": {
+      "returncode": 0
+    },
+    "forge": {
+      "passed": 10,
+      "returncode": 0
+    },
+    "parser": {
+      "passed": 78,
+      "returncode": 0
+    },
+    "python": {
+      "failures": 0,
+      "returncode": 0,
+      "skip_lines": [
+        "test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors (test_owner_watch_guard.GroupGuard.test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors) ... skipped 'actual hard RLIMIT_NOFILE prevents inheriting infinity'",
+        "test_infinite_limit_normal_timeout_and_cancel (test_owner_watch_guard.GroupGuard.test_infinite_limit_normal_timeout_and_cancel) ... skipped 'actual hard RLIMIT_NOFILE prevents inheriting infinity'"
+      ],
+      "skipped": 2,
+      "tests": 256,
+      "unittest_seconds": 886.022
+    },
+    "shell": {
+      "passed": 603,
+      "returncode": 0
+    },
+    "shellcheck": {
+      "returncode": 0
+    }
+  },
+  "macos": {
+    "docs": {
+      "returncode": 0
+    },
+    "forge": {
+      "passed": 10,
+      "returncode": 0
+    },
+    "parser": {
+      "passed": 78,
+      "returncode": 0
+    },
+    "python": {
+      "failures": 0,
+      "returncode": 0,
+      "skipped": 0,
+      "tests": 256,
+      "unittest_seconds": 632.458
+    },
+    "shell": {
+      "passed": 603,
+      "returncode": 0
+    },
+    "shellcheck": "No macOS run claimed"
+  },
+  "source_files": 139,
+  "source_manifest_sha256": "db9793740d657e25a1c95b62ce4c38e326ef3e7b6ed6a7100ef0675546b7ebcc"
+}

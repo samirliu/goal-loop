@@ -1,0 +1,384 @@
+--- a/scripts/goal_store.py
++++ b/scripts/goal_store.py
+@@ -57,15 +57,19 @@
+         os.close(fd)
+ 
+ 
+-def _atomic(path, data):
+-    fd, name = tempfile.mkstemp(prefix=_TMP_PREFIX, dir=str(path.parent))
++def _atomic(path, data, *, mode=None, staging=None):
++    fd, name = tempfile.mkstemp(prefix=_TMP_PREFIX, dir=str(staging or path.parent))
+     try:
+         with os.fdopen(fd, 'wb') as f:
++            if mode is not None:
++                os.fchmod(f.fileno(), mode)
+             f.write(data)
+             f.flush()
+             os.fsync(f.fileno())
+         os.replace(name, str(path))
+         _fsync_dir(path.parent)
++        if staging is not None and staging != path.parent:
++            _fsync_dir(staging)
+     finally:
+         if os.path.exists(name):
+             os.unlink(name)
+@@ -997,6 +1001,210 @@
+     print('CTL: BIND ok appended=%s skipped=0 operation=%s' % (len(lines), identity))
+ 
+ 
++def _incumbent_scope(project, names):
++    import unicodedata
++
++    if not names:
++        raise StoreError('explicit owned files required')
++    paths = {}
++    aliases = set()
++    for name in names:
++        if not _valid_name(name) or {'.goal', '.git'}.intersection(part.casefold() for part in name.split('/')):
++            raise StoreError('invalid owned file path')
++        alias = unicodedata.normalize('NFC', name).casefold()
++        if alias in aliases or any(a.startswith(alias + '/') or alias.startswith(a + '/') for a in aliases):
++            raise StoreError('overlapping owned files')
++        aliases.add(alias)
++        path = _close_path(project, name)
++        if not path.parent.is_dir():
++            raise StoreError('owned file parent must already exist')
++        paths[name] = path
++    return paths
++
++
++def _incumbent_file(path):
++    try:
++        fd = os.open(str(path), os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
++    except FileNotFoundError:
++        return None
++    with os.fdopen(fd, 'rb') as stream:
++        info = os.fstat(stream.fileno())
++        if (not stat.S_ISREG(info.st_mode) or info.st_nlink != 1 or info.st_uid != os.geteuid()
++                or stat.S_IMODE(info.st_mode) > 0o777):
++            raise StoreError('expected an owned regular file without aliases or special permissions')
++        data = stream.read()
++        after = os.fstat(stream.fileno())
++        live = path.lstat()
++        def identity(s):
++            return s.st_dev, s.st_ino, s.st_mode, s.st_size, s.st_mtime_ns, s.st_ctime_ns
++        if identity(info) != identity(after) or identity(after) != identity(live):
++            raise StoreError('owned file changed during capture')
++    return {'mode': stat.S_IMODE(info.st_mode), 'bytes': base64.b64encode(data).decode('ascii')}
++
++
++def _incumbent_context(state):
++    freeze = state / 'check_freeze'
++    return {'contract': _hash((state / 'goal.md').read_bytes()),
++            'check_freeze': _hash(freeze.read_bytes()) if freeze.exists() else None}
++
++
++def _incumbent_archive(state, identity):
++    if not isinstance(identity, str) or not _SHA256.fullmatch(identity):
++        raise StoreError('invalid checkpoint identity')
++    path = _close_path(state, 'store/incumbents/' + identity + '.json')
++    data = path.read_bytes()
++    if _hash(data) != identity:
++        raise StoreError('checkpoint checksum mismatch')
++    record = json.loads(data)
++    if (not isinstance(record, dict)
++            or set(record) != {'version', 'kind', 'base', 'context', 'head', 'artifact', 'proof', 'files'}
++            or type(record['version']) is not int or record['version'] != 1
++            or record['kind'] not in ('incumbent', 'candidate') or not isinstance(record['files'], dict)):
++        raise StoreError('invalid checkpoint schema')
++    _incumbent_scope(state.parent, record['files'])
++    for value in record['files'].values():
++        if value is not None:
++            if (not isinstance(value, dict) or set(value) != {'mode', 'bytes'}
++                    or type(value['mode']) is not int or not 0 <= value['mode'] <= 0o777
++                    or not isinstance(value['bytes'], str)):
++                raise StoreError('invalid checkpoint file')
++            base64.b64decode(value['bytes'], validate=True)
++    return record
++
++
++def _incumbent_pair(state, baseline, candidate):
++    best = _incumbent_archive(state, baseline)
++    trial = _incumbent_archive(state, candidate)
++    if (best['kind'] != 'incumbent' or trial['kind'] != 'candidate' or trial['base'] != baseline
++            or set(best['files']) != set(trial['files']) or best['context'] != trial['context']
++            or best['context'] != _incumbent_context(state)):
++        raise StoreError('checkpoint scope, lineage or frozen contract changed')
++    return best, trial
++
++
++def _recover_incumbent(state, envelope):
++    if set(envelope) != {'payload', 'sha256'}:
++        raise StoreError('invalid incumbent recovery envelope')
++    record = envelope['payload']
++    if (set(record) != {'version', 'base', 'candidate', 'head'} or type(record['version']) is not int
++            or record['version'] != 5 or _hash(_encode(record)) != envelope['sha256']
++            or verify_views(state) != record['head']):
++        raise StoreError('invalid or stale incumbent recovery journal')
++    best, trial = _incumbent_pair(state, record['base'], record['candidate'])
++    paths = _incumbent_scope(state.parent, best['files'])
++    staging = state / 'store/incumbents'
++    device = staging.stat().st_dev
++    for name, path in paths.items():
++        if path.parent.stat().st_dev != device:
++            raise StoreError('owned files must share a filesystem with the archive')
++        if _incumbent_file(path) not in (best['files'][name], trial['files'][name]):
++            raise StoreError('restore conflict: ' + name)
++    for name in paths:
++        path = _close_path(state.parent, name)
++        target = best['files'][name]
++        current = _incumbent_file(path)
++        if current == target:
++            continue
++        if current != trial['files'][name]:
++            raise StoreError('restore conflict: ' + name)
++        if target is None:
++            path.unlink()
++            _fsync_dir(path.parent)
++        else:
++            _atomic(path, base64.b64decode(target['bytes']), mode=target['mode'], staging=staging)
++        if os.environ.get('GOAL_INCUMBENT_FAULT') == 'first-file':
++            os._exit(91)
++    if {name: _incumbent_file(path) for name, path in paths.items()} != best['files']:
++        raise StoreError('restore verification failed')
++    pending = state / 'store/pending'
++    pending.unlink()
++    _fsync_dir(pending.parent)
++
++
++def incumbent_cli(argv):
++    import argparse
++    import subprocess
++
++    parser = argparse.ArgumentParser(description='Archive and restore an explicit owned file scope')
++    parser.add_argument('action', choices=('save', 'candidate', 'restore'))
++    parser.add_argument('--project', default='.')
++    parser.add_argument('--file', action='append', default=[])
++    parser.add_argument('--base')
++    parser.add_argument('--candidate')
++    args = parser.parse_args(argv)
++    if args.action == 'save':
++        valid = args.file and args.base is None and args.candidate is None
++    else:
++        valid = not args.file and args.base and (args.candidate if args.action == 'restore' else args.candidate is None)
++    if not valid:
++        raise StoreError('save requires --file, candidate requires --base, restore requires both checkpoint IDs')
++    project = Path(args.project).resolve(strict=True)
++    state = project / '.goal'
++    fd = os.open(str(state), os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
++    try:
++        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
++        pending = state / 'store/pending'
++        if pending.exists():
++            raise StoreError('recovery-required')
++        head = verify_views(state)
++        context = _incumbent_context(state)
++        if args.action == 'restore':
++            best, trial = _incumbent_pair(state, args.base, args.candidate)
++            paths = _incumbent_scope(project, best['files'])
++            actual = {name: _incumbent_file(path) for name, path in paths.items()}
++            if actual != best['files']:
++                if actual != trial['files']:
++                    raise StoreError('restore conflict: owned files changed after candidate capture')
++                device = (state / 'store/incumbents').stat().st_dev
++                if any(path.parent.stat().st_dev != device for path in paths.values()):
++                    raise StoreError('owned files must share a filesystem with the archive')
++                record = dict(version=5, base=args.base, candidate=args.candidate, head=head)
++                envelope = {'payload': record, 'sha256': _hash(_encode(record))}
++                _atomic(pending, _encode(envelope))
++                _recover_incumbent(state, envelope)
++            print('INCUMBENT: restored %s (fresh gate required)' % args.base)
++            return
++
++        script = str(Path(__file__).with_name('goal_gate.sh'))
++        command = ['bash', script, '--project', str(project)]
++        baseline = None if args.action == 'save' else _incumbent_archive(state, args.base)
++        if baseline and (baseline['kind'] != 'incumbent' or baseline['context'] != context):
++            raise StoreError('candidate requires a checkpoint of the same frozen contract')
++        paths = _incumbent_scope(project, args.file if baseline is None else baseline['files'])
++        files = {name: _incumbent_file(path) for name, path in paths.items()}
++        artifact = subprocess.check_output(command + ['--digest']).decode('ascii').strip()
++        proof = None
++        if baseline is None:
++            env = {k: v for k, v in os.environ.items() if not k.startswith(('GOAL_ACCESS_', 'GOAL_CLOSE_', 'GOAL_WRITER_', 'GOAL_GATE_'))}
++            env.update(GOAL_ACCESS_FD=str(fd), GOAL_ACCESS_OWNER_PID=str(os.getpid()),
++                       GOAL_ACCESS_MODE='exclusive-read')
++            check = subprocess.run(command + ['--check'], env=env, pass_fds=(fd,), capture_output=True)
++            if check.returncode != 0:
++                print((check.stdout + check.stderr).decode('utf-8', 'replace'), file=sys.stderr, end='')
++                raise StoreError('incumbent must pass a fresh gate')
++            proof = base64.b64encode(check.stdout + check.stderr).decode('ascii')
++        if (verify_views(state) != head or _incumbent_context(state) != context
++                or {name: _incumbent_file(path) for name, path in paths.items()} != files
++                or subprocess.check_output(command + ['--digest']).decode('ascii').strip() != artifact):
++            raise StoreError('project changed during checkpoint capture')
++        data = _encode(dict(version=1, kind='incumbent' if baseline is None else 'candidate',
++                            base=args.base, context=context, head=head, artifact=artifact, proof=proof, files=files))
++        identity = _hash(data)
++        path = _close_path(state, 'store/incumbents/' + identity + '.json')
++        path.parent.mkdir(exist_ok=True)
++        _fsync_dir(path.parent.parent)
++        if path.exists():
++            if path.read_bytes() != data:
++                raise StoreError('checkpoint checksum mismatch')
++        else:
++            _atomic(path, data)
++        print(identity)
++    except subprocess.CalledProcessError as exc:
++        raise StoreError('unable to bind artifact digest') from exc
++    finally:
++        os.close(fd)
++
++
+ def close_journal(state, action, result=0):
+     """Rollback journal for the existing close writer; never replay checks."""
+     state = Path(state)
+@@ -1006,6 +1214,9 @@
+         if (isinstance(envelope, dict) and isinstance(envelope.get('payload'), dict)
+                 and envelope['payload'].get('version') == 4):
+             return mutation_journal(state, 'recover')
++        if (isinstance(envelope, dict) and isinstance(envelope.get('payload'), dict)
++                and envelope['payload'].get('version') == 5):
++            return _recover_incumbent(state, envelope)
+     if action == 'begin':
+         if pending.exists():
+             raise StoreError('recovery required')
+@@ -1125,6 +1336,8 @@
+             _writer_exec(sys.argv[2:])
+         elif len(sys.argv) >= 2 and sys.argv[1] == 'access-exec':
+             _access_exec(sys.argv[2:])
++        elif len(sys.argv) >= 2 and sys.argv[1] == 'incumbent':
++            incumbent_cli(sys.argv[2:])
+         else:
+             raise StoreError('unknown command')
+     except (StoreError, OSError, ValueError, KeyError, TypeError) as exc:
+--- a/scripts/goal_ctl.sh
++++ b/scripts/goal_ctl.sh
+@@ -116,7 +116,7 @@
+     exit 0 ;;
+   recover)
+     python3 -I "$here/goal_store.py" close-journal "$sd" recover || exit 4
+-    echo 'CTL: RECOVER ok (ledger only; checks were not replayed)'
++    echo 'CTL: RECOVER ok (checks were not replayed)'
+     exit 0 ;;
+   init)
+     [ -d "$sd" ] || mkdir -p "$sd/logs"
+--- /dev/null
++++ b/tests/test_incumbent.py
+@@ -0,0 +1,116 @@
++"""Exercise scoped rollback through the production gate and recovery command."""
++import os
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++import unittest
++
++SCRIPTS = Path(__file__).resolve().parents[1] / 'scripts'
++
++
++class Incumbent(unittest.TestCase):
++    def setUp(self):
++        tmp = tempfile.TemporaryDirectory(prefix='goal-incumbent-')
++        self.addCleanup(tmp.cleanup)
++        self.project = Path(tmp.name)
++        self.state = self.project / '.goal'
++        self.ctl('init')
++        (self.state / 'goal.md').write_text(
++            '# Goal\n\n## Acceptance criteria\n\n'
++            '- AC-1 | good bytes | check: `grep -qx good a.txt` | expected: exit=0\n\n'
++            '## Approval\n\napproved: PENDING\n')
++        self.a = self.project / 'a.txt'
++        self.b = self.project / 'b.txt'
++        self.new = self.project / 'new.txt'
++        self.a.write_text('good\n')
++        self.a.chmod(0o755)
++        self.b.write_text('keep\n')
++        self.ctl('stamp', '--auto')
++        self.ctl('close-iteration', '--task', 'T1', '--files', 'a.txt,b.txt',
++                 '--checks-pass', '1', '--checks-fail', '0', '--checks-unverifiable', '0',
++                 '--progress', 'yes', '--exit-signal', 'yes', '--adversarial', 'clear',
++                 '--adversarial-note', 'exact bytes checked', '--no-gate')
++
++    def run_entry(self, cmd, *args, expected=0, env=None):
++        result = subprocess.run([*cmd, *args, '--project', str(self.project)],
++                                capture_output=True, text=True, timeout=15, env=env)
++        self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
++        return result.stdout, result.stderr
++
++    def ctl(self, *args, **kwargs):
++        return self.run_entry(['bash', str(SCRIPTS / 'goal_ctl.sh')], *args, **kwargs)
++
++    def gate(self, *args, **kwargs):
++        return self.run_entry(['bash', str(SCRIPTS / 'goal_gate.sh')], *args, **kwargs)
++
++    def checkpoint(self, *args, **kwargs):
++        return self.run_entry([sys.executable, '-I', str(SCRIPTS / 'goal_store.py'), 'incumbent'],
++                              *args, **kwargs)
++
++    def pair(self):
++        base = self.checkpoint('save', '--file', 'a.txt', '--file', 'b.txt', '--file', 'new.txt')[0].strip()
++        self.a.write_text('bad\n')
++        self.a.chmod(0o600)
++        self.b.unlink()
++        self.new.write_text('candidate addition\n')
++        candidate = self.checkpoint('candidate', '--base', base)[0].strip()
++        return ('--base', base, '--candidate', candidate)
++
++    def test_restored_bytes_and_permissions_reproduce_original_go(self):
++        args = self.pair()
++        self.gate('--verify', expected=2)
++        head = (self.state / 'store/commits/current').read_bytes()
++        self.checkpoint('restore', *args)
++        self.assertEqual(self.a.read_text(), 'good\n')
++        self.assertEqual(self.a.stat().st_mode & 0o777, 0o755)
++        self.assertEqual(self.b.read_text(), 'keep\n')
++        self.assertFalse(self.new.exists())
++        self.assertEqual((self.state / 'store/commits/current').read_bytes(), head)
++        self.assertIn('GATE: GO', self.gate('--check')[0])
++        self.checkpoint('restore', *args)
++
++    def test_owned_user_edit_refuses_all_writes_unowned_edit_survives(self):
++        args = self.pair()
++        unrelated = self.project / 'user.txt'
++        unrelated.write_text('user-owned\n')
++        self.new.write_text('edited by user\n')
++        self.checkpoint('restore', *args, expected=4)
++        self.assertEqual(self.a.read_text(), 'bad\n')
++        self.assertFalse(self.b.exists())
++        self.assertFalse((self.state / 'store/pending').exists())
++        self.new.write_text('candidate addition\n')
++        self.checkpoint('restore', *args)
++        self.assertEqual(unrelated.read_text(), 'user-owned\n')
++        self.gate('--verify')
++
++    def test_interrupted_restore_blocks_gate_and_recovery_preserves_conflicts(self):
++        args = self.pair()
++        self.checkpoint('restore', *args, expected=91,
++                        env=dict(os.environ, GOAL_INCUMBENT_FAULT='first-file'))
++        self.assertTrue((self.state / 'store/pending').exists())
++        self.assertIn('recovery-required', self.gate('--check', expected=4)[1])
++        self.assertEqual(self.a.read_text(), 'good\n')
++        self.assertFalse(self.b.exists())
++        self.new.write_text('new user content\n')
++        self.assertIn('restore conflict', self.ctl('recover', expected=4)[1])
++        self.assertFalse(self.b.exists())
++        self.assertEqual(self.new.read_text(), 'new user content\n')
++        self.new.write_text('candidate addition\n')
++        self.ctl('recover')
++        self.assertFalse((self.state / 'store/pending').exists())
++        self.gate('--check')
++
++    def test_failed_gate_or_unsafe_scope_cannot_be_saved_as_incumbent(self):
++        self.checkpoint('save', '--file', '.goal/state.rec', expected=4)
++        link = self.project / 'alias.txt'
++        link.symlink_to(self.a)
++        self.checkpoint('save', '--file', 'alias.txt', expected=4)
++        link.unlink()
++        self.a.write_text('bad\n')
++        self.checkpoint('save', '--file', 'a.txt', expected=4)
++        self.assertFalse((self.state / 'store/incumbents').exists())
++
++
++if __name__ == '__main__':
++    unittest.main()

@@ -1,0 +1,63 @@
+{
+  "scope": "CRLF fixture temporary-file repair and non-root macOS read-only-copy validation only. Earlier archives unchanged.",
+  "changed_script": "companions/contract-forge/tests/run_fixtures.sh",
+  "script_sha256": "341b527a6bd33aefc0ffd91b68008eb17d48663733bfb8d9f53dcdf822c989c7",
+  "before_script_sha256": "9ff211ac41f680d2382019e09cf68a37917c86b05a405f26d92dce94cc8ff0d1",
+  "uid": 501,
+  "fixtures_before": {
+    "pass": 9,
+    "fail": 1
+  },
+  "fixtures_after": {
+    "pass": 10,
+    "fail": 0
+  },
+  "source_added_paths": [],
+  "inputs_and_linter_unchanged": true,
+  "files": {
+    "forge-readonly-after-script.txt": {
+      "sha256": "341b527a6bd33aefc0ffd91b68008eb17d48663733bfb8d9f53dcdf822c989c7",
+      "bytes": 2010
+    },
+    "forge-readonly-after.json": {
+      "sha256": "8a8adc8a43b805a7e50950354daec02efd36d6e401d128141fccb2938ebe9d78",
+      "bytes": 7108
+    },
+    "forge-readonly-after.log": {
+      "sha256": "126fa8aff1221bd9c4fce47a472a3d1e7a3a34a198f0ab4862ea4bd40745c61a",
+      "bytes": 258
+    },
+    "forge-readonly-before-script.txt": {
+      "sha256": "9ff211ac41f680d2382019e09cf68a37917c86b05a405f26d92dce94cc8ff0d1",
+      "bytes": 1766
+    },
+    "forge-readonly-before.json": {
+      "sha256": "8891904180dd20fc281cc66e95bb0081f7a5cea21fa178594f9fdfd6c974d98a",
+      "bytes": 6651
+    },
+    "forge-readonly-before.log": {
+      "sha256": "4f9926115b625d5313739c1eac9e72685b361c549e2040783f3c57bce0c2f811",
+      "bytes": 579
+    },
+    "forge-readonly-diff-check.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "forge-readonly-summary.json": {
+      "sha256": "977a35da12567ddbcfb45e3aa8634b7040428ba926b607c74ec424c455005724",
+      "bytes": 743
+    },
+    "forge-readonly-syntax.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "forge-readonly.md": {
+      "sha256": "67e551d7a670811729c00a3f1ff1a88692654d92e79f9664a1fb39fbeb8c1bd3",
+      "bytes": 1301
+    },
+    "forge-readonly.patch": {
+      "sha256": "edef9e5e52d1b6df0c08eba874a8ab60f7f8fe61fba70cc4548b50a4d64ab87d",
+      "bytes": 1142
+    }
+  }
+}

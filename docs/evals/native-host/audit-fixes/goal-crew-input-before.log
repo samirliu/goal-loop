@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_all_cost_history_expires_when_frozen_input_bytes_change (__main__.Crew.test_all_cost_history_expires_when_frozen_input_bytes_change)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_crew.py", line 363, in test_all_cost_history_expires_when_frozen_input_bytes_change
+    self.assertNotEqual(after['condition'], before['condition'])
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '6a5f5354069862aea9876fad2235641560996f7047467b0539a41ac397e34535' == '6a5f5354069862aea9876fad2235641560996f7047467b0539a41ac397e34535'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.999s
+
+FAILED (failures=1)

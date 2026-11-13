@@ -1,0 +1,13 @@
+ok   usage rc=2
+ok   good-threshold
+ok   good-objective-forge
+ok   good-pipe-in-backtick
+ok   bad-no-horizon
+ok   bad-pipe-spec
+ok   bad-calib-on-metric
+ok   bad-window-no-external
+ok   bad-objective-target
+/tmp/goal-forge-readonly-followup-lfyel4n8/before-readonly/tests/run_fixtures.sh: line 50: /tmp/goal-forge-readonly-followup-lfyel4n8/before-readonly/tests/fixtures/_crlf-threshold.md: Permission denied
+FAIL crlf-threshold rc=2
+  LINT: missing file /tmp/goal-forge-readonly-followup-lfyel4n8/before-readonly/tests/fixtures/_crlf-threshold.md
+== fixtures: pass=9 fail=1 ==

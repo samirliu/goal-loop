@@ -1,0 +1,46 @@
+{
+  "captured_utc": "2026-11-12T12:35:41.450308+00:00",
+  "current_changed_from_snapshot": [],
+  "excluded_unmanifested_files": [
+    {
+      "bytes": 7657,
+      "mode": 420,
+      "path": "scripts/__pycache__/goal_bounded.cpython-314.pyc",
+      "sha256": "9c2dbfe6b1212469404a4b405a11d8691d03bfee875aa8a6bb3ddc46f1c48b1b"
+    },
+    {
+      "bytes": 61509,
+      "mode": 420,
+      "path": "scripts/__pycache__/goal_evolve.cpython-314.pyc",
+      "sha256": "0a2b654245a9a0e0a126caa8af705eb9f6debc380d8b4d190f86b4a12e1d85b2"
+    },
+    {
+      "bytes": 39393,
+      "mode": 420,
+      "path": "scripts/__pycache__/goal_owner_watch.cpython-314.pyc",
+      "sha256": "24d55ebc20d6c1d66837fbcdad29112221288b7131b5f37b440113ae16787627"
+    },
+    {
+      "bytes": 32168,
+      "mode": 420,
+      "path": "scripts/__pycache__/goal_runner.cpython-314.pyc",
+      "sha256": "59028b16d31117d3e11b0a1e858114ac05392bb29a42242fbd267f9430035fea"
+    },
+    {
+      "bytes": 113086,
+      "mode": 420,
+      "path": "scripts/__pycache__/goal_store.cpython-314.pyc",
+      "sha256": "b10ff3670978675c0fcad921871d146117904fa3d687d7caae523d9ae8a0c08e"
+    },
+    {
+      "bytes": 28533,
+      "mode": 420,
+      "path": "tests/__pycache__/test_evolve.cpython-314.pyc",
+      "sha256": "6a57a0977fb382a72f526d1c59d5c35060b846dd00281251ddfc295fa67c729a"
+    }
+  ],
+  "matched_source_files": 139,
+  "scope": "Only named frozen source files are archived. Snapshot and results files were not modified.",
+  "source_manifest_sha256": "db9793740d657e25a1c95b62ce4c38e326ef3e7b6ed6a7100ef0675546b7ebcc",
+  "source_mismatches": []
+}

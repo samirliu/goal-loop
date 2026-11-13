@@ -1,0 +1,5 @@
+Command: ['/opt/homebrew/opt/python@3.12/bin/python3.12', '-B', '-c', 'import resource,pytest; resource.setrlimit(resource.RLIMIT_NOFILE,(1024,1024)); raise SystemExit(pytest.main(["-q","-s","tests/test_owner_watch_guard.py","-k","guard_drops_stdout"]))']
+OWNER_GUARD_FD_CAPABILITY {"nofile": [1024, 1024], "required_minimum_fd": 2000, "high_fd_measured": false}
+s
+1 skipped, 4 deselected in 0.01s
+Exit: 0

@@ -1,0 +1,49 @@
+{
+  "base": "/tmp/goal-p0-followup-b6x8tybz",
+  "synthetic_only": true,
+  "f1_dirty_gitlink": {
+    "before": {
+      "returncode": 0,
+      "stdout": "v2-1b25e8c0543ef6ba6bd2cee204a9492318e274706bc1f965ec4c5eb4d211cdec\n",
+      "stderr": ""
+    },
+    "after": {
+      "returncode": 0,
+      "stdout": "v2-47fac3fb67e6eb0533d3ca04c029e9e63a86ea549c26e0997fab618abefd29ac\n",
+      "stderr": ""
+    },
+    "changed": true
+  },
+  "f1_top_level_unreadable_untracked": {
+    "before": {
+      "returncode": 0,
+      "stdout": "v2-f0f87352b5e9925e5eca06c0b202b0b783ee80b10bcc40ae8db9a81692457097\n",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\n"
+    },
+    "after": {
+      "returncode": 0,
+      "stdout": "v2-f0f87352b5e9925e5eca06c0b202b0b783ee80b10bcc40ae8db9a81692457097\n",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\n"
+    },
+    "silently_same_successful_digest": true,
+    "uid": 501
+  },
+  "f4_original": {
+    "returncode": 0,
+    "stdout": "{\n  \"verified\": true,\n  \"attempts\": 4,\n  \"pairs\": 98,\n  \"raw_outputs\": 196,\n  \"measured_inputs\": 98,\n  \"holdout_evaluations\": [\n    1,\n    2,\n    3\n  ],\n  \"selected\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n  \"transitions\": [\n    {\n      \"run\": \"1349e45a1ba242b79d4fa1c92e89a008\",\n      \"prior\": null,\n      \"status\": \"enabled\",\n      \"enabled\": \"6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.5045883895806631,\n          \"one_sided_sign_p\": 0.015625,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.6583116841452026,\n          \"one_sided_sign_p\": 0.015625,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"b153ebc1c1cd459b8a6a817bf7699134\",\n      \"prior\": \"6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5\",\n      \"status\": \"withdrawn\",\n      \"enabled\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": false,\n          \"regressed\": true,\n          \"complete\": true,\n          \"cost_gain\": -0.7510357134147685,\n          \"one_sided_sign_p\": 1.0,\n          \"reverse_sign_p\": 0.015625,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"be509e33ea6948908b0dca966baa99f2\",\n      \"prior\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"status\": \"enabled\",\n      \"enabled\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.6370327171170055,\n          \"one_sided_sign_p\": 2.002716064453125e-05,\n          \"reverse_sign_p\": 0.9999990463256836,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.7311167394259347,\n          \"one_sided_sign_p\": 2.002716064453125e-05,\n          \"reverse_sign_p\": 0.9999990463256836,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"446e56fe51b84b3a9bd9f2f70a3d28aa\",\n      \"prior\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"status\": \"enabled\",\n      \"enabled\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.687022152242417,\n          \"one_sided_sign_p\": 9.5367431640625e-07,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.7781439860151237,\n          \"one_sided_sign_p\": 0.00020122528076171875,\n          \"reverse_sign_p\": 0.9999799728393555,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    }\n  ]\n}\n",
+    "stderr": ""
+  },
+  "f4_candidate_identity_mutation": {
+    "report": "/tmp/goal-p0-followup-b6x8tybz/recordings/goal-real-evolution-20261111/state/be509e33ea6948908b0dca966baa99f2/report.json",
+    "normal": {
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 247, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 170, in verify\n    protocol = frozen_protocol(run, report, state)\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 60, in frozen_protocol\n    assert report['policies'][side] == files[name], side + ' policy does not match frozen program'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: candidate policy does not match frozen program\n"
+    },
+    "optimized": {
+      "returncode": 0,
+      "stdout": "{\n  \"verified\": true,\n  \"attempts\": 4,\n  \"pairs\": 98,\n  \"raw_outputs\": 196,\n  \"measured_inputs\": 98,\n  \"holdout_evaluations\": [\n    1,\n    2,\n    3\n  ],\n  \"selected\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n  \"transitions\": [\n    {\n      \"run\": \"1349e45a1ba242b79d4fa1c92e89a008\",\n      \"prior\": null,\n      \"status\": \"enabled\",\n      \"enabled\": \"6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.5045883895806631,\n          \"one_sided_sign_p\": 0.015625,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.6583116841452026,\n          \"one_sided_sign_p\": 0.015625,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"b153ebc1c1cd459b8a6a817bf7699134\",\n      \"prior\": \"6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5\",\n      \"status\": \"withdrawn\",\n      \"enabled\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": false,\n          \"regressed\": true,\n          \"complete\": true,\n          \"cost_gain\": -0.7510357134147685,\n          \"one_sided_sign_p\": 1.0,\n          \"reverse_sign_p\": 0.015625,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"be509e33ea6948908b0dca966baa99f2\",\n      \"prior\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"status\": \"enabled\",\n      \"enabled\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.6370327171170055,\n          \"one_sided_sign_p\": 2.002716064453125e-05,\n          \"reverse_sign_p\": 0.9999990463256836,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.7311167394259347,\n          \"one_sided_sign_p\": 2.002716064453125e-05,\n          \"reverse_sign_p\": 0.9999990463256836,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"446e56fe51b84b3a9bd9f2f70a3d28aa\",\n      \"prior\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"status\": \"enabled\",\n      \"enabled\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.687022152242417,\n          \"one_sided_sign_p\": 9.5367431640625e-07,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.7781439860151237,\n          \"one_sided_sign_p\": 0.00020122528076171875,\n          \"reverse_sign_p\": 0.9999799728393555,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    }\n  ]\n}\n",
+      "stderr": ""
+    }
+  }
+}

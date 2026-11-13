@@ -6,7 +6,7 @@ Load a pack only when the contract (or CLI) activates its capability keys.
 | Pack | Activate when you see |
 |---|---|
 | `instrument.md` | `judged` · `calib:` · `probe:` · `metric:` · `sd:` · `var:` · cold-seat brief |
-| `gradient.md` | `objective:` · `exit: forge` · horizon · `--strategy` · EFFICIENCY / eval-gap / promote |
+| `gradient.md` | `objective:` · `exit: forge` · horizon · `--strategy` · policy cost comparison / promotion · EFFICIENCY / eval-gap / promote |
 | `external.md` | `external:` · `window:` · deferred settle |
 
 Invariant map (authoritative table + check order: `references/gate.md`):

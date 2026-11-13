@@ -1,0 +1,145 @@
+{
+  "scope": "Independent reconstruction of this recorded local Python fixture only (int, str, list oracle); no new policy executions or model experiments.",
+  "verifier_sha256": "b7e4e0461ec44d06270e3b505bd5f74a9c618d990fae1011e5323b561020b69b",
+  "previous_verifier_sha256": "33c9164c22629b2676099fa39aff7cf9e26c0ceacd69322e90142de1ffbe98bf",
+  "before_evidence": "/tmp/goal-agent-verifier-before.json",
+  "cases": {
+    "original": {
+      "path": "/tmp/goal-real-evolution-20261111",
+      "verifier_exit": 0,
+      "result": {
+        "verified": true,
+        "attempts": 4,
+        "pairs": 98,
+        "raw_outputs": 196,
+        "measured_inputs": 98,
+        "holdout_evaluations": [
+          1,
+          2,
+          3
+        ],
+        "selected": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+        "transitions": [
+          {
+            "run": "1349e45a1ba242b79d4fa1c92e89a008",
+            "prior": null,
+            "status": "enabled",
+            "enabled": "6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5",
+            "phases": {
+              "development": {
+                "pass_": true,
+                "regressed": false,
+                "complete": true,
+                "cost_gain": 0.5045883895806631,
+                "one_sided_sign_p": 0.015625,
+                "reverse_sign_p": 1.0,
+                "quality_sign_p": 1.0
+              },
+              "holdout": {
+                "pass_": true,
+                "regressed": false,
+                "complete": true,
+                "cost_gain": 0.6583116841452026,
+                "one_sided_sign_p": 0.015625,
+                "reverse_sign_p": 1.0,
+                "quality_sign_p": 1.0
+              }
+            }
+          },
+          {
+            "run": "b153ebc1c1cd459b8a6a817bf7699134",
+            "prior": "6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5",
+            "status": "withdrawn",
+            "enabled": "3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e",
+            "phases": {
+              "development": {
+                "pass_": false,
+                "regressed": true,
+                "complete": true,
+                "cost_gain": -0.7510357134147685,
+                "one_sided_sign_p": 1.0,
+                "reverse_sign_p": 0.015625,
+                "quality_sign_p": 1.0
+              }
+            }
+          },
+          {
+            "run": "be509e33ea6948908b0dca966baa99f2",
+            "prior": "3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e",
+            "status": "enabled",
+            "enabled": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+            "phases": {
+              "development": {
+                "pass_": true,
+                "regressed": false,
+                "complete": true,
+                "cost_gain": 0.6370327171170055,
+                "one_sided_sign_p": 2.002716064453125e-05,
+                "reverse_sign_p": 0.9999990463256836,
+                "quality_sign_p": 1.0
+              },
+              "holdout": {
+                "pass_": true,
+                "regressed": false,
+                "complete": true,
+                "cost_gain": 0.7311167394259347,
+                "one_sided_sign_p": 2.002716064453125e-05,
+                "reverse_sign_p": 0.9999990463256836,
+                "quality_sign_p": 1.0
+              }
+            }
+          },
+          {
+            "run": "446e56fe51b84b3a9bd9f2f70a3d28aa",
+            "prior": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+            "status": "enabled",
+            "enabled": "769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9",
+            "phases": {
+              "development": {
+                "pass_": true,
+                "regressed": false,
+                "complete": true,
+                "cost_gain": 0.687022152242417,
+                "one_sided_sign_p": 9.5367431640625e-07,
+                "reverse_sign_p": 1.0,
+                "quality_sign_p": 1.0
+              },
+              "holdout": {
+                "pass_": true,
+                "regressed": false,
+                "complete": true,
+                "cost_gain": 0.7781439860151237,
+                "one_sided_sign_p": 0.00020122528076171875,
+                "reverse_sign_p": 0.9999799728393555,
+                "quality_sign_p": 1.0
+              }
+            }
+          }
+        ]
+      }
+    },
+    "candidate_identity_substitution": {
+      "path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-auditor-policy-binding-jonq9u4u/recorded-run",
+      "verifier_exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 247, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 170, in verify\n    protocol = frozen_protocol(run, report, state)\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 60, in frozen_protocol\n    assert report['policies'][side] == files[name], side + ' policy does not match frozen program'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: candidate policy does not match frozen program\n"
+    },
+    "unjustified_10_percent_withdrawal": {
+      "path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-auditor-counterexample-zv6v4no7/recorded-run",
+      "verifier_exit": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 247, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 227, in verify\n    assert (report['status'], report['enabled']) == (status, selected), 'policy transition mismatch: expected ' + status\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: policy transition mismatch: expected retained-insufficient-counterevidence\n"
+    }
+  },
+  "original_manifest_files_checked": 701,
+  "original_manifest_changed_files": [],
+  "raw_archive_sha256": "05f6f845711c1baa7517f025a3f16d5192adfeabf93a9b1318b19109aa05f553",
+  "raw_archive_unchanged": true,
+  "prior_audit_before_sha256": "643368e86201c6841cb0bc8b2f747194a1ca2720ff7da79a01b5df5b47d61629",
+  "focused_tests": {
+    "command": "python3 -B tests/test_evolution_verifier.py",
+    "tests": 12,
+    "failures": 0,
+    "seconds": 13.627
+  }
+}

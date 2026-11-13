@@ -1,0 +1,53 @@
+{
+  "baseline_commit": "cf198829f9c8efe740d7d30a09de5d0251303b62",
+  "replay_order": [
+    "../crew-cost/implementation.patch",
+    "../incumbent/implementation.patch",
+    "implementation.patch"
+  ],
+  "sources": {
+    "scripts/goal_evolve.py": "fabae22d1506b52177e93fa9a5d6b1230a70e7653f39579baecc51c44dcdf4fa",
+    "scripts/goal_bounded.py": "bd3b757d953575de8f9a37d10f6eada32fc7ded232032295b87335cae3e01e94",
+    "scripts/goal_owner_watch.py": "d5b1135ce26fe1dc9a4f93c16f89d08a380f4f53828ebbc6b74cbc6d83b190a6",
+    "scripts/goal_trace.py": "bf7072b2d3cda49dd091c070f2631783848908799a695208b579ea54135ee3b3",
+    "scripts/goal_store.py": "a6ad466669b6d9dcc1b283a197fe22e233696587e871d139dd1745eb9fa45dae",
+    "examples/evolution-dedupe/run.py": "37a8e682bfc7da62949d386f95d8e579930e314f87f2aa4e7b82b3f8fed03318",
+    "tests/test_evolve.py": "be23b98a69cd8de4684487f9103c94c2117f72818ec5b3b2345be70663b3be32",
+    "tests/test_incumbent.py": "435e6678368f0a16a3cf5f060ac18dd80d40a31531957e435943083085ee9836"
+  },
+  "evidence": {
+    "README.md": "a36ea4b050c78d20f1aa45a3fe107be627f2a4792e61eca466534ad1602175ee",
+    "before.txt": "e40458b640950dc4590257a9d59adb633efc7f5c2d767ac3a50394baf166838d",
+    "implementation.patch": "a2c174b43812f89b1f51014f16d217e0094f53054d87be59104c5d1727cb4ec4",
+    "python-regression.txt": "c44215853f7495bf651f17cc01c65be1a2d8ffe5b6b28fc6d64050f353f3ed0b",
+    "raw-trials.tar.gz": "430f69865b92d6dcc37b0e38f975a57613e4c3d28fe7cb6bcbcc6149e1f4f347",
+    "shell-regression.txt": "4a21424f271be461582cc2b8f814cb50d7fba64e12b9eaafff3a4db89cf43b2f",
+    "verify.py": "d7d09662a1302f5edbcc2d6dcd5f72c74ca647a7dff410e75ff339fa5d352667"
+  },
+  "runs": [
+    {
+      "id": "23ff674c3d4b47ba891fa27f8408fe4b",
+      "status": "enabled",
+      "protocol": "ce1d299e691cb19f85058ce4e17f64e26d39cb5672f31a6182153df79e43c56c",
+      "elapsed": 6.028482374968007
+    },
+    {
+      "id": "9b5423faae9f4d1d919b7a60d7cb57a9",
+      "status": "withdrawn",
+      "protocol": "8fd75a5ea4a341c50a7a727c875c83f429633a14dad92098ea12d9611444343e",
+      "elapsed": 0.23630200000479817
+    },
+    {
+      "id": "c2e134101ac7465893f4731ecb3ceb3f",
+      "status": "enabled",
+      "protocol": "10c7fb79028571e01ed78cbb633ad2c38394452e5e1ea66decc95e9858228f47",
+      "elapsed": 14.929893374908715
+    }
+  ],
+  "regression": {
+    "python": 126,
+    "shell_assertions": 592,
+    "parser_assertions": 78,
+    "forge_fixtures": 10
+  }
+}

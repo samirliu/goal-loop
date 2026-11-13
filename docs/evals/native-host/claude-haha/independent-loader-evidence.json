@@ -1,0 +1,102 @@
+{
+  "scope": "Read-only source evidence for the exact local client; source-based inference, not a new CLI/model run.",
+  "client": "/Users/m/repo/workspace/claude-code-haha",
+  "recorded_runtime": "999.0.0-local",
+  "project_link_does_not_prove_selected_version": true,
+  "inference": "Default user skills precede project skills; realpath dedup does not remove distinct same-name files; headless uniqBy(name) and command lookup keep first match.",
+  "minimal_proposed_plugin_declaration": {
+    "skills": "./"
+  },
+  "unambiguous_proposed_command": "/goal-loop-host:goal-loop",
+  "sources": {
+    "src/skills/loadSkillsDir.ts": {
+      "sha256": "d66e37fd2db4404b75330223831c5fd7f278afef58a92bc660fb86d002833744",
+      "excerpts": [
+        {
+          "first_line": 118,
+          "last_line": 124,
+          "text": "async function getFileIdentity(filePath: string): Promise<string | null> {\n  try {\n    return await realpath(filePath)\n  } catch {\n    return null\n  }\n}"
+        },
+        {
+          "first_line": 717,
+          "last_line": 738,
+          "text": "    const allSkillsWithPaths = [\n      ...managedSkills,\n      ...userSkills,\n      ...projectSkillsNested.flat(),\n      ...additionalSkillsNested.flat(),\n      ...legacyCommands,\n    ]\n\n    // Deduplicate by resolved path (handles symlinks and duplicate parent directories)\n    // Pre-compute file identities in parallel (realpath calls are independent),\n    // then dedup synchronously (order-dependent first-wins)\n    const fileIds = await Promise.all(\n      allSkillsWithPaths.map(({ skill, filePath }) =>\n        skill.type === 'prompt'\n          ? getFileIdentity(filePath)\n          : Promise.resolve(null),\n      ),\n    )\n\n    const seenFileIds = new Map<\n      string,\n      SettingSource | 'builtin' | 'mcp' | 'plugin' | 'bundled'"
+        },
+        {
+          "first_line": 750,
+          "last_line": 769,
+          "text": "        continue\n      }\n\n      const existingSource = seenFileIds.get(fileId)\n      if (existingSource !== undefined) {\n        logForDebugging(\n          `Skipping duplicate skill '${skill.name}' from ${skill.source} (same file already loaded from ${existingSource})`,\n        )\n        continue\n      }\n\n      seenFileIds.set(fileId, skill.source)\n      deduplicatedSkills.push(skill)\n    }\n\n    const duplicatesRemoved =\n      allSkillsWithPaths.length - deduplicatedSkills.length\n    if (duplicatesRemoved > 0) {\n      logForDebugging(`Deduplicated ${duplicatesRemoved} skills (same file)`)\n    }"
+        }
+      ]
+    },
+    "src/commands.ts": {
+      "sha256": "3bfd54c3cfcaed9f10d5dc15334cc49e42d0c9374e92d9a7058897701d95df64",
+      "excerpts": [
+        {
+          "first_line": 460,
+          "last_line": 469,
+          "text": "  return [\n    ...bundledSkills,\n    ...builtinPluginSkills,\n    ...skillDirCommands,\n    ...workflowCommands,\n    ...pluginCommands,\n    ...pluginSkills,\n    ...COMMANDS(),\n  ]\n})"
+        },
+        {
+          "first_line": 689,
+          "last_line": 698,
+          "text": "  commandName: string,\n  commands: Command[],\n): Command | undefined {\n  return commands.find(\n    _ =>\n      _.name === commandName ||\n      getCommandName(_) === commandName ||\n      _.aliases?.includes(commandName),\n  )\n}"
+        }
+      ]
+    },
+    "src/cli/print.ts": {
+      "sha256": "77bb8bed6ebe3e5fbc3c6521dcddab479af8ce9e3df82b2a103c27bf14cc573d",
+      "excerpts": [
+        {
+          "first_line": 2144,
+          "last_line": 2153,
+          "text": "          // inside the closure.\n          const cmd = command\n          await runWithWorkload(cmd.workload ?? options.workload, async () => {\n            for await (const message of ask({\n              commands: uniqBy(\n                [...currentCommands, ...appState.mcp.commands],\n                'name',\n              ),\n              prompt: input,\n              promptUuid: cmd.uuid,"
+        }
+      ]
+    },
+    "src/utils/processUserInput/processSlashCommand.tsx": {
+      "sha256": "56b12ed45c20c6afe2968b8510609515edbd065c0e7fa4a5edf9f0118bb45182",
+      "excerpts": [
+        {
+          "first_line": 525,
+          "last_line": 529,
+          "text": "async function getMessagesForSlashCommand(commandName: string, args: string, setToolJSX: SetToolJSXFn, context: ProcessUserInputContext, precedingInputBlocks: ContentBlockParam[], imageContentBlocks: ContentBlockParam[], _isAlreadyProcessing?: boolean, canUseTool?: CanUseToolFn, uuid?: string): Promise<SlashCommandResult> {\n  const command = getCommand(commandName, context.options.commands);\n\n  // Track skill usage for ranking (only for prompt commands that are user-invocable)\n  if (command.type === 'prompt' && command.userInvocable !== false) {"
+        }
+      ]
+    },
+    "src/utils/plugins/loadPluginCommands.ts": {
+      "sha256": "019d56133c75b3e5ac967bbc7b45e0be10a679ae27887ae5fcd5d9e6e74936c2",
+      "excerpts": [
+        {
+          "first_line": 698,
+          "last_line": 705,
+          "text": "  // First, check if skillsPath itself contains SKILL.md (direct skill directory)\n  const directSkillPath = join(skillsPath, 'SKILL.md')\n  let directSkillContent: string | null = null\n  try {\n    directSkillContent = await fs.readFile(directSkillPath, {\n      encoding: 'utf-8',\n    })\n  } catch (e: unknown) {"
+        },
+        {
+          "first_line": 714,
+          "last_line": 727,
+          "text": "\n  if (directSkillContent !== null) {\n    // This is a direct skill directory, load the skill from here\n    if (isDuplicatePath(fs, directSkillPath, loadedPaths)) {\n      return skills\n    }\n    try {\n      const { frontmatter, content: markdownContent } = parseFrontmatter(\n        directSkillContent,\n        directSkillPath,\n      )\n\n      const skillName = `${pluginName}:${basename(skillsPath)}`\n"
+        }
+      ]
+    },
+    "src/utils/plugins/schemas.ts": {
+      "sha256": "ef9c84eadb613d3fc03d24ab519e0597405246ac1cac6725d5cbc9b1a23c0273",
+      "excerpts": [
+        {
+          "first_line": 484,
+          "last_line": 496,
+          "text": "const PluginManifestSkillsSchema = lazySchema(() =>\n  z.object({\n    skills: z.union([\n      RelativePath().describe(\n        'Path to additional skill directory (in addition to those in the skills/ directory, if it exists), relative to the plugin root',\n      ),\n      z\n        .array(\n          RelativePath().describe(\n            'Path to additional skill directory (in addition to those in the skills/ directory, if it exists), relative to the plugin root',\n          ),\n        )\n        .describe('List of paths to additional skill directories'),"
+        }
+      ]
+    }
+  },
+  "global_copy": {
+    "path": "/Users/m/.claude/skills/goal-loop/SKILL.md",
+    "is_symlink": false,
+    "sha256": "7191ebc0c8b8dc688921eb08c4e9e4635bcf09298b2fc4cacb489d13a25dcdbe"
+  },
+  "current_root_skill": {
+    "path": "/Users/m/repo/goal-loop/SKILL.md",
+    "sha256": "ec03584de0cfbeb69dec7ee011178fb6b5126ac273b0f47a38f5ae40a1ceb840"
+  }
+}

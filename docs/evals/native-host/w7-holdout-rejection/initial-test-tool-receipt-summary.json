@@ -1,0 +1,9 @@
+{
+  "provenance": "Summary of returned tool receipt; no separately redirected raw log was captured for this initial test attempt.",
+  "command": "python3.12 -m pytest -q -s tests/test_evolve.py -k development_gain_then_complete_holdout",
+  "exit_code": 1,
+  "result": "1 failed, 10 deselected in 0.11s",
+  "failure": "assertEqual persisted JSON report, in-memory result at tests/test_evolve.py:131",
+  "cause": "The production in-memory report contains tuple pair orders; their JSON representation contains lists. All holdout rejection and unchanged-pointer assertions preceding that report comparison passed.",
+  "correction": "Normalize the in-memory result through evolve.encode and json.loads before comparing with the persisted JSON. No production or expected policy decision was changed."
+}

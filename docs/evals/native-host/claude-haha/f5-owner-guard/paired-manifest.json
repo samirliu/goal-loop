@@ -1,0 +1,12 @@
+{
+  "scope": "Same immutable bounded and trace bytes; only owner_watch differs. Real macOS child inherits actual RLIMIT_NOFILE infinity.",
+  "bounded_sha256": "1c0825e9d3af649e997c294ce704f3de41b2edc6defd431be9de64aeeb79d5f6",
+  "trace_sha256": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb",
+  "current_root_bounded_sha256": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c",
+  "paired_before": "paired-before.json",
+  "paired_after": "paired-after.json",
+  "results": [
+    4,
+    7
+  ]
+}

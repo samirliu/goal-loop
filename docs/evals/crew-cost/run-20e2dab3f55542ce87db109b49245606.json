@@ -1,0 +1,20 @@
+{
+  "fresh_seed": 1009,
+  "calibration_seeds": [
+    41,
+    73,
+    109
+  ],
+  "startup_delays": [
+    0.01,
+    8
+  ],
+  "sources": {
+    "scripts/goal_crew.py": "9c7857b963cdb379260cf7ebf66ed3b6d4b8c5d56a07a708983ef1ca14c39b0f",
+    "examples/crew-cost/run.py": "a209763a00fff96929fcb2d9ceba541f70e231b1ea79ead120e9ced39a3ccb1f",
+    "examples/crew-cost/task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+  },
+  "logical_cpus": 12,
+  "tokens": null,
+  "money": null
+}

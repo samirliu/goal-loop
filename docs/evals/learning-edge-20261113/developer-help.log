@@ -1,0 +1,17 @@
+usage: evaluate_entry.py [-h] --before BEFORE --after AFTER --cli CLI
+                         --output OUTPUT [--permission-mode PERMISSION_MODE]
+
+Explicit, bounded developer comparison. Never called by the installed skill.
+Four predeclared calls, no retries, no installation or permission changes.
+Uses a user-supplied existing CLI. Filtered logs omit model thinking and
+secrets.
+
+options:
+  -h, --help            show this help message and exit
+  --before BEFORE
+  --after AFTER
+  --cli CLI
+  --output OUTPUT
+  --permission-mode PERMISSION_MODE
+                        forward only an explicitly authorized mode; omitted
+                        preserves the host default

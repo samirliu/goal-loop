@@ -1,0 +1,7 @@
+  ok   - 53 maximize GO at score 7 (rc=0)
+  ok   - 53 GO line carries score
+  ok   - 53 best_score stored
+  ok   - 54 score-regressed -> rc2 (rc=2)
+  ok   - 54 reason score-regressed
+== results: pass=5 fail=0 ==
+== total: pass=5 fail=0 shards=1 ==

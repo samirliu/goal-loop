@@ -1,0 +1,17 @@
+F
+=================================== FAILURES ===================================
+_________ GroupGuard.test_guard_drops_stdout_and_high_lock_descriptor __________
+
+self = <test_owner_watch_guard.GroupGuard testMethod=test_guard_drops_stdout_and_high_lock_descriptor>
+
+    def test_guard_drops_stdout_and_high_lock_descriptor(self):
+>       self.guard_descriptors()
+
+tests/test_owner_watch_guard.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_owner_watch_guard.py:100: in guard_descriptors
+    self.assertTrue(ready.exists(), 'guard descriptor probe did not become ready')
+E   AssertionError: False is not true : guard descriptor probe did not become ready
+=========================== short test summary info ============================
+FAILED tests/test_owner_watch_guard.py::GroupGuard::test_guard_drops_stdout_and_high_lock_descriptor
+1 failed, 4 deselected in 0.06s

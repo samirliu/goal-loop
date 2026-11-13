@@ -1,0 +1,3 @@
+  FAIL - 04 not-claimed -> rc2 (want rc=2 got rc=0)
+== results: pass=0 fail=1 ==
+== total: pass=0 fail=1 shards=1 ==

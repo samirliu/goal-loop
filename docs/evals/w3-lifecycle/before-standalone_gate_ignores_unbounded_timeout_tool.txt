@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_standalone_gate_ignores_unbounded_timeout_tool (__main__.Lifecycle.test_standalone_gate_ignores_unbounded_timeout_tool)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-w3-baseline-35zj3b8y/tests/test_runner_lifecycle.py", line 191, in test_standalone_gate_ignores_unbounded_timeout_tool
+    self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : b'GATE: VERIFY AC-1|PASS|exit=0\nGATE: VERIFY-OK checked=1\n/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-w3-baseline-35zj3b8y/scripts/goal_parse.sh: line 414: tmp: unbound variable\n/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-w3-baseline-35zj3b8y/scripts/goal_parse.sh: line 446: tmp: unbound variable\n'
+
+----------------------------------------------------------------------
+Ran 1 test in 3.208s
+
+FAILED (failures=1)

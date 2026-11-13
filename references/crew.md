@@ -13,6 +13,75 @@ the wall clock before reading/planning; reserve time to close the ledger. Crew
 composition is controller-elected (no flag). The execution surface is one-shot subagents
 (Agent tool): parallel workers, one shared workspace, one brief contract.
 
+When choosing crew on cost evidence, use `scripts/goal_crew.py plan --project
+<project> --graph .goal/proposals/crew.json`. The graph references existing
+work-plan task ids, owned files and dependencies; it is an experiment input,
+not another completion queue. The executable schema and lifecycle commands are
+in [the cost example](../examples/crew-cost/README.md). Keep backend/model/host
+identity, task shape, checker sources and read-only inputs explicit. Local
+process-demo measurements do not establish native Agent-tool startup costs.
+
+The adviser requires three recent inline and crew observations at comparable
+conditions (including actual immutable input bytes), retains failures, and compares the DAG's conservative observed
+cost range including startup, queue, coordination, join and validation. It
+reports worker-seconds as well as delivery time; unknown tokens/money are not
+free resources. No usable startup data means serial; coupled scopes acquire
+precedence, and exhausted measured budgets stop further dispatch.
+
+Record `begin`, then `event dispatch` **before** the real host call. Record
+`started` only when the host exposes a readiness event; otherwise leave it
+unknown. Record `returned` or the observed `fault`, then `validate` and `adopt`.
+Validation runs the frozen named check; `first_valid` is the first observed
+passing result, not the first text/token or an inferred artifact birth time.
+Measure coordination/join/conflict/recovery with stage begin/end; skip is only
+for an operation actually not performed. Missing stages stay unknown. Finish
+reruns the integration check and preserves failed waves. Native cancellation
+remains the host's job; only record an active worker fault after observing it.
+The helper verifies/adopts file versions and reports cost; the existing gate
+still decides GO, and the controller still ticks the original work-plan.
+
+### Bound units and learned routing
+
+Graph version 1 remains compatible. Version 2 has the same graph fields and
+adds `inputs` to each job. List immutable files from graph `inputs` and actual
+output files of direct `deps`; every declared dependency must provide a named
+consumed artifact. Remove ordering with no data dependency. Overlapping v2
+units must be fused; v1 retains its conservative ordered shared-write support.
+
+Version 2 binds adopted output bytes/modes, transitive inputs, interfaces.md,
+contract/check freeze, instruments, context and active routing version. A later
+`begin` reuses an unchanged accepted unit and refuses its dispatch/prepare.
+Only the failed or invalidated units need workers; the frozen integration check
+and final gate still run. Reuse has no invented startup, first-valid or worker
+time. Source wave and unit identity remain explicit. Changed input/interface/
+checker/policy invalidates reuse. A changed adopted producer also blocks v1
+successors before dispatch.
+
+Failed dispatches accumulate by contract and owned file scope, independently of
+task/strategy names. Three failures stop that unit. An unchanged retry requires
+a different `--retry-note` describing the revised breakpoint brief; merely
+changing a label cannot reset the count. The derived repair brief includes the
+failed check output, fault, allowed files and attempts. It does not prove that
+the supplied explanation is semantically correct.
+
+`plan` and `begin` accept `--policy-state PROJECT/.goal/proposals/DIR`. They run
+the existing qualified `goal_evolve.py` archive under the same deadline and
+consume JSON `{"match":true,"choice":"serial","reason":"..."}`; unmatching
+rules must return `match:false, choice:baseline`. These bounded decisions can
+restrict concurrency, never widen permissions, skip checks or force a crew.
+`begin` enforces serial as inline mode, and host prepare emits the consumed
+version and focused input/check/repair map in worker_prefix. Invalid output,
+pending transition or stale selection refuses dispatch. No configured policy
+means the existing measured planner; an unqualified candidate has no effect.
+The receipt records selection, actual input hash, decision and runtime. This is
+context selection, not a filesystem read sandbox. See the [learning example](../examples/learning-edge/README.md)
+for promotion/retention/withdrawal and its evidence limits.
+
+For native host tools, [the host adapter](host.md) wraps these observations in
+nonce-bound tickets, actual launch/status receipts and the shared deadline.
+Use its ready/owned-tool commands; do not invent startup or cancellation times
+from a worker's final prose. The explicit Work bridge does not install hooks.
+
 ## 2 Interface first
 
 Before dispatching, write `.goal/interfaces.md`: module boundaries, shared

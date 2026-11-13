@@ -1,0 +1,19 @@
+{
+  "input_sha256": "2249f25b93f9f8357fbb65cf0c8e2db1733d186a6043fd25dda0d313c369e214",
+  "expected_sha256": "256d38741b80c683725a68ca764f4c94f559271bfe5664fff3de5f9bb8e746aa",
+  "checks": [
+    {
+      "stage": "withdrawn",
+      "policy_sha256": "778f4b2faaba0e6238777fbb8693b87e7bd3ea5687787c20f6a8ec5b46a48b96",
+      "passed": true,
+      "output_sha256": "256d38741b80c683725a68ca764f4c94f559271bfe5664fff3de5f9bb8e746aa"
+    },
+    {
+      "stage": "repaired",
+      "policy_sha256": "d1391a6d9c36bd56efab96e8752174ffe360cd7f2beab2182cb7ad456d327b60",
+      "passed": true,
+      "output_sha256": "256d38741b80c683725a68ca764f4c94f559271bfe5664fff3de5f9bb8e746aa"
+    }
+  ],
+  "method": "execute archived programs on recorded counterexample, compare parsed output with frozen expected result"
+}

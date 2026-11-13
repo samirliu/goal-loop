@@ -1,0 +1,22 @@
+{
+  "baseline_commit": "cf198829f9c8efe740d7d30a09de5d0251303b62",
+  "cases": [
+    {
+      "case": "ambient_mode",
+      "before_exit": 1,
+      "after_exit": 0
+    },
+    {
+      "case": "resetting_approval",
+      "before_exit": 1,
+      "after_exit": 0
+    }
+  ],
+  "current_files": {
+    "scripts/goal_store.py": "27a9800fdd11b472330f04199fa6865cda88ea5af84a032e9bbbd790b1815a46",
+    "scripts/goal_gate.sh": "8a47c3987f4c5ad48e32e66fbae7d13684931521533bd515bcbe864de4ba6295",
+    "scripts/goal_ctl.sh": "2271a933d5b0b53fe7951c4fa26532b95db8b4982b0f7af9356b3c340bfd7af4",
+    "scripts/goal_parse.sh": "42dc2241e2ab33e2e135d7185ea59d413ffbcbc573ee19b026685b097258e193",
+    "tests/test_view_authority.py": "6c5bef2f55d4a99307df7cc1ef5d57154edfb19ba9bae20885e6d9d50a984156"
+  }
+}

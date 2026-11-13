@@ -1,0 +1,53 @@
+--- before/tests/test_owner_watch_guard.py
++++ after/tests/test_owner_watch_guard.py
+@@ -75,6 +75,11 @@
+             self.assertTrue(ready.exists(), observed)
+ 
+     def guard_descriptors(self, infinite=False):
++        inherited = resource.getrlimit(resource.RLIMIT_NOFILE)
++        if inherited[1] != resource.RLIM_INFINITY and inherited[1] < 2001:
++            print('OWNER_GUARD_FD_CAPABILITY ' + json.dumps(
++                dict(nofile=inherited, required_minimum_fd=2000, high_fd_measured=False)), flush=True)
++            self.skipTest('actual hard RLIMIT_NOFILE cannot support FD 2000')
+         ready = self.root / 'guard-ready.json'
+         lock = self.root / 'lock'
+         descriptor = os.open(lock, os.O_CREAT | os.O_RDWR, 0o600)
+@@ -82,11 +87,15 @@
+         body = ('import fcntl,importlib.util,json,os,resource,time; from pathlib import Path; '
+                 's=importlib.util.spec_from_file_location("watch",%r); '
+                 'w=importlib.util.module_from_spec(s); s.loader.exec_module(w); '
++                'before=resource.getrlimit(resource.RLIMIT_NOFILE); '
++                '\nif before[0]!=resource.RLIM_INFINITY and before[0]<2001:\n'
++                ' resource.setrlimit(resource.RLIMIT_NOFILE,(2001,before[1]))\n'
+                 'fd=fcntl.fcntl(%s,fcntl.F_DUPFD,2000); os.close(%s); '
+                 'w._group_guard(); time.sleep(.1); waited=os.waitpid(-1,os.WNOHANG); '
+                 'os.close(fd); os.close(1); '
+                 'Path(%r).write_text(json.dumps({"guard_alive":waited[0]==0,"guard_wait":waited,'
+-                '"nofile":resource.getrlimit(resource.RLIMIT_NOFILE),"high_fd":fd})); time.sleep(30)'
++                '"nofile_before_fd_setup":before,"nofile":resource.getrlimit(resource.RLIMIT_NOFILE),'
++                '"high_fd":fd})); time.sleep(30)'
+                 % (str(WATCH), descriptor, descriptor, str(ready)))
+         process = subprocess.Popen([sys.executable, '-I', '-c', body], pass_fds=(descriptor,),
+                                    start_new_session=True, stdin=subprocess.DEVNULL,
+@@ -97,7 +106,12 @@
+             until = time.monotonic() + 3
+             while not ready.exists() and time.monotonic() < until and process.poll() is None:
+                 time.sleep(.01)
+-            self.assertTrue(ready.exists(), 'guard descriptor probe did not become ready')
++            if not ready.exists():
++                if process.poll() is None:
++                    os.killpg(process.pid, signal.SIGKILL)
++                stdout, stderr = process.communicate(timeout=5)
++                self.fail('guard descriptor probe setup failed: rc=%s inherited_nofile=%r stdout=%r stderr=%r' %
++                          (process.returncode, inherited, stdout, stderr))
+             observed = json.loads(ready.read_bytes())
+             readable, _, _ = select.select([process.stdout], [], [], .5)
+             observed['stdout_eof_while_parent_alive'] = bool(readable) and os.read(process.stdout.fileno(), 1) == b''
+@@ -119,6 +133,7 @@
+             stdout, stderr = process.communicate(timeout=5)
+         observed.update(infinite_requested=infinite, stdout=stdout.decode(), stderr=stderr.decode())
+         print('OWNER_GUARD_FDS ' + json.dumps(observed, sort_keys=True), flush=True)
++        self.assertGreaterEqual(observed['high_fd'], 2000, observed)
+         self.assertTrue(observed['guard_alive'], observed)
+         self.assertTrue(observed['parent_alive'], observed)
+         self.assertTrue(observed['stdout_eof_while_parent_alive'], observed)

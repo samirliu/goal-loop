@@ -1,0 +1,93 @@
+--- a/scripts/goal_host.py
++++ b/scripts/goal_host.py
+@@ -202,19 +202,36 @@
+     trace.publish(target, data)
+ 
+ 
++def ready_launcher(row, verify=False):
++    digest = row.get('ready_launcher_sha256')
++    if digest is None:
++        return None
++    script = Path(row['project']) / '.goal/evidence/host' / ('ready-' + row['id'] + '.sh')
++    if verify:
++        safe(script)
++        require(script.is_file() and script.stat().st_size <= 65536
++                and store._hash(script.read_bytes()) == digest, 'ready launcher missing or changed')
++    return shlex.join(['bash', str(script)])
++
++
+ def response(row):
+     ticket = row['id'] + ':' + row['nonce']
+-    args = [sys.executable, '-I', str(Path(__file__).resolve()), 'ready', str(row['project']), ticket]
++    python = row.get('command_python', sys.executable)
++    require(isinstance(python, str) and Path(python).is_absolute() and '\0' not in python,
++            'invalid ticket interpreter')
++    args = [python, '-I', str(Path(__file__).resolve()), 'ready', str(row['project']), ticket]
+     command = shlex.join(args)
+-    tool = [sys.executable, '-I', str(Path(__file__).with_name('goal_host_command.py').resolve()),
++    tool = [python, '-I', str(Path(__file__).with_name('goal_host_command.py').resolve()),
+             str(row['project']), ticket, '--']
+     owned_ready = shlex.join(tool + args)
+-    checked = shlex.join([sys.executable, '-I', str(Path(__file__).with_name('goal_host_command.py').resolve()),
++    checked = shlex.join([python, '-I', str(Path(__file__).with_name('goal_host_command.py').resolve()),
+                           '--check', str(row['project']), ticket])
++    launcher = ready_launcher(row)
+     return dict(ticket=ticket, header='GOAL_HOST_TICKET ' + ticket,
+                 ready_command=command, files=row['files'],
+-                owned_ready_command=owned_ready, check_command=checked, tool_prefix=shlex.join(tool)+' ',
+-                worker_prefix='GOAL_HOST_TICKET ' + ticket + '\nFirst tool command: ' + owned_ready +
++                owned_ready_command=owned_ready, launcher_command=launcher,
++                check_command=checked, tool_prefix=shlex.join(tool)+' ',
++                worker_prefix='GOAL_HOST_TICKET ' + ticket + '\nFirst tool command: ' + (launcher or owned_ready) +
+                     '\nRun every shell tool through this owned prefix: ' + shlex.join(tool) +
+                     ' COMMAND ARG...\nRun the frozen check without inline shell code: ' + checked + '\n',
+                 cancel_file=row['cancel_file'], deadline_epoch=row['deadline_epoch'],
+@@ -244,7 +261,7 @@
+                        backend=current['backend'], session=current['session'], run=current['run'],
+                        call_id=identity(call_id) if call_id is not None else None,
+                        agent_id=None, parent_agent_id=None, phase='preparing', outcome='running',
+-                       ready=None, receipts=[], boot=budget.boot_identity(),
++                       ready=None, receipts=[], boot=budget.boot_identity(), command_python=sys.executable,
+                        before_sha256=store._hash(store._encode(crew.scope_digest(root, job['files']))),
+                        after_sha256=None, deadline_epoch=end, deadline_monotonic=cap)
+             row['cancel_file'] = str(path / ('cancel-' + row['id'] + '-' + row['nonce']))
+@@ -258,6 +275,14 @@
+         try:
+             if graph['jobs'][task]['dispatch'] is None:
+                 worker.event(task, 'dispatch')
++            if row['backend'] == 'claude' and row.get('ready_launcher_sha256') is None:
++                script = safe(path / ('ready-' + row['id'] + '.sh'))
++                body = ('#!/bin/sh\nexec ' + response(row)['owned_ready_command'] + '\n').encode()
++                if script.exists():
++                    require(script.is_file() and script.read_bytes() == body, 'ready launcher already differs')
++                else:
++                    store._atomic(script, body)
++                row['ready_launcher_sha256'] = store._hash(body)
+             row['phase'] = 'prepared'
+             row['deadline_epoch'] = min(end, row['deadline_epoch'])
+             row['deadline_monotonic'] = min(cap, row['deadline_monotonic'])
+@@ -480,7 +505,9 @@
+     if not linked and shell and isinstance(command, str):
+         for row in rows:
+             brief = response(row)
+-            if command.strip() in (brief['ready_command'], brief['owned_ready_command']):
++            if command.strip() in (brief['ready_command'], brief['owned_ready_command'], brief['launcher_command']):
++                if command.strip() == brief['launcher_command']:
++                    ready_launcher(row, verify=True)
+                 attach(root, row['id']+':'+row['nonce'], {'agentId': agent})
+                 linked = [get(path, row['id']+':'+row['nonce'])[1]]
+                 break
+@@ -493,9 +520,12 @@
+         return {}
+     require(isinstance(command, str) and command, 'unsupported native shell input; use the owned command wrapper')
+     brief = response(row)
++    if command.strip() == brief['launcher_command']:
++        ready_launcher(row, verify=True)
++        return {}
+     if command.strip() in (brief['ready_command'], brief['check_command']):
+         return {}
+-    prefix = [sys.executable, '-I', str(Path(__file__).with_name('goal_host_command.py').resolve()),
++    prefix = [row.get('command_python', sys.executable), '-I', str(Path(__file__).with_name('goal_host_command.py').resolve()),
+               str(root), row['id']+':'+row['nonce'], '--']
+     try:
+         argv = shlex.split(command)

@@ -1,0 +1,128 @@
+--- before/scripts/goal_host.py
++++ after/scripts/goal_host.py
+@@ -448,6 +448,23 @@
+                                    'permissionDecisionReason': 'goal-loop: ' + reason}}
+ 
+ 
++def owned_write(root, files, value):
++    """Check the declared path of a known structured write, not arbitrary code."""
++    require(isinstance(value, str) and value and '\0' not in value,
++            'structured worker write requires file_path')
++    try:
++        candidate = Path(value)
++        target = (candidate if candidate.is_absolute() else root / candidate).resolve(strict=False)
++    except (OSError, RuntimeError) as exc:
++        raise ValueError('structured worker write path cannot be resolved') from exc
++    require(target != root and root in target.parents,
++            'structured worker write outside project')
++    relative = target.relative_to(root)
++    require('.goal' not in relative.parts, 'structured worker write to .goal refused')
++    require(any(target == root / name or root / name in target.parents for name in files),
++            'structured worker write outside owned scope')
++
++
+ def owned_shell(root, path, current, payload):
+     """Bind first-tool tickets without guessing Start-event arrival order."""
+     agent = payload.get('agent_id')
+@@ -471,6 +488,8 @@
+     row = linked[0]
+     require(row['phase'] == 'prepared' and not safe(Path(row['cancel_file'])).exists(), 'attempt is not active or cancellation requested')
+     if not shell:
++        if current['backend'] == 'claude' and payload.get('tool_name') in ('Write', 'Edit'):
++            owned_write(root, row['files'], tool.get('file_path') if isinstance(tool, dict) else None)
+         return {}
+     require(isinstance(command, str) and command, 'unsupported native shell input; use the owned command wrapper')
+     brief = response(row)
+--- before/tests/test_host.py
++++ after/tests/test_host.py
+@@ -353,5 +353,90 @@
+         self.assertEqual(process.returncode, 0, out+err)
+ 
+ 
++    def structured_write_worker(self, files=None):
++        host.begin(self.project, 'claude', 'structured-writes', 60)
++        graph = json.loads(self.graph.read_bytes())
++        graph['jobs'][0]['files'] = files or ['1.out']
++        declared = self.project / 'structured-graph.json'
++        declared.write_text(json.dumps(graph))
++        wave = host.crew.begin(self.project, declared, 'crew', 'structured-writes')
++        item = host.prepare(self.project, wave, 'T1', session='structured-writes')
++        ready = self.payload('PreToolUse', session_id='structured-writes', agent_id='write-worker',
++                             tool_name='Bash', tool_input={'command': item['owned_ready_command']})
++        self.assertEqual(self.cli_hook(ready, 'claude'), {})
++        result = subprocess.run(item['owned_ready_command'], shell=True, capture_output=True, timeout=10)
++        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++        self.assertEqual(self.attempt(item)['agent_id'], 'write-worker')
++        self.assertIsNotNone(self.attempt(item)['ready'])
++        return item
++
++    def structured_write_hook(self, tool, file_path, agent='write-worker'):
++        fields = ({'content': 'candidate'} if tool == 'Write' else
++                  {'old_string': 'before', 'new_string': 'after'})
++        result = self.cli_hook(self.payload('PreToolUse', session_id='structured-writes',
++            agent_id=agent, tool_name=tool, tool_input=dict(fields, file_path=file_path)), 'claude')
++        print('STRUCTURED_WRITE_HOOK ' + json.dumps(dict(
++            agent=agent, tool=tool, file_path=file_path, response=result), sort_keys=True), flush=True)
++        return result
++
++    def test_registered_write_edit_stay_in_owned_paths_and_can_retry(self):
++        item = self.structured_write_worker()
++        before = self.attempt(item)
++        for tool in ('Write', 'Edit'):
++            for name in (str(self.project / '1.out'), './scratch/../1.out'):
++                with self.subTest(tool=tool, allowed=name):
++                    # An empty response retains the host's normal permission checks.
++                    self.assertEqual(self.structured_write_hook(tool, name), {})
++            for name in (str(self.project / '2.out'), '1.out.extra', '.goal/state.rec',
++                         str(self.project.parent / (self.project.name + '-outside.py')), None):
++                with self.subTest(tool=tool, denied=name):
++                    result = self.structured_write_hook(tool, name)['hookSpecificOutput']
++                    self.assertEqual(result['permissionDecision'], 'deny')
++                    self.assertIn('structured worker write', result['permissionDecisionReason'])
++                    self.assertEqual(self.attempt(item), before)
++                    self.assertEqual(self.structured_write_hook(tool, '1.out'), {})
++
++    def test_structured_write_subtree_checks_symlinks_and_control_paths(self):
++        # The hook checks path ownership; crew's final validator still accepts
++        # regular-file scopes only. A missing declared root can be prepared
++        # before this fixture creates its subtree; no crew finish is fabricated.
++        self.structured_write_worker(['owned'])
++        owned = self.project / 'owned'
++        owned.mkdir()
++        for tool in ('Write', 'Edit'):
++            self.assertEqual(self.structured_write_hook(tool, str(owned / 'nested/new.py')), {})
++            self.assertEqual(self.structured_write_hook(tool, 'owned/../owned/new.py'), {})
++            for name in ('owned/../2.out', 'owned/.goal/state.rec'):
++                result = self.structured_write_hook(tool, name)['hookSpecificOutput']
++                self.assertEqual(result['permissionDecision'], 'deny')
++        with tempfile.TemporaryDirectory(prefix='goal-write-outside-') as outside:
++            link = owned / 'escape'
++            link.symlink_to(outside, target_is_directory=True)
++            for tool in ('Write', 'Edit'):
++                result = self.structured_write_hook(tool, str(link / 'new.py'))['hookSpecificOutput']
++                self.assertEqual(result['permissionDecision'], 'deny')
++            # resolve must honor symlinks before '..', unlike lexical abspath.
++            result = self.structured_write_hook('Write', str(link / '../new.py'))['hookSpecificOutput']
++            self.assertEqual(result['permissionDecision'], 'deny')
++
++    def test_structured_leaf_symlink_escape_and_parent_permissions(self):
++        self.structured_write_worker()
++        with tempfile.TemporaryDirectory(prefix='goal-write-outside-') as outside:
++            leaf = self.project / '1.out'
++            leaf.symlink_to(Path(outside) / 'not-created')
++            for tool in ('Write', 'Edit'):
++                self.assertEqual(self.structured_write_hook(tool, str(leaf))[
++                    'hookSpecificOutput']['permissionDecision'], 'deny')
++            leaf.unlink()
++            leaf.symlink_to(self.project / '2.out')
++            self.assertEqual(self.structured_write_hook('Write', str(leaf))[
++                'hookSpecificOutput']['permissionDecision'], 'deny')
++            leaf.unlink()
++            for tool in ('Write', 'Edit'):
++                self.assertEqual(self.structured_write_hook(tool, '1.out'), {})
++                # The controller is not a registered worker; retain its normal
++                # host permissions even with a prepared worker in the session.
++                self.assertEqual(self.structured_write_hook(tool, str(Path(outside) / 'parent.py'), agent=None), {})
++
+ if __name__ == '__main__':
+     unittest.main()

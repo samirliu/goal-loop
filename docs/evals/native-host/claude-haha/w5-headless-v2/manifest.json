@@ -1,0 +1,1101 @@
+{
+  "source": "/private/tmp/goal-w5-claude-auditlog-v2-independent-frozen",
+  "files": {
+    "crew-1/briefs.json": {
+      "bytes": 5830,
+      "mode": 420,
+      "mtime_ns": 1794477965243429313,
+      "sha256": "690308cbedf6747bdcb3834e39767c904842f9d50b07f146ffbc2cfc159b9286"
+    },
+    "crew-1/command.json": {
+      "bytes": 1575,
+      "mode": 420,
+      "mtime_ns": 1794477965243591146,
+      "sha256": "103bf564efd3935826bc0a0b7b9f7fa44a5ad29bab07164ce01e66d980761769"
+    },
+    "crew-1/events.jsonl": {
+      "bytes": 452191,
+      "mode": 420,
+      "mtime_ns": 1794478573321169694,
+      "sha256": "fc16bceb865dd4c5b7dd783e1091cc31711d74d71476b7a1e74ea5833aacfa99"
+    },
+    "crew-1/host-attempts-before-validation/attempt-00d598d63a494c2798dd42074faf29bd.json": {
+      "bytes": 1304,
+      "mode": 384,
+      "mtime_ns": 1794478032017178762,
+      "sha256": "f430c856c95cb62e62aebe946d16e62b73a5a13101cc202e9fc201ea6f8eee05"
+    },
+    "crew-1/host-attempts-before-validation/attempt-2c297179a6cd4626820d3356582e2683.json": {
+      "bytes": 1093,
+      "mode": 384,
+      "mtime_ns": 1794478590004981166,
+      "sha256": "19f82a58b0a00445641e94987b78ee93fac3e8905fcf02c3696f896b38fedc95"
+    },
+    "crew-1/host-events/event-3e442873016cc8e75e8416b10ae388f9ae897ac4cbe520d083e18f69fb8be6b9.json": {
+      "bytes": 365,
+      "mode": 384,
+      "mtime_ns": 1794477974667707783,
+      "sha256": "3e1d9ae51429cf456e5e3ebe0b813da751764bd4cddbd9d35d4a2dc96e7ddd89"
+    },
+    "crew-1/host-events/event-91d9c394dab2564728335d2564e8d873ab73a7684d6afa458e373a60f6bb21f0.json": {
+      "bytes": 341,
+      "mode": 384,
+      "mtime_ns": 1794477968187823320,
+      "sha256": "84a18992b97c02f3fa3b0d5737dc6e3f88b37c42f914d0625c6a09af8c0c2b0a"
+    },
+    "crew-1/host-events/event-a97029891ce5d175afe562aa74e2b19ee759a24775b59cbcb3b6ed88a0bac807.json": {
+      "bytes": 364,
+      "mode": 384,
+      "mtime_ns": 1794478031938393408,
+      "sha256": "664df0d3de98396c5fa8d0debe36449d1fc63a0fe5bdf24ef67783775fb30eaa"
+    },
+    "crew-1/host-events/event-abf3d4484cbdff6a672bbad915446a716983ca4f84f5a755ad4b26bafebbd018.json": {
+      "bytes": 365,
+      "mode": 384,
+      "mtime_ns": 1794477974666254368,
+      "sha256": "e08d30a44cf0cec14109a5caed9eac798b7626ef8f2feeb25b713af05bef616d"
+    },
+    "crew-1/lifecycle.json": {
+      "bytes": 1306,
+      "mode": 420,
+      "mtime_ns": 1794478590057980248,
+      "sha256": "b16a5461e009e0e0a412b9cc5e7795a90d2d4a618d81705503239860b978d63c"
+    },
+    "crew-1/manifest.json": {
+      "bytes": 4872,
+      "mode": 420,
+      "mtime_ns": 1794477965220259248,
+      "sha256": "5df6792327a0b677faec011709e68e23e59f5bea24054b60c2b7e04810ba5f42"
+    },
+    "crew-1/native-attempts.json": {
+      "bytes": 2604,
+      "mode": 420,
+      "mtime_ns": 1794478590053852585,
+      "sha256": "417ad7e6bc3618a789f0aa8c51e095336e2c501f88e3fe21b7dce0ad585d2138"
+    },
+    "crew-1/parent-message-batch-indices.json": {
+      "bytes": 44,
+      "mode": 420,
+      "mtime_ns": 1794478590054547126,
+      "sha256": "56f1e76230df1839ba0810b7847f005adb717df941cc5a937a35a2d792c8acb4"
+    },
+    "crew-1/parent-tool-batches.json": {
+      "bytes": 6396,
+      "mode": 420,
+      "mtime_ns": 1794478590054409960,
+      "sha256": "357fdd4db8c8a9e827b53a511f21393600919343ac04a403d51bb6bd686c78ca"
+    },
+    "crew-1/partial-artifact/auditlog/__init__.py": {
+      "bytes": 0,
+      "mode": 420,
+      "mtime_ns": 1794477965204993635,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "crew-1/partial-artifact/auditlog/__main__.py": {
+      "bytes": 36,
+      "mode": 420,
+      "mtime_ns": 1794477965205265010,
+      "sha256": "fe1aa2695a28ebf98159755b20240ab7486ccc0549d823e228fb0b0fd4644253"
+    },
+    "crew-1/partial-artifact/auditlog/aggregate.py": {
+      "bytes": 2892,
+      "mode": 420,
+      "mtime_ns": 1794478006201426743,
+      "sha256": "67b549b82b3526bf6cfb35906a6134ef52422a959b41dd7a16467366348f6d33"
+    },
+    "crew-1/partial-artifact/auditlog/codec.py": {
+      "bytes": 52,
+      "mode": 420,
+      "mtime_ns": 1794477965205117635,
+      "sha256": "ec3a36708681aa27bcd7f9464e62f63ae31befeb739be81d59ab990e7a503789"
+    },
+    "crew-1/prompt-receipt.json": {
+      "bytes": 356,
+      "mode": 420,
+      "mtime_ns": 1794477968195051606,
+      "sha256": "78ce6d64a488329da88a612c9d5524672efd8713425973ccd675ecf1e59bb280"
+    },
+    "crew-1/results.json": {
+      "bytes": 1136,
+      "mode": 420,
+      "mtime_ns": 1794478590054155543,
+      "sha256": "6c904af5b60e85d8dfdb098e756c8eb47f8ed203274052b4e7e4e69e90a8825f"
+    },
+    "crew-1/stderr.txt": {
+      "bytes": 0,
+      "mode": 420,
+      "mtime_ns": 1794477965243628813,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "crew-1/unsealed-wave.json": {
+      "bytes": 5129,
+      "mode": 420,
+      "mtime_ns": 1794478590059332914,
+      "sha256": "d837ad193d92f17e7bd7e45ba7347242c71d442db0ab5f616119c1e583e69595"
+    },
+    "driver.py": {
+      "bytes": 31405,
+      "mode": 420,
+      "mtime_ns": 1794474365148697375,
+      "sha256": "04718b8a88cc55b5414645c56bab89601d7d52397c2c079e8137af614136a675"
+    },
+    "entry.json": {
+      "bytes": 85,
+      "mode": 420,
+      "mtime_ns": 1794477690974708234,
+      "sha256": "e57fbbaa05d46c6303f953dc4803d0477ab1bb6db8f66c767017a48c44e574b1"
+    },
+    "prereg.md": {
+      "bytes": 11835,
+      "mode": 420,
+      "mtime_ns": 1794474412541453537,
+      "sha256": "6122ea953a1924ac4d231fdffceca14e0ae5f3ffaf32c6f62e78750bd0b92ddd"
+    },
+    "project/control/grade.py": {
+      "bytes": 10464,
+      "mode": 420,
+      "mtime_ns": 1794370198915393053,
+      "sha256": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19"
+    },
+    "project/control/graph-fused.json": {
+      "bytes": 1506,
+      "mode": 420,
+      "mtime_ns": 1794477691472078504,
+      "sha256": "a17d18d606fdbf39dfbf938cc98305b53383670627598fe6c7abf45cca598671"
+    },
+    "project/control/graph.json": {
+      "bytes": 1883,
+      "mode": 420,
+      "mtime_ns": 1794477691472208087,
+      "sha256": "4173be382d0bf6dd25c12501c9498d5916090f86275761e90f2b80d74c3ae84f"
+    },
+    "project/control/job_check.py": {
+      "bytes": 2043,
+      "mode": 420,
+      "mtime_ns": 1794405311641846843,
+      "sha256": "b72826bd3c9ccee97731943f97f5a96469f48dbc014e18f3adb56e2528e78f84"
+    },
+    "project/control/mcp.json": {
+      "bytes": 23,
+      "mode": 420,
+      "mtime_ns": 1794477691025856235,
+      "sha256": "d8e397af03b5b032f21d0aa967086f0c78b33c87b76f2e9898ae0a144df7de02"
+    },
+    "project/control/stamp.json": {
+      "bytes": 86,
+      "mode": 420,
+      "mtime_ns": 1794477691471565129,
+      "sha256": "1a8b03417ce30c41aff93c227fc176ab4dc45005fcda6a9aae8a3767a03ecd3e"
+    },
+    "project/work/.goal/check_freeze": {
+      "bytes": 75,
+      "mode": 420,
+      "mtime_ns": 1794477691404105850,
+      "sha256": "0fc21d9feee3fb47f41b930dc3ce03e673216aa89cd0cede01a80006da9b2fed"
+    },
+    "project/work/.goal/evidence/crew/0439341d44f84b8787fb738a7bc35162.json": {
+      "bytes": 3641,
+      "mode": 384,
+      "mtime_ns": 1794478032016624388,
+      "sha256": "cf167d1d89d4a132b8bf6b133b7a1be73b5128482c38eddbb643fdd7cf0945d6"
+    },
+    "project/work/.goal/evidence/crew/37889113c36d4d0ca522ee0c7f156980.json": {
+      "bytes": 6425,
+      "mode": 384,
+      "mtime_ns": 1794477965192838020,
+      "sha256": "07545fb202545ba41edbb2201119911e4eb7242e0a1406091be08f5298691778"
+    },
+    "project/work/.goal/evidence/host/attempt-00d598d63a494c2798dd42074faf29bd.json": {
+      "bytes": 1304,
+      "mode": 384,
+      "mtime_ns": 1794478032017178762,
+      "sha256": "f430c856c95cb62e62aebe946d16e62b73a5a13101cc202e9fc201ea6f8eee05"
+    },
+    "project/work/.goal/evidence/host/attempt-2c297179a6cd4626820d3356582e2683.json": {
+      "bytes": 1093,
+      "mode": 384,
+      "mtime_ns": 1794478590004981166,
+      "sha256": "19f82a58b0a00445641e94987b78ee93fac3e8905fcf02c3696f896b38fedc95"
+    },
+    "project/work/.goal/evidence/host/attempt-e3c9a80f3f964cc98eb7e6f69b80b511.json": {
+      "bytes": 1373,
+      "mode": 384,
+      "mtime_ns": 1794477964900132959,
+      "sha256": "a15cd78bcf31f21e828ffda2fc8b900eb6c4d104020e049f262cfd5c643fbca2"
+    },
+    "project/work/.goal/evidence/host/cancel-2c297179a6cd4626820d3356582e2683-4ef9a3c3aa78409caa708a209fcde797": {
+      "bytes": 17,
+      "mode": 384,
+      "mtime_ns": 1794478590003497626,
+      "sha256": "ef8d8aca8bd99a5207379bba558d371ea473bd1a6f7ceb025ddf0be66cb317a4"
+    },
+    "project/work/.goal/evidence/host/event-3e442873016cc8e75e8416b10ae388f9ae897ac4cbe520d083e18f69fb8be6b9.json": {
+      "bytes": 365,
+      "mode": 384,
+      "mtime_ns": 1794477974667707783,
+      "sha256": "3e1d9ae51429cf456e5e3ebe0b813da751764bd4cddbd9d35d4a2dc96e7ddd89"
+    },
+    "project/work/.goal/evidence/host/event-91d9c394dab2564728335d2564e8d873ab73a7684d6afa458e373a60f6bb21f0.json": {
+      "bytes": 341,
+      "mode": 384,
+      "mtime_ns": 1794477968187823320,
+      "sha256": "84a18992b97c02f3fa3b0d5737dc6e3f88b37c42f914d0625c6a09af8c0c2b0a"
+    },
+    "project/work/.goal/evidence/host/event-9c4bb27196e04b355e99a9c064895eab2d801b915eea7b96b33df1eaf7067644.json": {
+      "bytes": 341,
+      "mode": 384,
+      "mtime_ns": 1794477699572576779,
+      "sha256": "43bbaf3f0b6811cce2144c3775763717f3ed6181dcf4b1b6f8bd17341ceb9dc3"
+    },
+    "project/work/.goal/evidence/host/event-a97029891ce5d175afe562aa74e2b19ee759a24775b59cbcb3b6ed88a0bac807.json": {
+      "bytes": 364,
+      "mode": 384,
+      "mtime_ns": 1794478031938393408,
+      "sha256": "664df0d3de98396c5fa8d0debe36449d1fc63a0fe5bdf24ef67783775fb30eaa"
+    },
+    "project/work/.goal/evidence/host/event-a9969acc7ff0a1393feb82df20dec4f43e34ac0b65e329c24ca55d796a1e1acb.json": {
+      "bytes": 347,
+      "mode": 384,
+      "mtime_ns": 1794477964684171672,
+      "sha256": "04ae65f9d993767f90fb008a55b60adce6d6d9189da40d160b5c89598f3e3c98"
+    },
+    "project/work/.goal/evidence/host/event-abf3d4484cbdff6a672bbad915446a716983ca4f84f5a755ad4b26bafebbd018.json": {
+      "bytes": 365,
+      "mode": 384,
+      "mtime_ns": 1794477974666254368,
+      "sha256": "e08d30a44cf0cec14109a5caed9eac798b7626ef8f2feeb25b713af05bef616d"
+    },
+    "project/work/.goal/evidence/host/event-b8a221185419749e68209e26b938ac468140d4f4970beb8c1a91d99d944285d2.json": {
+      "bytes": 364,
+      "mode": 384,
+      "mtime_ns": 1794477959363813667,
+      "sha256": "57830cfb76211e9db34a338ad48839b75ca17affde106866b30bb28b2a2cb4d7"
+    },
+    "project/work/.goal/evidence/host/event-e028c8b0edab608021d6a6f8c4d8bd00c9b9e49f277c1aaf71bc125a983be2af.json": {
+      "bytes": 365,
+      "mode": 384,
+      "mtime_ns": 1794477704176048938,
+      "sha256": "06612c30cba194926e1f3fd64525f766522877da34797ee97c38e8c493357cd6"
+    },
+    "project/work/.goal/evidence/host/prompt-550201a5b8416bf8bda9d290791e88870c344f26181f1907601b974c38858c8b.json": {
+      "bytes": 391,
+      "mode": 384,
+      "mtime_ns": 1794477966196844310,
+      "sha256": "056ea56457c09baae1455cb736b878bb6c5197c37f4b5802a522d73571556076"
+    },
+    "project/work/.goal/evidence/host/prompt-9597209187fde1207ce94668c48e5d01938e94254e27d7e2d6bb3b3734c7e2f0.json": {
+      "bytes": 392,
+      "mode": 384,
+      "mtime_ns": 1794477692865780059,
+      "sha256": "0db57d274e7fa913431885d8b6bfd185722bfa969f9725e5727a44dd16325c86"
+    },
+    "project/work/.goal/evidence/host/session-550201a5b8416bf8bda9d290791e88870c344f26181f1907601b974c38858c8b.json": {
+      "bytes": 317,
+      "mode": 384,
+      "mtime_ns": 1794477965215451127,
+      "sha256": "c10eca2fa085b274afd4dbef114bc6cda2bce1d63ec711eb6014f3bb7040d54b"
+    },
+    "project/work/.goal/evidence/host/session-9597209187fde1207ce94668c48e5d01938e94254e27d7e2d6bb3b3734c7e2f0.json": {
+      "bytes": 317,
+      "mode": 384,
+      "mtime_ns": 1794477691480605289,
+      "sha256": "5d5b4b1767c0687b673ab54823d3408dbeb59ebd8b625c899555573f8f186cf8"
+    },
+    "project/work/.goal/evidence/host/session-d3dcea33e9096627c13c59caafca8e98f48b861b98d2f1168c54bb01d911bafb.json": {
+      "bytes": 303,
+      "mode": 384,
+      "mtime_ns": 1794477691197464140,
+      "sha256": "67e8da27cdbb4cc1de6511a5c2d93e0586422ac983e24acb764a71d5078fa1cc"
+    },
+    "project/work/.goal/evidence/runtime/0602a4b1b80a439db7db2eb809ef6bca.json": {
+      "bytes": 1265,
+      "mode": 384,
+      "mtime_ns": 1794477820187538860,
+      "sha256": "ad7e9f99c0b85e605d1f61f61c29f3eb4d29d623013ea104de7b687c18dfa1b7"
+    },
+    "project/work/.goal/evidence/runtime/0bfcf94bc0e54c988eeca4390c063f03.json": {
+      "bytes": 1600,
+      "mode": 384,
+      "mtime_ns": 1794478590007380414,
+      "sha256": "b9b9146ccb25a632ad671fcc57541ae1396f08be1a2570fe5abed7c3feb9e869"
+    },
+    "project/work/.goal/evidence/runtime/1624fb1d8054421e95521c9f37e56663.json": {
+      "bytes": 1276,
+      "mode": 384,
+      "mtime_ns": 1794478027545384962,
+      "sha256": "bbc8d9ed188e59d387404ad27815db95a116d6cd888b9f1358fae00cf1fc9ef6"
+    },
+    "project/work/.goal/evidence/runtime/1e476aa402fe4696a8b6fe2c3fbcbc21.json": {
+      "bytes": 1546,
+      "mode": 384,
+      "mtime_ns": 1794477820478872717,
+      "sha256": "5f7568819d672294ec3768cf7585886439ef6d9035ad7dbdcbb1c34f554d884d"
+    },
+    "project/work/.goal/evidence/runtime/1fd92e062e40409387034d5801db301d.json": {
+      "bytes": 1317,
+      "mode": 384,
+      "mtime_ns": 1794477709282392318,
+      "sha256": "0e7b867e83a8b5c0a31c8b9a57daf4ba471c41cdbca327369105c68b9817f572"
+    },
+    "project/work/.goal/evidence/runtime/22612c5511d2427d8dd9ce3857edcb98.json": {
+      "bytes": 1419,
+      "mode": 384,
+      "mtime_ns": 1794477968187317112,
+      "sha256": "9fa919eddb989d859829ddd0266a7bec6b10941b3e4adaff497164510cf9ecf4"
+    },
+    "project/work/.goal/evidence/runtime/286e4e953da2484d85107ba01a0720ad.json": {
+      "bytes": 1535,
+      "mode": 384,
+      "mtime_ns": 1794478020192442939,
+      "sha256": "87a75332bc5d96afb316492b9614940e315c08fe2132b106dd24c6edcb61d205"
+    },
+    "project/work/.goal/evidence/runtime/2b11c712adc442ecac98516bb749a435.json": {
+      "bytes": 1171,
+      "mode": 384,
+      "mtime_ns": 1794477897042170990,
+      "sha256": "bbe9b403f435d67f3c2cee885f373f5597dae4b2f9c8257b5a2313777d61791e"
+    },
+    "project/work/.goal/evidence/runtime/3b365d4db90d488eb209aef9805786e5.json": {
+      "bytes": 1449,
+      "mode": 384,
+      "mtime_ns": 1794477870061859705,
+      "sha256": "3e18f53932aa907c45462f975f6334d5165abb403dc638870c6712a0be0745fe"
+    },
+    "project/work/.goal/evidence/runtime/3f6c366a694e4fd5a6e56fda28d204f7.json": {
+      "bytes": 1214,
+      "mode": 384,
+      "mtime_ns": 1794477870055153960,
+      "sha256": "fb27c2ee79cd863b3d2090359707ab2c1a01fba37b591ca3c4a5234011720a50"
+    },
+    "project/work/.goal/evidence/runtime/498fa22e529b4aa59ea2508bfe395e41.json": {
+      "bytes": 1571,
+      "mode": 384,
+      "mtime_ns": 1794477941643044043,
+      "sha256": "eb8ca011f2d8ecd5aa27375c258ea4de97a31395ae11c10bfeaebc123a1dbe0a"
+    },
+    "project/work/.goal/evidence/runtime/56c3c0b1774b4559b1c14764ec5d5f5e.json": {
+      "bytes": 1468,
+      "mode": 384,
+      "mtime_ns": 1794478025021941790,
+      "sha256": "a03cfa44b0dd24fb9b29b4b22a9a40e48d606d8a3c091b97ff18f4f5e39a208f"
+    },
+    "project/work/.goal/evidence/runtime/5bd35b203fc4421cba0e19e26ad8f52d.json": {
+      "bytes": 1420,
+      "mode": 384,
+      "mtime_ns": 1794477699572291353,
+      "sha256": "706ff82fcdb288269cc07ce46c41161cee3c264b502b3d8e04d82100c015f5c4"
+    },
+    "project/work/.goal/evidence/runtime/5da19a6061e44f7e9c301bd32dfbc356.json": {
+      "bytes": 1453,
+      "mode": 384,
+      "mtime_ns": 1794477974665483535,
+      "sha256": "903c02fddc3519c8536b8b2dc5b30f78b9e0479e6e302730158c212d2a6cf954"
+    },
+    "project/work/.goal/evidence/runtime/5eb7739e7d7e422c8790a76602b4f0e2.json": {
+      "bytes": 1124,
+      "mode": 384,
+      "mtime_ns": 1794477964890200259,
+      "sha256": "0dee0df014d48de8be98b83f5c85d1b1ce7bf46a450fd02fa9902a5b83c5827a"
+    },
+    "project/work/.goal/evidence/runtime/62e80ec5f7ca4d5ea52d708f8eda83b1.json": {
+      "bytes": 1167,
+      "mode": 384,
+      "mtime_ns": 1794477711327949741,
+      "sha256": "61236279668b46b01022308054be011d41ba4288b9d8c8e33ad8faebf8b89ad6"
+    },
+    "project/work/.goal/evidence/runtime/6eec34dc0b5e4b2ea19d770a6db07988.json": {
+      "bytes": 1453,
+      "mode": 384,
+      "mtime_ns": 1794477974667343034,
+      "sha256": "d55f0926e904b2b7e90df93d6179b7751dfe21249869e47fa8f1ee50cb259325"
+    },
+    "project/work/.goal/evidence/runtime/73373bae0792483a9c9537e396098edd.json": {
+      "bytes": 1177,
+      "mode": 384,
+      "mtime_ns": 1794477712987525917,
+      "sha256": "a81c7e3cadc87da06302e663f50d32ea0d63086495b705af58c6fd9939837b9c"
+    },
+    "project/work/.goal/evidence/runtime/773357f938144498b26eb605153a0a9f.json": {
+      "bytes": 1221,
+      "mode": 384,
+      "mtime_ns": 1794477950282798134,
+      "sha256": "d0da7a196c0c3c90feb84674751414f0d3990112890bfaa225411a69d4bccf6e"
+    },
+    "project/work/.goal/evidence/runtime/77f14bf2281c4cc7918dae4a7f358157.json": {
+      "bytes": 1418,
+      "mode": 384,
+      "mtime_ns": 1794477927499850385,
+      "sha256": "caa6d1e7f1ccf362dfd88f7e2c91deceff940e983eab140881614dec3e19d2f6"
+    },
+    "project/work/.goal/evidence/runtime/78a4af86526b4738bee06183cdb7ef9c.json": {
+      "bytes": 2040,
+      "mode": 384,
+      "mtime_ns": 1794478025189746574,
+      "sha256": "89b7bbb58d606eafe433f1c8b73e773c31df7efb4cfa6760bd45ab2d69f217a1"
+    },
+    "project/work/.goal/evidence/runtime/7e2a2a6553044b52a56f9e19fdd83f70.json": {
+      "bytes": 1169,
+      "mode": 384,
+      "mtime_ns": 1794477927492928682,
+      "sha256": "d80c1d12717d7015ddea48466ad11dede01afd9b529214f06914e6f9416935d0"
+    },
+    "project/work/.goal/evidence/runtime/8abe6630d31b41dc94419cb9b8589e10.json": {
+      "bytes": 1170,
+      "mode": 384,
+      "mtime_ns": 1794477911967224115,
+      "sha256": "5a54c306c0c05cd3857843828e884746f4f3a3678fda805f532b5deebba0d6ba"
+    },
+    "project/work/.goal/evidence/runtime/8efa3e40c0ab4733ac6649d78c051244.json": {
+      "bytes": 1419,
+      "mode": 384,
+      "mtime_ns": 1794477911973995777,
+      "sha256": "ba08f58cc386b5a6325fcc326bcd7a115b09cd70bc3c700624c3666684c37211"
+    },
+    "project/work/.goal/evidence/runtime/954485ee84324c8c9953577672ae7911.json": {
+      "bytes": 1169,
+      "mode": 384,
+      "mtime_ns": 1794477905008265697,
+      "sha256": "bb92132538f9356487699448e9a987672a7668d0de09cc53c1a40ee00690dd47"
+    },
+    "project/work/.goal/evidence/runtime/9f28a9ca8a4c4d0ea47504fbd1faf4fb.json": {
+      "bytes": 3172,
+      "mode": 384,
+      "mtime_ns": 1794478012260201456,
+      "sha256": "f970d79f6ab85ef8a00b64a2af6d5ec393580a30749f71924622f960ba4240ec"
+    },
+    "project/work/.goal/evidence/runtime/a16be6dee22845b59b6b28a982b73226.json": {
+      "bytes": 1220,
+      "mode": 384,
+      "mtime_ns": 1794477979057516815,
+      "sha256": "8522807ed4d5ccd073beb3e35de3bb9f01eec6ad7b06c4af3b342ff1d1551ca5"
+    },
+    "project/work/.goal/evidence/runtime/a2f387f47ff6468db538f01697391371.json": {
+      "bytes": 1432,
+      "mode": 384,
+      "mtime_ns": 1794477964683736130,
+      "sha256": "d23052c3293dc8ad9dc8edf5a7cfffd9064e3271ba53c20f9ca61709f696c025"
+    },
+    "project/work/.goal/evidence/runtime/aa39fb1975824bb89ab990ebfdb2cd4d.json": {
+      "bytes": 1696,
+      "mode": 384,
+      "mtime_ns": 1794477946361386940,
+      "sha256": "bd72374231a5ed3ac88ab8443e4146058c2a4bdba29a6bb29959b32b6ebaf10c"
+    },
+    "project/work/.goal/evidence/runtime/ad346aa9f670417db5bd42ded7ac53c2.json": {
+      "bytes": 1451,
+      "mode": 384,
+      "mtime_ns": 1794477959363153751,
+      "sha256": "45227681806ff707f46a078510616b16a8fcaddf9d475364bc1cb3576031f47a"
+    },
+    "project/work/.goal/evidence/runtime/b3c4e6d3864449b98aa80ff56760378f.json": {
+      "bytes": 1200,
+      "mode": 384,
+      "mtime_ns": 1794478025182495829,
+      "sha256": "6663766a307626227a0bb4b695cf612e5e7e395949982bd9e0804d1d9b95f561"
+    },
+    "project/work/.goal/evidence/runtime/c56e98900e9c4a70a101a1f57af6278b.json": {
+      "bytes": 1317,
+      "mode": 384,
+      "mtime_ns": 1794477976951986687,
+      "sha256": "2c78bc4d89ef555252e98334a044b60c68df3ed330886a9d43493139b47e4c8c"
+    },
+    "project/work/.goal/evidence/runtime/c69ea5ad0b464bad9707088e4c079416.json": {
+      "bytes": 1151,
+      "mode": 384,
+      "mtime_ns": 1794477875420500976,
+      "sha256": "8480194e5d5bce326a46615ab365d9315c275c9623a58242e26083672d4e516d"
+    },
+    "project/work/.goal/evidence/runtime/cd1390f589974cc7980190dfab349c99.json": {
+      "bytes": 1894,
+      "mode": 384,
+      "mtime_ns": 1794477964900695709,
+      "sha256": "b685150a04727d0d521feb2b1c085746a4993c4c164ecc3a3a53110cdc045563"
+    },
+    "project/work/.goal/evidence/runtime/da2e28cb19ee435c8d64f1749dc971fd.json": {
+      "bytes": 1283,
+      "mode": 384,
+      "mtime_ns": 1794477965185503817,
+      "sha256": "728e012ccc4a4ed818078aaadaf442ead8ea38e0722cdd3d80dad8a02e471f60"
+    },
+    "project/work/.goal/evidence/runtime/dde8415a04a14d6d88c2f469e011d040.json": {
+      "bytes": 1155,
+      "mode": 384,
+      "mtime_ns": 1794477933275474155,
+      "sha256": "088d602844e4b29b93efd444b38371663d4315f21c2eb41d3f94792208c34a81"
+    },
+    "project/work/.goal/evidence/runtime/e4e29558ef4e498aa0bd99d56d78fe68.json": {
+      "bytes": 1451,
+      "mode": 384,
+      "mtime_ns": 1794478031937775700,
+      "sha256": "c7abceb155cf9ff0b2ef7d88e250f6d686aae82fd02e951def46e20a5b0f38ad"
+    },
+    "project/work/.goal/evidence/runtime/e559a2069d8f48d1ae097dde30448270.json": {
+      "bytes": 1276,
+      "mode": 384,
+      "mtime_ns": 1794478016253676926,
+      "sha256": "4205b14ecc4ae989ba2674ae94a7d7cd8a73a1fc13c8e39ae4d7d73cef538229"
+    },
+    "project/work/.goal/evidence/runtime/ea9ca70d48a04edbbddd1a8600338804.json": {
+      "bytes": 1452,
+      "mode": 384,
+      "mtime_ns": 1794477704175429715,
+      "sha256": "a19b71afc23077670ea647c442aeba7c2d1995cdbc0cc216c6cc0f5dd09f8e8d"
+    },
+    "project/work/.goal/evidence/runtime/efe0482468da44d280b98ed73ca9d784.json": {
+      "bytes": 1223,
+      "mode": 384,
+      "mtime_ns": 1794477936898298334,
+      "sha256": "0af36513f73be60b59d9218a715b3c9d57502770b79d106371cf24cccd09067a"
+    },
+    "project/work/.goal/evidence/runtime/ff3d5f3e00064f97994be962aa3ef4fb.json": {
+      "bytes": 1822,
+      "mode": 384,
+      "mtime_ns": 1794478032020090427,
+      "sha256": "52a2fac4e989764a4f20261a6cb5343b731bc0081f80dc3aa12565b1d4c6439c"
+    },
+    "project/work/.goal/goal.md": {
+      "bytes": 302,
+      "mode": 420,
+      "mtime_ns": 1794477691408915346,
+      "sha256": "a40626b122e388b1b8b62aa1190e31c04f3aafc6725583fccca40f952b41d042"
+    },
+    "project/work/.goal/loop-log.md": {
+      "bytes": 0,
+      "mode": 420,
+      "mtime_ns": 1794477691139852894,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "project/work/.goal/pre-reg.md": {
+      "bytes": 1958,
+      "mode": 420,
+      "mtime_ns": 1794477691420365170,
+      "sha256": "4a34a7e4b27c48a71c7a0358f86b0be94e1b33b94a2a8db84370aa76649b7025"
+    },
+    "project/work/.goal/runner.clock": {
+      "bytes": 11,
+      "mode": 384,
+      "mtime_ns": 1794477965214830252,
+      "sha256": "040cae8384336ab5c9489af3b5005ed110b19b766b23862315a8ae50d8f9dd53"
+    },
+    "project/work/.goal/runner.deadline": {
+      "bytes": 11,
+      "mode": 384,
+      "mtime_ns": 1794477965215040794,
+      "sha256": "a583444e7895f9f9c2951271cd8a2df7d8e1b99caff428ba0103e1ba62ac9477"
+    },
+    "project/work/.goal/runner.json": {
+      "bytes": 496,
+      "mode": 384,
+      "mtime_ns": 1794477965214571711,
+      "sha256": "e1e1222d6b88c76fdaabf3f3a2c4cbf7a58c9eb13e4702c3e47562e77b5a52e1"
+    },
+    "project/work/.goal/state.rec": {
+      "bytes": 255,
+      "mode": 420,
+      "mtime_ns": 1794477691139799686,
+      "sha256": "f41891e0c1ff7c75fce9efeebee9ade0c5ba0d06f76ea8c718ab0ebf7947a8c4"
+    },
+    "project/work/.goal/store/commits/current": {
+      "bytes": 87,
+      "mode": 384,
+      "mtime_ns": 1794477965214216169,
+      "sha256": "1e987c8e42b7178d37abbfa98add6499e4cc9142b200d3b3f23df90ad64eeb29"
+    },
+    "project/work/.goal/store/commits/generations/5c5e0466fa8b05eae5415258096ec97942602f5df0e1da9da0a00722a5dae2c9": {
+      "bytes": 5482,
+      "mode": 384,
+      "mtime_ns": 1794477965213920128,
+      "sha256": "5c5e0466fa8b05eae5415258096ec97942602f5df0e1da9da0a00722a5dae2c9"
+    },
+    "project/work/.goal/store/commits/generations/650ffdd9dbde07281f7327de91a95b9d7f4296c140978ee8af77b66e7fce5e9e": {
+      "bytes": 1524,
+      "mode": 384,
+      "mtime_ns": 1794477691185904107,
+      "sha256": "650ffdd9dbde07281f7327de91a95b9d7f4296c140978ee8af77b66e7fce5e9e"
+    },
+    "project/work/.goal/store/commits/generations/a5ad93616958ba30f21cd86866b90c400d032d262700b66897ee07b20ffedb2d": {
+      "bytes": 2421,
+      "mode": 384,
+      "mtime_ns": 1794477691196167391,
+      "sha256": "a5ad93616958ba30f21cd86866b90c400d032d262700b66897ee07b20ffedb2d"
+    },
+    "project/work/.goal/store/commits/generations/ed720d570f9a509a6d16cf7a3e3127034cbeeda43dc509e5a69d6e61570ed8de": {
+      "bytes": 5736,
+      "mode": 384,
+      "mtime_ns": 1794477691463089719,
+      "sha256": "ed720d570f9a509a6d16cf7a3e3127034cbeeda43dc509e5a69d6e61570ed8de"
+    },
+    "project/work/.goal/store/commits/writer.lock": {
+      "bytes": 0,
+      "mode": 384,
+      "mtime_ns": 1794477691184973358,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "project/work/.goal/verdicts.rec": {
+      "bytes": 0,
+      "mode": 420,
+      "mtime_ns": 1794477691139917769,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "project/work/.goal/work-plan.md": {
+      "bytes": 132,
+      "mode": 420,
+      "mtime_ns": 1794477691142580642,
+      "sha256": "6ffd71e91f37544a950eee06eefec77899e5375e1e95f083e93c3d3608a1761f"
+    },
+    "project/work/TASK.md": {
+      "bytes": 933,
+      "mode": 420,
+      "mtime_ns": 1794477691025358652,
+      "sha256": "82ab0743fa37841a91d88f7c8fb525612cc74be34c947799e2646e84fa9952fd"
+    },
+    "project/work/auditlog/__init__.py": {
+      "bytes": 0,
+      "mode": 420,
+      "mtime_ns": 1794477965204993635,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "project/work/auditlog/__main__.py": {
+      "bytes": 36,
+      "mode": 420,
+      "mtime_ns": 1794477965205265010,
+      "sha256": "fe1aa2695a28ebf98159755b20240ab7486ccc0549d823e228fb0b0fd4644253"
+    },
+    "project/work/auditlog/__pycache__/__init__.cpython-314.pyc": {
+      "bytes": 172,
+      "mode": 420,
+      "mtime_ns": 1794478012256120751,
+      "sha256": "16edafd5e16c5ad740cc884cd6610948f03569682bbeb3d3a02e22179e79a7d8"
+    },
+    "project/work/auditlog/__pycache__/aggregate.cpython-314.pyc": {
+      "bytes": 3640,
+      "mode": 420,
+      "mtime_ns": 1794478012256709292,
+      "sha256": "90160db8eaa5f19822bc7253573e5ad68baf1006e0b3d46e9485b64fb0c60f2b"
+    },
+    "project/work/auditlog/__pycache__/codec.cpython-314.pyc": {
+      "bytes": 306,
+      "mode": 420,
+      "mtime_ns": 1794478025168322341,
+      "sha256": "f61b194227311aeee559d0f90be77d80bc393538ebd083cc109160b9f9165b68"
+    },
+    "project/work/auditlog/aggregate.py": {
+      "bytes": 2892,
+      "mode": 420,
+      "mtime_ns": 1794478006201426743,
+      "sha256": "67b549b82b3526bf6cfb35906a6134ef52422a959b41dd7a16467366348f6d33"
+    },
+    "project/work/auditlog/codec.py": {
+      "bytes": 52,
+      "mode": 420,
+      "mtime_ns": 1794477965205117635,
+      "sha256": "ec3a36708681aa27bcd7f9464e62f63ae31befeb739be81d59ab990e7a503789"
+    },
+    "project/work/public.py": {
+      "bytes": 980,
+      "mode": 420,
+      "mtime_ns": 1794477691025430361,
+      "sha256": "898d8b22ddfef661a431ff233760b65d1f6a439cd924412bfd49df56532e7a2f"
+    },
+    "report.json": {
+      "bytes": 51647,
+      "mode": 420,
+      "mtime_ns": 1794478590062505953,
+      "sha256": "48c16574ca3f71cc0b9e7c15d22bd02961cb826d730c6a82af0ec505497c934b"
+    },
+    "single-1/artifact/auditlog/__init__.py": {
+      "bytes": 319,
+      "mode": 420,
+      "mtime_ns": 1794477861407933536,
+      "sha256": "90d612ea66359d020c5b77c5d325a47bcc2ad7ef5020fe4e05de376e09e5a5ce"
+    },
+    "single-1/artifact/auditlog/__main__.py": {
+      "bytes": 5291,
+      "mode": 420,
+      "mtime_ns": 1794477861265303482,
+      "sha256": "b198c17649475d613e0a7eb5943357bce42e55b5144ac9d24b15471a496c9ef8"
+    },
+    "single-1/artifact/auditlog/aggregate.py": {
+      "bytes": 1820,
+      "mode": 420,
+      "mtime_ns": 1794477848627764655,
+      "sha256": "b5b58c7ae52c656dfb587d297eefcaf5d08446f27bc93da41364c88939495173"
+    },
+    "single-1/artifact/auditlog/codec.py": {
+      "bytes": 3460,
+      "mode": 420,
+      "mtime_ns": 1794477848484304976,
+      "sha256": "3975b3410ee897c038b4d54b3ad9f4b80a8dd9477fd7205bebe965770de43fa5"
+    },
+    "single-1/briefs.json": {
+      "bytes": 2976,
+      "mode": 420,
+      "mtime_ns": 1794477691499567274,
+      "sha256": "ae04b6cfa9e21f83c38b85f1821ab3967b096de6982db75f80acd39b5a061aee"
+    },
+    "single-1/command.json": {
+      "bytes": 1575,
+      "mode": 420,
+      "mtime_ns": 1794477691499754065,
+      "sha256": "cf6873e00fbfa9644e8652f13ad0af3dbdbf284d1cdd1080162a16136fdf4df6"
+    },
+    "single-1/events.jsonl": {
+      "bytes": 174725,
+      "mode": 420,
+      "mtime_ns": 1794477964612848228,
+      "sha256": "86173c0b524156ed9457002f8dc365d56cdc3946ad39a4af7b25b6f7957566a7"
+    },
+    "single-1/host-attempts-after-validation/attempt-e3c9a80f3f964cc98eb7e6f69b80b511.json": {
+      "bytes": 1373,
+      "mode": 384,
+      "mtime_ns": 1794477964900132959,
+      "sha256": "a15cd78bcf31f21e828ffda2fc8b900eb6c4d104020e049f262cfd5c643fbca2"
+    },
+    "single-1/host-attempts-before-validation/attempt-e3c9a80f3f964cc98eb7e6f69b80b511.json": {
+      "bytes": 1373,
+      "mode": 384,
+      "mtime_ns": 1794477959443086646,
+      "sha256": "a15cd78bcf31f21e828ffda2fc8b900eb6c4d104020e049f262cfd5c643fbca2"
+    },
+    "single-1/host-events/event-9c4bb27196e04b355e99a9c064895eab2d801b915eea7b96b33df1eaf7067644.json": {
+      "bytes": 341,
+      "mode": 384,
+      "mtime_ns": 1794477699572576779,
+      "sha256": "43bbaf3f0b6811cce2144c3775763717f3ed6181dcf4b1b6f8bd17341ceb9dc3"
+    },
+    "single-1/host-events/event-a9969acc7ff0a1393feb82df20dec4f43e34ac0b65e329c24ca55d796a1e1acb.json": {
+      "bytes": 347,
+      "mode": 384,
+      "mtime_ns": 1794477964684171672,
+      "sha256": "04ae65f9d993767f90fb008a55b60adce6d6d9189da40d160b5c89598f3e3c98"
+    },
+    "single-1/host-events/event-b8a221185419749e68209e26b938ac468140d4f4970beb8c1a91d99d944285d2.json": {
+      "bytes": 364,
+      "mode": 384,
+      "mtime_ns": 1794477959363813667,
+      "sha256": "57830cfb76211e9db34a338ad48839b75ca17affde106866b30bb28b2a2cb4d7"
+    },
+    "single-1/host-events/event-e028c8b0edab608021d6a6f8c4d8bd00c9b9e49f277c1aaf71bc125a983be2af.json": {
+      "bytes": 365,
+      "mode": 384,
+      "mtime_ns": 1794477704176048938,
+      "sha256": "06612c30cba194926e1f3fd64525f766522877da34797ee97c38e8c493357cd6"
+    },
+    "single-1/lifecycle.json": {
+      "bytes": 1288,
+      "mode": 420,
+      "mtime_ns": 1794477964712640066,
+      "sha256": "48009d6f8a36528b8b994fb429df0f9d92ccf59b9e3c95e33500c392594c5c33"
+    },
+    "single-1/manifest.json": {
+      "bytes": 4874,
+      "mode": 420,
+      "mtime_ns": 1794477691487030575,
+      "sha256": "675b12b4dad98f08982d66a8088285d2fcd905421cee8021126c64e0f3730fd8"
+    },
+    "single-1/native-agent-batches.json": {
+      "bytes": 3244,
+      "mode": 420,
+      "mtime_ns": 1794477965194839435,
+      "sha256": "c0082f0a4d722e943129abe21d1188002de491f0bcf07771d596802b02a3e90c"
+    },
+    "single-1/native-agent-calls.json": {
+      "bytes": 3216,
+      "mode": 420,
+      "mtime_ns": 1794477965194931518,
+      "sha256": "a5614b4de102cf86825c1b39f93e4153d7ef8ea8f46d05454551e4053a5a5ee6"
+    },
+    "single-1/native-attempts.json": {
+      "bytes": 1512,
+      "mode": 420,
+      "mtime_ns": 1794477964710440943,
+      "sha256": "f27066647a5ae52f9e6c8b3b121bb9a3a7bf2c2a5f9816cf9c98b01bdc3f26f6"
+    },
+    "single-1/parent-message-batch-indices.json": {
+      "bytes": 44,
+      "mode": 420,
+      "mtime_ns": 1794477964710837859,
+      "sha256": "a47a71ae75de59a5a36eb91a32120a1d56b59a2bbae2e834d48442d047e06d68"
+    },
+    "single-1/parent-tool-batches.json": {
+      "bytes": 3244,
+      "mode": 420,
+      "mtime_ns": 1794477964710724401,
+      "sha256": "c0082f0a4d722e943129abe21d1188002de491f0bcf07771d596802b02a3e90c"
+    },
+    "single-1/prompt-receipt.json": {
+      "bytes": 357,
+      "mode": 420,
+      "mtime_ns": 1794477699580223025,
+      "sha256": "a59746b77e24ddcf8ac67abeaf7c3f97bd130fb027c04979f056ab6e777576df"
+    },
+    "single-1/result.json": {
+      "bytes": 8154,
+      "mode": 420,
+      "mtime_ns": 1794477965193228811,
+      "sha256": "faec9818aa62073f476681a3ceb8ece444cf37abf65db9ce2ea9727be9608775"
+    },
+    "single-1/results.json": {
+      "bytes": 2297,
+      "mode": 420,
+      "mtime_ns": 1794477964710590609,
+      "sha256": "900a8d2f76567f4472e54a08c4cd56b88105e920fd59c94e20d68be57856ce86"
+    },
+    "single-1/seal-stdout.txt": {
+      "bytes": 309,
+      "mode": 420,
+      "mtime_ns": 1794477965194295852,
+      "sha256": "351c65d2ea6f90b09766577623be37adcb2e8e885c11843408bb2fe1f7a1cc88"
+    },
+    "single-1/stderr.txt": {
+      "bytes": 0,
+      "mode": 420,
+      "mtime_ns": 1794477691499792482,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sources/.claude-plugin/plugin.json": {
+      "bytes": 149,
+      "mode": 420,
+      "mtime_ns": 1794472164718457512,
+      "sha256": "e36378fbc9c44db142d171ceb4303e5614cef87f2ee030040a61dfeda7b98dde"
+    },
+    "sources/SKILL.md": {
+      "bytes": 8332,
+      "mode": 420,
+      "mtime_ns": 1794406772224224037,
+      "sha256": "ec03584de0cfbeb69dec7ee011178fb6b5126ac273b0f47a38f5ae40a1ceb840"
+    },
+    "sources/agents/goal-adjudicator.md": {
+      "bytes": 1663,
+      "mode": 420,
+      "mtime_ns": 1791899384149585794,
+      "sha256": "f7ede0b8f73573a4e6c416d1282fda5d8340226611b2c68c0603ba2b803d73f3"
+    },
+    "sources/agents/goal-checker-req.md": {
+      "bytes": 3062,
+      "mode": 420,
+      "mtime_ns": 1794404691401129932,
+      "sha256": "407a8d9d2e85261bfb09b2a0c2ee5d6864a4abb572b4adc25ffeab3cb7c7c73d"
+    },
+    "sources/agents/goal-critic.md": {
+      "bytes": 2552,
+      "mode": 420,
+      "mtime_ns": 1794362679388804678,
+      "sha256": "d3034a768937c08f2766bbcdccb2b276df669d950f0f143bca40188a378b5544"
+    },
+    "sources/agents/goal-mech-worker.md": {
+      "bytes": 1504,
+      "mode": 420,
+      "mtime_ns": 1794404691379584918,
+      "sha256": "cf95458067dee6950a6fc73d8641bd381519eaeafc1396c6c7e1da37f0ead7d6"
+    },
+    "sources/agents/goal-worker.md": {
+      "bytes": 2250,
+      "mode": 420,
+      "mtime_ns": 1794404691353454077,
+      "sha256": "93fc6d5de4e0b3c03d31c5e62b250b277017fe3ebdd3e18667203e1e5e7cfd06"
+    },
+    "sources/examples/agent-evals/grade.py": {
+      "bytes": 10464,
+      "mode": 420,
+      "mtime_ns": 1794370198915393053,
+      "sha256": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19"
+    },
+    "sources/examples/agent-evals/tasks.py": {
+      "bytes": 8737,
+      "mode": 420,
+      "mtime_ns": 1794370126027699234,
+      "sha256": "5441b4ad2aeab3558f31f26f4a0c117e10dfa3f439f86d3ad6aa29ece5416e38"
+    },
+    "sources/examples/crew-cost/native.py": {
+      "bytes": 7682,
+      "mode": 420,
+      "mtime_ns": 1794451495498284821,
+      "sha256": "622966f00364eb4a8a404cc6d5b20420cadd6cea7b98c1cc28fc6032f46ee039"
+    },
+    "sources/examples/crew-cost/native_checks.py": {
+      "bytes": 2043,
+      "mode": 420,
+      "mtime_ns": 1794405311641846843,
+      "sha256": "b72826bd3c9ccee97731943f97f5a96469f48dbc014e18f3adb56e2528e78f84"
+    },
+    "sources/hooks/hooks.json": {
+      "bytes": 1331,
+      "mode": 420,
+      "mtime_ns": 1794404342137532190,
+      "sha256": "9343223f6d4a673d7dfa84d38ee095702ef3ff652d07e558c325b4ce0e3da44f"
+    },
+    "sources/references/companions.md": {
+      "bytes": 4658,
+      "mode": 420,
+      "mtime_ns": 1793765737667869318,
+      "sha256": "f004518887cfd11d0e599bd3dc4f0ed8fc91ef73237ddc5aaa7f3906fd2c8fa3"
+    },
+    "sources/references/crew.md": {
+      "bytes": 12647,
+      "mode": 420,
+      "mtime_ns": 1794459207095923173,
+      "sha256": "5c776149323657ba9e215fac646fbc37490186e9cc6c75120951f6c3f6fa798a"
+    },
+    "sources/references/gate.md": {
+      "bytes": 20899,
+      "mode": 420,
+      "mtime_ns": 1794374715882333574,
+      "sha256": "934894c986d6c97e1d6360aa6e5e83c140ad442ab0562dd14ebb1033cf5f9f58"
+    },
+    "sources/references/host.md": {
+      "bytes": 5986,
+      "mode": 420,
+      "mtime_ns": 1794472164759166720,
+      "sha256": "5978ddc28ddcd2032e9de2633d02d4ea39cafc28904c8edf8bb143e28ab26013"
+    },
+    "sources/references/packs/README.md": {
+      "bytes": 962,
+      "mode": 420,
+      "mtime_ns": 1794304418805715184,
+      "sha256": "4c0b959ea7644cccc65055d8b3b4471767a43b3ae58e6b47c24e2568819a04fd"
+    },
+    "sources/references/packs/external.md": {
+      "bytes": 2022,
+      "mode": 420,
+      "mtime_ns": 1792069171628108349,
+      "sha256": "25f77d3591b44f9c77a6213897659f3883acd55e0cfda71691cab46000c08d78"
+    },
+    "sources/references/packs/gradient.md": {
+      "bytes": 12311,
+      "mode": 420,
+      "mtime_ns": 1794439223372495317,
+      "sha256": "be89ba286423a5b1c1247ac2196876bd789a3b234705db8135518e9bd82c5ed9"
+    },
+    "sources/references/packs/instrument.md": {
+      "bytes": 3918,
+      "mode": 420,
+      "mtime_ns": 1794358721461991888,
+      "sha256": "9ba9e8591472c1d0afe30ad1dc1711e4d4d744f8beef47f36759e8a9f2b569c1"
+    },
+    "sources/references/patterns.md": {
+      "bytes": 8754,
+      "mode": 420,
+      "mtime_ns": 1792069171628635387,
+      "sha256": "2dfb30a03ea84b946c93d8c656ba05b212f81fd58695267323e73b1c8e65320d"
+    },
+    "sources/scripts/goal_audit.sh": {
+      "bytes": 8455,
+      "mode": 420,
+      "mtime_ns": 1794283455686750335,
+      "sha256": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb"
+    },
+    "sources/scripts/goal_bounded.py": {
+      "bytes": 4880,
+      "mode": 420,
+      "mtime_ns": 1794470282032379526,
+      "sha256": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c"
+    },
+    "sources/scripts/goal_crew.py": {
+      "bytes": 29793,
+      "mode": 420,
+      "mtime_ns": 1794455846375235429,
+      "sha256": "f0bf48438a6c2d4eecbc7a1be03c9d6b990da94a686dbde1e251c58a7c23bae9"
+    },
+    "sources/scripts/goal_ctl.sh": {
+      "bytes": 48567,
+      "mode": 420,
+      "mtime_ns": 1794374642205273133,
+      "sha256": "2bb2ad319b73da9ce8d9927a7e0c4f7e2ccc424ae4efdeee65ab70cd0c745a64"
+    },
+    "sources/scripts/goal_evolve.py": {
+      "bytes": 39633,
+      "mode": 420,
+      "mtime_ns": 1794455797433733239,
+      "sha256": "e6ff794567ce37409a8cd7cca0efc2efa93b35a0bf968b3d22411ccd908d0ae7"
+    },
+    "sources/scripts/goal_forge.py": {
+      "bytes": 19977,
+      "mode": 420,
+      "mtime_ns": 1794362700703682771,
+      "sha256": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb"
+    },
+    "sources/scripts/goal_gate.sh": {
+      "bytes": 52825,
+      "mode": 420,
+      "mtime_ns": 1794391722483089765,
+      "sha256": "4fbedbde2f524d69e3b3ca16e2f150a7aee7cf62b789e5a8abdbf8bb01cc6c8c"
+    },
+    "sources/scripts/goal_hook.sh": {
+      "bytes": 2898,
+      "mode": 420,
+      "mtime_ns": 1794283663266208176,
+      "sha256": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87"
+    },
+    "sources/scripts/goal_host.py": {
+      "bytes": 32384,
+      "mode": 420,
+      "mtime_ns": 1794472164741011447,
+      "sha256": "7cd29cccfbc59672a4393e68e0561bf54e9034a307a111e41949683f08879570"
+    },
+    "sources/scripts/goal_host_command.py": {
+      "bytes": 4049,
+      "mode": 420,
+      "mtime_ns": 1794416656278838662,
+      "sha256": "4331b9672bb9e3b658a2fe0320411da08721995126b71690ab535ebcbaa600e5"
+    },
+    "sources/scripts/goal_host_config.py": {
+      "bytes": 904,
+      "mode": 420,
+      "mtime_ns": 1794405704470416613,
+      "sha256": "fcb9118c8ce1b9a940bfeed1cc289155f4366c301ff2acaa926cb5c0d494f1f5"
+    },
+    "sources/scripts/goal_loop.sh": {
+      "bytes": 8830,
+      "mode": 420,
+      "mtime_ns": 1794400741279577211,
+      "sha256": "d5481f38bdbba6ae781479979985b4d415acb6be688d5e227914f0458948f05a"
+    },
+    "sources/scripts/goal_owner_watch.py": {
+      "bytes": 14672,
+      "mode": 420,
+      "mtime_ns": 1794470261521643111,
+      "sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd"
+    },
+    "sources/scripts/goal_parse.sh": {
+      "bytes": 24003,
+      "mode": 420,
+      "mtime_ns": 1794460241693301128,
+      "sha256": "368fdcbb5838c8a8d64570f409b1ea713ec3ce24938825a8dc5f9f2ed1a85bdb"
+    },
+    "sources/scripts/goal_runner.py": {
+      "bytes": 19620,
+      "mode": 420,
+      "mtime_ns": 1794465630144535590,
+      "sha256": "09c14fe4f348bc768ee66605353df80267017caf494b046b37f0fb8716ff39aa"
+    },
+    "sources/scripts/goal_store.py": {
+      "bytes": 73190,
+      "mode": 420,
+      "mtime_ns": 1794465630119446357,
+      "sha256": "13d4250e70d406d030eace9d7c2b12c6fc0a0dd4cff11fcd536671ae4d0ee8f3"
+    },
+    "sources/scripts/goal_strategy.awk": {
+      "bytes": 6219,
+      "mode": 420,
+      "mtime_ns": 1794308020167631520,
+      "sha256": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c"
+    },
+    "sources/scripts/goal_trace.py": {
+      "bytes": 9591,
+      "mode": 420,
+      "mtime_ns": 1794400416019106194,
+      "sha256": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb"
+    },
+    "sources/scripts/goal_tree_digest.py": {
+      "bytes": 8401,
+      "mode": 420,
+      "mtime_ns": 1794455464677326640,
+      "sha256": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d"
+    }
+  },
+  "archive_sha256": "6e0216c992c50093ca285d47051eecbe44b356f5fa1bb4d04a3a465df26a0008",
+  "archive_bytes": 238964,
+  "payload_files": 182,
+  "verified": true
+}

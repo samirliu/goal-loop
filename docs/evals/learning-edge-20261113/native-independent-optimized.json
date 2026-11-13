@@ -1,0 +1,134 @@
+{
+  "accepted": 3,
+  "money": null,
+  "normal_deliveries": 3,
+  "pairs": [
+    {
+      "checked_seconds_delta": 51.51264816708863,
+      "seed": 911221,
+      "tool_delta": -21
+    },
+    {
+      "checked_seconds_delta": 45.404511084081605,
+      "seed": 911222,
+      "tool_delta": -27
+    }
+  ],
+  "scope": "two held-out grading seeds of one task family; descriptive only",
+  "tokens": null,
+  "totals": {
+    "after": {
+      "accepted": 1,
+      "all_trial_wall_per_accepted": 662.6485735420138,
+      "attempted": 2,
+      "normal_deliveries": 1,
+      "total_observed_wall_seconds": 662.6485735420138
+    },
+    "before": {
+      "accepted": 2,
+      "all_trial_wall_per_accepted": 282.86570714542177,
+      "attempted": 2,
+      "normal_deliveries": 2,
+      "total_observed_wall_seconds": 565.7314142908435
+    }
+  },
+  "trials": [
+    {
+      "accepted": true,
+      "cli_seconds": 264.7485039578751,
+      "final_checked_seconds": 265.90010520792566,
+      "independent_replay_result": 0,
+      "normal_final_delivery": true,
+      "position": 1,
+      "posthoc_replay": {
+        "audit": {
+          "result": 0,
+          "stderr": "",
+          "stdout": "AUDIT: clean (controller ledger hygiene OK)\n"
+        },
+        "gate": {
+          "result": 0,
+          "stderr": "",
+          "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-8e21601f9dfccc61893384029c9ab25caacbaa6f8befc6d5a2ce415b483c57d3 iter=1 ac=2 pass=2 unverified=0 mode=threshold\n"
+        }
+      },
+      "seed": 911221,
+      "tool_errors": 2,
+      "tools": 68,
+      "variant": "before"
+    },
+    {
+      "accepted": true,
+      "cli_seconds": 316.1428164578974,
+      "final_checked_seconds": 317.4127533750143,
+      "independent_replay_result": 0,
+      "normal_final_delivery": true,
+      "position": 2,
+      "posthoc_replay": {
+        "audit": {
+          "result": 0,
+          "stderr": "",
+          "stdout": "AUDIT: clean (controller ledger hygiene OK)\n"
+        },
+        "gate": {
+          "result": 0,
+          "stderr": "",
+          "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-6b3605933d6b2a43f57be5356f6d318caa2e00da63958c6be1dba3e23c1958e4 iter=1 ac=3 pass=3 unverified=0 mode=threshold\n"
+        }
+      },
+      "seed": 911221,
+      "tool_errors": 1,
+      "tools": 47,
+      "variant": "after"
+    },
+    {
+      "accepted": false,
+      "cli_seconds": 345.0205893749371,
+      "final_checked_seconds": 345.2358201669995,
+      "independent_replay_result": 0,
+      "normal_final_delivery": false,
+      "position": 3,
+      "posthoc_replay": {
+        "audit": {
+          "result": 0,
+          "stderr": "",
+          "stdout": "AUDIT: clean (controller ledger hygiene OK)\n"
+        },
+        "gate": {
+          "result": 4,
+          "stderr": "GATE: ERROR reason=no-goal-md\n",
+          "stdout": ""
+        }
+      },
+      "seed": 911222,
+      "tool_errors": 1,
+      "tools": 25,
+      "variant": "after"
+    },
+    {
+      "accepted": true,
+      "cli_seconds": 298.71048204111867,
+      "final_checked_seconds": 299.83130908291787,
+      "independent_replay_result": 0,
+      "normal_final_delivery": true,
+      "position": 4,
+      "posthoc_replay": {
+        "audit": {
+          "result": 0,
+          "stderr": "",
+          "stdout": "AUDIT: clean (controller ledger hygiene OK)\n"
+        },
+        "gate": {
+          "result": 0,
+          "stderr": "",
+          "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-047ce231d95e40dc314a0a79ddfed91237286015836bae4ac252fda6a19c57aa iter=1 ac=2 pass=2 unverified=0 mode=threshold\n"
+        }
+      },
+      "seed": 911222,
+      "tool_errors": 1,
+      "tools": 52,
+      "variant": "before"
+    }
+  ],
+  "verified": true
+}

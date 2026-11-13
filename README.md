@@ -2,9 +2,11 @@
 
 **v4.1.1** — 用冻结的验收契约、共享工作区 subagent 波次和确定性门控推进交付；用测量反馈选择下一轮策略。
 
-这一版只深化归因：相邻读数差属于当前波次；缺失证据断链；策略采用最新窗口；噪声信息不足时不推荐。`EFFICIENCY` 和 `STRATEGY-PICK` 共用一个计算内核，删除重复逻辑。入口比 v4.0 更短，命令和账本格式兼容。真实试跑又修正了短预算任务的派工选择，并修复无人值守执行目录及锁清理。
+当前优化把内容绑定、可恢复收账和局部策略学习接成可执行路径：旧的 `EFFICIENCY` / `STRATEGY-PICK` 保持轻量归因；需要晋升工具策略时，另用固定协议、配对成本测量和新留出实例决定启用、保留或撤回。优化仍在进行；局部 Python 策略实验已跑通，完整 agent 效用与通用自主进化尚未得到证明。
 
 可重跑证据与设计边界见 [本次评估记录](docs/evaluation-design.md)。门控复跑证明的是契约被满足；真实效率、可迁移性必须通过固定预算下的留出任务对照证明。
+
+入口/恢复可用 `goal_host.py enter` 识别唯一真实宿主回执，再用 `goal_ctl.sh context` 获取带版本的执行地图。crew 图 v2 绑定实际输入并复用未失效单元；`--policy-state` 让既有合格策略实际限制派工，撤回后拒绝旧版本。原 Gate、账本和预算保持完成依据。见[端到端小示例](examples/learning-edge/README.md)与[本轮实现记录](docs/deepening-execution.md)；示例受控晋升不代表真实 agent 效用已获证明。
 
 ```
 objective → contract (AC-1..N, each with a NAMED failable check) → user approval stamp
@@ -26,7 +28,7 @@ Two pieces, both required / 两件套，缺一不可：
 git clone https://github.com/samirliu/goal-loop.git
 mkdir -p ~/.claude/skills/goal-loop
 cp -r goal-loop/SKILL.md goal-loop/VERSION goal-loop/assets \
-      goal-loop/references goal-loop/scripts goal-loop/tests \
+      goal-loop/references goal-loop/scripts \
       goal-loop/examples goal-loop/companions \
       ~/.claude/skills/goal-loop/
 
@@ -43,18 +45,20 @@ rm -f ~/.claude/skills/goal-loop/scripts/goal_team.sh \
 ```
 
 - Windows（git-bash）路径同上：`C:\Users\<你>\.claude\skills\goal-loop\` 与 `C:\Users\<你>\.claude\agents\`。当前收账锁需要支持 `fcntl.flock` 的 POSIX Python 3；原生 Windows Python 不支持，Windows 下的完整运行尚未验证。
-- 依赖：`grep / sed / gawk / sha1sum|cksum`，工作树内容指纹还需 `sha256sum`、`shasum` 或 `openssl` 中之一；**无 jq**。控制器及门控/审计读取需要 POSIX Python 3 的目录锁，无人值守运行器还需要进程组监督；缺少时拒绝执行。独立 `--digest` 保留 shell 后备路径，有 Python 时加速。CR 与 `LC_ALL` 已内置处理。有 coreutils `timeout` 时每条门控重跑检查限时（默认 120s）。
-  - **macOS**：系统 `bash` 是 3.2，系统 `awk` 是 BSD —— 脚本已兼容 bash 3.2；`gawk` 必装且会自动发现 `~/.local/bin/gawk`、Homebrew 路径。`brew install gawk`（可选 `coreutils` 提供 `timeout`/`gtimeout`）。
+- 原生预算/worker 事件接入另见 [宿主适配](references/host.md)：Claude Code 可用本仓库的 opt-in plugin；Codex 提供配置生成器，当前 Work 使用显式 bridge。仅复制 skill 不会自动安装 hooks。
+- 按次使用 `claude --plugin-dir /ABS/goal-loop` 会同时加载当前 skill、agents 和 hooks；调用 `/goal-loop-host:goal-loop <objective>` 可避开同名旧全局 skill，无需覆盖全局安装。
+- 依赖：`grep / sed / gawk / sha1sum|cksum`，工作树内容指纹还需 `sha256sum`、`shasum` 或 `openssl` 中之一；**无 jq**。控制器及门控/审计读取需要 POSIX Python 3 的目录锁，无人值守运行器还需要进程组监督；缺少时拒绝执行。独立 `--digest` 保留 shell 后备路径，有 Python 时加速。CR 与 `LC_ALL` 已内置处理。门控 check/probe/external 均通过 Python 进程组监督限时（默认 120s），不依赖 GNU timeout。
+  - **macOS**：系统 `bash` 是 3.2，系统 `awk` 是 BSD —— 脚本已兼容 bash 3.2；`gawk` 必装且会自动发现 `~/.local/bin/gawk`、Homebrew 路径。`brew install gawk`。
   - **Linux**：`apt install gawk`（通常已带）。
 - Smoke test / 冒烟验证（不耗 API）：
 
 ```bash
 bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check
 # 无 .goal/ 的目录里应返回 rc=4, reason=no-goal-dir —— 说明门控在岗
-bash ~/.claude/skills/goal-loop/tests/run_tests.sh
+bash goal-loop/tests/run_tests.sh
 # 场景套件应 fail=0 全绿 —— 门控语义的回归
 # 默认 --jobs=8 并行分片（约 3–4 分钟）；--jobs=1 串行；--only 78-90 增量
-bash ~/.claude/skills/goal-loop/tests/docs_consistency.sh
+bash goal-loop/tests/docs_consistency.sh
 # 文档一致性（活文档字面量）应 CONSISTENT
 bash ~/.claude/skills/goal-loop/examples/quickstart-one-shot/run.sh
 # 小任务快车道：单 AC 最小契约应 GO（rc=0）—— 证明仪式的下限
@@ -68,7 +72,11 @@ bash ~/.claude/skills/goal-loop/examples/quickstart-one-shot/run.sh
 bash scripts/goal_ctl.sh recover --project /path/to/project
 ```
 
-恢复会核对提交指针：提交前中断则回滚，提交后中断则按已提交快照补全；不会重新运行测量或外部工具。可重试的收账调用应提前选定并复用 `--operation-id ID`，避免丢失成功确认时重复消费轮号。历史重试会明确输出 `REPLAY`，不代表当前产物通过验收。日志损坏时拒绝恢复；`CLOSE ok` 只在提交完成后输出。这些测试覆盖进程中断和注入的 I/O 故障，尚未验证真实断电。控制器写入及门控/status/audit/Stop hook 的读取共用目录锁，冲突时报告 `ledger-busy`；带外部缓存的门控独占访问。完整事务仍有待完成项，具体保护范围、重试及恢复边界见 [事务状态说明](docs/transaction-state.md)。
+版本化账本的 state/log/scores、判词、检查器冻结记录与受管理原始证据会在读取前核对提交快照；发现 `ledger-view-mismatch` 时也用 recover 重建视图，gate 不会自行修账。升级旧账本若返回 `ledger-migration-required`，先运行 `bash scripts/goal_ctl.sh migrate --project /path/to/project`。迁移只确认一致的旧账本，不接受与已提交历史冲突的手改内容，也不修改业务 AC。
+
+恢复会核对提交指针：提交前中断则回滚，提交后中断则按已提交快照补全；不会重新运行测量或外部工具。init/stamp/bind/close 共用提交历史，可重试的调用应提前选定并复用 `--operation-id ID`。历史重试输出 `REPLAY`，不代表当前产物通过验收。日志损坏时拒绝恢复；成功确认只在提交完成后输出。这些测试覆盖进程中断和注入的 I/O 故障，尚未验证真实断电。控制器写入及门控/status/audit/Stop hook 的读取共用目录锁，冲突时报告 `ledger-busy`；带外部缓存的门控独占访问。完整事务仍有待完成项，具体保护范围、重试及恢复边界见 [事务状态说明](docs/transaction-state.md)。
+
+可执行的局部策略实验见 [配对成本实验与自动撤回](examples/evolution-dedupe/README.md)：冻结策略版本、grader 和任务，用新留出实例判断是否启用候选，并在反例出现后撤回。它目前支持单文件 Python 工具策略，衡量实际运行与验证时间；不把本地实验结果包装成相对原生 `/goal` 的通用优势。
 
 ```
 /goal-loop <objective>
@@ -80,9 +88,9 @@ Four steps, no fifth / 四步循环，没有第五步：
    **plus the exact command that settles it** (a check must be able to FAIL).
    You approve with one word → AC section frozen by a sha1 stamp (R3).
    每条 AC = 可判定陈述 + 能让它失败的指名检测命令；你回一个字即盖章冻结。
-2. **Dispatch / 派工** — concurrent workers on disjoint file scopes (width fits the work; no default cap);
+2. **Dispatch / 派工** — choose serial or concurrent workers using measured startup and coordination costs;
    interfaces frozen in `.goal/interfaces.md` first.
-   默认一波 subagent 并行 worker，共享工作区。
+   小任务和启动成本未知时先串行；证据支持净收益时，才在不相交文件域共享工作区并行。
 3. **Join + gate** — merge review, then `bash scripts/goal_gate.sh --check`
    re-runs every deterministic check. This is the **only** completion authority.
    合并审阅后门控重跑全部确定性检查——唯一的完成判定。
@@ -120,12 +128,14 @@ forge 退出 = 地板全过 ∧ dry_streak≥dry_limit ∧ critic 空答案；�
 In-session bookkeeping is one Bash call: `scripts/goal_ctl.sh close-iteration ...`
 (forge contracts require `--dry yes|no`). 会话内记账一条命令。
 
-## Unattended mode / 无人值守模式（可选）
+## 外部开发运行器（显式选择）
+
+正常 skill/plugin 由宿主执行模型与 subagent，不启动第二个宿主。独立开发验证的外层运行器已移到仓库 `devtools/`，不随上面的 skill 安装复制。旧 `scripts/goal_loop.sh` 只返回迁移提示和 rc=4，不再调用客户端。
 
 ```bash
-bash ~/.claude/skills/goal-loop/scripts/goal_loop.sh --init      # 播种 .goal/
+bash devtools/goal_loop.sh --init      # 仅在源码仓库，显式选择外部验证
 # 填好 .goal/goal.md 的 AC 并取得批准戳后：
-bash ~/.claude/skills/goal-loop/scripts/goal_loop.sh --continue --max-iterations=6
+bash devtools/goal_loop.sh --continue --max-iterations=6
 ```
 
 The outer shell loop trusts **only the gate's exit code** — 0 DELIVERED, 3 BLOCKED,

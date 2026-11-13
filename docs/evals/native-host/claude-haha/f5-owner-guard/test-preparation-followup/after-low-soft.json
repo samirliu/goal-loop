@@ -1,0 +1,21 @@
+{
+  "command": [
+    "/opt/homebrew/opt/python@3.12/bin/python3.12",
+    "-B",
+    "-c",
+    "import resource,pytest; soft,hard=resource.getrlimit(resource.RLIMIT_NOFILE); resource.setrlimit(resource.RLIMIT_NOFILE,(1024,hard)); raise SystemExit(pytest.main([\"-q\",\"-s\",\"tests/test_owner_watch_guard.py\",\"-k\",\"guard_drops_stdout\"]))"
+  ],
+  "uid": 501,
+  "platform": "darwin",
+  "python": "3.12.13 (main, Mar  3 2026, 12:39:30) [Clang 17.0.0 (clang-1700.6.3.2)]",
+  "inherited_nofile": [
+    4096,
+    9223372036854775807
+  ],
+  "requested_test_process_soft": 1024,
+  "result": 0,
+  "stdout": "OWNER_GUARD_FDS {\"guard_alive\": true, \"guard_wait\": [0, 0], \"high_fd\": 2000, \"infinite_requested\": false, \"lock_released_while_parent_alive\": true, \"nofile\": [2001, 9223372036854775807], \"nofile_before_fd_setup\": [1024, 9223372036854775807], \"parent_alive\": true, \"stderr\": \"\", \"stdout\": \"\", \"stdout_eof_while_parent_alive\": true}\n.\n1 passed, 4 deselected in 0.15s\n",
+  "stderr": "",
+  "production_sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+  "test_sha256": "63ccbe2d2a124cb25b24fedb5174ae9d5bdeacd8a704ab061c5e38364ce38d14"
+}

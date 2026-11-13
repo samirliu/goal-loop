@@ -1,0 +1,10 @@
+Command: python3.12 -m pytest -q -s tests/test_medium_grader.py
+Exit: 0
+MEDIUM_GRADER_OBSERVATION {"fixture": "control", "returncode": 0, "ok": true, "checks": 28, "failed": [], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+.MEDIUM_GRADER_OBSERVATION {"fixture": "missing-input", "returncode": 1, "ok": false, "checks": 28, "failed": ["cli-missing-input"], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+uMEDIUM_GRADER_OBSERVATION {"fixture": "physical-line", "returncode": 1, "ok": false, "checks": 28, "failed": ["strict-physical-line-13"], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+uMEDIUM_GRADER_OBSERVATION {"fixture": "integer-amount", "returncode": 1, "ok": false, "checks": 28, "failed": ["parser-original-integer"], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+uMEDIUM_GRADER_OBSERVATION {"fixture": "skip-fields", "returncode": 1, "ok": false, "checks": 28, "failed": ["skip-bad-complete-groups"], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+uMEDIUM_GRADER_OBSERVATION {"fixture": "literal-utf8", "returncode": 1, "ok": false, "checks": 28, "failed": ["cli-literal-utf8"], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+u.
+2 passed, 5 subtests passed in 1.71s

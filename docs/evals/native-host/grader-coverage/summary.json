@@ -1,0 +1,19 @@
+{
+  "scope": "Medium grader deterministic coverage delta only; no TASK/runtime/other-family changes",
+  "before_grade_sha256": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19",
+  "after_grade_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d",
+  "same_test_sha256": "6381ef5802a80bbfec70a67f2d4b40ae5e3ca163834e2ca0a428d9acb2b17902",
+  "unchanged_other_families": [
+    "small",
+    "optimization",
+    "recovery"
+  ],
+  "changed_from_closed139": [
+    "examples/agent-evals/grade.py"
+  ],
+  "new_test": "tests/test_medium_grader.py",
+  "original_21_names_preserved_as_prefix": true,
+  "posthoc_six_all_28": true,
+  "atomic_publication": "Publication-time failure/visibility remains untested; no particular mechanism required",
+  "runtime_full_matrix": "Original closed139 manifest contains the old grader. This new eval delta has targeted validation only."
+}

@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_runner_death_before_reaping_stops_group_and_releases_ownership (__main__.Lifecycle.test_runner_death_before_reaping_stops_group_and_releases_ownership)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-w3-baseline-35zj3b8y/tests/test_runner_lifecycle.py", line 89, in test_runner_death_before_reaping_stops_group_and_releases_ownership
+    self.assertFalse((self.state / 'leak').exists())
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 1 test in 2.689s
+
+FAILED (failures=1)

@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_outer_executor_cancellation_cleans_nested_check_group (__main__.Lifecycle.test_outer_executor_cancellation_cleans_nested_check_group)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_runner_lifecycle.py", line 222, in test_outer_executor_cancellation_cleans_nested_check_group
+    self.assertFalse((self.state / 'evidence/leak').exists(), 'nested group outlived its executor')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : nested group outlived its executor
+
+----------------------------------------------------------------------
+Ran 1 test in 3.623s
+
+FAILED (failures=1)

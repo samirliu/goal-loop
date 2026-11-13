@@ -1,0 +1,39 @@
+{
+  "scope": "Focused local-Git validation only; no network, model calls, or full-suite run.",
+  "commands": [
+    {
+      "command": "python3 -B tests/test_worktree_scope.py",
+      "tests": 18,
+      "failures": 0,
+      "seconds": 21.153
+    },
+    {
+      "command": "bash tests/run_tests.sh --only 140,142-158 --jobs=4",
+      "note": "Runner selected block 140 only; range run separately below.",
+      "checks": 9,
+      "failures": 0
+    },
+    {
+      "command": "bash tests/run_tests.sh --only 142-158 --jobs=4",
+      "checks": 59,
+      "failures": 0
+    },
+    {
+      "command": "bash -n scripts/goal_parse.sh",
+      "returncode": 0
+    },
+    {
+      "command": "git diff --check -- scripts/goal_parse.sh scripts/goal_tree_digest.py tests/test_worktree_scope.py",
+      "returncode": 0
+    }
+  ],
+  "evidence": [
+    "/tmp/goal-gitlink-content-before.json",
+    "/tmp/goal-gitlink-content-after.json"
+  ],
+  "sha256": {
+    "scripts/goal_parse.sh": "a26c26a2d177dba4d2e23bd287e19be0e5a08d7bc0cb84c4efd06a0a46cd21dd",
+    "scripts/goal_tree_digest.py": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d",
+    "tests/test_worktree_scope.py": "dbaa7929d8715b41de65b98067ea12c899c3c4ea1e4db6fbfe98f725084cbb44"
+  }
+}

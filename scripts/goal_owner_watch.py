@@ -15,11 +15,14 @@ child sets GOAL_ACCESS_EXEC_PID to its own PID, retaining the original owner
 and access mode. This is trusted process supervision, not a permission boundary.
 """
 import contextlib
+import errno
+import math
 import os
 import select
 import signal
 import stat
 import sys
+import time
 
 
 class WatchError(RuntimeError):
@@ -149,32 +152,80 @@ def _defer_cancel():
         signal.pthread_sigmask(signal.SIG_SETMASK, previous)
 
 
-def _stop_child(pid):
+def _stop_child(pid, process_group=False):
     # This is our own unreaped child: even if it has exited, its PID cannot
     # have been reassigned. Do not reap it before this final signal attempt.
-    with contextlib.suppress(ProcessLookupError):
-        os.kill(pid, signal.SIGKILL)
-    _wait_child(pid)
+    try:
+        if process_group:
+            with contextlib.suppress(ProcessLookupError):
+                os.killpg(pid, signal.SIGKILL)
+    finally:
+        with contextlib.suppress(ProcessLookupError):
+            os.kill(pid, signal.SIGKILL)
+        _wait_child(pid)
 
 
-def _command_child(command, release, events):
+def _group_guard():
+    # Darwin returns EPERM when a group contains only an unreaped zombie.
+    # Retain one signalable member until group cleanup, so the parent can kill
+    # the group BEFORE reaping/reserving its leader. The guard has no user IO
+    # or lock descriptors. Fork completes before the actual command can exit.
+    # Snapshot actual handles before fork, so unavailable inventories reject
+    # command startup in the leader. RLIMIT_NOFILE may be infinity (Bun/macOS)
+    # and cannot be passed as the C-int endpoint of os.closerange.
+    for directory in ('/proc/self/fd', '/dev/fd'):
+        try:
+            descriptors = [int(name) for name in os.listdir(directory) if name.isdigit()]
+            break
+        except OSError:
+            continue
+    else:
+        raise WatchError('open-descriptor-inventory-unavailable')
+    if os.fork() == 0:
+        for fd in descriptors:
+            try:
+                os.close(fd)
+            except OSError as exc:
+                # listdir's own temporary directory descriptor is already
+                # closed when its snapshot is returned.
+                if exc.errno != errno.EBADF:
+                    raise
+        while True:
+            signal.pause()
+
+
+def _command_child(command, release, events, process_group=False, close_fds=()):
     try:
         signal.signal(signal.SIGTERM, signal.SIG_DFL)
         signal.signal(signal.SIGINT, signal.SIG_DFL)
         events.close()
+        for fd in close_fds:
+            os.close(fd)
+        if process_group:
+            os.setsid()
         allowed = os.read(release, 1)
         os.close(release)
         if allowed != b'1':
             os._exit(143)
+        if process_group:
+            _group_guard()
         env = os.environ.copy()
-        env['GOAL_ACCESS_EXEC_PID'] = str(os.getpid())
+        if close_fds:
+            env.pop('GOAL_RUNNER_FD', None)
+        if process_group:
+            # A bounded user command has dropped ledger descriptors. It must
+            # acquire fresh access if it invokes a product entrypoint itself.
+            env.pop('GOAL_ACCESS_EXEC_PID', None)
+        else:
+            env['GOAL_ACCESS_EXEC_PID'] = str(os.getpid())
         os.execvpe(command[0], command, env)
     except BaseException as exc:
         print('OWNER_WATCH: ERROR command-start: %s' % exc, file=sys.stderr, flush=True)
         os._exit(127)
 
 
-def supervise(owner, command, ready_fd=None):
+def supervise(owner, command, ready_fd=None, *, timeout=None, process_group=False, close_fds=(),
+              cancel_file=None, deadline_epoch=None):
     """Run command; return its status, or 143 if owner exits first.
 
     No command is released until owner and child exit subscriptions are armed.
@@ -184,6 +235,19 @@ def supervise(owner, command, ready_fd=None):
     """
     if type(owner) is not int or owner <= 1 or owner == os.getpid() or not command:
         raise WatchError('requires a distinct positive owner PID and command')
+    if timeout is not None and (not math.isfinite(timeout) or timeout < 0):
+        raise WatchError('timeout must be finite and nonnegative')
+    if deadline_epoch is not None and (not math.isfinite(deadline_epoch) or deadline_epoch < 0):
+        raise WatchError('deadline must be finite and nonnegative')
+    if cancel_file is not None:
+        cancel_file = os.fspath(cancel_file)
+        if not cancel_file or '\0' in cancel_file:
+            raise WatchError('invalid cancellation path')
+        if os.path.lexists(cancel_file):
+            return 130
+    if deadline_epoch is not None and time.time() >= deadline_epoch:
+        return 124
+    until = None if timeout is None else time.monotonic() + timeout
     if os.name != 'posix' or not hasattr(os, 'fork') or not hasattr(signal, 'pthread_sigmask'):
         raise WatchError('POSIX fork supervision unavailable')
     if ready_fd is not None:
@@ -211,7 +275,7 @@ def supervise(owner, command, ready_fd=None):
             os.close(release_write)
             if ready_fd is not None:
                 os.close(ready_fd)
-            _command_child(command, release_read, events)
+            _command_child(command, release_read, events, process_group, close_fds)
             os._exit(127)
         os.close(release_read)
         release_read = None
@@ -227,9 +291,18 @@ def supervise(owner, command, ready_fd=None):
             return 143
         if 'child' in found:
             with _defer_cancel():
+                if process_group:
+                    with contextlib.suppress(ProcessLookupError):
+                        os.killpg(child, signal.SIGKILL)
                 status = _wait_child(child)
                 child = None
             return status if status >= 0 else 128 - status
+        if until is not None and time.monotonic() >= until:
+            return 124
+        if cancel_file is not None and os.path.lexists(cancel_file):
+            return 130
+        if deadline_epoch is not None and time.time() >= deadline_epoch:
+            return 124
         if ready_fd is not None:
             os.write(ready_fd, ('READY %s %s\n' % (events.name, child)).encode('ascii'))
             os.close(ready_fd)
@@ -238,11 +311,33 @@ def supervise(owner, command, ready_fd=None):
         os.close(release_write)
         release_write = None
         while True:
-            found = events.events(None)
+            if cancel_file is not None and os.path.lexists(cancel_file):
+                return 130
+            remaining = None if until is None else max(0, until - time.monotonic())
+            if deadline_epoch is not None:
+                wall_left = max(0, deadline_epoch - time.time())
+                remaining = wall_left if remaining is None else min(remaining, wall_left)
+            if remaining == 0:
+                return 124
+            # kqueue timespec / poll millisecond fields have finite ranges.
+            # Keep the absolute deadline; bounding one wait never grants time.
+            # Native model cancellation may leave its tool process owner alive.
+            # Observe only this attempt's cancellation token; PID lifetime still
+            # uses kernel events. Existing callers retain the event-only path.
+            interval = .05 if cancel_file is not None or deadline_epoch is not None else 60
+            wait_for = None if remaining is None else min(remaining, interval)
+            if interval < 60 and wait_for is None:
+                wait_for = interval
+            found = events.events(wait_for)
             if 'owner' in found:
                 return 143
             if 'child' in found:
                 with _defer_cancel():
+                    if process_group:
+                        # Kill descendants before reaping the group leader;
+                        # its reserved PID cannot yet name an unrelated group.
+                        with contextlib.suppress(ProcessLookupError):
+                            os.killpg(child, signal.SIGKILL)
                     status = _wait_child(child)
                     child = None
                 return status if status >= 0 else 128 - status
@@ -255,7 +350,7 @@ def supervise(owner, command, ready_fd=None):
             signal.signal(signum, signal.SIG_IGN)
         try:
             if child is not None:
-                _stop_child(child)
+                _stop_child(child, process_group)
         finally:
             for signum, previous in saved_signals.items():
                 signal.signal(signum, previous)

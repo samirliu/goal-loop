@@ -1,0 +1,81 @@
+--- a/tests/test_host.py
++++ b/tests/test_host.py
+@@ -8,6 +8,7 @@
+ import tempfile
+ import time
+ import unittest
++from unittest import mock
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+ SCRIPT = ROOT / 'scripts/goal_host.py'
+@@ -438,5 +439,70 @@
+                 # host permissions even with a prepared worker in the session.
+                 self.assertEqual(self.structured_write_hook(tool, str(Path(outside) / 'parent.py'), agent=None), {})
+ 
++    def launcher_item(self):
++        host.begin(self.project, 'claude', 'launcher-test', 60)
++        return host.prepare(self.project, self.wave, 'T1', session='launcher-test')
++
++    def launcher_hook(self, item):
++        return self.cli_hook(self.payload('PreToolUse', session_id='launcher-test',
++            agent_id='launcher-worker', tool_name='Bash',
++            tool_input={'command': item['launcher_command']}), 'claude')
++
++    def test_claude_launcher_binds_and_runs_original_owned_ready(self):
++        item = self.launcher_item()
++        self.assertIn('First tool command: '+item['launcher_command']+'\n', item['worker_prefix'])
++        self.assertNotIn(item['ticket'], item['launcher_command'])
++        before = self.attempt(item)
++        again = host.prepare(self.project, self.wave, 'T1', session='launcher-test')
++        self.assertEqual(item, again)
++        # New tickets retain their prepared interpreter across hook entry paths.
++        with mock.patch.object(host.sys, 'executable', '/different/python'):
++            self.assertEqual(host.response(before), item)
++        self.assertEqual(self.launcher_hook(item), {})
++        self.assertEqual(self.attempt(item)['agent_id'], 'launcher-worker')
++        self.assertIsNone(self.attempt(item)['ready'])
++        run = subprocess.run(host.shlex.split(item['launcher_command']), capture_output=True, timeout=10)
++        self.assertEqual(run.returncode, 0, run.stdout+run.stderr)
++        after = self.attempt(item)
++        self.assertIsNotNone(after['ready'])
++        self.assertEqual(after['deadline_monotonic'], before['deadline_monotonic'])
++        # Existing integrations can still use the original owned command.
++        legacy = self.payload('PreToolUse', session_id='launcher-test', agent_id='launcher-worker',
++                              tool_name='Bash', tool_input={'command': item['owned_ready_command']})
++        self.assertEqual(self.cli_hook(legacy, 'claude'), {})
++        run = subprocess.run(host.shlex.split(item['owned_ready_command']), capture_output=True, timeout=10)
++        self.assertEqual(run.returncode, 0, run.stdout+run.stderr)
++        self.assertEqual(self.attempt(item)['ready'], after['ready'])
++
++    def rejected_launcher(self, mutation):
++        item = self.launcher_item()
++        before = self.attempt(item)
++        script = Path(host.shlex.split(item['launcher_command'])[1])
++        marker = self.project / 'must-not-execute'
++        bad = '#!/bin/sh\ntouch '+host.shlex.quote(str(marker))+'\n'
++        if mutation == 'missing':
++            script.unlink()
++        elif mutation == 'symlink':
++            target = self.project / 'replacement.sh'
++            target.write_text(script.read_text())
++            script.unlink(); script.symlink_to(target)
++        else:
++            script.write_text(bad)
++        decision = self.launcher_hook(item)['hookSpecificOutput']
++        self.assertEqual(decision['permissionDecision'], 'deny')
++        self.assertIn('launcher' if mutation != 'symlink' else 'symlink', decision['permissionDecisionReason'])
++        self.assertEqual(self.attempt(item), before)
++        self.assertFalse(marker.exists())
++
++    def test_changed_launcher_cannot_bind_a_worker(self):
++        self.rejected_launcher('changed')
++
++    def test_missing_launcher_cannot_bind_a_worker(self):
++        self.rejected_launcher('missing')
++
++    def test_symlink_launcher_cannot_bind_a_worker(self):
++        self.rejected_launcher('symlink')
++
++
+ if __name__ == '__main__':
+     unittest.main()

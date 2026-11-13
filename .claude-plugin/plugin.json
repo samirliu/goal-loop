@@ -1,0 +1,6 @@
+{
+  "name": "goal-loop-host",
+  "version": "4.1.1",
+  "skills": "./",
+  "description": "Opt-in native lifecycle and budget adapter for goal-loop."
+}

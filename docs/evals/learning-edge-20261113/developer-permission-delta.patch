@@ -1,0 +1,50 @@
+--- a/devtools/evaluate_entry.py
++++ b/devtools/evaluate_entry.py
+@@ -65,7 +65,7 @@
+     return None
+ 
+ 
+-def trial(folder,plugin,cli,specimen,seed,grader):
++def trial(folder,plugin,cli,specimen,seed,grader,permission_mode=None):
+     entry,epoch=time.monotonic(),time.time();end=entry+360
+     folder.mkdir();work=folder/'work';control=folder/'control';control.mkdir()
+     shutil.copytree(specimen,work)
+@@ -77,9 +77,11 @@
+         'TASK.md and public.py are frozen inputs. Modify only solution.py, optional tests, and this project .goal metadata. '
+         'Do not modify the skill or any other repository, and do not use web, MCP, dependencies or model overrides. '
+         'Use the skill normal completion conditions and report the resulting evidence.')
+-    command=[str(cli),'--permission-mode','bypassPermissions','--print','--no-session-persistence','--session-id',session,
++    command=[str(cli),'--print','--no-session-persistence','--session-id',session,
+         '--plugin-dir',str(plugin),'--output-format','stream-json','--verbose','--include-hook-events','--max-turns','80',
+         '--tools','Agent,Read,Grep,Glob,Write,Edit,Bash','--strict-mcp-config','--mcp-config',str(control/'mcp.json'),'--',prompt]
++    if permission_mode is not None:
++        command[1:1]=['--permission-mode',permission_mode]
+     # Same 15-second independent verification reserve in every position.
+     cli_end=end-15
+     bounded=[sys.executable,'-I',str(plugin/'scripts/goal_bounded.py'),'--owner',str(os.getpid()),
+@@ -157,6 +159,7 @@
+     p=argparse.ArgumentParser(description=__doc__)
+     p.add_argument('--before',type=Path,required=True);p.add_argument('--after',type=Path,required=True)
+     p.add_argument('--cli',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
++    p.add_argument('--permission-mode',help='forward only an explicitly authorized mode; omitted preserves the host default')
+     args=p.parse_args();args.output.mkdir(parents=True,exist_ok=False)
+     tasks=module(ROOT/'examples/agent-evals/tasks.py')
+     order=[('before',911221),('after',911221),('after',911222),('before',911222)]
+@@ -168,7 +171,7 @@
+         specimen=frozen/str(seed);tasks.prepare(specimen,'small',seed)
+         inputs[str(seed)]={str(f.relative_to(specimen)):sha(f) for f in specimen.rglob('*') if f.is_file()}
+     save(args.output/'pre-registration.json',dict(order=order,maximum_calls=4,trial_seconds=360,cli_seconds=345,
+-        maximum_turns=80,permission_mode='user-preexisting bypassPermissions',model_override=None,
++        maximum_turns=80,permission_mode=args.permission_mode or 'host-default',model_override=None,
+         scope='same small-family task with two held-out grading seeds; descriptive entry comparison only',
+         frozen_inputs=inputs,grader_sha256=sha(frozen/'grade.py'),task_generator_sha256=sha(frozen/'tasks.py'),
+         cli_sha256=sha(args.cli),tokens=None,money=None))
+@@ -180,7 +183,7 @@
+     records=[]
+     for n,(name,seed) in enumerate(order,1):
+         plugin=(args.before if name=='before' else args.after).resolve()
+-        report=trial(args.output/('%s-%s'%(n,name)),plugin,args.cli.resolve(),frozen/str(seed),seed,frozen/'grade.py')
++        report=trial(args.output/('%s-%s'%(n,name)),plugin,args.cli.resolve(),frozen/str(seed),seed,frozen/'grade.py',args.permission_mode)
+         records.append(dict(position=n,variant=name,seed=seed,**report))
+         save(args.output/'report.json',dict(scope='descriptive pilot, no general superiority claim',records=records,tokens=None,money=None))
+         print(json.dumps(dict(position=n,variant=name,accepted=report['accepted'],cli=report['cli_result'],tools=report['tool_calls'],seconds=report['finished_elapsed'])),flush=True)

@@ -1,0 +1,8 @@
+{
+  "fixture": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-gitlink-before-f620v8ts/parent",
+  "manifest": "160000 c9c9184e2788e97bc5273411cbe467043a5cc746 0\tcomponent",
+  "status_after": "Am component",
+  "before": "v2-0ecc804bbe7aad86d7c3c4bd5d4f46768275bb2dca6ba26bdf6aa6f66c78dfba",
+  "after": "v2-0ecc804bbe7aad86d7c3c4bd5d4f46768275bb2dca6ba26bdf6aa6f66c78dfba",
+  "same_digest": true
+}

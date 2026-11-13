@@ -1,0 +1,14 @@
+..F
+======================================================================
+FAIL: test_hash_preparation_is_inside_the_same_bound (__main__.GateBudget.test_hash_preparation_is_inside_the_same_bound)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_gate_budget.py", line 73, in test_hash_preparation_is_inside_the_same_bound
+    self.assertLess(time.monotonic() - started, 4.2)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4.254909832961857 not less than 4.2
+
+----------------------------------------------------------------------
+Ran 3 tests in 15.395s
+
+FAILED (failures=1)

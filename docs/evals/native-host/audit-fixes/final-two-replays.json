@@ -1,0 +1,129 @@
+{
+  "scope": "Independent final replay of two retained local counterexamples only",
+  "source_hashes_before": {
+    "scripts/goal_parse.sh": "368fdcbb5838c8a8d64570f409b1ea713ec3ce24938825a8dc5f9f2ed1a85bdb",
+    "scripts/goal_tree_digest.py": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d",
+    "examples/evolution-dedupe/verify_agent.py": "6dce55331e40e0dd6c73d2116b73bfddc05cafb25088058496e4f7a7f5874716"
+  },
+  "gate": {
+    "--digest": {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+        "--digest",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 4,
+      "stdout": "",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\nGATE: ERROR incomplete-git-inventory\nGATE: ERROR reason=unreadable-project\n"
+    },
+    "--check": {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+        "--check",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 4,
+      "stdout": "",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\nGATE: ERROR incomplete-git-inventory\nGATE: ERROR reason=unreadable-project\n"
+    },
+    "fallback-digest": {
+      "command": [
+        "bash",
+        "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+        "--digest",
+        "--project",
+        "/tmp/goal-p0-followup-b6x8tybz/flat"
+      ],
+      "returncode": 4,
+      "stdout": "",
+      "stderr": "warning: could not open directory 'untracked/': Permission denied\nGATE: ERROR incomplete-git-inventory\nGATE: ERROR reason=unreadable-project\n"
+    }
+  },
+  "verifier": {
+    "normal": {
+      "original": {
+        "command": [
+          "/opt/homebrew/opt/python@3.14/bin/python3.14",
+          "-B",
+          "/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py",
+          "/tmp/goal-p0-followup-b6x8tybz/final-two-replays-original/goal-real-evolution-20261111"
+        ],
+        "returncode": 0,
+        "stdout": "{\n  \"verified\": true,\n  \"attempts\": 4,\n  \"pairs\": 98,\n  \"raw_outputs\": 196,\n  \"measured_inputs\": 98,\n  \"holdout_evaluations\": [\n    1,\n    2,\n    3\n  ],\n  \"selected\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n  \"transitions\": [\n    {\n      \"run\": \"1349e45a1ba242b79d4fa1c92e89a008\",\n      \"prior\": null,\n      \"status\": \"enabled\",\n      \"enabled\": \"6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.5045883895806631,\n          \"one_sided_sign_p\": 0.015625,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.6583116841452026,\n          \"one_sided_sign_p\": 0.015625,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"b153ebc1c1cd459b8a6a817bf7699134\",\n      \"prior\": \"6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5\",\n      \"status\": \"withdrawn\",\n      \"enabled\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": false,\n          \"regressed\": true,\n          \"complete\": true,\n          \"cost_gain\": -0.7510357134147685,\n          \"one_sided_sign_p\": 1.0,\n          \"reverse_sign_p\": 0.015625,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"be509e33ea6948908b0dca966baa99f2\",\n      \"prior\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"status\": \"enabled\",\n      \"enabled\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.6370327171170055,\n          \"one_sided_sign_p\": 2.002716064453125e-05,\n          \"reverse_sign_p\": 0.9999990463256836,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.7311167394259347,\n          \"one_sided_sign_p\": 2.002716064453125e-05,\n          \"reverse_sign_p\": 0.9999990463256836,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"446e56fe51b84b3a9bd9f2f70a3d28aa\",\n      \"prior\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"status\": \"enabled\",\n      \"enabled\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.687022152242417,\n          \"one_sided_sign_p\": 9.5367431640625e-07,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.7781439860151237,\n          \"one_sided_sign_p\": 0.00020122528076171875,\n          \"reverse_sign_p\": 0.9999799728393555,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    }\n  ]\n}\n",
+        "stderr": ""
+      },
+      "retained_identity_mutation": {
+        "command": [
+          "/opt/homebrew/opt/python@3.14/bin/python3.14",
+          "-B",
+          "/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py",
+          "/tmp/goal-p0-followup-b6x8tybz/recordings/goal-real-evolution-20261111"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 261, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 181, in verify\n    protocol = frozen_protocol(run, report, state)\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 70, in frozen_protocol\n    require(report['policies'][side] == files[name], side + ' policy does not match frozen program')\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 24, in require\n    raise VerificationError(message)\nVerificationError: candidate policy does not match frozen program\n"
+      }
+    },
+    "-O": {
+      "original": {
+        "command": [
+          "/opt/homebrew/opt/python@3.14/bin/python3.14",
+          "-O",
+          "-B",
+          "/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py",
+          "/tmp/goal-p0-followup-b6x8tybz/final-two-replays-original/goal-real-evolution-20261111"
+        ],
+        "returncode": 0,
+        "stdout": "{\n  \"verified\": true,\n  \"attempts\": 4,\n  \"pairs\": 98,\n  \"raw_outputs\": 196,\n  \"measured_inputs\": 98,\n  \"holdout_evaluations\": [\n    1,\n    2,\n    3\n  ],\n  \"selected\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n  \"transitions\": [\n    {\n      \"run\": \"1349e45a1ba242b79d4fa1c92e89a008\",\n      \"prior\": null,\n      \"status\": \"enabled\",\n      \"enabled\": \"6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.5045883895806631,\n          \"one_sided_sign_p\": 0.015625,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.6583116841452026,\n          \"one_sided_sign_p\": 0.015625,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"b153ebc1c1cd459b8a6a817bf7699134\",\n      \"prior\": \"6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5\",\n      \"status\": \"withdrawn\",\n      \"enabled\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": false,\n          \"regressed\": true,\n          \"complete\": true,\n          \"cost_gain\": -0.7510357134147685,\n          \"one_sided_sign_p\": 1.0,\n          \"reverse_sign_p\": 0.015625,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"be509e33ea6948908b0dca966baa99f2\",\n      \"prior\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"status\": \"enabled\",\n      \"enabled\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.6370327171170055,\n          \"one_sided_sign_p\": 2.002716064453125e-05,\n          \"reverse_sign_p\": 0.9999990463256836,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.7311167394259347,\n          \"one_sided_sign_p\": 2.002716064453125e-05,\n          \"reverse_sign_p\": 0.9999990463256836,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"446e56fe51b84b3a9bd9f2f70a3d28aa\",\n      \"prior\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"status\": \"enabled\",\n      \"enabled\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.687022152242417,\n          \"one_sided_sign_p\": 9.5367431640625e-07,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.7781439860151237,\n          \"one_sided_sign_p\": 0.00020122528076171875,\n          \"reverse_sign_p\": 0.9999799728393555,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    }\n  ]\n}\n",
+        "stderr": ""
+      },
+      "retained_identity_mutation": {
+        "command": [
+          "/opt/homebrew/opt/python@3.14/bin/python3.14",
+          "-O",
+          "-B",
+          "/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py",
+          "/tmp/goal-p0-followup-b6x8tybz/recordings/goal-real-evolution-20261111"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 261, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 181, in verify\n    protocol = frozen_protocol(run, report, state)\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 70, in frozen_protocol\n    require(report['policies'][side] == files[name], side + ' policy does not match frozen program')\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 24, in require\n    raise VerificationError(message)\nVerificationError: candidate policy does not match frozen program\n"
+      }
+    },
+    "PYTHONOPTIMIZE=1": {
+      "original": {
+        "command": [
+          "/opt/homebrew/opt/python@3.14/bin/python3.14",
+          "-B",
+          "/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py",
+          "/tmp/goal-p0-followup-b6x8tybz/final-two-replays-original/goal-real-evolution-20261111"
+        ],
+        "returncode": 0,
+        "stdout": "{\n  \"verified\": true,\n  \"attempts\": 4,\n  \"pairs\": 98,\n  \"raw_outputs\": 196,\n  \"measured_inputs\": 98,\n  \"holdout_evaluations\": [\n    1,\n    2,\n    3\n  ],\n  \"selected\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n  \"transitions\": [\n    {\n      \"run\": \"1349e45a1ba242b79d4fa1c92e89a008\",\n      \"prior\": null,\n      \"status\": \"enabled\",\n      \"enabled\": \"6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.5045883895806631,\n          \"one_sided_sign_p\": 0.015625,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.6583116841452026,\n          \"one_sided_sign_p\": 0.015625,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"b153ebc1c1cd459b8a6a817bf7699134\",\n      \"prior\": \"6709a768a717d4df7b05994886d69099c69c6cf33c0f3c9866ac2b97423219e5\",\n      \"status\": \"withdrawn\",\n      \"enabled\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": false,\n          \"regressed\": true,\n          \"complete\": true,\n          \"cost_gain\": -0.7510357134147685,\n          \"one_sided_sign_p\": 1.0,\n          \"reverse_sign_p\": 0.015625,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"be509e33ea6948908b0dca966baa99f2\",\n      \"prior\": \"3cf149aff4cb90e9dc33a284337bfcfeda32ab50264e8950ad36f545ca93764e\",\n      \"status\": \"enabled\",\n      \"enabled\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.6370327171170055,\n          \"one_sided_sign_p\": 2.002716064453125e-05,\n          \"reverse_sign_p\": 0.9999990463256836,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.7311167394259347,\n          \"one_sided_sign_p\": 2.002716064453125e-05,\n          \"reverse_sign_p\": 0.9999990463256836,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    },\n    {\n      \"run\": \"446e56fe51b84b3a9bd9f2f70a3d28aa\",\n      \"prior\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"status\": \"enabled\",\n      \"enabled\": \"769ad7882f7d1483af82c4a41a86425b14c844442d3be96da336b7ac2ea2a2d9\",\n      \"phases\": {\n        \"development\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.687022152242417,\n          \"one_sided_sign_p\": 9.5367431640625e-07,\n          \"reverse_sign_p\": 1.0,\n          \"quality_sign_p\": 1.0\n        },\n        \"holdout\": {\n          \"pass_\": true,\n          \"regressed\": false,\n          \"complete\": true,\n          \"cost_gain\": 0.7781439860151237,\n          \"one_sided_sign_p\": 0.00020122528076171875,\n          \"reverse_sign_p\": 0.9999799728393555,\n          \"quality_sign_p\": 1.0\n        }\n      }\n    }\n  ]\n}\n",
+        "stderr": ""
+      },
+      "retained_identity_mutation": {
+        "command": [
+          "/opt/homebrew/opt/python@3.14/bin/python3.14",
+          "-B",
+          "/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py",
+          "/tmp/goal-p0-followup-b6x8tybz/recordings/goal-real-evolution-20261111"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "Traceback (most recent call last):\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 261, in <module>\n    print(json.dumps(verify(Path(sys.argv[1])), indent=2))\n                     ~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 181, in verify\n    protocol = frozen_protocol(run, report, state)\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 70, in frozen_protocol\n    require(report['policies'][side] == files[name], side + ' policy does not match frozen program')\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/verify_agent.py\", line 24, in require\n    raise VerificationError(message)\nVerificationError: candidate policy does not match frozen program\n"
+      }
+    }
+  },
+  "source_hashes_after": {
+    "scripts/goal_parse.sh": "368fdcbb5838c8a8d64570f409b1ea713ec3ce24938825a8dc5f9f2ed1a85bdb",
+    "scripts/goal_tree_digest.py": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d",
+    "examples/evolution-dedupe/verify_agent.py": "6dce55331e40e0dd6c73d2116b73bfddc05cafb25088058496e4f7a7f5874716"
+  },
+  "two_counterexamples_closed": true,
+  "policy_or_model_execution": false
+}

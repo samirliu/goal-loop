@@ -1,0 +1,213 @@
+--- before/scripts/goal_owner_watch.py
++++ after/scripts/goal_owner_watch.py
+@@ -15,9 +15,9 @@
+ and access mode. This is trusted process supervision, not a permission boundary.
+ """
+ import contextlib
++import errno
+ import math
+ import os
+-import resource
+ import select
+ import signal
+ import stat
+@@ -170,8 +170,26 @@
+     # Retain one signalable member until group cleanup, so the parent can kill
+     # the group BEFORE reaping/reserving its leader. The guard has no user IO
+     # or lock descriptors. Fork completes before the actual command can exit.
++    # Snapshot actual handles before fork, so unavailable inventories reject
++    # command startup in the leader. RLIMIT_NOFILE may be infinity (Bun/macOS)
++    # and cannot be passed as the C-int endpoint of os.closerange.
++    for directory in ('/proc/self/fd', '/dev/fd'):
++        try:
++            descriptors = [int(name) for name in os.listdir(directory) if name.isdigit()]
++            break
++        except OSError:
++            continue
++    else:
++        raise WatchError('open-descriptor-inventory-unavailable')
+     if os.fork() == 0:
+-        os.closerange(0, resource.getrlimit(resource.RLIMIT_NOFILE)[0])
++        for fd in descriptors:
++            try:
++                os.close(fd)
++            except OSError as exc:
++                # listdir's own temporary directory descriptor is already
++                # closed when its snapshot is returned.
++                if exc.errno != errno.EBADF:
++                    raise
+         while True:
+             signal.pause()
+ 
+--- /dev/null
++++ after/tests/test_owner_watch_guard.py
+@@ -0,0 +1,169 @@
++"""Real process-group guards under finite and inherited infinite FD limits."""
++import fcntl
++import json
++import os
++from pathlib import Path
++import resource
++import select
++import signal
++import subprocess
++import sys
++import tempfile
++import time
++import unittest
++
++SCRIPTS = Path(__file__).resolve().parents[1] / 'scripts'
++WATCH = SCRIPTS / 'goal_owner_watch.py'
++INFINITY = resource.getrlimit(resource.RLIMIT_NOFILE)[1] == resource.RLIM_INFINITY
++
++
++def inherit_infinite_limit():
++    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
++    resource.setrlimit(resource.RLIMIT_NOFILE, (resource.RLIM_INFINITY, hard))
++
++
++@unittest.skipUnless(sys.platform == 'darwin' or sys.platform.startswith('linux'), 'macOS/Linux exit events required')
++class GroupGuard(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory(prefix='goal-group-guard-')
++        self.addCleanup(self.temp.cleanup)
++        self.root = Path(self.temp.name)
++
++    def bounded(self, mode, infinite=False):
++        ready, late, cancel = [self.root / name for name in (mode+'-ready', mode+'-late', mode+'-cancel')]
++        body = ('import json,os,resource,time; from pathlib import Path; '
++                'print(json.dumps({"nofile":resource.getrlimit(resource.RLIMIT_NOFILE)}),flush=True); ')
++        if mode == 'normal':
++            body += 'raise SystemExit(7)'
++        else:
++            body += ('Path(%r).touch(); child=os.fork(); '
++                     '\nif child==0:\n time.sleep(.6); Path(%r).touch(); os._exit(0)'
++                     '\ntime.sleep(30)' % (str(ready), str(late)))
++        command = [sys.executable, '-I', str(SCRIPTS / 'goal_bounded.py'), '--owner', str(os.getpid()),
++                   '--seconds', '.25' if mode == 'timeout' else '3']
++        if mode == 'cancel':
++            command += ['--cancel-file', str(cancel)]
++        command += ['--', sys.executable, '-I', '-c', body]
++        env = {k: v for k, v in os.environ.items() if not k.startswith('GOAL_')}
++        started = time.monotonic()
++        process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
++                                   env=env, preexec_fn=inherit_infinite_limit if infinite else None)
++        try:
++            if mode == 'cancel':
++                until = time.monotonic() + 2
++                while not ready.exists() and time.monotonic() < until and process.poll() is None:
++                    time.sleep(.01)
++                self.assertTrue(ready.exists(), 'command did not reach cancellation point')
++                cancel.touch()
++            stdout, stderr = process.communicate(timeout=5)
++            elapsed = time.monotonic() - started
++        finally:
++            if process.poll() is None:
++                process.kill(); process.communicate(timeout=5)
++        if mode != 'normal':
++            time.sleep(.65)
++        observed = dict(mode=mode, infinite_requested=infinite, result=process.returncode, elapsed=elapsed,
++                        stdout=stdout.decode(), stderr=stderr.decode(), command_ready=ready.exists(), late_write=late.exists())
++        print('OWNER_GUARD_OBSERVATION ' + json.dumps(observed, sort_keys=True), flush=True)
++        self.assertEqual(process.returncode, {'normal': 7, 'timeout': 124, 'cancel': 130}[mode], observed)
++        self.assertNotIn(b'command-start', stderr, observed)
++        self.assertFalse(late.exists(), observed)
++        limits = json.loads(stdout)['nofile']
++        if infinite:
++            self.assertEqual(limits[0], resource.RLIM_INFINITY, observed)
++        if mode != 'normal':
++            self.assertTrue(ready.exists(), observed)
++
++    def guard_descriptors(self, infinite=False):
++        ready = self.root / 'guard-ready.json'
++        lock = self.root / 'lock'
++        descriptor = os.open(lock, os.O_CREAT | os.O_RDWR, 0o600)
++        fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
++        body = ('import fcntl,importlib.util,json,os,resource,time; from pathlib import Path; '
++                's=importlib.util.spec_from_file_location("watch",%r); '
++                'w=importlib.util.module_from_spec(s); s.loader.exec_module(w); '
++                'fd=fcntl.fcntl(%s,fcntl.F_DUPFD,2000); os.close(%s); '
++                'w._group_guard(); time.sleep(.1); waited=os.waitpid(-1,os.WNOHANG); '
++                'os.close(fd); os.close(1); '
++                'Path(%r).write_text(json.dumps({"guard_alive":waited[0]==0,"guard_wait":waited,'
++                '"nofile":resource.getrlimit(resource.RLIMIT_NOFILE),"high_fd":fd})); time.sleep(30)'
++                % (str(WATCH), descriptor, descriptor, str(ready)))
++        process = subprocess.Popen([sys.executable, '-I', '-c', body], pass_fds=(descriptor,),
++                                   start_new_session=True, stdin=subprocess.DEVNULL,
++                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE,
++                                   preexec_fn=inherit_infinite_limit if infinite else None)
++        os.close(descriptor)
++        try:
++            until = time.monotonic() + 3
++            while not ready.exists() and time.monotonic() < until and process.poll() is None:
++                time.sleep(.01)
++            self.assertTrue(ready.exists(), 'guard descriptor probe did not become ready')
++            observed = json.loads(ready.read_bytes())
++            readable, _, _ = select.select([process.stdout], [], [], .5)
++            observed['stdout_eof_while_parent_alive'] = bool(readable) and os.read(process.stdout.fileno(), 1) == b''
++            probe = os.open(lock, os.O_RDWR)
++            try:
++                try:
++                    fcntl.flock(probe, fcntl.LOCK_EX | fcntl.LOCK_NB)
++                    observed['lock_released_while_parent_alive'] = True
++                except BlockingIOError:
++                    observed['lock_released_while_parent_alive'] = False
++            finally:
++                os.close(probe)
++            observed['parent_alive'] = process.poll() is None
++        finally:
++            # This unreaped session leader is our child and still reserves the
++            # process-group identity; never signal unrelated process names.
++            if process.poll() is None:
++                os.killpg(process.pid, signal.SIGKILL)
++            stdout, stderr = process.communicate(timeout=5)
++        observed.update(infinite_requested=infinite, stdout=stdout.decode(), stderr=stderr.decode())
++        print('OWNER_GUARD_FDS ' + json.dumps(observed, sort_keys=True), flush=True)
++        self.assertTrue(observed['guard_alive'], observed)
++        self.assertTrue(observed['parent_alive'], observed)
++        self.assertTrue(observed['stdout_eof_while_parent_alive'], observed)
++        self.assertTrue(observed['lock_released_while_parent_alive'], observed)
++        if infinite:
++            self.assertEqual(observed['nofile'][0], resource.RLIM_INFINITY)
++
++    def test_finite_limit_normal_timeout_and_cancel(self):
++        for mode in ('normal', 'timeout', 'cancel'):
++            with self.subTest(mode=mode):
++                self.bounded(mode)
++
++    @unittest.skipUnless(INFINITY, 'actual hard RLIMIT_NOFILE prevents inheriting infinity')
++    def test_infinite_limit_normal_timeout_and_cancel(self):
++        for mode in ('normal', 'timeout', 'cancel'):
++            with self.subTest(mode=mode):
++                self.bounded(mode, infinite=True)
++
++    def test_guard_drops_stdout_and_high_lock_descriptor(self):
++        self.guard_descriptors()
++
++    def test_unavailable_descriptor_inventories_never_execute_user_command(self):
++        marker = self.root / 'must-not-execute'
++        body = ('import importlib.util,os,sys; '
++                's=importlib.util.spec_from_file_location("watch",%r); '
++                'w=importlib.util.module_from_spec(s); s.loader.exec_module(w); '
++                '\ndef unavailable(path):\n raise PermissionError("injected unavailable FD inventory")'
++                '\nw.os.listdir=unavailable'
++                '\ntry:\n status=w.supervise(%s,[sys.executable,"-I","-c",%r],timeout=1,process_group=True)'
++                '\nexcept OSError as exc:\n print("SUPERVISOR_SETUP_ERROR: "+str(exc),file=sys.stderr); status=4'
++                '\nraise SystemExit(status)'
++                % (str(WATCH), os.getpid(), 'from pathlib import Path; Path(%r).touch()' % str(marker)))
++        result = subprocess.run([sys.executable, '-I', '-c', body],
++                                stdin=subprocess.DEVNULL, capture_output=True, timeout=3)
++        observed = dict(result=result.returncode, command_executed=marker.exists(),
++                        stdout=result.stdout.decode(), stderr=result.stderr.decode())
++        print('OWNER_GUARD_UNAVAILABLE ' + json.dumps(observed, sort_keys=True), flush=True)
++        self.assertNotEqual(result.returncode, 0, observed)
++        self.assertIn(b'open-descriptor-inventory-unavailable', result.stderr, observed)
++        self.assertFalse(marker.exists(), observed)
++
++    @unittest.skipUnless(INFINITY, 'actual hard RLIMIT_NOFILE prevents inheriting infinity')
++    def test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors(self):
++        self.guard_descriptors(infinite=True)
++
++
++if __name__ == '__main__':
++    unittest.main()

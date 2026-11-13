@@ -1,0 +1,102 @@
+{
+  "scope": "Existing frozen-source regression and retained tool receipts only; no new tests, models or cohorts executed during documentation/archive work.",
+  "frozen_source_files": 137,
+  "macos": {
+    "python": {
+      "tests": 237,
+      "failures": 1,
+      "returncode": 1,
+      "runner_seconds": 528.646,
+      "failure": "test_hash_preparation_is_inside_the_same_bound",
+      "observed_seconds": 4.339360459009185,
+      "threshold_seconds": 4.2
+    },
+    "shell": {
+      "pass": 603,
+      "fail": 0
+    },
+    "parser": {
+      "pass": 78,
+      "fail": 0
+    },
+    "forge": {
+      "pass": 10,
+      "fail": 0
+    },
+    "docs_returncode": 0,
+    "source_check": {
+      "changed": []
+    },
+    "focused_cases_within_full_run": {
+      "worktree_scope": {
+        "tests": 19,
+        "all_ok": true
+      },
+      "evolution_verifier": {
+        "tests": 15,
+        "all_ok": true
+      }
+    },
+    "skips_present": false
+  },
+  "linux": {
+    "uid": 65534,
+    "python_version": "3.12.14",
+    "architecture": "aarch64",
+    "terminal_returncodes": {
+      "python": 1,
+      "shell": 0,
+      "shellcheck": 0,
+      "docs": 0,
+      "parser": 0,
+      "forge": 1
+    },
+    "python": {
+      "tests": 237,
+      "failures": 2,
+      "runner_seconds": 741.823,
+      "failures_observed": [
+        {
+          "test": "test_background_check_is_cancelled_and_cannot_keep_access_or_store_lock",
+          "diagnostic": "os.kill(pid, 0) remained successful after the 2-second wait; zombie versus live process is not determined by this log."
+        },
+        {
+          "test": "test_standalone_gate_ignores_unbounded_timeout_tool",
+          "observed_seconds": 2.1616122090053977,
+          "threshold_seconds": 2
+        }
+      ]
+    },
+    "shell": {
+      "pass": 603,
+      "fail": 0
+    },
+    "parser": {
+      "pass": 78,
+      "fail": 0
+    },
+    "forge": {
+      "pass": 9,
+      "fail": 1,
+      "failure": "crlf-threshold",
+      "diagnostic": "Fixture attempted to create /src/companions/contract-forge/tests/fixtures/_crlf-threshold.md on the read-only source mount."
+    },
+    "skips_present": false
+  },
+  "isolated_reruns": "See isolated-hash-preparation-tool-receipts.json; these are summaries of returned tool receipts, not separately captured raw logs. Both passed without changing source or thresholds and do not erase full-run failures.",
+  "interpretation": "Neither platform full suite is all green. No new efficiency or 9+ conclusion follows from this archive.",
+  "post_full_diagnostic": {
+    "production_source_changed": false,
+    "changed_tests": [
+      "tests/test_ledger_access.py"
+    ],
+    "outcome": "Non-reaping PID1 retains killed grandchildren as Z; no execution, late writes or held locks.",
+    "observed_uid": 65534,
+    "live_control_running": true,
+    "reaped_control_running": false,
+    "current_test_sha256": "045346788c78390bfdcf2a54d8da95722d5ee9dd46056f338e8e332f6b0c400d",
+    "full_suite_rerun": false,
+    "timing_thresholds_changed": false,
+    "note": "Original full-run failures remain recorded; diagnostics are separate evidence."
+  }
+}

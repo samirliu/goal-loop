@@ -1,6 +1,7 @@
 ---
 name: goal-worker
-description: Bounded production worker of the goal-loop skill. One assignment,
+description: >-
+  Bounded production worker of the goal-loop skill. One assignment,
   one artifact: receives a task, the exact output path, needed context, and a
   named pass condition; produces the artifact and returns evidence. Use for
   reasoning-heavy stage work (code that must compute, synthesis, analysis).

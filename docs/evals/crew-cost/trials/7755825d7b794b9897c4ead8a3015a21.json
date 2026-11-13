@@ -1,0 +1,314 @@
+{
+  "observation": {
+    "baseline": {
+      "output-T1.json": null,
+      "output-T2.json": null,
+      "output-T3.json": null
+    },
+    "boot": "652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a",
+    "clock": 1794330764.364933,
+    "condition": "98bb6149450438f9d73506fc662a91082c5642c270cfa57203f88455e43e7e55",
+    "contract_sha256": "e5156e6550c329fb36634b2261f618865cd24b382d2326e43865bb74bd6a4caf",
+    "deadline": 1516932.4919464465,
+    "edges": {
+      "T1": [],
+      "T2": [],
+      "T3": []
+    },
+    "elapsed": 1.9340912499465048,
+    "final_validation": {
+      "start": 1.8583588749170303,
+      "end": 1.9340603749733418,
+      "result": 0,
+      "digest": {
+        "output-T1.json": [
+          420,
+          "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+        ],
+        "output-T2.json": [
+          420,
+          "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+        ],
+        "output-T3.json": [
+          420,
+          "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+        ]
+      },
+      "command_sha256": "205b5a45260981277ceb031fd6f896508945d3d4edf006f0a470b47f776aeead",
+      "stdout": "",
+      "stderr": ""
+    },
+    "finished": 1794330764.4406888,
+    "graph": {
+      "capacity": 3,
+      "context": {
+        "backend": "local-process-demo-v1",
+        "controller": "python-fixture-v1",
+        "host_capacity": 3,
+        "input_shape": {
+          "factor_bits": 20,
+          "items": 18,
+          "jobs": 3
+        },
+        "startup_delay_seconds": 0.01
+      },
+      "final_check": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "task.py",
+        "grade-all"
+      ],
+      "inputs": [
+        "input-T1.json",
+        "input-T2.json",
+        "input-T3.json"
+      ],
+      "instrument_hashes": {
+        "../../task.py": "a906647e713579bd855c5a09eabbfe8368713253b3c80c7dd11e520ca536a1f2"
+      },
+      "instrument_paths": {
+        "../../task.py": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-cost-_6ucowep/task.py"
+      },
+      "instruments": [
+        "../../task.py"
+      ],
+      "jobs": [
+        {
+          "check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade",
+            "T1"
+          ],
+          "deps": [],
+          "files": [
+            "output-T1.json"
+          ],
+          "id": "T1"
+        },
+        {
+          "check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade",
+            "T2"
+          ],
+          "deps": [],
+          "files": [
+            "output-T2.json"
+          ],
+          "id": "T2"
+        },
+        {
+          "check": [
+            "/opt/homebrew/opt/python@3.14/bin/python3.14",
+            "task.py",
+            "grade",
+            "T3"
+          ],
+          "deps": [],
+          "files": [
+            "output-T3.json"
+          ],
+          "id": "T3"
+        }
+      ],
+      "version": 1
+    },
+    "id": "7755825d7b794b9897c4ead8a3015a21",
+    "inputs": {
+      "input-T1.json": [
+        420,
+        "20aa6086eb1fd75c8e15e6cd64a411d495a2579e01b57ff78cbcdf1d06844642"
+      ],
+      "input-T2.json": [
+        420,
+        "9b1fdc35773a77606dff773d228972e962a5af4481493c11803093a3d27c5e2f"
+      ],
+      "input-T3.json": [
+        420,
+        "c404e194edd62318dd0ebd05dc60ed882aaa33ce3172242639408d414f2ecceb"
+      ]
+    },
+    "jobs": {
+      "T1": {
+        "adopted": 0.6207620000932366,
+        "adopted_digest": {
+          "output-T1.json": [
+            420,
+            "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+          ]
+        },
+        "adoption_version": 0,
+        "dispatch": 0.0009038341231644154,
+        "fault": null,
+        "first_valid": 0.6201829591300339,
+        "result": 0,
+        "returned": 0.5392985839862376,
+        "started": 0.0690941249486059,
+        "validations": [
+          {
+            "command_sha256": "ba646463868c2bc82a581c7676771a8b7e26f78afb07bc8c263a0bc70e782601",
+            "digest": {
+              "output-T1.json": [
+                420,
+                "41af4cfd8215739f39cfa37052aa29595fb3ec76fd2a5fb5df35aad0f5e66aa8"
+              ]
+            },
+            "end": 0.6201829591300339,
+            "result": 0,
+            "start": 0.5402114170137793,
+            "stderr": "",
+            "stdout": ""
+          }
+        ],
+        "dependency_queue_seconds": 0.0009038341231644154,
+        "startup_queue_seconds": 0.06819029082544148
+      },
+      "T2": {
+        "adopted": 1.234892874956131,
+        "adopted_digest": {
+          "output-T2.json": [
+            420,
+            "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+          ]
+        },
+        "adoption_version": 0,
+        "dispatch": 0.6215856671333313,
+        "fault": null,
+        "first_valid": 1.23430012492463,
+        "result": 0,
+        "returned": 1.1567047089338303,
+        "started": 0.6864692089147866,
+        "validations": [
+          {
+            "command_sha256": "b104de76f7244e16e465200a30fdef060ef0c4884782ef09b594f0165540e1e1",
+            "digest": {
+              "output-T2.json": [
+                420,
+                "331a9ac14b8a55f4ded72d07b78208a8c116ede9dd60ef195cc674ff5eb84240"
+              ]
+            },
+            "end": 1.23430012492463,
+            "result": 0,
+            "start": 1.1577207089867443,
+            "stderr": "",
+            "stdout": ""
+          }
+        ],
+        "dependency_queue_seconds": 0.6215856671333313,
+        "startup_queue_seconds": 0.06488354178145528
+      },
+      "T3": {
+        "adopted": 1.8574337500613183,
+        "adopted_digest": {
+          "output-T3.json": [
+            420,
+            "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+          ]
+        },
+        "adoption_version": 0,
+        "dispatch": 1.2357555420603603,
+        "fault": null,
+        "first_valid": 1.8568240001332015,
+        "result": 0,
+        "returned": 1.7821981669403613,
+        "started": 1.3057197090238333,
+        "validations": [
+          {
+            "command_sha256": "48c602d841632d1e978daf068d8bfa34e9b2d8a786c7f9f773aa2081c45b3489",
+            "digest": {
+              "output-T3.json": [
+                420,
+                "72139247586b398b5108923064e4b9adbe97bc9a9fc870d1278f83a15ed94a96"
+              ]
+            },
+            "end": 1.8568240001332015,
+            "result": 0,
+            "start": 1.7831938341259956,
+            "stderr": "",
+            "stdout": ""
+          }
+        ],
+        "dependency_queue_seconds": 1.2357555420603603,
+        "startup_queue_seconds": 0.06996416696347296
+      }
+    },
+    "mode": "inline",
+    "money": null,
+    "origin": 1516336.998546541,
+    "quality": true,
+    "stages": [
+      {
+        "end": 0.06971070892177522,
+        "name": "coordination",
+        "start": 0.0005416250787675381
+      },
+      {
+        "end": 0.5397757501341403,
+        "name": "join",
+        "start": 0.07010499993339181
+      },
+      {
+        "end": 0.687046583974734,
+        "name": "coordination",
+        "start": 0.6212080421391875
+      },
+      {
+        "end": 1.1572515000589192,
+        "name": "join",
+        "start": 0.6874684591311961
+      },
+      {
+        "end": 1.3063926249742508,
+        "name": "coordination",
+        "start": 1.2353582500945777
+      },
+      {
+        "end": 1.7827125841286033,
+        "name": "join",
+        "start": 1.306921541923657
+      },
+      {
+        "end": 1.8579165420960635,
+        "name": "conflict",
+        "skipped": "no operation performed",
+        "start": 1.8579165420960635
+      },
+      {
+        "name": "revalidation",
+        "start": 1.8583588749170303,
+        "end": 1.9340603749733418,
+        "source": "frozen-final-check"
+      }
+    ],
+    "started": 1794330762.5066,
+    "tokens": null,
+    "trial": "low-cal-73",
+    "version": 1,
+    "worker_seconds": 1.6199564165435731,
+    "stage_seconds": {
+      "join": 1.4152448333334178,
+      "coordination": 0.2060420005582273,
+      "conflict": 0.0,
+      "recovery": null,
+      "revalidation": 0.07570150005631149
+    }
+  },
+  "raw": {
+    "T1": {
+      "stdout": "READY\n",
+      "stderr": "",
+      "result": 0
+    },
+    "T2": {
+      "stdout": "READY\n",
+      "stderr": "",
+      "result": 0
+    },
+    "T3": {
+      "stdout": "READY\n",
+      "stderr": "",
+      "result": 0
+    }
+  }
+}

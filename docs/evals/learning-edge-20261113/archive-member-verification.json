@@ -1,0 +1,38 @@
+[
+  {
+    "path": "source-before82.tar.xz",
+    "verified": true,
+    "files": 83,
+    "sha256": "dc63c96ae516c6c433459007c9650450c5571e60816ed8ca16faf8c82bd256bb"
+  },
+  {
+    "path": "source-matrix149.tar.xz",
+    "verified": true,
+    "files": 150,
+    "sha256": "24bb6b8f6fa1a353a82b2876259d81540cc287fd12ec19d8cab94e4593b4d732"
+  },
+  {
+    "path": "source-final149.tar.xz",
+    "verified": true,
+    "files": 150,
+    "sha256": "b3633a7e672f4e31d96e34b4dbc47ad7d2380dfff2c3e9f93dd694d53771ad47"
+  },
+  {
+    "path": "source-context-before-fix.tar.xz",
+    "verified": true,
+    "files": 149,
+    "sha256": "f66f10f3e058edd26bdc3d1d0243b1dcc45fd2f65e6bbb148195f5d22ca1a8d1"
+  },
+  {
+    "path": "mechanism-run.tar.xz",
+    "verified": true,
+    "files": 162,
+    "sha256": "cbc680793f64be42d3023671ebcd1745994de0e63dc788b70375593685320e5a"
+  },
+  {
+    "path": "native-four.tar.xz",
+    "verified": true,
+    "files": 559,
+    "sha256": "1fafacf64ce021e57c6879e4ab6a8e93f89f9503b2f24bf271f9ba8ac4f1c930"
+  }
+]

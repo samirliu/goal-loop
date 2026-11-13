@@ -1,0 +1,70 @@
+test_clear_receipts_without_dry_probes_never_complete_forge (__main__.ForgeCoverage.test_clear_receipts_without_dry_probes_never_complete_forge) ... ok
+test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe (__main__.ForgeCoverage.test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe) ... FAIL
+test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit (__main__.ForgeCoverage.test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit) ... FAIL
+test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope (__main__.ForgeCoverage.test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope) ... FAIL
+test_repeated_clear_records_stability_and_explicit_blind_spots (__main__.ForgeCoverage.test_repeated_clear_records_stability_and_explicit_blind_spots) ... FAIL
+test_stamp_requires_a_declared_probe_scope_before_any_commit (__main__.ForgeCoverage.test_stamp_requires_a_declared_probe_scope_before_any_commit) ... FAIL
+
+======================================================================
+FAIL: test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe (__main__.ForgeCoverage.test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 100, in test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe
+    report = self.report(3)
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 66, in report
+    self.assertEqual(len(rows), 1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit (__main__.ForgeCoverage.test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 122, in test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit
+    report = self.report(1)
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 66, in report
+    self.assertEqual(len(rows), 1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope (__main__.ForgeCoverage.test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 113, in test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope
+    self.assertFalse(self.report(1)['qualified'])
+                     ~~~~~~~~~~~^^^
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 66, in report
+    self.assertEqual(len(rows), 1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_repeated_clear_records_stability_and_explicit_blind_spots (__main__.ForgeCoverage.test_repeated_clear_records_stability_and_explicit_blind_spots)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 79, in test_repeated_clear_records_stability_and_explicit_blind_spots
+    first, repeated = self.report(1), self.report(3)
+                      ~~~~~~~~~~~^^^
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 66, in report
+    self.assertEqual(len(rows), 1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+AssertionError: 0 != 1
+
+======================================================================
+FAIL: test_stamp_requires_a_declared_probe_scope_before_any_commit (__main__.ForgeCoverage.test_stamp_requires_a_declared_probe_scope_before_any_commit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 72, in test_stamp_requires_a_declared_probe_scope_before_any_commit
+    self.call(CTL, 'stamp', '--auto', expected=2)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_forge.py", line 50, in call
+    self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 2 : approved: e3b769c8 2026-11-11 auto
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 16.123s
+
+FAILED (failures=5)

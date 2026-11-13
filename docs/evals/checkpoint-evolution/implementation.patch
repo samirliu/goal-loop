@@ -1,0 +1,887 @@
+--- a/scripts/goal_evolve.py
++++ b/scripts/goal_evolve.py
+@@ -3,11 +3,12 @@
+ 
+ This is an opt-in cost experiment, not a sandbox or a generalization claim.
+ Workers receive task input; only the separately launched grader receives gold.
+-Both policy programs are single Python files using the standard library.
+ """
+ import argparse
++import base64
+ import fcntl
+ import hashlib
++import importlib.util
+ import json
+ import math
+ import os
+@@ -24,6 +25,44 @@
+ 
+ class ExperimentError(RuntimeError):
+     pass
++
++
++class Bundle:
++    """Runnable owned files from a matched pair of artifact checkpoints."""
++    def __init__(self, entry, files, context, snapshot=None):
++        self.entry = entry
++        self.files = files
++        self.context = context
++        self.snapshot = snapshot
++
++    def archive(self):
++        return encode({'entry': self.entry, 'files': self.files, 'context': self.context})
++
++
++def checkpoint_programs(protocol, project):
++    if project is None:
++        raise ExperimentError('version 2 requires --project')
++    spec = importlib.util.spec_from_file_location('goal_store', Path(__file__).with_name('goal_store.py'))
++    store = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(store)
++    state = Path(project).resolve(strict=True) / '.goal'
++    fd = os.open(state, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
++    try:
++        fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
++        if (state / 'store/pending').exists():
++            raise ExperimentError('checkpoint project requires recovery')
++        store.verify_views(state)
++        best, trial = store._incumbent_pair(state, protocol['baseline'], protocol['candidate'])
++    except store.StoreError as exc:
++        raise ExperimentError(str(exc)) from exc
++    finally:
++        os.close(fd)
++    entry = protocol['entry']
++    if (not isinstance(entry, str) or not entry.endswith('.py')
++            or any(record['files'].get(entry) is None for record in (best, trial))):
++        raise ExperimentError('entry must be an owned Python file in both checkpoints')
++    return {side: Bundle(entry, record['files'], record['context'], encode(record))
++            for side, record in (('baseline', best), ('candidate', trial))}
+ 
+ 
+ def encode(value):
+@@ -54,12 +93,18 @@
+     atomic_bytes(path, encode(value))
+ 
+ 
+-def load_protocol(path):
++def program_bytes(program):
++    return program.archive() if isinstance(program, Bundle) else program
++
++
++def load_protocol(path, project=None):
+     path = Path(path).resolve()
+-    protocol = json.loads(path.read_bytes())
++    data = path.read_bytes()
++    protocol = json.loads(data)
+     required = {'version', 'baseline', 'candidate', 'grader', 'development', 'holdout',
+                 'minimum_pairs', 'minimum_cost_gain', 'quality_tolerance', 'trial_seconds', 'budget_seconds'}
+-    if not isinstance(protocol, dict) or set(protocol) != required or type(protocol['version']) is not int or protocol['version'] != 1:
++    version = protocol.get('version') if isinstance(protocol, dict) else None
++    if type(version) is not int or version not in (1, 2) or set(protocol) != required.union({'entry'} if version == 2 else ()):
+         raise ExperimentError('unknown experiment protocol')
+     minimum = protocol['minimum_pairs']
+     if type(minimum) is not int or minimum < 6:
+@@ -70,7 +115,7 @@
+             raise ExperimentError('invalid ' + name)
+     if not 0 < protocol['minimum_cost_gain'] < 1 or not protocol['trial_seconds'] or not protocol['budget_seconds']:
+         raise ExperimentError('require a positive cost gain and bounded trial/run budgets')
+-    frozen = {str(path): path.read_bytes()}
++    frozen = {str(path): data}
+ 
+     def read(name):
+         if not isinstance(name, str):
+@@ -78,12 +123,16 @@
+         candidate = (path.parent / name).resolve()
+         if not candidate.is_relative_to(path.parent) or not candidate.is_file():
+             raise ExperimentError('experiment files must be inside protocol directory')
++        if str(candidate) in frozen:
++            return frozen[str(candidate)]
+         data = candidate.read_bytes()
+         frozen[str(candidate)] = data
+         return data
+ 
+-    programs = {name: read(protocol[name]) for name in ('baseline', 'candidate', 'grader')}
+-    if digest(programs['baseline']) == digest(programs['candidate']):
++    programs = (checkpoint_programs(protocol, project) if version == 2 else
++                {name: read(protocol[name]) for name in ('baseline', 'candidate')})
++    programs['grader'] = read(protocol['grader'])
++    if program_bytes(programs['baseline']) == program_bytes(programs['candidate']):
+         raise ExperimentError('candidate has no behavioral version difference')
+     phases, seen = {}, set()
+     for phase in ('development', 'holdout'):
+@@ -95,6 +144,7 @@
+             if not isinstance(case, dict) or set(case) != {'input', 'expected'}:
+                 raise ExperimentError('invalid case')
+             task, expected = read(case['input']), read(case['expected'])
++            expected.decode('utf-8')  # Invalid gold is a protocol error, not a worker failure.
+             identity = digest(task)
+             if identity in seen:
+                 raise ExperimentError('development/holdout task inputs must be distinct')
+@@ -105,119 +155,252 @@
+     return protocol, programs, phases, frozen, fingerprint
+ 
+ 
+-def run_program(program, stdin, timeout):
+-    """Bound an owned process group and capture outputs without pipe deadlocks."""
++def run_program(program, stdin, deadline):
++    """Measure from workspace preparation through owned-process cleanup."""
+     with tempfile.TemporaryDirectory(prefix='goal-policy-trial-') as tmp:
+         root = Path(tmp)
+-        (root / 'policy.py').write_bytes(program)
++        work = root / 'work'
++        work.mkdir()
++        if isinstance(program, Bundle):
++            for name, value in program.files.items():
++                if value is not None:
++                    path = work / name
++                    path.parent.mkdir(parents=True, exist_ok=True)
++                    path.write_bytes(base64.b64decode(value['bytes'], validate=True))
++                    path.chmod(value['mode'])
++            # -I excludes all implicit imports from the caller and the task.
++            # Add only the explicitly materialized workspace and entry parent.
++            invocation = ['-c', 'import os,runpy,sys; entry=sys.argv.pop(1); '
++                          'sys.path[:0]=[os.path.dirname(entry),os.getcwd()]; '
++                          'runpy.run_path(entry,run_name="__main__")', str(work / program.entry)]
++        else:
++            (work / 'policy.py').write_bytes(program)
++            invocation = [str(work / 'policy.py')]
++
+         def bound_files():
+             soft, hard = resource.getrlimit(resource.RLIMIT_FSIZE)
+             cap = min([1024 * 1024] + [limit for limit in (soft, hard) if limit != resource.RLIM_INFINITY])
+             resource.setrlimit(resource.RLIMIT_FSIZE, (cap, hard))
+-        with (root / 'stdout').open('w+b') as output, (root / 'stderr').open('w+b') as error:
+-            process = subprocess.Popen([sys.executable, '-I', str(root / 'policy.py')], cwd=root,
+-                                       stdin=subprocess.PIPE, stdout=output, stderr=error,
+-                                       start_new_session=True, close_fds=True, preexec_fn=bound_files)
+-            reason = None
+-            try:
+-                process.communicate(stdin, timeout=timeout)
+-            except subprocess.TimeoutExpired:
+-                reason = 'timeout'
+-            finally:
+-                try:
+-                    os.killpg(process.pid, signal.SIGKILL)
+-                except ProcessLookupError:
+-                    pass
+-                process.wait()
+-            output.seek(0); stdout = output.read(1024 * 1024 + 1)
+-            error.seek(0); stderr = error.read(4096).decode('utf-8', errors='replace')
+-            if len(stdout) > 1024 * 1024:
+-                reason = 'output-limit'
+-            if process.returncode == -signal.SIGXFSZ:
+-                reason = 'output-limit'
+-            return stdout[:1024 * 1024], process.returncode, reason, stderr
++
++        bounded = Path(__file__).with_name('goal_bounded.py').resolve()
++        receipt = root / 'receipt'
++        env = os.environ.copy()
++        env.pop('GOAL_RUNNER_FD', None)
++        env['GOAL_RUNNER_MONOTONIC_END'] = str(deadline)
++        with (root / 'stdin').open('w+b') as source, (root / 'stdout').open('w+b') as output, (root / 'stderr').open('w+b') as error:
++            source.write(stdin)
++            source.seek(0)
++            if time.monotonic() >= deadline:
++                return b'', None, 'timeout', ''
++            completed = subprocess.run([sys.executable, '-I', str(bounded), '--owner', str(os.getpid()),
++                                        '--receipt', str(receipt), '--', sys.executable, '-I', '-B', *invocation],
++                                       cwd=work, stdin=source, stdout=output, stderr=error, env=env,
++                                       start_new_session=True, preexec_fn=bound_files)
++            output.seek(0)
++            stdout = output.read(1024 * 1024 + 1)
++            error.seek(0)
++            stderr = error.read(4096).decode('utf-8', errors='replace')
++        if completed.returncode or not receipt.is_file():
++            return stdout, None, 'supervisor-failed', stderr
++        rc = int(receipt.read_text(encoding='ascii'))
++        reason = {124: 'timeout', 130: 'cancelled', 143: 'cancelled', 128 + signal.SIGXFSZ: 'output-limit'}.get(rc)
++        return stdout, rc, reason, stderr
+ 
+ 
+ def trial(program, grader, task, expected, seconds, deadline):
+     started = time.monotonic()
+-    remaining = min(seconds, deadline - started)
+-    if remaining <= 0:
+-        return {'ok': False, 'reason': 'run-budget', 'elapsed': 0, 'score': None}, b''
+-    output, rc, reason, error = run_program(program, task, remaining)
+-    record = {'ok': False, 'reason': reason or ('worker-exit=%s' % rc if rc else None),
+-              'elapsed': 0, 'score': None, 'output_sha256': digest(output), 'stderr': error,
+-              'floor': None, 'horizon': None, 'tokens': None, 'money': None}
++    trial_end = min(started + seconds, deadline)
++    record = dict(ok=False, reason='run-budget', elapsed=None, score=None, output_sha256=None,
++                  floor=None, horizon=None, tokens=None, money=None, regression=False)
++    if started >= trial_end:
++        return record, b''
++    output, rc, reason, error = run_program(program, task, trial_end)
++    record.update(reason=reason or ('worker-exit=%s' % rc if rc else None),
++                  output_sha256=digest(output), stderr=error, worker_exit=rc,
++                  regression=reason == 'output-limit' or (reason is None and rc != 0))
+     if reason is None and rc == 0:
+         try:
+             request = encode({'output': output.decode('utf-8'), 'expected': expected.decode('utf-8')})
+-            remaining = min(seconds, deadline - time.monotonic())
+-            if remaining <= 0:
+-                raise ExperimentError('run-budget')
+-            result, grade_rc, grade_reason, grade_error = run_program(grader, request, remaining)
+-            record.update(grader_stdout=result[:4096].decode('utf-8', errors='replace'), grader_sha256=digest(result))
+-            grade = json.loads(result)
+-            if (grade_rc or grade_reason or not isinstance(grade, dict) or set(grade) != {'floor', 'horizon', 'score'}
+-                    or type(grade['floor']) is not bool or type(grade['horizon']) is not bool
+-                    or type(grade['score']) not in (int, float) or not math.isfinite(grade['score'])):
+-                raise ExperimentError('invalid grader result: ' + grade_error)
+-            record.update(ok=grade['floor'] and grade['horizon'], score=grade['score'],
+-                          floor=grade['floor'], horizon=grade['horizon'],
+-                          reason=None if grade['floor'] and grade['horizon'] else 'floor-or-horizon')
+-        except (ValueError, UnicodeError, ExperimentError) as exc:
+-            record['reason'] = str(exc)
++        except UnicodeError:
++            record.update(reason='worker-output-not-utf8', regression=True)
++        else:
++            result, grade_rc, grade_reason, grade_error = run_program(grader, request, trial_end)
++            record.update(grader_stdout=result[:4096].decode('utf-8', errors='replace'),
++                          grader_sha256=digest(result), grader_exit=grade_rc, grader_stderr=grade_error)
++            if grade_reason in ('timeout', 'cancelled'):
++                record['reason'] = 'grader-' + grade_reason
++            else:
++                apply_grade(record, result, grade_rc, grade_reason)
+     record['elapsed'] = time.monotonic() - started
+     return record, output
++
++
++def apply_grade(record, result, rc, reason):
++    try:
++        if rc or reason:
++            raise ExperimentError('grader command failed')
++        grade = json.loads(result)
++        if (not isinstance(grade, dict) or set(grade) != {'floor', 'horizon', 'score'}
++                or type(grade['floor']) is not bool or type(grade['horizon']) is not bool
++                or type(grade['score']) not in (int, float) or not math.isfinite(grade['score'])):
++            raise ExperimentError('invalid grader result')
++        passed = grade['floor'] and grade['horizon']
++        record.update(ok=passed, score=grade['score'], floor=grade['floor'], horizon=grade['horizon'],
++                      reason=None if passed else 'floor-or-horizon', regression=not passed)
++    except (ValueError, ExperimentError, OverflowError) as exc:
++        record.update(reason='instrument-invalid', grader_error=str(exc))
+ 
+ 
+ def compare(pairs, protocol, alpha=0.05):
+     """Preregistered paired cost improvement with exact one-sided sign test."""
+     if len(pairs) < protocol['minimum_pairs'] or any(not row[side]['ok'] for row in pairs for side in ('baseline', 'candidate')):
+         return {'pass': False, 'reason': 'insufficient-or-ineligible-pairs'}
+-    quality = sum(row['candidate']['score'] - row['baseline']['score'] for row in pairs) / len(pairs)
++    quality_deltas = [row['candidate']['score'] - row['baseline']['score'] for row in pairs]
++    quality = statistics.mean(quality_deltas)
+     baseline = sum(row['baseline']['elapsed'] for row in pairs)
+     candidate = sum(row['candidate']['elapsed'] for row in pairs)
+     positive = sum(row['candidate']['elapsed'] < row['baseline']['elapsed'] for row in pairs)
+     negative = sum(row['candidate']['elapsed'] > row['baseline']['elapsed'] for row in pairs)
+     n = positive + negative
+-    probability = sum(math.comb(n, k) for k in range(positive, n + 1)) / 2 ** n if n else 1
+-    reverse_probability = sum(math.comb(n, k) for k in range(negative, n + 1)) / 2 ** n if n else 1
++    probability = sign_probability(positive, n)
++    reverse_probability = sign_probability(negative, n)
++    quality_p = sign_probability(sum(delta < 0 for delta in quality_deltas),
++                                 sum(delta != 0 for delta in quality_deltas))
+     gain = (baseline - candidate) / baseline if baseline else 0
+     passed = quality >= -protocol['quality_tolerance'] and gain >= protocol['minimum_cost_gain'] and probability <= alpha
+     return {'pass': passed, 'reason': 'paired-cost-benefit' if passed else 'no-confirmed-benefit',
+             'pairs': len(pairs), 'quality_delta': quality, 'cost_gain': gain,
+-            'regressed': quality < -protocol['quality_tolerance'] or (gain <= -protocol['minimum_cost_gain'] and reverse_probability <= alpha),
++            'regressed': ((quality < -protocol['quality_tolerance'] and quality_p <= alpha)
++                          or (gain <= -protocol['minimum_cost_gain'] and reverse_probability <= alpha)),
+             'one_sided_sign_p': probability, 'alpha': alpha,
++            'quality_delta_sd': statistics.stdev(quality_deltas),
+             'paired_seconds_sd': statistics.stdev(row['baseline']['elapsed'] - row['candidate']['elapsed'] for row in pairs),
+             'baseline_seconds': baseline, 'candidate_seconds': candidate}
+ 
+ 
+-def experiment(protocol_path, state_path):
++def sign_probability(positive, nonzero):
++    return sum(math.comb(nonzero, k) for k in range(positive, nonzero + 1)) / 2 ** nonzero
++
++
++def enabled_policy(state):
++    path = state / 'enabled.json'
++    if not path.exists():
++        return None
++    record = json.loads(path.read_bytes())
++    if (not isinstance(record, dict) or set(record) != {'version', 'policy', 'program', 'run', 'protocol'}
++            or type(record['version']) is not int or record['version'] not in (1, 2)):
++        raise ExperimentError('invalid enabled policy record')
++    identity = record['policy']
++    suffix = '.py' if record['version'] == 1 else '.json'
++    if (identity is not None and (not isinstance(identity, str) or len(identity) != 64
++                                  or any(char not in '0123456789abcdef' for char in identity))
++            or record['program'] != (None if identity is None else 'policies/' + identity + suffix)):
++        raise ExperimentError('invalid enabled policy record')
++    if identity is not None and digest((state / record['program']).read_bytes()) != identity:
++        raise ExperimentError('corrupt archived policy')
++    return record
++
++
++def run_enabled(state, seconds, stdin):
++    if not math.isfinite(seconds) or seconds <= 0:
++        raise ExperimentError('execution budget must be positive and finite')
++    end = run_deadline(time.monotonic() + seconds)
++    selected = enabled_policy(Path(state))
++    if selected is None or selected['policy'] is None:
++        raise ExperimentError('no qualified policy enabled')
++    program = (Path(state) / selected['program']).read_bytes()
++    if digest(program) != selected['policy']:
++        raise ExperimentError('corrupt archived policy')
++    if selected['version'] == 2:
++        record = json.loads(program)
++        program = Bundle(record['entry'], record['files'], record['context'])
++        for name in program.files:
++            if not name or '\\' in name or any(part in ('', '.', '..') for part in name.split('/')):
++                raise ExperimentError('invalid archived policy path')
++        if program.files.get(program.entry) is None:
++            raise ExperimentError('invalid archived policy entry')
++    return run_program(program, stdin, end)
++
++
++def run_deadline(local_end):
++    outer = os.environ.get('GOAL_RUNNER_MONOTONIC_END')
++    if outer:
++        outer_end = float(outer)
++        if not math.isfinite(outer_end):
++            raise ExperimentError('invalid runner deadline')
++        return min(local_end, outer_end)
++    return local_end
++
++
++def record_trial(run, phase, index, side, case_id, record, output):
++    # Keep attempted results available even if the next trial or phase dies.
++    (run / ('%s-%s-%s.out' % (phase, index, side))).write_bytes(output)
++    with (run / 'trials.jsonl').open('ab') as log:
++        log.write(encode(dict(phase=phase, index=index, side=side, case=case_id, result=record)) + b'\n')
++        log.flush()
++        os.fsync(log.fileno())
++
++
++def instrument_failed(record):
++    return record.get('reason') in ('instrument-invalid', 'supervisor-failed')
++
++
++def disposition(report, identities, current, timely):
++    incumbent = current['policy'] if current else None
++    status = report['status']
++    if status == 'instrument-invalid':
++        return status, incumbent
++    if status == 'holdout-validated' and timely:
++        return 'enabled', identities['candidate']
++    phases = report['phases'].values()
++    rows = [pair for phase in phases for pair in phase['pairs']]
++    baseline = identities['baseline'] if rows and all(row['baseline']['ok'] for row in rows) else None
++    if incumbent == identities['candidate']:
++        regressed = any(row['candidate'].get('regression') or row['candidate'].get('floor') is False
++                        or row['candidate'].get('horizon') is False for row in rows)
++        regressed |= any(phase['decision'].get('regressed', False)
++                         and len(phase['pairs']) == phase['scheduled_pairs'] for phase in phases)
++        if not regressed:
++            return 'retained-insufficient-counterevidence', incumbent
++        return ('withdrawn', baseline) if baseline else ('blocked-no-qualified-policy', None)
++    if baseline is not None:
++        return status if status != 'holdout-validated' else 'run-budget', baseline
++    if incumbent is not None and not any(row['baseline'].get('regression') for row in rows):
++        return 'retained-insufficient-counterevidence', incumbent
++    return 'blocked-no-qualified-policy', None
++
++
++def experiment(protocol_path, state_path, project=None):
+     started = time.monotonic()
+     runner = Path(__file__).read_bytes()
+-    protocol, programs, phases, frozen, fingerprint = load_protocol(protocol_path)
+-    deadline = started + protocol['budget_seconds']
++    protocol, programs, phases, frozen, fingerprint = load_protocol(protocol_path, project)
++    version = protocol['version']
++    support = ['goal_bounded.py', 'goal_owner_watch.py', 'goal_trace.py']
++    if version == 2:
++        support.append('goal_store.py')
++    runtime_sources = {Path(__file__).with_name(name): Path(__file__).with_name(name).read_bytes()
++                       for name in support}
++    deadline = run_deadline(started + protocol['budget_seconds'])
+     state = Path(state_path)
+     state.mkdir(parents=True, exist_ok=True)
+     directory = os.open(state, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+     try:
+         fcntl.flock(directory, fcntl.LOCK_EX | fcntl.LOCK_NB)
+-        identities = {name: digest(data) for name, data in programs.items()}
++        serialized = {name: program_bytes(program) for name, program in programs.items()}
++        identities = {name: digest(data) for name, data in serialized.items()}
+         selection = state / 'enabled.json'
+-        current = json.loads(selection.read_bytes()) if selection.exists() else None
+-        if current is not None and (not isinstance(current, dict)
+-                or set(current) != {'version', 'policy', 'program', 'run', 'protocol'}
+-                or type(current['version']) is not int or current['version'] != 1
+-                or (current['policy'] is not None and not isinstance(current['policy'], str))
+-                or current['program'] != ('policies/' + current['policy'] + '.py' if current['policy'] is not None else None)):
+-            raise ExperimentError('invalid enabled policy record')
++        current = enabled_policy(state)
++        if current is not None and current['version'] != version:
++            raise ExperimentError('use a separate state directory for a different protocol version')
+         if current is not None and current.get('policy') not in (None, identities['baseline'], identities['candidate']):
+             raise ExperimentError('protocol does not compare the currently enabled policy')
+         used_path = state / 'used-holdout.json'
+-        used = json.loads(used_path.read_bytes()) if used_path.exists() else []
+-        if not isinstance(used, list) or any(not isinstance(value, str) or len(value) != 64 for value in used):
++        previous = json.loads(used_path.read_bytes()) if used_path.exists() else []
++        if not isinstance(previous, list) or any(not isinstance(value, str) or len(value) != 64 for value in previous):
+             raise ExperimentError('invalid holdout exposure registry')
++        used = set(previous)
+         holdout_ids = [case[0] for case in phases['holdout']]
+-        if set(used).intersection(holdout_ids):
++        if used.intersection(holdout_ids):
+             raise ExperimentError('holdout inputs already exposed; use fresh held-out tasks')
+         budget_path = state / 'statistical-budget.json'
+         testing = json.loads(budget_path.read_bytes()) if budget_path.exists() else {'version': 1, 'evaluations': 0}
+@@ -226,15 +409,18 @@
+                 or type(testing['evaluations']) is not int or testing['evaluations'] < 0):
+             raise ExperimentError('invalid sequential testing budget')
+         policies = state / 'policies'; policies.mkdir(exist_ok=True)
++        suffix = '.py' if version == 1 else '.json'
+         for name in ('baseline', 'candidate'):
+-            target = policies / (identities[name] + '.py')
+-            if target.exists() and target.read_bytes() != programs[name]:
++            target = policies / (identities[name] + suffix)
++            if target.exists() and target.read_bytes() != serialized[name]:
+                 raise ExperimentError('corrupt archived policy')
+             if not target.exists():
+-                atomic_bytes(target, programs[name])
++                atomic_bytes(target, serialized[name])
+         run_id = uuid.uuid4().hex
+         run = state / run_id; run.mkdir()
+         (run / 'runner.py').write_bytes(runner)
++        for source, data in runtime_sources.items():
++            (run / source.name).write_bytes(data)
+         protocol_root = Path(protocol_path).resolve().parent
+         for name, data in frozen.items():
+             copy = run / 'frozen' / Path(name).relative_to(protocol_root)
+@@ -242,85 +428,127 @@
+             copy.write_bytes(data)
+         atomic(run / 'protocol.json', {'protocol': protocol, 'fingerprint': fingerprint,
+                                       'files': {name: digest(data) for name, data in frozen.items()}})
+-        report = {'version': 1, 'run': run_id, 'protocol': fingerprint, 'policies': identities,
++        report = {'version': version, 'run': run_id, 'protocol': fingerprint, 'policies': identities,
+                   'runner_sha256': digest(runner), 'status': 'candidate', 'phases': {},
++                  'runtime_sources': {path.name: digest(data) for path, data in runtime_sources.items()},
+                   'runtime': {'python': sys.version, 'executable': sys.executable, 'platform': sys.platform},
+                   'enabled': None, 'tokens': None, 'money': None}
++        if version == 2:
++            report['checkpoints'] = {side: protocol[side] for side in ('baseline', 'candidate')}
++            report['context'] = programs['baseline'].context
++            for side, identity in report['checkpoints'].items():
++                snapshot = programs[side].snapshot
++                if digest(snapshot) != identity:
++                    raise ExperimentError('noncanonical artifact checkpoint')
++                (run / ('checkpoint-' + side + '.json')).write_bytes(snapshot)
+         for phase, cases in phases.items():
+             pairs = []
+             alpha = 0.05
++            if time.monotonic() >= deadline:
++                report['status'] = 'run-budget'
++                break
+             if phase == 'holdout':
+-                # Reserve before running: interruption must not erase exposure.
+-                atomic(used_path, sorted(set(used).union(holdout_ids)))
+                 evaluation = testing['evaluations'] + 1
+                 alpha = 0.05 / (evaluation * (evaluation + 1))
++                if math.ldexp(1, -len(cases)) > alpha:
++                    report['phases'][phase] = {
++                        'scheduled_pairs': len(cases), 'pairs': [],
++                        'decision': {'pass': False, 'reason': 'holdout-underpowered',
++                                     'alpha': alpha, 'minimum_decisive_pairs': math.ceil(-math.log2(alpha))}}
++                    report['status'] = 'holdout-rejected'
++                    break
+                 atomic(budget_path, {'version': 1, 'evaluations': evaluation})
+                 report.update(holdout_evaluation=evaluation, holdout_alpha=alpha)
++            # Conservatively reserve this phase's input IDs before dispatch.
++            # Development may be repeated, but can never become new holdout.
++            used.update(case[0] for case in cases)
++            atomic(used_path, sorted(used))
++            invalid = False
+             for index, (case_id, task, expected) in enumerate(cases):
+                 if time.monotonic() >= deadline:
+                     break
+                 pair = {'case': case_id}
+                 order = ('baseline', 'candidate') if index % 2 == 0 else ('candidate', 'baseline')
++                pair['order'] = order
+                 for side in order:
+                     record, output = trial(programs[side], programs['grader'], task, expected,
+                                            protocol['trial_seconds'], deadline)
+                     pair[side] = record
+-                    (run / ('%s-%s-%s.out' % (phase, index, side))).write_bytes(output)
++                    record_trial(run, phase, index, side, case_id, record, output)
++                    if instrument_failed(record):
++                        invalid = True
++                        other = order[1]
++                        if other not in pair:
++                            pair[other] = {'ok': False, 'reason': 'not-dispatched-instrument-invalid',
++                                           'elapsed': None, 'score': None, 'tokens': None, 'money': None}
++                        break
+                 pairs.append(pair)
+                 # Frozen source/inputs are checked after every pair; a worker
+                 # cannot win by quietly replacing the original evaluator.
+-                if Path(__file__).read_bytes() != runner or any(Path(name).read_bytes() != data for name, data in frozen.items()):
++                if (Path(__file__).read_bytes() != runner
++                        or any(not Path(name).is_file() or Path(name).read_bytes() != data
++                               for name, data in {**frozen, **runtime_sources}.items())):
+                     report.update(status='instrument-invalid', elapsed=time.monotonic() - started)
+                     report['phases'][phase] = {'pairs': pairs, 'decision': {'pass': False, 'reason': 'frozen-material-changed'}}
+                     atomic(run / 'report.json', report)
+                     raise ExperimentError('frozen experiment material changed; report=' + str(run / 'report.json'))
+                 if any(not pair[side]['ok'] for side in ('baseline', 'candidate')):
+-                    break  # One failed floor is decisive; do not spend holdout.
++                    break  # A failed pair cannot pass this phase.
+             decision = compare(pairs, protocol, alpha=alpha)
+-            report['phases'][phase] = {'pairs': pairs, 'decision': decision}
++            if decision['pass'] and len(pairs) != len(cases):
++                decision.update({'pass': False, 'reason': 'incomplete-phase'})
++            report['phases'][phase] = {'scheduled_pairs': len(cases), 'pairs': pairs, 'decision': decision}
+             atomic(run / 'report.json', report)
++            if invalid:
++                report['status'] = 'instrument-invalid'
++                break
+             if not decision['pass']:
+                 report['status'] = 'rejected' if phase == 'development' else 'holdout-rejected'
+                 break
+             report['status'] = 'local-reproduced' if phase == 'development' else 'holdout-validated'
+-        winner = report['status'] == 'holdout-validated' and time.monotonic() <= deadline
+-        baseline_eligible = all(row['baseline']['ok'] for phase in report['phases'].values() for row in phase['pairs'])
+-        has_pairs = any(phase['pairs'] for phase in report['phases'].values())
+-        selected = identities['candidate'] if winner else identities['baseline'] if baseline_eligible and has_pairs else None
+-        retained = False
+-        if not winner and current and current['policy'] is not None:
+-            candidate_incumbent = current['policy'] == identities['candidate']
+-            candidate_failed = any(not row['candidate']['ok'] for phase in report['phases'].values() for row in phase['pairs'])
+-            regressed = any(phase['decision'].get('regressed', False) for phase in report['phases'].values())
+-            if not has_pairs or (candidate_incumbent and not candidate_failed and not regressed):
+-                selected, retained = current['policy'], True
+-        # Explicit experiment protocol authorizes local activation and rollback
+-        # only between these exact archived policy versions.
+-        report['status'] = 'enabled' if winner else ('withdrawn' if current and current['policy'] == identities['candidate'] else report['status'])
+-        if retained:
+-            report['status'] = 'retained-insufficient-counterevidence'
+-        if selected is None:
+-            report['status'] = 'blocked-no-qualified-policy'
++        incumbent = current['policy'] if current else None
++        report['elapsed'] = time.monotonic() - started
++        report['within_budget'] = started + report['elapsed'] <= deadline
++        report['status'], selected = disposition(report, identities, current, report['within_budget'])
+         report['enabled'] = selected
+-        report['elapsed'] = time.monotonic() - started
+-        report['within_budget'] = report['elapsed'] <= protocol['budget_seconds']
+         atomic(run / 'report.json', report)
+-        atomic(selection, {'version': 1, 'policy': selected, 'program': 'policies/' + selected + '.py' if selected is not None else None,
+-                           'run': run_id, 'protocol': fingerprint})
++        if report['status'] != 'instrument-invalid' and (current is None or incumbent != selected):
++            atomic(selection, {'version': version, 'policy': selected,
++                               'program': 'policies/' + selected + suffix if selected is not None else None,
++                               'run': run_id, 'protocol': fingerprint})
+         return report
+     finally:
+         os.close(directory)
+ 
+ 
+-if __name__ == '__main__':
++def main(argv):
++    if argv[:1] == ['run-enabled']:
++        parser = argparse.ArgumentParser(description='Execute the enabled archive for this experiment scope')
++        parser.add_argument('--state', required=True)
++        parser.add_argument('--seconds', type=float, required=True)
++        args = parser.parse_args(argv[1:])
++        output, rc, reason, error = run_enabled(args.state, args.seconds, sys.stdin.buffer.read())
++        sys.stdout.buffer.write(output)
++        if error:
++            sys.stderr.write(error)
++        if reason:
++            print('EVOLVE: ' + reason, file=sys.stderr)
++        return 4 if rc is None else rc
++
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('protocol')
+     parser.add_argument('--state', required=True)
+-    arguments = parser.parse_args()
++    parser.add_argument('--project', help='project with the version 2 artifact checkpoints')
++    arguments = parser.parse_args(argv)
++    result = experiment(arguments.protocol, arguments.state, arguments.project)
++    print(json.dumps({'status': result['status'], 'enabled': result['enabled'],
++                      'elapsed': result['elapsed'], 'report': str(Path(arguments.state) / result['run'] / 'report.json')}))
++    return 0
++
++
++if __name__ == '__main__':
+     try:
+-        result = experiment(arguments.protocol, arguments.state)
+-        print(json.dumps({'status': result['status'], 'enabled': result['enabled'],
+-                          'elapsed': result['elapsed'], 'report': str(Path(arguments.state) / result['run'] / 'report.json')}))
++        sys.exit(main(sys.argv[1:]))
+     except (ExperimentError, OSError, ValueError, KeyError, TypeError) as exc:
+         print('EVOLVE: ERROR ' + str(exc), file=sys.stderr)
+         sys.exit(4)
+--- a/tests/test_evolve.py
++++ b/tests/test_evolve.py
+@@ -72,7 +72,7 @@
+         def failure(*args):
+             row, output = self.telemetry(*args)
+             if b'candidate' in args[0]:
+-                row['ok'] = False
++                row.update(ok=False, floor=False)
+             return row, output
+         with mock.patch.object(evolve, 'trial', side_effect=failure):
+             withdrawn = evolve.experiment(fresh, self.state)
+@@ -103,9 +103,11 @@
+         with mock.patch.object(evolve, 'trial', side_effect=self.telemetry):
+             monitored = evolve.experiment(fresh, self.state)
+         # Six positive pairs meet the first alpha=.025 but do not meet the
+-        # second alpha=.00833. No new promotion, and no fabricated regression.
+-        self.assertFalse(monitored['phases']['holdout']['decision']['pass'])
+-        self.assertEqual(monitored['holdout_evaluation'], 2)
++        # second alpha=.00833. Skip an unwinnable holdout before dispatch.
++        holdout = monitored['phases']['holdout']
++        self.assertEqual(holdout['decision']['reason'], 'holdout-underpowered')
++        self.assertEqual(holdout['pairs'], [])
++        self.assertEqual(json.loads((self.state / 'statistical-budget.json').read_bytes())['evaluations'], 1)
+         self.assertEqual(monitored['status'], 'retained-insufficient-counterevidence')
+         self.assertEqual(monitored['enabled'], initial['enabled'])
+ 
+@@ -124,6 +126,59 @@
+         self.assertEqual(len(report['phases']['development']['pairs']), 1)
+         self.assertFalse((self.state / 'enabled.json').exists())
+ 
++    def test_broken_grader_does_not_withdraw_an_enabled_policy(self):
++        first = self.protocol('initial')
++        with mock.patch.object(evolve, 'trial', side_effect=self.telemetry):
++            initial = evolve.experiment(first, self.state)
++        next_protocol = self.protocol('monitor-broken-grader', offset=4000)
++        (next_protocol.parent / 'grader.py').write_text('raise RuntimeError("broken instrument")')
++        monitored = evolve.experiment(next_protocol, self.state)
++        self.assertEqual(monitored['enabled'], initial['enabled'])
++        self.assertEqual(monitored['status'], 'instrument-invalid')
++        self.assertNotIn('holdout', monitored['phases'])
++
++    def test_former_development_inputs_cannot_be_used_as_holdout(self):
++        first = self.protocol('initial')
++        with mock.patch.object(evolve, 'trial', side_effect=self.telemetry):
++            evolve.experiment(first, self.state)
++        second = self.protocol('bad-holdout', offset=-100)
++        with self.assertRaisesRegex(evolve.ExperimentError, 'already exposed'):
++            evolve.experiment(second, self.state)
++
++    def test_trial_budget_covers_worker_and_grader_together(self):
++        import time
++        worker = b'import time;time.sleep(.30);print("ok")'
++        grader = b'import time;time.sleep(.30);print(\'{"floor":true,"horizon":true,"score":1}\')'
++        record, _ = evolve.trial(worker, grader, b'{}', b'{}', .50, time.monotonic() + 5)
++        self.assertFalse(record['ok'])
++        self.assertIsNone(record['floor'])
++        self.assertGreater(record['elapsed'], .30)
++
++    def test_enough_pairs_before_deadline_does_not_qualify_a_partial_phase(self):
++        protocol = self.protocol('partial')
++        config = json.loads(protocol.read_bytes())
++        extra = protocol.parent / 'seventh.json'
++        extra.write_text('{"task": 7}')
++        config['development'].append({'input': extra.name, 'expected': extra.name})
++        protocol.write_text(json.dumps(config))
++        clock = [0]
++        calls = []
++
++        def advance(*args):
++            calls.append(args)
++            if len(calls) == 12:
++                clock[0] = 11
++            return self.telemetry(*args)
++
++        with mock.patch.object(evolve.time, 'monotonic', side_effect=lambda: clock[0]), \
++                mock.patch.object(evolve, 'trial', side_effect=advance):
++            result = evolve.experiment(protocol, self.state)
++        phase = result['phases']['development']
++        self.assertEqual(len(phase['pairs']), 6)
++        self.assertEqual(phase['decision']['reason'], 'incomplete-phase')
++        self.assertNotIn('holdout', result['phases'])
++        self.assertNotEqual(result['enabled'], result['policies']['candidate'])
++
+     def test_real_worker_failure_and_timeout_are_measured_not_dropped(self):
+         grader = b'import json;print(json.dumps({"floor":True,"horizon":True,"score":1}))\n'
+         import time
+--- a/tests/test_incumbent.py
++++ b/tests/test_incumbent.py
+@@ -1,4 +1,5 @@
+ """Exercise scoped rollback through the production gate and recovery command."""
++import json
+ import os
+ from pathlib import Path
+ import subprocess
+@@ -111,6 +112,20 @@
+         self.checkpoint('save', '--file', 'a.txt', expected=4)
+         self.assertFalse((self.state / 'store/incumbents').exists())
+ 
++    def test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch(self):
++        _, base, _, candidate = self.pair()
++        protocol = dict(version=2, baseline=candidate, candidate=base, entry='a.txt',
++                        grader='absent.py', development=[], holdout=[],
++                        minimum_pairs=6, minimum_cost_gain=.15, quality_tolerance=0,
++                        trial_seconds=1, budget_seconds=10)
++        path = self.project / 'protocol.json'
++        path.write_text(json.dumps(protocol))
++        trial_state = self.project / '.goal/proposals/test'
++        _, error = self.run_entry([sys.executable, '-I', str(SCRIPTS / 'goal_evolve.py')],
++                                  str(path), '--state', str(trial_state), expected=4)
++        self.assertIn('scope, lineage or frozen contract changed', error)
++        self.assertFalse(trial_state.exists())
++
+ 
+ if __name__ == '__main__':
+     unittest.main()
+--- a/examples/evolution-dedupe/run.py
++++ b/examples/evolution-dedupe/run.py
+@@ -13,26 +13,28 @@
+ import sys
+ 
+ ROOT = Path(__file__).resolve().parents[2]
+-BASELINE = '''import json,sys
+-items=json.load(sys.stdin)["items"]
+-result=[]
+-for item in items:
+-    if item not in result: result.append(item)
+-json.dump(result,sys.stdout)
++BASELINE = '''def dedupe(items):
++    result = []
++    for item in items:
++        if item not in result:
++            result.append(item)
++    return result
+ '''
+-CANDIDATE = '''import json,sys
+-items=json.load(sys.stdin)["items"]
+-json.dump(list(dict.fromkeys(items)),sys.stdout)
++CANDIDATE = '''def dedupe(items):
++    return list(dict.fromkeys(items))
+ '''
+-REPAIRED = '''import json,sys
+-items=json.load(sys.stdin)["items"]
+-try:
+-    result=list(dict.fromkeys(items))
+-except TypeError:
+-    result=[]
+-    for item in items:
+-        if item not in result: result.append(item)
+-json.dump(result,sys.stdout)
++REPAIRED = '''def dedupe(items):
++    try:
++        return list(dict.fromkeys(items))
++    except TypeError:
++        result = []
++        for item in items:
++            if item not in result:
++                result.append(item)
++        return result
++'''
++DRIVER = '''import json,sys
++json.dump(dedupe(json.load(sys.stdin)["items"]),sys.stdout)
+ '''
+ GRADER = '''import json,sys
+ case=json.load(sys.stdin)
+@@ -47,10 +49,48 @@
+ '''
+ 
+ 
+-def prepare(root, counterexample=False, repair=False):
++def capture_checkpoints(project, candidate):
++    scripts = ROOT / 'scripts'
++
++    def invoke(command, *args):
++        result = subprocess.run([*command, *args, '--project', str(project)],
++                                check=True, stdout=subprocess.PIPE, text=True, timeout=20)
++        return result.stdout.strip()
++
++    ctl = ['bash', str(scripts / 'goal_ctl.sh')]
++    store = [sys.executable, '-I', str(scripts / 'goal_store.py'), 'incumbent']
++    marker = project / '.goal' / 'dedupe-baseline'
++    if not marker.exists():
++        project.mkdir(parents=True, exist_ok=True)
++        invoke(ctl, 'init')
++        (project / 'app.py').write_text('from ordered import dedupe\n' + DRIVER)
++        (project / 'ordered.py').write_text(BASELINE)
++        (project / '.goal/goal.md').write_text(
++            '# Goal\n\n## Acceptance criteria\n\n'
++            '- AC-1 | preserves order | check: `python3 -B -c "from ordered import dedupe; '
++            'assert dedupe([2, 1, 2]) == [2, 1]"` | expected: exit=0\n\n'
++            '## Approval\n\napproved: PENDING\n')
++        invoke(ctl, 'stamp', '--auto')
++        invoke(ctl, 'close-iteration', '--task', 'T1', '--files', 'app.py,ordered.py', '--checks-pass', '1',
++               '--checks-fail', '0', '--checks-unverifiable', '0', '--progress', 'yes', '--exit-signal', 'yes',
++               '--adversarial', 'clear', '--adversarial-note', 'fresh deterministic check', '--no-gate')
++        baseline = invoke(store, 'save', '--file', 'app.py', '--file', 'ordered.py')
++        marker.write_text(baseline + '\n')
++    baseline = marker.read_text().strip()
++    (project / 'ordered.py').write_text(candidate)
++    return {'baseline': baseline, 'candidate': invoke(store, 'candidate', '--base', baseline), 'entry': 'app.py'}
++
++
++def prepare(root, counterexample=False, repair=False, project=None):
+     root.mkdir(parents=True, exist_ok=True)
+-    for name, data in (('baseline.py', BASELINE), ('candidate.py', REPAIRED if repair else CANDIDATE), ('grader.py', GRADER)):
+-        (root / name).write_text(data)
++    candidate = REPAIRED if repair else CANDIDATE
++    (root / 'grader.py').write_text(GRADER)
++    if project is None:
++        (root / 'baseline.py').write_text(BASELINE + DRIVER)
++        (root / 'candidate.py').write_text(candidate + DRIVER)
++        policies = {'baseline': 'baseline.py', 'candidate': 'candidate.py'}
++    else:
++        policies = capture_checkpoints(project, candidate)
+     phases = {}
+     for phase, offset in (('development', 17), ('holdout', 10017)):
+         cases = []
+@@ -70,9 +110,9 @@
+             (root / expected_name).write_text(json.dumps(expected))
+             cases.append({'input': input_name, 'expected': expected_name})
+         phases[phase] = cases
+-    protocol = dict(version=1, baseline='baseline.py', candidate='candidate.py', grader='grader.py',
++    protocol = dict(version=1 if project is None else 2, grader='grader.py',
+                     minimum_pairs=6, minimum_cost_gain=0.15, quality_tolerance=0,
+-                    trial_seconds=5, budget_seconds=60, **phases)
++                    trial_seconds=5, budget_seconds=60, **phases, **policies)
+     path = root / 'protocol.json'
+     path.write_text(json.dumps(protocol, indent=2))
+     return path
+@@ -81,20 +121,32 @@
+ if __name__ == '__main__':
+     parser = argparse.ArgumentParser(description=__doc__)
+     parser.add_argument('--output', type=Path, required=True)
++    parser.add_argument('--checkpoint', action='store_true', help='compare two-file artifact checkpoints from a real goal project')
+     phase = parser.add_mutually_exclusive_group()
+     phase.add_argument('--counterexample', action='store_true')
+     phase.add_argument('--repair', action='store_true')
+     args = parser.parse_args()
+-    protocol = prepare(args.output / ('counterexample' if args.counterexample else 'repaired' if args.repair else 'integer-cases'),
+-                       args.counterexample, args.repair)
+-    subprocess.run([sys.executable, '-I', str(ROOT / 'scripts/goal_evolve.py'), str(protocol),
+-                    '--state', str(args.output / 'state')], check=True)
++    project = args.output / 'project' if args.checkpoint else None
++    name = 'counterexample' if args.counterexample else 'repaired' if args.repair else 'integer-cases'
++    protocol = prepare(args.output / name, args.counterexample, args.repair, project)
++    runner = [sys.executable, '-I', str(ROOT / 'scripts/goal_evolve.py')]
++    state_args = ['--state', str(args.output / 'state')]
++    project_args = ['--project', str(project)] if project else []
++    decision = subprocess.check_output([*runner, str(protocol), *state_args, *project_args], text=True)
++    print(decision.strip())
++    if project and json.loads(decision)['status'] == 'withdrawn':
++        frozen = json.loads(protocol.read_bytes())
++        subprocess.run([sys.executable, '-I', str(ROOT / 'scripts/goal_store.py'), 'incumbent', 'restore',
++                        '--project', str(project), '--base', frozen['baseline'], '--candidate', frozen['candidate']],
++                       check=True, timeout=20)
++        subprocess.run(['bash', str(ROOT / 'scripts/goal_gate.sh'), '--project', str(project), '--check'],
++                       check=True, timeout=20)
+     enabled = json.loads((args.output / 'state/enabled.json').read_bytes())
+     if enabled['policy'] is not None:
+         program = args.output / 'state' / enabled['program']
+         assert hashlib.sha256(program.read_bytes()).hexdigest() == enabled['policy']
+         case = json.loads(protocol.read_bytes())['development'][0]
+-        output = subprocess.run([sys.executable, '-I', str(program)],
++        output = subprocess.run([*runner, 'run-enabled', *state_args, '--seconds', '5'],
+                                 input=(protocol.parent / case['input']).read_bytes(),
+                                 capture_output=True, timeout=5, check=True)
+         assert json.loads(output.stdout) == json.loads((protocol.parent / case['expected']).read_bytes())

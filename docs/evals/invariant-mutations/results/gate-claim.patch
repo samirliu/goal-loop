@@ -1,0 +1,11 @@
+--- a/scripts/goal_gate.sh
++++ b/scripts/goal_gate.sh
+@@ -580,7 +580,7 @@
+ done
+ [ -z "$missing_lk" ] || echo "GATE: NOTE loop-log-missing-keys:${missing_lk# }" >&2
+ claim=$(printf '%s\n' "$lb" | grep -E '^exit_signal=' | tail -1 | cut -d= -f2-)
+-[ "$claim" = yes ] || [ "$mode" = checkpoint ] || fail "not-claimed"
++:
+ # (5c/5d two-pass + raw run immediately before GO - after mechanical ACs)
+ # R12 tooth at the arbiter (v2.7): the CLAIMING block must carry a schema-valid
+ # task= id. ctl enforces this at write time, but a hand-written ledger block

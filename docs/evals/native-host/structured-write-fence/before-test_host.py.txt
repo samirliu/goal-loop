@@ -1,0 +1,357 @@
+"""Explicit host receipts and synthetic hook contracts; no model requests."""
+import importlib.util
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+import time
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / 'scripts/goal_host.py'
+spec = importlib.util.spec_from_file_location('test_goal_host', SCRIPT)
+host = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(host)
+
+
+class Host(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix='goal-host-bridge-')
+        self.addCleanup(self.temp.cleanup)
+        self.project = Path(self.temp.name)
+        self.init(self.project)
+        self.session = host.begin(self.project, 'codex', 'session-one', 90)
+        self.graph = self.project / 'graph.json'
+        self.graph.write_text(json.dumps(dict(version=1, context={'host': 'fixture'}, capacity=2,
+            jobs=[dict(id='T' + str(n), files=[str(n) + '.out'], deps=[],
+                       check=[sys.executable, '-c', 'from pathlib import Path; assert Path(%r).read_text()=="valid"' % (str(n) + '.out')])
+                  for n in range(1, 4)],
+            final_check=['true'], instruments=[], inputs=[])))
+        self.wave = host.crew.begin(self.project, self.graph, 'crew', 'host-fixture')
+
+    def init(self, project):
+        for args in (['init'],):
+            result = subprocess.run(['bash', str(ROOT / 'scripts/goal_ctl.sh'), *args, '--project', str(project)],
+                                    capture_output=True, timeout=15)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        (project / '.goal/goal.md').write_text('# Goal\n\n## Acceptance criteria\n\n'
+            '- AC-1 | host | check: `true` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n')
+        result = subprocess.run(['bash', str(ROOT / 'scripts/goal_ctl.sh'), 'stamp', '--auto', '--project', str(project)],
+                                capture_output=True, timeout=15)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def prepare(self, task='T1'):
+        return host.prepare(self.project, self.wave, task)
+
+    def attempt(self, item):
+        return host.get(host.folder(self.project)[1], item['ticket'])[1]
+
+    def job(self, task='T1'):
+        return host.crew.load(host.crew.Wave(self.project, self.wave).path)['jobs'][task]
+
+    def payload(self, event, **kwargs):
+        value = dict(hook_event_name=event, session_id='session-one', cwd=str(self.project))
+        value.update(kwargs)
+        return value
+
+    def cli_hook(self, payload, backend='codex'):
+        result = subprocess.run([sys.executable, '-I', str(SCRIPT), 'hook', '--backend', backend],
+                                input=json.dumps(payload).encode(), capture_output=True, timeout=12)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return json.loads(result.stdout)
+
+    def test_bridge_ack_ready_structured_completion_and_independent_adoption(self):
+        item = self.prepare()
+        self.assertEqual(self.prepare()['ticket'], item['ticket'])
+        self.assertIn('GOAL_HOST_TICKET ' + item['ticket'], item['worker_prefix'])
+        host.attach(self.project, item['ticket'], {'task_name': '/root/w5/T1'})
+        host.attach(self.project, item['ticket'], {'task_name': '/root/w5/T1'})
+        self.assertIsNone(self.job()['returned'])
+        time.sleep(0.04)
+        result = subprocess.run(item['ready_command'], shell=True, capture_output=True, timeout=12)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertGreater(self.job()['started'] - self.job()['dispatch'], 0.04)
+        self.assertIsNone(self.job()['first_valid'])
+        host.reconcile(self.project, {'agents': [{'agent_name': '/root/w5/T1', 'agent_status': 'running',
+                                                'message': 'completed; all tests pass'}]})
+        self.assertIsNone(self.job()['returned'])
+        with self.assertRaisesRegex(ValueError, 'completion'):
+            host.validate(self.project, item['ticket'])
+        receipt = {'agents': [{'agent_name': '/root/w5/T1', 'agent_status': {'completed': 'failed, SUCCESS, anything'}}]}
+        host.reconcile(self.project, receipt)
+        host.reconcile(self.project, receipt)
+        self.assertIsNotNone(self.job()['returned'])
+        self.assertIsNone(self.job()['adopted'])
+        with self.assertRaisesRegex(ValueError, 'validation'):
+            host.adopt(self.project, item['ticket'])
+        self.assertNotEqual(host.validate(self.project, item['ticket']), 0)
+        with self.assertRaisesRegex(ValueError, 'stale/failed'):
+            host.adopt(self.project, item['ticket'])
+        (self.project / '1.out').write_text('valid')
+        self.assertEqual(host.validate(self.project, item['ticket']), 0)
+        host.adopt(self.project, item['ticket'])
+        host.adopt(self.project, item['ticket'])
+        (self.project / '1.out').write_text('later edit')
+        with self.assertRaisesRegex(ValueError, 'stale/failed'):
+            host.adopt(self.project, item['ticket'])
+        traces = host.trace.records(self.project)
+        span = next(r for r in traces if r['id'] == item['trace'])
+        self.assertEqual(span['host']['agent_id'], '/root/w5/T1')
+        self.assertIsNotNone(span['host']['before_sha256'])
+        self.assertIsNotNone(span['host']['after_sha256'])
+        self.assertIsNone(span['tokens']); self.assertIsNone(span['money'])
+
+    def test_cancellation_token_kills_only_owned_command_and_needs_host_confirmation(self):
+        first, sibling = self.prepare(), self.prepare('T2')
+        host.attach(self.project, first['ticket'], {'task_name': '/root/w5/T1'})
+        host.attach(self.project, sibling['ticket'], {'task_name': '/root/w5/T2'})
+        marker = self.project / 'ready'
+        code = 'from pathlib import Path; import time; Path(%r).touch(); time.sleep(20)' % str(marker)
+        process = subprocess.Popen([sys.executable, '-I', str(ROOT / 'scripts/goal_bounded.py'),
+            '--owner', str(os.getpid()), '--seconds', '20', '--cancel-file', first['cancel_file'],
+            '--deadline-epoch', str(first['deadline_epoch']), '--', sys.executable, '-c', code],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.addCleanup(lambda: process.kill() if process.poll() is None else None)
+        until = time.monotonic() + 5
+        while not marker.exists() and process.poll() is None and time.monotonic() < until:
+            time.sleep(0.01)
+        self.assertTrue(marker.exists())
+        host.cancel(self.project, first['ticket'])
+        host.cancel(self.project, first['ticket'])
+        out, err = process.communicate(timeout=5)
+        self.assertEqual(process.returncode, 130, out + err)
+        self.assertFalse(Path(sibling['cancel_file']).exists())
+        self.assertEqual(self.attempt(first)['outcome'], 'cancel-requested')
+        self.assertIsNone(self.job()['returned'])
+        host.reconcile(self.project, {'agents': [{'agent_name': '/root/w5/T1', 'agent_status': 'interrupted'},
+                                               {'agent_name': '/root/w5/T2', 'agent_status': 'running'}]})
+        self.assertEqual(self.job()['fault']['kind'], 'cancelled')
+        self.assertIsNone(self.job('T2')['returned'])
+        row = self.attempt(first)
+        self.assertEqual(row['outcome'], 'cancelled')
+        self.assertEqual(row['before_sha256'], row['after_sha256'])
+        self.assertIsNone(self.job()['first_valid'])
+
+    def test_nonce_capacity_and_scope_rejection_preserve_failed_attempt(self):
+        first = self.prepare()
+        self.prepare('T2')
+        with self.assertRaisesRegex(ValueError, 'capacity'):
+            self.prepare('T3')
+        rows = host.attempts(host.folder(self.project)[1])
+        failed = next(r for r in rows if r['task'] == 'T3')
+        self.assertEqual(failed['outcome'], 'failed')
+        self.assertIsNone(self.job('T3')['dispatch'])
+        self.assertEqual(failed['before_sha256'], failed['after_sha256'])
+        self.assertEqual(len(rows), 3)
+        with self.assertRaisesRegex(ValueError, 'nonce'):
+            host.ready(self.project, first['ticket'].split(':')[0] + ':' + '0' * 32)
+        with self.assertRaisesRegex(ValueError, 'unregistered'):
+            self.prepare('T99')
+        self.assertEqual(len(host.attempts(host.folder(self.project)[1])), 3)
+        with self.assertRaisesRegex(ValueError, 'native agentId'):
+            host.attach(self.project, first['ticket'], {'message': '/root/w5/T1 completed'})
+
+    def test_native_hooks_correlate_only_nonce_call_and_native_agent_id(self):
+        item = self.prepare()
+        bad = self.payload('PreToolUse', tool_name='spawn_agent', tool_use_id='call-one', tool_input={'message': 'implement T1'})
+        self.assertEqual(self.cli_hook(bad)['hookSpecificOutput']['permissionDecision'], 'deny')
+        good = dict(bad, tool_input={'message': item['worker_prefix'] + 'body never persisted'})
+        self.assertEqual(self.cli_hook(good), {})
+        self.assertEqual(self.cli_hook(good), {})
+        wrong = dict(good, tool_use_id='other-call')
+        self.assertEqual(self.cli_hook(wrong)['hookSpecificOutput']['permissionDecision'], 'deny')
+        self.cli_hook(self.payload('SubagentStart', agent_id='native-worker'))
+        self.cli_hook(self.payload('SubagentStop', agent_id='native-worker', last_assistant_message='all done'))
+        self.assertIsNone(self.job()['returned'])
+        post = self.payload('PostToolUse', tool_name='spawn_agent', tool_use_id='call-one',
+                            tool_response={'agentId': 'native-worker', 'status': 'async_launched', 'totalTokens': 999})
+        self.assertEqual(self.cli_hook(post), {})
+        self.assertEqual(self.attempt(item)['agent_id'], 'native-worker')
+        self.assertIsNone(self.job()['returned'])
+        self.cli_hook(self.payload('SubagentStop', agent_id='native-worker', last_assistant_message='completed'))
+        self.assertIsNone(self.job()['returned'])
+        host.reconcile(self.project, {'method': 'item/completed', 'params': {'item': {
+            'type': 'collabAgentToolCall', 'status': 'completed',
+            'agentsStates': {'native-worker': {'status': 'completed', 'message': 'ignored'}}}}})
+        self.assertIsNotNone(self.job()['returned'])
+        self.assertIsNone(self.job()['adopted'])
+        for path in host.folder(self.project)[1].glob('*.json'):
+            self.assertNotIn('body never persisted', path.read_text())
+            self.assertNotIn('all done', path.read_text())
+        span = next(r for r in host.trace.records(self.project) if r['id'] == item['trace'])
+        self.assertEqual(span['host']['call_id'], 'call-one')
+        self.assertIsNone(span['tokens'])
+        events = [host.load(p) for p in host.folder(self.project)[1].glob('event-*.json')]
+        self.assertTrue(events)
+        self.assertTrue(all(e['known'] is False for e in events))
+
+    def test_expired_budget_denies_hooks_and_no_wave_dispatch(self):
+        origin = host.capture('codex', 'session-one', 'tool')
+        host.budget.adopt_host(self.project / '.goal', origin, 1)
+        time.sleep(1.05)
+        with self.assertRaisesRegex(ValueError, 'time-budget-exhausted'):
+            self.prepare()
+        self.assertIsNone(self.job()['dispatch'])
+        out = self.cli_hook(self.payload('PreToolUse', tool_name='shell', tool_use_id='late', tool_input={}))
+        self.assertEqual(out['hookSpecificOutput']['permissionDecision'], 'deny')
+        self.assertNotIn('continue', out)
+
+    def test_non_goal_noop_and_explicit_prompt_entry_cache(self):
+        with tempfile.TemporaryDirectory(prefix='non-goal-') as directory:
+            payload = dict(hook_event_name='UserPromptSubmit', session_id='ordinary', cwd=directory, prompt='private body')
+            self.assertEqual(host.hook(payload, 'claude'), {})
+            self.assertFalse((Path(directory) / '.goal').exists())
+        self.assertEqual(self.cli_hook(self.payload('PreToolUse', tool_name='Agent', session_id='other-session')), {})
+        with tempfile.TemporaryDirectory(prefix='prompt-goal-') as directory:
+            project = Path(directory)
+            self.init(project)
+            payload = dict(hook_event_name='UserPromptSubmit', session_id='prompt-session', cwd=directory, prompt='private body')
+            self.assertEqual(host.hook(payload, 'claude', project), {})
+            time.sleep(0.04)
+            value = host.begin(project, 'claude', 'prompt-session', 30)
+            self.assertEqual(value['scope'], 'host-prompt-entry')
+            persisted = host.budget.runner_data((project / '.goal/runner.json').read_bytes())
+            self.assertGreater(time.monotonic() - persisted['origin']['monotonic'], 0.04)
+            self.assertNotIn('private body', ''.join(p.read_text() for p in host.folder(project)[1].glob('*.json')))
+
+    def test_interrupt_only_requests_and_structured_errors_keep_missing_output(self):
+        first, sibling = self.prepare(), self.prepare('T2')
+        host.attach(self.project, first['ticket'], {'agentId': 'a1'})
+        host.attach(self.project, sibling['ticket'], {'agentId': 'a2'})
+        self.cli_hook(self.payload('Interrupt'))
+        self.assertTrue(Path(first['cancel_file']).exists())
+        self.assertTrue(Path(sibling['cancel_file']).exists())
+        self.assertIsNone(self.job()['returned'])
+        denied = self.cli_hook(self.payload('PreToolUse', agent_id='a1', tool_name='shell', tool_input={}))
+        self.assertEqual(denied['hookSpecificOutput']['permissionDecision'], 'deny')
+        host.reconcile(self.project, {'threadId': 'a1', 'turn': {'status': 'failed'}})
+        self.assertEqual(self.attempt(first)['outcome'], 'failed')
+        self.assertIsNotNone(self.job()['fault'])
+        self.assertIsNone(self.job()['first_valid'])
+        self.assertFalse((self.project / '1.out').exists())
+        self.assertIsNone(self.job('T2')['returned'])
+
+    def test_symlinked_state_and_cancel_target_are_refused(self):
+        item = self.prepare()
+        valuable = self.project / 'valuable'
+        valuable.write_text('preserve')
+        Path(item['cancel_file']).symlink_to(valuable)
+        with self.assertRaisesRegex(ValueError, 'symlink'):
+            host.cancel(self.project, item['ticket'])
+        self.assertEqual(valuable.read_text(), 'preserve')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / '.goal').symlink_to(self.project / '.goal')
+            with self.assertRaisesRegex(ValueError, 'symlink'):
+                host.begin(root, 'codex', 'bad', 30)
+
+    def test_first_explicit_prompt_is_captured_before_initialization_and_reentry(self):
+        for command in ('/goal-loop', '/goal-loop-host:goal-loop'):
+            with self.subTest(command=command), tempfile.TemporaryDirectory(prefix='first-goal-prompt-') as directory:
+                project = Path(directory)
+                payload = dict(hook_event_name='UserPromptSubmit', session_id='first', cwd=directory, prompt=command)
+                host.hook(payload, 'codex')
+                self.assertFalse((project/'.goal').exists())
+                payload['prompt'] = command+' continue'
+                host.hook(payload, 'codex')
+                self.assertFalse((project/'.goal').exists())
+                payload['prompt'] = command+' --auto implement the requested artifact'
+                host.hook(payload, 'codex')
+                first = host.load(host.session_path(host.folder(project)[1], 'codex', 'first', 'prompt'))
+                time.sleep(.04)
+                host.hook(payload, 'codex')
+                later = host.load(host.session_path(host.folder(project)[1], 'codex', 'first', 'prompt'))
+                self.assertEqual(first, later)
+                session = host.begin(project, 'codex', 'first', 30)
+                self.assertEqual(session['scope'], 'host-prompt-entry')
+                runner = host.budget.runner_data((project/'.goal/runner.json').read_bytes())
+                self.assertEqual(runner['origin'], first['origin'])
+                self.assertGreater(time.monotonic()-runner['origin']['monotonic'], .04)
+
+    def test_first_worker_tool_binds_ticket_and_codex_keeps_normal_permissions(self):
+        item = self.prepare()
+        ready = self.payload('PreToolUse', tool_name='Bash', tool_use_id='ready', agent_id='worker-first',
+                             tool_input={'command': item['owned_ready_command']})
+        self.assertEqual(self.cli_hook(ready), {})
+        self.assertEqual(self.attempt(item)['agent_id'], 'worker-first')
+        self.assertIsNone(self.job()['started'])  # Hook entry is not READY.
+        result = subprocess.run(item['owned_ready_command'], shell=True, capture_output=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        plain = self.payload('PreToolUse', tool_name='Bash', agent_id='worker-first', tool_input={'command': 'echo hello'})
+        rejected = self.cli_hook(plain)['hookSpecificOutput']
+        self.assertEqual(rejected['permissionDecision'], 'deny')
+        self.assertIn('goal_host_command.py', rejected['permissionDecisionReason'])
+        self.assertIsNotNone(self.job()['started'])
+        self.assertIsNone(self.job()['returned'])
+        # Shell metacharacters outside the owned argv must never be accepted
+        # simply because the text starts with the correct wrapper prefix.
+        plain['tool_input']['command'] = item['owned_ready_command']+'; echo escaped'
+        self.assertEqual(self.cli_hook(plain)['hookSpecificOutput']['permissionDecision'], 'deny')
+        plain['tool_input']['command'] = item['check_command']
+        self.assertEqual(self.cli_hook(plain), {})
+        plain['tool_input']['command'] = item['ready_command']
+        self.assertEqual(self.cli_hook(plain), {})
+
+    def test_native_claude_rewrite_does_not_auto_approve_permissions(self):
+        with tempfile.TemporaryDirectory(prefix='claude-owned-tool-') as directory:
+            project = Path(directory)
+            self.init(project)
+            host.begin(project, 'claude', 'claude-one', 30)
+            wave = host.crew.begin(project, self.graph, 'crew', 'claude-tools')
+            item = host.prepare(project, wave, 'T1')
+            payload = dict(hook_event_name='PreToolUse', cwd=directory, session_id='claude-one',
+                           agent_id='claude-worker', tool_name='Bash', tool_input={'command': item['owned_ready_command']})
+            self.assertEqual(host.hook(payload, 'claude'), {})
+            original = 'printf "%s" "$HOME `literal`"'
+            payload['tool_input'] = {'command': original, 'timeout': 1000, 'description': 'kept'}
+            rewritten = host.hook(payload, 'claude')['hookSpecificOutput']
+            self.assertNotIn('permissionDecision', rewritten)
+            args = host.shlex.split(rewritten['updatedInput']['command'])
+            self.assertEqual(args[-3:], ['/bin/sh', '-c', original])
+            self.assertEqual(rewritten['updatedInput']['timeout'], 1000)
+            self.assertEqual(rewritten['updatedInput']['description'], 'kept')
+
+    def test_short_write_lock_contention_waits_and_records_each_ready_once(self):
+        items = [self.prepare(), self.prepare('T2')]
+        children = []
+        with host.locked(self.project):
+            for item in items:
+                children.append(subprocess.Popen(host.shlex.split(item['ready_command']),
+                                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE))
+            time.sleep(.08)
+        for child in children:
+            out, err = child.communicate(timeout=5)
+            self.assertEqual(child.returncode, 0, out+err)
+        self.assertIsNotNone(self.job()['started'])
+        self.assertIsNotNone(self.job('T2')['started'])
+
+    def test_other_worker_can_be_cancelled_while_validator_is_running(self):
+        checker = ('from pathlib import Path; import time; Path(%r).touch(); time.sleep(1.3)'
+                   % str(self.project/'validator-ready'))
+        definition = json.loads(self.graph.read_bytes())
+        definition['jobs'][0]['check'] = [sys.executable, '-c', checker]
+        self.graph.write_text(json.dumps(definition))
+        self.wave = host.crew.begin(self.project, self.graph, 'crew', 'cancel-during-validation')
+        first, sibling = self.prepare(), self.prepare('T2')
+        host.attach(self.project, first['ticket'], {'agentId': 'validator-target'})
+        host.reconcile(self.project, {'agentId': 'validator-target', 'status': 'completed'})
+        process = subprocess.Popen([sys.executable, '-I', str(SCRIPT), 'validate', str(self.project), first['ticket']],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.addCleanup(lambda: process.kill() if process.poll() is None else None)
+        until = time.monotonic()+4
+        while not (self.project/'validator-ready').exists() and process.poll() is None and time.monotonic()<until:
+            time.sleep(.01)
+        self.assertTrue((self.project/'validator-ready').exists())
+        started = time.monotonic()
+        host.cancel(self.project, sibling['ticket'])
+        self.assertLess(time.monotonic()-started, .5)
+        self.assertTrue(Path(sibling['cancel_file']).exists())
+        self.assertIsNone(process.poll())
+        out, err = process.communicate(timeout=4)
+        self.assertEqual(process.returncode, 0, out+err)
+
+
+if __name__ == '__main__':
+    unittest.main()

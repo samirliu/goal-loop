@@ -1,0 +1,12 @@
+Observed tool-output excerpt of the initial full run. The full log was
+accidentally overwritten by the final rerun; this is not a complete raw log.
+
+ERROR: test_deadline_limits_workers_and_resume (test_budget.Budget.test_deadline_limits_workers_and_resume)
+File tests/test_budget.py, line 67: calls=(p/'.goal/calls').read_text().count('x')
+FileNotFoundError: no .goal/calls (executor had not been dispatched).
+Ran 187 tests in 471.175s
+FAILED (errors=1)
+
+The original 2-second fixture then passed independently (1 test, 6.109s).
+The revised 5-second budget/8-second delayed leak fixture passed (14.741s).
+The one-dispatch, no-budget-extension and no-late-write assertions remain.

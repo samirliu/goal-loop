@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_linked_worktree_uses_the_selected_worktree_bytes (__main__.WorktreeScope.test_linked_worktree_uses_the_selected_worktree_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-invariant-mutations-1cvu1cyn/bind-content/tests/test_worktree_scope.py", line 49, in test_linked_worktree_uses_the_selected_worktree_bytes
+    self.assertNotEqual(selected, self.digest(linked))
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'v2-1195ba28c60579cbcf8df9667b276eff5940e97f7889ef99c48dc16f82ad059a\n' == 'v2-1195ba28c60579cbcf8df9667b276eff5940e97f7889ef99c48dc16f82ad059a\n'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.364s
+
+FAILED (failures=1)

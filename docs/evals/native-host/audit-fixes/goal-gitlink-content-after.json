@@ -1,0 +1,30 @@
+{
+  "fixture": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-gitlink-before-f620v8ts/parent",
+  "original_evidence": "/tmp/goal-gitlink-content-before.json",
+  "before": {
+    "returncode": 0,
+    "stdout": "v2-54056a789721e1adb1be8d995312ccea6945a683abfa9346ff2940be05d552d2",
+    "stderr": ""
+  },
+  "after": {
+    "returncode": 0,
+    "stdout": "v2-2fb0962a379fad9a41e1d093f3f75edc8933593485f14855dddc2869d4736ffb",
+    "stderr": ""
+  },
+  "changed_digest": true,
+  "judged_before_child_edit": {
+    "returncode": 0,
+    "stdout": "GATE: GO digest=v2-7c142f1fc7985bb50c4385bc0fb8035a0fa08846ca1c5f4ed921c4b90fd76013 iter=1 ac=1 pass=1 unverified=0 mode=threshold",
+    "stderr": "GATE: NOTE judge-score-unrecorded (AC-1 claimed without a numeric judge score; R13 stays inert - record --judge-score N to activate the divergence guard)"
+  },
+  "judged_after_child_edit": {
+    "returncode": 2,
+    "stdout": "",
+    "stderr": "GATE: NOTE false-complete suspected; already counted by the ratchet - fix the artifact and let the claim pass, do not re-claim unchanged\nGATE: NO-GO reason=verdicts-stale:block=v2-7c142f1fc7985bb50c4385bc0fb8035a0fa08846ca1c5f4ed921c4b90fd76013 current=v2-227a966cd974910ca75339529897f69646fc9605c9c196fbfd830429fd0db43c hint=rebind-judged"
+  },
+  "shell_fallback": {
+    "returncode": 4,
+    "stdout": "",
+    "stderr": "GATE: ERROR gitlink-requires-python\nGATE: ERROR reason=unreadable-project"
+  }
+}

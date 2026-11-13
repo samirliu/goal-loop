@@ -1,0 +1,15 @@
+GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "__main__.GateEntryBudget.test_python_startup_delay_spends_the_same_settlement", "completed": ["0", "1"], "contexts": [["1684745.994686541", "1684748.994686541"], ["1684745.994686541", "1684748.994686541"], ["1684745.994686541", "1684748.994686541"]], "elapsed": 5.357969249831513, "fresh_access_entries": [], "limits": [], "returncode": 2, "started_monotonic": 1684743.661355833, "startup_delay_marker": true, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": "GATE: VERIFY AC-1|PASS|exit=0\nGATE: VERIFY AC-2|PASS|exit=0\n"}
+F
+======================================================================
+FAIL: test_python_startup_delay_spends_the_same_settlement (__main__.GateEntryBudget.test_python_startup_delay_spends_the_same_settlement)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_gate_entry_budget.py", line 231, in test_python_startup_delay_spends_the_same_settlement
+    self.assertLess(observed['elapsed'],4.2,observed)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 5.357969249831513 not less than 4.2 : {'case': '__main__.GateEntryBudget.test_python_startup_delay_spends_the_same_settlement', 'started_monotonic': 1684743.661355833, 'elapsed': 5.357969249831513, 'returncode': 2, 'fresh_access_entries': [], 'access_elapsed': None, 'contexts': [['1684745.994686541', '1684748.994686541'], ['1684745.994686541', '1684748.994686541'], ['1684745.994686541', '1684748.994686541']], 'limits': [], 'completed': ['0', '1'], 'stdout': 'GATE: VERIFY AC-1|PASS|exit=0\nGATE: VERIFY AC-2|PASS|exit=0\n', 'stderr': 'GATE: NO-GO reason=verification-time-budget-exhausted\n', 'startup_delay_marker': True}
+
+----------------------------------------------------------------------
+Ran 1 test in 6.964s
+
+FAILED (failures=1)

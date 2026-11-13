@@ -1,0 +1,139 @@
+{
+  "scope": "All six preregistered positions; descriptive statistics, not confidence or population effect; original grader only",
+  "cohort_elapsed": 1406.781991166994,
+  "backend": "claude",
+  "source_hashes": {
+    ".claude-plugin/plugin.json": "e36378fbc9c44db142d171ceb4303e5614cef87f2ee030040a61dfeda7b98dde",
+    "SKILL.md": "ec03584de0cfbeb69dec7ee011178fb6b5126ac273b0f47a38f5ae40a1ceb840",
+    "agents/goal-adjudicator.md": "f7ede0b8f73573a4e6c416d1282fda5d8340226611b2c68c0603ba2b803d73f3",
+    "agents/goal-checker-req.md": "407a8d9d2e85261bfb09b2a0c2ee5d6864a4abb572b4adc25ffeab3cb7c7c73d",
+    "agents/goal-critic.md": "d3034a768937c08f2766bbcdccb2b276df669d950f0f143bca40188a378b5544",
+    "agents/goal-mech-worker.md": "cf95458067dee6950a6fc73d8641bd381519eaeafc1396c6c7e1da37f0ead7d6",
+    "agents/goal-worker.md": "93fc6d5de4e0b3c03d31c5e62b250b277017fe3ebdd3e18667203e1e5e7cfd06",
+    "examples/agent-evals/grade.py": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19",
+    "examples/agent-evals/tasks.py": "5441b4ad2aeab3558f31f26f4a0c117e10dfa3f439f86d3ad6aa29ece5416e38",
+    "examples/crew-cost/native.py": "622966f00364eb4a8a404cc6d5b20420cadd6cea7b98c1cc28fc6032f46ee039",
+    "examples/crew-cost/native_checks.py": "b72826bd3c9ccee97731943f97f5a96469f48dbc014e18f3adb56e2528e78f84",
+    "hooks/hooks.json": "9343223f6d4a673d7dfa84d38ee095702ef3ff652d07e558c325b4ce0e3da44f",
+    "references/companions.md": "f004518887cfd11d0e599bd3dc4f0ed8fc91ef73237ddc5aaa7f3906fd2c8fa3",
+    "references/crew.md": "5c776149323657ba9e215fac646fbc37490186e9cc6c75120951f6c3f6fa798a",
+    "references/gate.md": "934894c986d6c97e1d6360aa6e5e83c140ad442ab0562dd14ebb1033cf5f9f58",
+    "references/host.md": "aca33ff4a8c403f71e50282f3c8950de87c7bafd8a2cd835574b763f6a1dc179",
+    "references/packs/README.md": "4c0b959ea7644cccc65055d8b3b4471767a43b3ae58e6b47c24e2568819a04fd",
+    "references/packs/external.md": "25f77d3591b44f9c77a6213897659f3883acd55e0cfda71691cab46000c08d78",
+    "references/packs/gradient.md": "be89ba286423a5b1c1247ac2196876bd789a3b234705db8135518e9bd82c5ed9",
+    "references/packs/instrument.md": "9ba9e8591472c1d0afe30ad1dc1711e4d4d744f8beef47f36759e8a9f2b569c1",
+    "references/patterns.md": "2dfb30a03ea84b946c93d8c656ba05b212f81fd58695267323e73b1c8e65320d",
+    "scripts/goal_audit.sh": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb",
+    "scripts/goal_bounded.py": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c",
+    "scripts/goal_crew.py": "f0bf48438a6c2d4eecbc7a1be03c9d6b990da94a686dbde1e251c58a7c23bae9",
+    "scripts/goal_ctl.sh": "2bb2ad319b73da9ce8d9927a7e0c4f7e2ccc424ae4efdeee65ab70cd0c745a64",
+    "scripts/goal_evolve.py": "e6ff794567ce37409a8cd7cca0efc2efa93b35a0bf968b3d22411ccd908d0ae7",
+    "scripts/goal_forge.py": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb",
+    "scripts/goal_gate.sh": "4fbedbde2f524d69e3b3ca16e2f150a7aee7cf62b789e5a8abdbf8bb01cc6c8c",
+    "scripts/goal_hook.sh": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87",
+    "scripts/goal_host.py": "6cd50115f5e0ac78e89b9287a2475026a6aa9a3db7a2245a4efe9e9d8c2eb060",
+    "scripts/goal_host_command.py": "4331b9672bb9e3b658a2fe0320411da08721995126b71690ab535ebcbaa600e5",
+    "scripts/goal_host_config.py": "fcb9118c8ce1b9a940bfeed1cc289155f4366c301ff2acaa926cb5c0d494f1f5",
+    "scripts/goal_loop.sh": "d5481f38bdbba6ae781479979985b4d415acb6be688d5e227914f0458948f05a",
+    "scripts/goal_owner_watch.py": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+    "scripts/goal_parse.sh": "368fdcbb5838c8a8d64570f409b1ea713ec3ce24938825a8dc5f9f2ed1a85bdb",
+    "scripts/goal_runner.py": "09c14fe4f348bc768ee66605353df80267017caf494b046b37f0fb8716ff39aa",
+    "scripts/goal_store.py": "13d4250e70d406d030eace9d7c2b12c6fc0a0dd4cff11fcd536671ae4d0ee8f3",
+    "scripts/goal_strategy.awk": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+    "scripts/goal_trace.py": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb",
+    "scripts/goal_tree_digest.py": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d"
+  },
+  "accepted_original_grader": 6,
+  "positions": 6,
+  "baseline_restored": true,
+  "planner": {
+    "budget_fit": "yes",
+    "choice": "serial",
+    "condition": "5cfa4cf14ab0f6fab3c7a93d1f810291391c2cd864063be8de91d91aa358e6e2",
+    "crew_upper": 458.2238892498426,
+    "crew_worker_seconds_upper": 510.2923377091065,
+    "effective_dependencies": {
+      "T1": [],
+      "T2": []
+    },
+    "failures": 0,
+    "money": null,
+    "observations": 6,
+    "observer_transport": "python-api",
+    "pending": 0,
+    "reason": "startup-coordination-or-dependency-cost",
+    "serial_basis": "single-worker",
+    "serial_lower": 152.65992137487046,
+    "serial_worker_seconds_lower": 150.3640145829413,
+    "single_observations": 3,
+    "single_worker_lower": 152.65992137487046,
+    "tokens": null,
+    "uncertainty": "observed-range; not a confidence interval"
+  },
+  "batch_identities": [
+    "fce785a538a51c98c006a665c39f06466a46478f879ae82f538b856d6345c149"
+  ],
+  "condition_identity": {
+    "crew": [
+      "5cfa4cf14ab0f6fab3c7a93d1f810291391c2cd864063be8de91d91aa358e6e2"
+    ],
+    "fused": [
+      "6126be43340ca0d190c9aa49533f91356f75572129df79543808ea88c8b2759c"
+    ]
+  },
+  "tokens": null,
+  "money": null,
+  "modes": {
+    "fused": {
+      "n": 3,
+      "wall_mean": 201.79887866663435,
+      "wall_median": 208.92011870793067,
+      "wall_min": 152.65992137487046,
+      "wall_max": 243.81659591710195,
+      "worker_seconds_mean": 199.87214308332963,
+      "worker_seconds_total": 599.6164292499889
+    },
+    "crew": {
+      "n": 3,
+      "wall_mean": 266.90327927757363,
+      "wall_median": 225.23737808293663,
+      "wall_min": 117.2485704999417,
+      "wall_max": 458.2238892498426,
+      "worker_seconds_mean": 314.6006443056588,
+      "worker_seconds_total": 943.8019329169765
+    }
+  },
+  "pairs": [
+    {
+      "pair": 1,
+      "single_wall": 152.65992137487046,
+      "crew_wall": 225.23737808293663,
+      "wall_difference": 72.57745670806617,
+      "crew_wall_change_fraction": 0.4754191935540537,
+      "single_worker_seconds": 150.3640145829413,
+      "crew_worker_seconds": 275.23410670785233,
+      "crew_worker_change_fraction": 0.8304519699827
+    },
+    {
+      "pair": 2,
+      "single_wall": 208.92011870793067,
+      "crew_wall": 458.2238892498426,
+      "wall_difference": 249.30377054191194,
+      "crew_wall_change_fraction": 1.193297094045966,
+      "single_worker_seconds": 207.21643975004554,
+      "crew_worker_seconds": 510.2923377091065,
+      "crew_worker_change_fraction": 1.462605468584663
+    },
+    {
+      "pair": 3,
+      "single_wall": 243.81659591710195,
+      "crew_wall": 117.2485704999417,
+      "wall_difference": -126.56802541716024,
+      "crew_wall_change_fraction": -0.5191116090399096,
+      "single_worker_seconds": 242.03597491700202,
+      "crew_worker_seconds": 158.27548850001767,
+      "crew_worker_change_fraction": -0.34606626740387314
+    }
+  ]
+}

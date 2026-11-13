@@ -1,0 +1,1459 @@
+diff --git a/scripts/goal_ctl.sh b/scripts/goal_ctl.sh
+index 41d81d2..4b9dc9e 100644
+--- a/scripts/goal_ctl.sh
++++ b/scripts/goal_ctl.sh
+@@ -39,7 +39,7 @@ operation_id="" operation_id_seen=0
+ 
+ while [ $# -gt 0 ]; do
+   case "$1" in
+-    init|stamp|bind|close-iteration|status|recover) cmd="$1" ;;
++    init|stamp|bind|close-iteration|status|recover|migrate) cmd="$1" ;;
+     --project) [ $# -ge 2 ] || { echo "CTL: ERROR missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
+     --auto) auto=1 ;;
+     --time-budget=*) time_budget="${1#*=}" ;;
+@@ -71,6 +71,11 @@ while [ $# -gt 0 ]; do
+   shift
+ done
+ [ -n "$cmd" ] || { echo "CTL: ERROR no-command (init|stamp|bind|close-iteration|status)" >&2; exit 4; }
++if [ "$operation_id_seen" -eq 1 ]; then
++  case "$cmd" in init|stamp|bind|close-iteration) : ;; *) echo 'CTL: ERROR operation-id-needs-writer-command' >&2; exit 4 ;; esac
++  printf '%s' "$operation_id" | grep -qE '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$' \
++    || { echo 'CTL: ERROR invalid-operation-id (1-128 ASCII letters/digits/._-, start with letter/digit)' >&2; exit 4; }
++fi
+ 
+ sd="$project/.goal"
+ if [ "$cmd" = init ]; then
+@@ -82,6 +87,7 @@ if [ "$cmd" = init ] && [ ! -d "$sd" ]; then
+ fi
+ if [ -d "$sd" ] && [ "${GOAL_ACCESS_EXEC_PID:-}" != "$$" ]; then
+   access_mode="write"; [ "$cmd" != status ] || access_mode="read"
++  case "$cmd" in init|recover|migrate) access_mode="$cmd" ;; esac
+   exec python3 -I "$here/goal_store.py" access-exec "$sd" "$access_mode" "$here/goal_ctl.sh" "${_goal_ctl_args[@]}"
+ fi
+ if [ "$cmd" != recover ] && [ -e "$sd/store/pending" ]; then
+@@ -94,11 +100,6 @@ r(){ gp_r; }
+ # MUST match goal_gate.sh hash_std - stamp and verify share one digest rule
+ hash_std(){ gp_hash_std; }
+ state_get(){ gp_state_get "$project" "$1"; }
+-if [ "$operation_id_seen" -eq 1 ]; then
+-  case "$cmd" in init|stamp|bind|close-iteration) : ;; *) echo 'CTL: ERROR operation-id-needs-writer-command' >&2; exit 4 ;; esac
+-  printf '%s' "$operation_id" | grep -qE '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$' \
+-    || { echo 'CTL: ERROR invalid-operation-id (1-128 ASCII letters/digits/._-, start with letter/digit)' >&2; exit 4; }
+-fi
+ if [ -n "$operation_id" ] && { [ "$cmd" = init ] || [ "$cmd" = stamp ]; }; then
+   python3 -I "$here/goal_store.py" mutation-retry "$sd" "$cmd" "${_goal_ctl_args[@]}"; replay_rc=$?
+   [ "$replay_rc" -eq 100 ] || exit "$replay_rc"
+@@ -110,13 +111,16 @@ if [ "$cmd" = stamp ] && [ -n "$time_budget" ]; then
+ fi
+ 
+ case "$cmd" in
++  migrate)
++    python3 -I "$here/goal_store.py" migrate-views "$sd" || exit 4
++    exit 0 ;;
+   recover)
+     python3 -I "$here/goal_store.py" close-journal "$sd" recover || exit 4
+     echo 'CTL: RECOVER ok (ledger only; checks were not replayed)'
+     exit 0 ;;
+   init)
+     [ -d "$sd" ] || mkdir -p "$sd/logs"
+-    if [ -f "$sd/goal.md" ]; then echo "CTL: ERROR already-initialized ($sd/goal.md)" >&2; exit 2; fi
++    if [ -f "$sd/goal.md" ] || [ -f "$sd/state.rec" ]; then echo "CTL: ERROR already-initialized ($sd)" >&2; exit 2; fi
+     mutation_id=$(python3 -I "$here/goal_store.py" mutation-journal "$sd" begin init "${_goal_ctl_args[@]}") || exit 4
+     printf 'iteration=0\nbreaker=CLOSED\nfalse_completes=0\nreplans=0\nno_progress_streak=0\nlast_progress_iteration=0\nmax_iterations=%s\nno_progress_limit=2\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=0\ndry_limit=3\ncheck_timeout=120\ntime_budget=0\ndeadline=0\n' "$max_iterations" > "$sd/state.rec" || exit 4
+     : > "$sd/loop-log.md" || exit 4
+@@ -662,7 +666,7 @@ case "$cmd" in
+       [ -z "$(gp_ac_sd_re "$project" "$obj_ac")$(gp_ac_var_re "$project" "$obj_ac")" ] || uncertain=1
+     fi
+     strategy_advice=""; pick_prefer=""; pick_avoid=""
+-    if [ -n "$obj_ac" ] || [ "$stalled" = 1 ]; then
++    if [ -n "$obj_ac" ] || [ "$stalled" = 1 ] || [ -s "$sd/loop-log.md" ]; then
+       sf=/dev/null; [ -s "$sd/scores.rec" ] && sf="$sd/scores.rec"
+       lf=/dev/null; [ -s "$sd/loop-log.md" ] && lf="$sd/loop-log.md"
+       strategy_advice=$(gawk -v obj="${obj_dir:-none}" -v tol="$tol" -v stalled="$stalled" -v uncertain="$uncertain" \
+diff --git a/scripts/goal_gate.sh b/scripts/goal_gate.sh
+index f0c189f..8527cdc 100644
+--- a/scripts/goal_gate.sh
++++ b/scripts/goal_gate.sh
+@@ -52,7 +52,10 @@ drop_check_locks(){
+     eval "exec ${check_fd}<&-"
+   done
+ }
+-check_run(){ drop_check_locks; exec "$@"; }
++check_run(){
++  drop_check_locks
++  exec python3 -I "$here/goal_bounded.py" --owner "$$" --seconds "$tmo" -- "$@"
++}
+ if [ "$mode" != digest ] && [ -e "$sd/store/pending" ] && [ "${GOAL_ACCESS_MODE:-}" != write ]; then
+   echo 'GATE: ERROR reason=recovery-required' >&2
+   exit 4
+@@ -73,7 +76,7 @@ ledger_digest(){                                       # 8 hex over the LEDGER s
+   # .goal/ (R6). The tree digest is blind to .goal, so the ledger gets its
+   # own before/after guard - a check editing goal.md/state/verdicts mid-run
+   # would otherwise measure one state and report another.
+-  { for f in goal.md state.rec loop-log.md verdicts.rec scores.rec work-plan.md baseline.md interfaces.md runner.deadline runner.clock; do
++  { for f in goal.md state.rec loop-log.md verdicts.rec scores.rec work-plan.md baseline.md interfaces.md runner.deadline runner.clock runner.json store/commits/current; do
+       [ -f "$sd/$f" ] && { printf '%s\n' "$f"; r < "$sd/$f"; }
+     done
+   } | hash_std | cut -c1-8
+@@ -255,11 +258,7 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
+       ext_state=DEFERRED; ext_note="not-ready ${ct:+$(( now - ct ))}s ago (window=${win}s)"
+     else
+       ec_err=$(mktemp "${TMPDIR:-/tmp}/goal-ecmd-err.XXXXXX" 2>/dev/null) || ec_err=/tmp/ecmd-err.$$
+-      if command -v timeout >/dev/null 2>&1; then
+-        (cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$ecmd" >/dev/null 2>"$ec_err"); ec_rc=$?
+-      else
+-        (cd "$project" 2>/dev/null && check_run bash -c "$ecmd" >/dev/null 2>"$ec_err"); ec_rc=$?
+-      fi
++      (cd "$project" 2>/dev/null && check_run bash -c "$ecmd" >/dev/null 2>"$ec_err"); ec_rc=$?
+       ec_tail=$(r < "$ec_err" | tail -3 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-160)
+       rm -f "$ec_err"
+       case "$ec_rc" in
+@@ -281,11 +280,7 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
+     pcmd=$(ac_probe_cmd "$id")
+     if [ -n "$pcmd" ]; then
+       perr=$(mktemp "${TMPDIR:-/tmp}/goal-probe-err.XXXXXX" 2>/dev/null) || perr=/tmp/probe-err.$$
+-      if command -v timeout >/dev/null 2>&1; then
+-        ( cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$pcmd" >/dev/null 2>"$perr" )
+-      else
+-        ( cd "$project" 2>/dev/null && check_run bash -c "$pcmd" >/dev/null 2>"$perr" )
+-      fi
++      ( cd "$project" 2>/dev/null && check_run bash -c "$pcmd" >/dev/null 2>"$perr" )
+       prc=$?
+       perr_tail=$(r < "$perr" | tail -2 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-120)
+       rm -f "$perr"
+@@ -299,11 +294,7 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
+   # a failure is never diagnosed by guessing (an eval system that says "failed"
+   # with no reason violates fail-loud). Streams stay separated on purpose.
+   gate_err=$(mktemp "${TMPDIR:-/tmp}/goal-gate-err.XXXXXX" 2>/dev/null) || gate_err=/tmp/gate-err.$$
+-  if command -v timeout >/dev/null 2>&1; then
+-    out=$(cd "$project" 2>/dev/null && check_run timeout "$tmo" bash -c "$cmd" 2>"$gate_err"); rc=$?
+-  else
+-    out=$(cd "$project" 2>/dev/null && check_run bash -c "$cmd" 2>"$gate_err"); rc=$?   # without coreutils timeout a hang hangs; documented
+-  fi
++  out=$(cd "$project" 2>/dev/null && check_run bash -c "$cmd" 2>"$gate_err"); rc=$?
+   err_tail=$(r < "$gate_err" | tail -3 | tr '\n' ' ' | sed 's/[[:space:]]*$//' | cut -c1-160)
+   rm -f "$gate_err"
+   [ -n "$err_tail" ] || err_tail=""
+diff --git a/scripts/goal_loop.sh b/scripts/goal_loop.sh
+index 7b694f6..40b3511 100644
+--- a/scripts/goal_loop.sh
++++ b/scripts/goal_loop.sh
+@@ -7,12 +7,13 @@
+ #                     [--check-only] [--resume] [--project DIR]
+ set -u
+ export LC_ALL=C.UTF-8
+-started_at=$(date +%s)
++started_at=${GOAL_RUNNER_STARTED_AT:-$(date +%s)}
+ 
+ here=$(cd "$(dirname "$0")" && pwd)
+ claude_bin="${CLAUDE_BIN:-claude}"
+ template="$here/../assets/goal.contract.md"
+ project="." mode="" max_iterations=12 wallclock=1800 rate=5 dry=0
++_goal_loop_args=("$@")
+ lock_owned=0
+ 
+ while [ $# -gt 0 ]; do
+@@ -41,41 +42,13 @@ bounded(){
+   local kind=$1 seconds=$2 status supervisor_rc child_rc; shift 2
+   command -v python3 >/dev/null 2>&1 || { echo 'GOAL_LOOP: ERROR python3-required-for-budget' >&2; return 4; }
+   status=$(mktemp "${TMPDIR:-/tmp}/goal-supervisor.XXXXXX") || return 4
+-  python3 -I -c '
+-import os, signal, subprocess, sys, time
+-if os.name != "posix": sys.exit(4)
+-owner=int(sys.argv[3])
+-try: p=subprocess.Popen(sys.argv[4:], start_new_session=True)
+-except OSError as e:
+- print("GOAL_LOOP: ERROR executor-start: " + str(e), file=sys.stderr); sys.exit(4)
+-def stop(*_):
+- try: os.killpg(p.pid, signal.SIGTERM)
+- except ProcessLookupError: pass
+- try: p.wait(timeout=0.5)
+- except subprocess.TimeoutExpired: pass
+- try: os.killpg(p.pid, signal.SIGKILL)
+- except ProcessLookupError: pass
+- p.wait()
+-signal.signal(signal.SIGTERM, lambda *_: (stop(), sys.exit(143)))
+-signal.signal(signal.SIGINT, lambda *_: (stop(), sys.exit(130)))
+-try:
+- end=time.monotonic()+max(0, float(sys.argv[2]))
+- while True:
+-  try: os.kill(owner, 0)
+-  except ProcessLookupError:
+-   stop(); sys.exit(143)
+-  remaining=end-time.monotonic()
+-  if remaining<=0:
+-   stop(); rc=124; break
+-  try: rc=p.wait(timeout=min(remaining, 0.1)); break
+-  except subprocess.TimeoutExpired: pass
+- try: os.killpg(p.pid, signal.SIGKILL)
+- except ProcessLookupError: pass
+- with open(sys.argv[1], "w", encoding="ascii") as receipt:
+-  receipt.write(str(rc if rc>=0 else 128-rc))
+-except BaseException:
+- stop(); raise
+-' "$status" "$seconds" "$$" "$@"; supervisor_rc=$?
++  if [ "$kind" = settlement ]; then
++    python3 -I "$here/goal_bounded.py" --receipt "$status" --seconds "$seconds" --owner "$$" --settlement -- "$@"; supervisor_rc=$?
++  elif [ "$kind" = executor ]; then
++    python3 -I "$here/goal_bounded.py" --receipt "$status" --seconds "$seconds" --owner "$$" --reserve -- "$@"; supervisor_rc=$?
++  else
++    python3 -I "$here/goal_bounded.py" --receipt "$status" --seconds "$seconds" --owner "$$" -- "$@"; supervisor_rc=$?
++  fi
+   child_rc=$(cat "$status" 2>/dev/null); rm -f "$status"
+   [ "$supervisor_rc" -eq 0 ] || { echo 'GOAL_LOOP: ERROR supervisor-failed' >&2; return 4; }
+   case "$child_rc" in ''|*[!0-9]*) echo 'GOAL_LOOP: ERROR supervisor-receipt-missing' >&2; return 4 ;; esac
+@@ -96,20 +69,6 @@ rotate(){                                                 # 10MB, keep 4
+   fi
+ }
+ 
+-acquire_lock(){
+-  local lf="$sd/lock" pid age now
+-  if [ -f "$lf" ]; then
+-    pid=$(head -1 "$lf" | tr -d '\r'); now=$(date +%s)
+-    age=$(( now - $(sed -n '2p' "$lf" | tr -d '\r' | tr -d ' ') ))
+-    if kill -0 "$pid" 2>/dev/null; then
+-      echo "GOAL_LOOP: BLOCKED live-lock pid=$pid age=${age}s" >&2; exit 4
+-    fi
+-    echo "GOAL_LOOP: NOTE reclaiming stale/overridden lock pid=$pid age=${age}s" >&2
+-  fi
+-  mkdir -p "$sd/logs" || exit 4
+-  printf '%s\n%s\n' "$$" "$(date +%s)" > "$lf" || exit 4
+-  lock_owned=1
+-}
+ release_lock(){
+   # Check/init and a refused duplicate never owned this lock. An overridden
+   # runner must also leave a newer owner's lock intact when it finally exits.
+@@ -117,33 +76,19 @@ release_lock(){
+   [ "$(head -1 "$sd/lock" 2>/dev/null)" = "$$" ] || return 0
+   rm -f "$sd/lock" 2>/dev/null || true
+ }
+-trap release_lock EXIT INT TERM
+-
+-# Never reuse predictable temporary names: a pre-existing symlink or file in
+-# .goal/ must not be truncated by the runner's own state update.
+-atomic_runner_write(){
+-  local target="$sd/$1" value="$2" tmp
+-  [ ! -L "$target" ] && { [ ! -e "$target" ] || [ -f "$target" ]; } || {
+-    echo 'GOAL_LOOP: ERROR invalid-runner-state-path' >&2; return 4;
+-  }
+-  tmp=$(mktemp "$sd/.runner-write.XXXXXX") || return 4
+-  if ! printf '%s\n' "$value" > "$tmp"; then rm -f "$tmp"; return 4; fi
+-  if [ -L "$target" ] || ! mv -f "$tmp" "$target"; then
+-    rm -f "$tmp"; echo 'GOAL_LOOP: ERROR runner-state-write' >&2; return 4
+-  fi
+-}
++trap release_lock EXIT
++trap 'exit 143' TERM
++trap 'exit 130' INT
+ 
+-# Wall-clock deadlines survive process restarts. Persist the greatest observed
+-# epoch so a clock rollback cannot silently grant another budget on resume.
+-# The runner lock serializes ordinary access; A3 still needs atomic ownership.
++# Budget observations publish one complete version under the ledger lock.
++# The persistent epoch deadline is additionally capped by this process run's
++# monotonic deadline; frozen/regressed wall clocks cannot reset round budgets.
+ observe_clock(){
++  local action=${1:-observe} observation
+   clock_now=$(date +%s) || { echo 'GOAL_LOOP: ERROR clock-unavailable' >&2; return 4; }
+-  case "$clock_now" in ''|*[!0-9]*) echo 'GOAL_LOOP: ERROR invalid-clock' >&2; return 4 ;; esac
+-  if [ "$clock_now" -lt "$clock_high" ]; then
+-    echo 'GOAL_LOOP: ERROR clock-regressed' >&2; return 4
+-  fi
+-  clock_high=$clock_now
+-  atomic_runner_write runner.clock "$clock_high"
++  observation=$(python3 -I "$here/goal_runner.py" budget "$sd" "$action" "$started_at" "$wallclock" "$clock_now") || return 4
++  read -r deadline clock_now remaining GOAL_RUNNER_MONOTONIC_END <<< "$observation"
++  export GOAL_RUNNER_MONOTONIC_END
+ }
+ 
+ run_claude(){
+@@ -162,7 +107,13 @@ case "$mode" in
+       echo "GOAL_LOOP: already initialized ($sd/goal.md) - editing the contract means re-approval (R3)" >&2; exit 2
+     fi
+     [ -f "$template" ] || { echo "GOAL_LOOP: ERROR template-missing $template" >&2; exit 4; }
+-    bash "$here/goal_ctl.sh" init --project "$project" --max-iterations="$max_iterations" >/dev/null || exit 4
++    if [ ! -f "$sd/state.rec" ]; then
++      bash "$here/goal_ctl.sh" init --project "$project" --max-iterations="$max_iterations" >/dev/null || exit 4
++    else
++      # ctl init may already have prepared the ledger. Never reset its history
++      # merely to seed the still-missing contract template.
++      bash "$here/goal_ctl.sh" status --project "$project" >/dev/null || exit 4
++    fi
+     cp "$template" "$sd/goal.md"
+     echo "GOAL_LOOP: INIT ok - fill $sd/goal.md, get user approval, then --continue"
+     exit 0 ;;
+@@ -175,35 +126,23 @@ case "$mode" in
+     wallclock=$(printf '%s' "$wallclock" | sed 's/^0*//')
+     [ -n "$wallclock" ] && [ "${#wallclock}" -le 10 ] && [ "$wallclock" -le 2147483647 ] \
+       || { echo 'GOAL_LOOP: ERROR invalid-wallclock' >&2; exit 4; }
+-    acquire_lock
+-    case "$started_at" in ''|*[!0-9]*) echo 'GOAL_LOOP: ERROR invalid-clock' >&2; exit 4 ;; esac
+-    clock_high=$started_at
+-    if [ -f "$sd/runner.clock" ]; then
+-      old_clock=$(cat "$sd/runner.clock")
+-      case "$old_clock" in ''|*[!0-9]*) echo 'GOAL_LOOP: ERROR invalid-runner-clock' >&2; exit 4 ;; esac
+-      if [ "$started_at" -lt "$old_clock" ]; then echo 'GOAL_LOOP: ERROR clock-regressed' >&2; exit 4; fi
+-      clock_high=$old_clock
+-    fi
+-    observe_clock || exit 4
+-    deadline=$((started_at + wallclock))
+-    if [ -f "$sd/runner.deadline" ]; then
+-      old=$(cat "$sd/runner.deadline")
+-      case "$old" in ''|*[!0-9]*) echo 'GOAL_LOOP: ERROR invalid-runner-deadline' >&2; exit 4 ;; esac
+-      [ "$old" -ge "$deadline" ] || deadline=$old
++    case "$max_iterations" in ''|*[!0-9]*) echo 'GOAL_LOOP: ERROR invalid-max-iterations' >&2; exit 4 ;; esac
++    max_iterations=$(printf '%s' "$max_iterations" | sed 's/^0*//')
++    [ -n "$max_iterations" ] && [ "${#max_iterations}" -le 7 ] || { echo 'GOAL_LOOP: ERROR invalid-max-iterations' >&2; exit 4; }
++    if [ "${GOAL_RUNNER_EXEC_PID:-}" != "$$" ]; then
++      exec python3 -I "$here/goal_runner.py" own "$sd" "$started_at" "$here/goal_loop.sh" "${_goal_loop_args[@]}"
+     fi
+-    contract_deadline=$(sed -n 's/^deadline=//p' "$sd/state.rec" | tail -1)
+-    case "$contract_deadline" in ''|*[!0-9]*) echo 'GOAL_LOOP: ERROR invalid-contract-deadline' >&2; exit 4 ;; esac
+-    if [ "$contract_deadline" -gt 0 ] && [ "$contract_deadline" -lt "$deadline" ]; then deadline=$contract_deadline; fi
+-    atomic_runner_write runner.deadline "$deadline" || exit 4
++    lock_owned=1
++    observe_clock begin || exit 4
+     i=0
+     while [ "$i" -lt "$max_iterations" ]; do
+       observe_clock || exit 4
+-      remaining=$((deadline - clock_now))
+       if [ "$remaining" -le 0 ]; then
+         # A bounded final settlement can still report an already-valid GO.
+-        bounded gate 3 bash "$here/goal_gate.sh" --check --project "$project"; rc=$?
++        bounded settlement 3 bash "$here/goal_gate.sh" --check --project "$project"; rc=$?
+         [ "$rc" -ne 4 ] || { echo 'GOAL_LOOP: ERROR settlement-unavailable'; exit 4; }
+-        [ "$rc" -ne 0 ] || { echo 'GOAL_LOOP: DELIVERED after-deadline'; exit 0; }
++        [ "$rc" -ne 0 ] || { observe_clock delivered || exit 4; echo 'GOAL_LOOP: DELIVERED after-deadline'; exit 0; }
++        observe_clock incomplete || exit 4
+         echo 'GOAL_LOOP: BLOCKED time-budget-exhausted'; exit 3
+       fi
+       i=$((i+1))
+@@ -217,22 +156,21 @@ case "$mode" in
+         [ "$run_rc" -ne 4 ] || { echo 'GOAL_LOOP: ERROR executor-unavailable'; exit 4; }
+       fi
+       observe_clock || exit 4
+-      remaining=$((deadline - clock_now))
+       if [ "$remaining" -gt 0 ]; then bounded gate "$remaining" bash "$here/goal_gate.sh" --check --project "$project"; rc=$?
+-      else bounded gate 3 bash "$here/goal_gate.sh" --check --project "$project"; rc=$?; fi
++      else bounded settlement 3 bash "$here/goal_gate.sh" --check --project "$project"; rc=$?; fi
+       case "$rc" in
+-        0) echo "GOAL_LOOP: DELIVERED iter=$i"; exit 0 ;;
+-        3) echo "GOAL_LOOP: BLOCKED iter=$i (breaker/false-complete)"; exit 3 ;;
++        0) observe_clock delivered || exit 4; echo "GOAL_LOOP: DELIVERED iter=$i"; exit 0 ;;
++        3) observe_clock incomplete || exit 4; echo "GOAL_LOOP: BLOCKED iter=$i (breaker/false-complete)"; exit 3 ;;
+         4) echo "GOAL_LOOP: ERROR state (iter=$i)" >&2; exit 4 ;;
+         *) echo "GOAL_LOOP: no-go iter=$i (reason above); next round" ;;
+       esac
+       observe_clock || exit 4
+-      remaining=$((deadline - clock_now))
+-      if [ "$remaining" -le 0 ]; then echo 'GOAL_LOOP: BLOCKED time-budget-exhausted'; exit 3; fi
++      if [ "$remaining" -le 0 ]; then observe_clock incomplete || exit 4; echo 'GOAL_LOOP: BLOCKED time-budget-exhausted'; exit 3; fi
+       if [ "$dry" -ne 1 ] && [ "$i" -lt "$max_iterations" ]; then
+-        [ "$remaining" -lt "$rate" ] && sleep "$remaining" || sleep "$rate"
++        bounded pause "$remaining" sleep "$rate" || true
+       fi
+     done
++    observe_clock incomplete || exit 4
+     echo "GOAL_LOOP: BLOCKED iterations-exhausted after $max_iterations" >&2
+     exit 3 ;;
+   *)
+diff --git a/scripts/goal_owner_watch.py b/scripts/goal_owner_watch.py
+index 289ecc6..bc24dba 100644
+--- a/scripts/goal_owner_watch.py
++++ b/scripts/goal_owner_watch.py
+@@ -15,11 +15,14 @@ child sets GOAL_ACCESS_EXEC_PID to its own PID, retaining the original owner
+ and access mode. This is trusted process supervision, not a permission boundary.
+ """
+ import contextlib
++import math
+ import os
++import resource
+ import select
+ import signal
+ import stat
+ import sys
++import time
+ 
+ 
+ class WatchError(RuntimeError):
+@@ -149,32 +152,61 @@ def _defer_cancel():
+         signal.pthread_sigmask(signal.SIG_SETMASK, previous)
+ 
+ 
+-def _stop_child(pid):
++def _stop_child(pid, process_group=False):
+     # This is our own unreaped child: even if it has exited, its PID cannot
+     # have been reassigned. Do not reap it before this final signal attempt.
+-    with contextlib.suppress(ProcessLookupError):
+-        os.kill(pid, signal.SIGKILL)
+-    _wait_child(pid)
++    try:
++        if process_group:
++            with contextlib.suppress(ProcessLookupError):
++                os.killpg(pid, signal.SIGKILL)
++    finally:
++        with contextlib.suppress(ProcessLookupError):
++            os.kill(pid, signal.SIGKILL)
++        _wait_child(pid)
++
++
++def _group_guard():
++    # Darwin returns EPERM when a group contains only an unreaped zombie.
++    # Retain one signalable member until group cleanup, so the parent can kill
++    # the group BEFORE reaping/reserving its leader. The guard has no user IO
++    # or lock descriptors. Fork completes before the actual command can exit.
++    if os.fork() == 0:
++        os.closerange(0, resource.getrlimit(resource.RLIMIT_NOFILE)[0])
++        while True:
++            signal.pause()
+ 
+ 
+-def _command_child(command, release, events):
++def _command_child(command, release, events, process_group=False, close_fds=()):
+     try:
+         signal.signal(signal.SIGTERM, signal.SIG_DFL)
+         signal.signal(signal.SIGINT, signal.SIG_DFL)
+         events.close()
++        for fd in close_fds:
++            os.close(fd)
++        if process_group:
++            os.setsid()
+         allowed = os.read(release, 1)
+         os.close(release)
+         if allowed != b'1':
+             os._exit(143)
++        if process_group:
++            _group_guard()
+         env = os.environ.copy()
+-        env['GOAL_ACCESS_EXEC_PID'] = str(os.getpid())
++        if close_fds:
++            env.pop('GOAL_RUNNER_FD', None)
++        if process_group:
++            # A bounded user command has dropped ledger descriptors. It must
++            # acquire fresh access if it invokes a product entrypoint itself.
++            env.pop('GOAL_ACCESS_EXEC_PID', None)
++        else:
++            env['GOAL_ACCESS_EXEC_PID'] = str(os.getpid())
+         os.execvpe(command[0], command, env)
+     except BaseException as exc:
+         print('OWNER_WATCH: ERROR command-start: %s' % exc, file=sys.stderr, flush=True)
+         os._exit(127)
+ 
+ 
+-def supervise(owner, command, ready_fd=None):
++def supervise(owner, command, ready_fd=None, *, timeout=None, process_group=False, close_fds=()):
+     """Run command; return its status, or 143 if owner exits first.
+ 
+     No command is released until owner and child exit subscriptions are armed.
+@@ -184,6 +216,9 @@ def supervise(owner, command, ready_fd=None):
+     """
+     if type(owner) is not int or owner <= 1 or owner == os.getpid() or not command:
+         raise WatchError('requires a distinct positive owner PID and command')
++    if timeout is not None and (not math.isfinite(timeout) or timeout < 0):
++        raise WatchError('timeout must be finite and nonnegative')
++    until = None if timeout is None else time.monotonic() + timeout
+     if os.name != 'posix' or not hasattr(os, 'fork') or not hasattr(signal, 'pthread_sigmask'):
+         raise WatchError('POSIX fork supervision unavailable')
+     if ready_fd is not None:
+@@ -211,7 +246,7 @@ def supervise(owner, command, ready_fd=None):
+             os.close(release_write)
+             if ready_fd is not None:
+                 os.close(ready_fd)
+-            _command_child(command, release_read, events)
++            _command_child(command, release_read, events, process_group, close_fds)
+             os._exit(127)
+         os.close(release_read)
+         release_read = None
+@@ -227,9 +262,14 @@ def supervise(owner, command, ready_fd=None):
+             return 143
+         if 'child' in found:
+             with _defer_cancel():
++                if process_group:
++                    with contextlib.suppress(ProcessLookupError):
++                        os.killpg(child, signal.SIGKILL)
+                 status = _wait_child(child)
+                 child = None
+             return status if status >= 0 else 128 - status
++        if until is not None and time.monotonic() >= until:
++            return 124
+         if ready_fd is not None:
+             os.write(ready_fd, ('READY %s %s\n' % (events.name, child)).encode('ascii'))
+             os.close(ready_fd)
+@@ -238,11 +278,19 @@ def supervise(owner, command, ready_fd=None):
+         os.close(release_write)
+         release_write = None
+         while True:
+-            found = events.events(None)
++            remaining = None if until is None else max(0, until - time.monotonic())
++            if remaining == 0:
++                return 124
++            found = events.events(remaining)
+             if 'owner' in found:
+                 return 143
+             if 'child' in found:
+                 with _defer_cancel():
++                    if process_group:
++                        # Kill descendants before reaping the group leader;
++                        # its reserved PID cannot yet name an unrelated group.
++                        with contextlib.suppress(ProcessLookupError):
++                            os.killpg(child, signal.SIGKILL)
+                     status = _wait_child(child)
+                     child = None
+                 return status if status >= 0 else 128 - status
+@@ -255,7 +303,7 @@ def supervise(owner, command, ready_fd=None):
+             signal.signal(signum, signal.SIG_IGN)
+         try:
+             if child is not None:
+-                _stop_child(child)
++                _stop_child(child, process_group)
+         finally:
+             for signum, previous in saved_signals.items():
+                 signal.signal(signum, previous)
+diff --git a/scripts/goal_parse.sh b/scripts/goal_parse.sh
+index fa192e4..52d937e 100644
+--- a/scripts/goal_parse.sh
++++ b/scripts/goal_parse.sh
+@@ -114,7 +114,10 @@ gp_watch_validate(){
+     cd "$1" || exit 4
+     local tmp path
+     tmp=$(mktemp "${TMPDIR:-/tmp}/goal-watch.XXXXXX") || exit 4
+-    trap 'rm -f -- "$tmp"' EXIT
++    # Bash 3 may unwind function locals before the subshell EXIT trap. Freeze
++    # the shell-quoted path now; never expand a vanished local during cleanup.
++    # shellcheck disable=SC2064
++    trap "$(printf 'rm -f -- %q' "$tmp")" EXIT
+     gp_watch_paths . > "$tmp" || exit 4
+     while IFS= read -r -d '' path; do
+       gp_watch_path_ok "$path" || { echo 'CTL: ERROR unsafe-watch-path' >&2; exit 4; }
+@@ -129,7 +132,8 @@ gp_tree_digest(){
+     local tmp path file mode content prune p i missing_ok watched
+     local -a args
+     tmp=$(mktemp -d "${TMPDIR:-/tmp}/goal-tree.XXXXXX") || exit 4
+-    trap 'rm -rf -- "$tmp"' EXIT
++    # shellcheck disable=SC2064
++    trap "$(printf 'rm -rf -- %q' "$tmp")" EXIT
+     # A command can exit successfully while returning empty or constant data.
+     # Known-answer checks detect common dead/misconfigured hash instruments.
+     content=$(printf '' | gp_tree_hash_stream) || exit 4
+diff --git a/scripts/goal_store.py b/scripts/goal_store.py
+index 50fe81f..3973d8b 100644
+--- a/scripts/goal_store.py
++++ b/scripts/goal_store.py
+@@ -1,8 +1,7 @@
+ """Immutable, single-pointer ledger storage for POSIX hosts (Python 3 stdlib).
+ 
+-Used by actual close commits, retry receipts, journal recovery and entrypoint
+-locking. Other writer snapshots and full reader version validation remain
+-unintegrated; no external action is replayed by recovery.
++Used by controller commits, retry receipts, journal recovery, runner budget
++publication and entrypoint locking. No external action is replayed by recovery.
+ """
+ import base64
+ import contextlib
+@@ -332,7 +331,8 @@ def _access_exec(argv):
+     The descriptor survives exec and is shared by cooperating child readers.
+     Nested writers are refused, including writers launched by a check.
+     """
+-    if len(argv) < 3 or argv[1] not in ('read', 'write', 'gate'):
++    write_modes = ('write', 'recover', 'migrate', 'init')
++    if len(argv) < 3 or argv[1] not in ('read', 'gate') + write_modes:
+         raise StoreError('access-exec requires state, read|write|gate, script')
+     state, mode, script = Path(argv[0]), argv[1], argv[2]
+     if fcntl is None or not getattr(os, 'O_DIRECTORY', 0) or not getattr(os, 'O_NOFOLLOW', 0):
+@@ -356,16 +356,18 @@ def _access_exec(argv):
+             current = os.fstat(fd)
+             if (same.st_dev, same.st_ino) != (current.st_dev, current.st_ino):
+                 raise StoreError('inherited lock belongs to another ledger')
+-            if mode == 'write' and (os.environ.get('GOAL_ACCESS_MODE') != 'write' or owner != os.getpid()):
++            if mode in write_modes and (os.environ.get('GOAL_ACCESS_MODE') != 'write' or owner != os.getpid()):
+                 raise StoreError('nested-writer')
+             os.close(fd)
+             fd = existing
+         else:
+             try:
+-                fcntl.flock(fd, (fcntl.LOCK_EX if mode == 'write' else fcntl.LOCK_SH) | fcntl.LOCK_NB)
++                fcntl.flock(fd, (fcntl.LOCK_EX if mode in write_modes else fcntl.LOCK_SH) | fcntl.LOCK_NB)
+             except OSError as exc:
+                 raise StoreError('ledger-busy; retry after current operation') from exc
+-        actual_mode = os.environ.get('GOAL_ACCESS_MODE', 'write' if mode == 'write' else 'read')
++        actual_mode = os.environ.get('GOAL_ACCESS_MODE') if inherited is not None else ('write' if mode in write_modes else 'read')
++        if actual_mode not in ('read', 'write', 'exclusive-read'):
++            raise StoreError('invalid inherited access mode')
+         # External receipts are a cache used by later decisions. Conservatively
+         # serialize gates mentioning them, including a harmless text decoy.
+         # Inspect only after acquiring SH, then upgrade before reading any views.
+@@ -382,11 +384,23 @@ def _access_exec(argv):
+                 except OSError as exc:
+                     raise StoreError('ledger-busy; retry external-cache gate') from exc
+                 actual_mode = 'exclusive-read'
++        pending = (state / 'store/pending').exists()
++        if actual_mode != 'write':
++            if pending:
++                raise StoreError('recovery-required')
++            verify_views(state)
++        elif not pending and mode not in ('recover', 'migrate'):
++            if mode != 'init' or Store(state / 'store/commits').read()[0] is not None or (state / 'state.rec').exists():
++                verify_views(state)
+         env = os.environ.copy()
+         env['GOAL_ACCESS_FD'] = str(fd)
+         env['GOAL_ACCESS_EXEC_PID'] = str(os.getpid())
+-        env.setdefault('GOAL_ACCESS_OWNER_PID', str(os.getpid()))
++        env['GOAL_ACCESS_OWNER_PID'] = str(owner if inherited is not None else os.getpid())
+         env['GOAL_ACCESS_MODE'] = actual_mode
++        if inherited is None:
++            for key in ('GOAL_WRITER_OWNER_PID', 'GOAL_CLOSE_EXEC_PID', 'GOAL_CLOSE_LOCK_FD',
++                        'GOAL_CLOSE_OPERATION', 'GOAL_CLOSE_INTENT'):
++                env.pop(key, None)
+         # Kept for the controller's internal check until its pending marker
+         # check is replaced by the common lock-aware access guard.
+         if env['GOAL_ACCESS_MODE'] == 'write':
+@@ -411,6 +425,10 @@ _OPERATION = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$')
+ _SHA256 = re.compile(r'^[0-9a-f]{64}$')
+ _CLOSE_META = '.close-commit.json'
+ _MUTATION_META = '.mutation-commit.json'
++_VIEW_META = '.ledger-views.json'
++_VIEW_FILES = {'state.rec', 'loop-log.md', 'scores.rec', 'verdicts.rec', 'check_freeze',
++               'evidence/adversarial.rec', 'evidence/faults.rec'}
++_RUNNER_FILES = {'runner.clock', 'runner.deadline', 'runner.json'}
+ _MUTATION_FILES = {
+     'init': ('state.rec', 'loop-log.md', 'verdicts.rec', 'work-plan.md'),
+     'stamp': ('state.rec', 'goal.md', 'check_freeze', 'pre-reg.md'),
+@@ -475,7 +493,10 @@ def _close_committed(state, operation, intent, require_current=False):
+                 or not isinstance(meta['missing'], list) or any(not isinstance(n, str) for n in meta['missing'])
+                 or len(set(meta['missing'])) != len(meta['missing'])):
+             raise StoreError('invalid close commit metadata')
+-        files = {name: data for name, data in snapshot.items() if name != _CLOSE_META}
++        scope = set(_CLOSE_FILES) | {'evidence/raw/%s.txt' % meta['iteration']}
++        files = {name: data for name, data in snapshot.items() if name in scope}
++        if not set(meta['missing']).issubset(scope):
++            raise StoreError('invalid close missing-file scope')
+         if set(files).intersection(meta['missing']):
+             raise StoreError('conflicting close snapshot paths')
+         files.update(dict.fromkeys(meta['missing']))
+@@ -589,6 +610,217 @@ def _capture_files(state, names):
+     return files
+ 
+ 
++def _is_view(name):
++    return name in _VIEW_FILES | _RUNNER_FILES or re.fullmatch(r'evidence/raw/(0|[1-9][0-9]*)\.txt', name) is not None
++
++
++def _view_names(state, include_runner=True):
++    names = set(_VIEW_FILES)
++    if include_runner:
++        names.update(name for name in _RUNNER_FILES if (state / name).exists() or (state / name).is_symlink())
++    raw = state / 'evidence/raw'
++    if raw.exists():
++        for path in raw.iterdir():
++            name = 'evidence/raw/' + path.name
++            if _is_view(name):
++                names.add(name)
++    return names
++
++
++def attach_views(state, snapshot):
++    """Every controller commit carries complete recoverable managed views."""
++    state = Path(state)
++    commits = Store(state / 'store/commits')
++    _, previous = commits.read()
++    previous_meta = json.loads(previous[_VIEW_META]) if _VIEW_META in previous else None
++    approved = previous_meta.get('approved') if previous_meta and previous_meta.get('version') == 2 else None
++    if 'goal.md' in snapshot:
++        current = _approval_from_text(snapshot['goal.md'].decode('utf-8'))
++        if approved is not None and current != approved:
++            raise StoreError('contract-approval-mismatch: an approved contract cannot be restamped')
++        approved = current
++    files = _capture_files(state, _view_names(state))
++    views = {name: _hash(data) if data is not None else None for name, data in files.items()}
++    snapshot.update({name: data for name, data in files.items() if data is not None})
++    for name, data in files.items():
++        if data is None:
++            snapshot.pop(name, None)
++    snapshot[_VIEW_META] = _encode({'version': 2, 'views': views, 'approved': approved})
++    return snapshot
++
++
++def _approval_from_text(text):
++    rows = re.findall(r'^approved: (.*)$', text, re.M)
++    if len(rows) > 1:
++        raise StoreError('ambiguous contract approval marker')
++    if not rows:
++        return None
++    match = re.match(r'([0-9a-f]{6,})(?:\s|$)', rows[0])
++    return match.group(1) if match else None
++
++
++def current_approval(state):
++    goal = state / 'goal.md'
++    return _approval_from_text(goal.read_text()) if goal.exists() else None
++
++
++def _assert_approval(state, snapshot):
++    meta = json.loads(snapshot[_VIEW_META])
++    if meta['version'] != 2:
++        raise StoreError('ledger-migration-required: run goal_ctl.sh migrate')
++    if current_approval(state) != meta['approved']:
++        raise StoreError('contract-approval-mismatch: restore the reviewed contract; migration cannot reapprove edits')
++
++
++def _historical_approval(commits, head):
++    observed = set()
++    while head is not None:
++        entry, files = commits._generation(head)
++        if _MUTATION_META in files:
++            meta = json.loads(files[_MUTATION_META])
++            if meta.get('kind') == 'stamp' and 'goal.md' in files:
++                approved = _approval_from_text(files['goal.md'].decode('utf-8'))
++                if approved is not None:
++                    observed.add(approved)
++        head = entry['previous']
++    if len(observed) > 1:
++        raise StoreError('contradictory historical contract approvals; migration refused')
++    return next(iter(observed)) if observed else None
++
++
++def _committed_views(snapshot):
++    try:
++        meta = json.loads(snapshot[_VIEW_META])
++    except KeyError as exc:
++        raise StoreError('ledger-migration-required: run goal_ctl.sh migrate') from exc
++    if (not isinstance(meta, dict) or type(meta.get('version')) is not int or meta['version'] not in (1, 2)
++            or set(meta) != ({'version', 'views'} if meta['version'] == 1 else {'version', 'views', 'approved'})
++            or not isinstance(meta['views'], dict) or not _VIEW_FILES.issubset(meta['views'])):
++        raise StoreError('unknown ledger view manifest')
++    if meta['version'] == 2 and meta['approved'] is not None and (
++            not isinstance(meta['approved'], str) or not re.fullmatch(r'[0-9a-f]{6,}', meta['approved'])):
++        raise StoreError('invalid committed contract approval')
++    files = {}
++    for name, checksum in meta['views'].items():
++        if not isinstance(name, str) or not _is_view(name):
++            raise StoreError('invalid ledger view path')
++        if checksum is None:
++            if name in snapshot:
++                raise StoreError('conflicting missing ledger view')
++            files[name] = None
++        elif (not isinstance(checksum, str) or not _SHA256.fullmatch(checksum)
++              or name not in snapshot or _hash(snapshot[name]) != checksum):
++            raise StoreError('ledger snapshot view checksum mismatch')
++        else:
++            files[name] = snapshot[name]
++    return files
++
++
++def verify_views(state):
++    state = Path(state)
++    head, snapshot = Store(state / 'store/commits').read()
++    if head is None:
++        raise StoreError('ledger-migration-required: run goal_ctl.sh migrate')
++    expected = _committed_views(snapshot)
++    # Legacy sidecars predate transactional runner state. Until first import,
++    # leave them untouched; runner begin validates their minimum/highwater.
++    actual = _capture_files(state, set(expected).union(_view_names(state, bool(_RUNNER_FILES.intersection(expected)))))
++    if actual != expected:
++        changed = sorted(name for name in set(actual).union(expected) if actual.get(name) != expected.get(name))
++        raise StoreError('ledger-view-mismatch: ' + ','.join(changed) + '; run goal_ctl.sh recover')
++    _assert_approval(state, snapshot)
++    return head
++
++
++def restore_committed_views(state, allow_legacy=False):
++    state = Path(state)
++    head, snapshot = Store(state / 'store/commits').read()
++    if head is None:
++        raise StoreError('ledger-migration-required: run goal_ctl.sh migrate')
++    files = _committed_views(snapshot)
++    if not allow_legacy or json.loads(snapshot[_VIEW_META])['version'] == 2:
++        _assert_approval(state, snapshot)
++    # Canonical raw files added without a commit are not part of this version.
++    files.update({name: None for name in _view_names(state, bool(_RUNNER_FILES.intersection(files))) - set(files)})
++    _restore_views(state, files)
++
++
++def _restore_if_versioned(state, required=False):
++    head, snapshot = Store(state / 'store/commits').read()
++    if head is not None and _VIEW_META in snapshot:
++        restore_committed_views(state, allow_legacy=True)
++    elif head is not None and required:
++        raise StoreError('ledger-migration-required: run goal_ctl.sh migrate')
++
++
++def migrate_views(state):
++    state = Path(state)
++    commits = Store(state / 'store/commits')
++    head, snapshot = commits.read()
++    if _VIEW_META in snapshot:
++        known = _committed_views(snapshot)
++        if json.loads(snapshot[_VIEW_META])['version'] == 2:
++            verify_views(state)
++            return
++        if _capture_files(state, set(known).union(_view_names(state))) != known:
++            raise StoreError('legacy views disagree with committed history; migration refused')
++    if head is not None:
++        known = {}
++        cursor = head
++        while cursor is not None:
++            entry, files = commits._generation(cursor)
++            for meta_name in (_CLOSE_META, _MUTATION_META):
++                if meta_name in files:
++                    meta = json.loads(files[meta_name])
++                    if (not isinstance(meta, dict) or type(meta.get('version')) is not int
++                            or meta['version'] != 1 or not isinstance(meta.get('missing'), list)):
++                        raise StoreError('invalid legacy commit metadata')
++                    common = {'version', 'operation', 'intent', 'missing'}
++                    expected = common | ({'kind'} if meta_name == _MUTATION_META else {'result', 'iteration'})
++                    if (set(meta) != expected or not isinstance(meta.get('operation'), str)
++                            or not _OPERATION.fullmatch(meta['operation']) or not isinstance(meta.get('intent'), str)
++                            or not _SHA256.fullmatch(meta['intent'])):
++                        raise StoreError('unknown legacy commit metadata')
++                    if meta_name == _MUTATION_META:
++                        if meta['kind'] not in _MUTATION_FILES:
++                            raise StoreError('unknown legacy mutation kind')
++                    elif (type(meta['iteration']) is not int or meta['iteration'] <= 0
++                          or type(meta['result']) is not int or meta['result'] not in (0, 2, 3, 4)):
++                        raise StoreError('invalid legacy close metadata')
++                    for name in meta['missing']:
++                        if not isinstance(name, str):
++                            raise StoreError('invalid legacy missing-file path')
++                        if _is_view(name):
++                            known.setdefault(name, None)
++            for name, data in files.items():
++                if _is_view(name):
++                    known.setdefault(name, data)
++            cursor = entry['previous']
++        if _capture_files(state, known) != known:
++            raise StoreError('legacy views disagree with committed history; migration refused')
++    state_file = state / 'state.rec'
++    if not state_file.is_file() or not (state / 'loop-log.md').is_file() or not (state / 'verdicts.rec').is_file():
++        raise StoreError('incomplete legacy ledger')
++    values = [line[10:] for line in state_file.read_text().splitlines() if line.startswith('iteration=')]
++    if len(values) != 1 or not values[0].isascii() or not values[0].isdigit():
++        raise StoreError('invalid legacy iteration')
++    blocks = re.findall(r'^## iteration ([0-9]+)$', (state / 'loop-log.md').read_text(), re.M)
++    if [int(value) for value in blocks] != list(range(1, int(values[0]) + 1)):
++        raise StoreError('legacy state/log iteration mismatch')
++    scores = state / 'scores.rec'
++    if scores.is_file():
++        rows = [line.split('|') for line in scores.read_text().splitlines() if line]
++        if (any(len(row) not in (3, 4) or not row[0].isascii() or not row[0].isdigit() for row in rows)
++                or [int(row[0]) for row in rows] != list(range(1, int(values[0]) + 1))):
++            raise StoreError('legacy state/score iteration mismatch')
++    approved = _historical_approval(commits, head)
++    if approved is not None and current_approval(state) != approved:
++        raise StoreError('legacy contract approval disagrees with committed history; migration refused')
++    seed = {'goal.md': (state / 'goal.md').read_bytes()} if (state / 'goal.md').exists() else {}
++    commits.commit('migration-' + uuid.uuid4().hex, b'ledger view migration v1',
++                   attach_views(state, seed), expected_head=head, lock_timeout=0)
++
++
+ def _encoded_files(files):
+     return {name: base64.b64encode(data).decode('ascii') if data is not None else None
+             for name, data in files.items()}
+@@ -673,7 +905,10 @@ def _mutation_committed(state, kind, operation, intent, require_current=False):
+             or any(not isinstance(n, str) for n in meta['missing'])
+             or len(set(meta['missing'])) != len(meta['missing'])):
+         raise StoreError('invalid mutation commit metadata')
+-    files = {name: data for name, data in snapshot.items() if name != _MUTATION_META}
++    scope = set(_MUTATION_FILES[kind])
++    files = {name: data for name, data in snapshot.items() if name in scope}
++    if not set(meta['missing']).issubset(scope):
++        raise StoreError('invalid mutation missing-file scope')
+     if set(files).intersection(meta['missing']):
+         raise StoreError('conflicting mutation snapshot paths')
+     files.update(dict.fromkeys(meta['missing']))
+@@ -721,7 +956,7 @@ def mutation_journal(state, action, kind=None, args=(), intent=None, operation=N
+         snapshot[_MUTATION_META] = _encode({'version': 1, 'kind': kind, 'operation': record['operation'],
+                                           'intent': record['intent'],
+                                           'missing': sorted(name for name, data in files.items() if data is None)})
+-        commits.commit(record['operation'], record['intent'].encode('ascii'), snapshot,
++        commits.commit(record['operation'], record['intent'].encode('ascii'), attach_views(state, snapshot),
+                        expected_head=record['base_head'], lock_timeout=0)
+     elif action == 'recover':
+         with Store(state / 'store')._lock(0):
+@@ -732,6 +967,7 @@ def mutation_journal(state, action, kind=None, args=(), intent=None, operation=N
+                 files = {name: base64.b64decode(data, validate=True) if data is not None else None
+                          for name, data in record['files'].items()}
+             _restore_views(state, files)
++            _restore_if_versioned(state)
+     else:
+         raise StoreError('unknown mutation journal action')
+     pending.unlink()
+@@ -827,13 +1063,14 @@ def close_journal(state, action, result=0):
+                 raise Conflict('close baseline committed version changed')
+             # The atomic current pointer publication is the close commit point.
+             # Its snapshot is also the source of recovery after this point.
+-            commits.commit(record['operation'], record['intent'].encode('ascii'), snapshot,
++            commits.commit(record['operation'], record['intent'].encode('ascii'), attach_views(state, snapshot),
+                            expected_head=head, lock_timeout=0)
+         pending.unlink()
+         _fsync_dir(pending.parent)
+     elif action == 'recover':
+         with Store(state / 'store')._lock(0):
+             if not pending.exists():
++                _restore_if_versioned(state, required=True)
+                 return
+             record = _close_record(pending)
+             files = record['files']
+@@ -857,6 +1094,7 @@ def close_journal(state, action, result=0):
+                     raise StoreError('committed close file set mismatch')
+                 decoded = final_files
+             _restore_views(state, decoded)
++            _restore_if_versioned(state)
+             pending.unlink()
+             _fsync_dir(pending.parent)
+     else:
+@@ -878,6 +1116,11 @@ if __name__ == '__main__':
+                 print(identity)
+         elif len(sys.argv) >= 3 and sys.argv[1] == 'bind-mutation':
+             bind_mutation(sys.argv[2], sys.argv[3:], sys.stdin.buffer.read())
++        elif len(sys.argv) == 3 and sys.argv[1] == 'check-views':
++            print(verify_views(sys.argv[2]))
++        elif len(sys.argv) == 3 and sys.argv[1] == 'migrate-views':
++            migrate_views(sys.argv[2])
++            print('CTL: MIGRATE ok')
+         elif len(sys.argv) >= 2 and sys.argv[1] == 'writer-exec':
+             _writer_exec(sys.argv[2:])
+         elif len(sys.argv) >= 2 and sys.argv[1] == 'access-exec':
+diff --git a/scripts/goal_bounded.py b/scripts/goal_bounded.py
+new file mode 100644
+index 0000000..24033c3
+--- /dev/null
++++ b/scripts/goal_bounded.py
+@@ -0,0 +1,69 @@
++#!/usr/bin/env python3
++"""Bound an owned command group using the shared kernel exit supervisor.
++
++No GNU timeout dependency. A runner lock, when supplied by the runner, remains
++with this supervisor until the command group is dead, and never reaches user
++commands. Stdout remains the command's measurement channel.
++"""
++import argparse
++import importlib.util
++import math
++import os
++from pathlib import Path
++import shutil
++import sys
++import time
++
++# -I deliberately excludes ambient Python modules, including the script dir.
++spec = importlib.util.spec_from_file_location('goal_owner_watch', Path(__file__).with_name('goal_owner_watch.py'))
++watch = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(watch)
++
++
++def main():
++    parser = argparse.ArgumentParser()
++    parser.add_argument('--owner', type=int, required=True)
++    parser.add_argument('--seconds', type=float, required=True)
++    parser.add_argument('--receipt', type=Path)
++    parser.add_argument('--settlement', action='store_true')
++    parser.add_argument('--reserve', action='store_true')
++    parser.add_argument('command', nargs=argparse.REMAINDER)
++    args = parser.parse_args()
++    command = args.command[1:] if args.command[:1] == ['--'] else args.command
++    if not command or shutil.which(command[0]) is None:
++        raise FileNotFoundError('command unavailable: ' + (command[0] if command else '(empty)'))
++    seconds = args.seconds
++    if not math.isfinite(seconds) or seconds < 0:
++        raise ValueError('invalid command budget')
++    if not args.settlement and os.environ.get('GOAL_RUNNER_MONOTONIC_END'):
++        seconds = min(seconds, max(0, float(os.environ['GOAL_RUNNER_MONOTONIC_END']) - time.monotonic()))
++    if args.reserve:
++        seconds = max(0, seconds - min(3, seconds * 0.1))
++    if args.settlement:
++        # Nested checks share the same finite settlement, rather than the
++        # expired search budget or a new three seconds per AC.
++        os.environ['GOAL_RUNNER_MONOTONIC_END'] = str(time.monotonic() + seconds)
++    # Nested command supervisors must survive their owner's group being
++    # cancelled. Otherwise outer killpg kills the supervisor itself while its
++    # separately sessioned check group continues running without supervision.
++    if os.getsid(0) != os.getpid():
++        os.setsid()
++    retained = ()
++    if os.environ.get('GOAL_RUNNER_FD'):
++        fd = int(os.environ['GOAL_RUNNER_FD'])
++        os.fstat(fd)  # Fail closed if the advertised ownership is not held.
++        retained = (fd,)
++    result = watch.supervise(args.owner, command, timeout=seconds,
++                             process_group=True, close_fds=retained)
++    if args.receipt:
++        args.receipt.write_text(str(result), encoding='ascii')
++        return 0
++    return result
++
++
++if __name__ == '__main__':
++    try:
++        sys.exit(main())
++    except (watch.WatchError, OSError, ValueError) as exc:
++        print('BOUNDED: ERROR %s' % exc, file=sys.stderr)
++        sys.exit(4)
+diff --git a/scripts/goal_runner.py b/scripts/goal_runner.py
+new file mode 100644
+index 0000000..983069f
+--- /dev/null
++++ b/scripts/goal_runner.py
+@@ -0,0 +1,230 @@
++#!/usr/bin/env python3
++"""Atomic unattended-run ownership and transactional budget observations.
++
++The permanent runner.lock inode provides kernel exclusion. .goal/lock is only
++a legacy-compatible human receipt. Budget files join the controller's immutable
++commit history; pointer publication precedes view installation, so interruption
++requires recovery instead of exposing a mixture as a valid run.
++"""
++import contextlib
++import fcntl
++import importlib.util
++import json
++import math
++import os
++from pathlib import Path
++import stat
++import subprocess
++import sys
++import time
++import uuid
++
++spec = importlib.util.spec_from_file_location('goal_store', Path(__file__).with_name('goal_store.py'))
++store = importlib.util.module_from_spec(spec)
++spec.loader.exec_module(store)
++
++
++def natural(value, label):
++    if not isinstance(value, str) or not value.isascii() or not value.isdigit():
++        raise store.StoreError('invalid-' + label)
++    return int(value)
++
++
++def boot_identity():
++    if sys.platform.startswith('linux'):
++        data = Path('/proc/sys/kernel/random/boot_id').read_bytes().strip()
++    elif sys.platform == 'darwin':
++        # Binary timeval, independent of locale/timezone and wall-clock edits.
++        data = subprocess.check_output(['/usr/sbin/sysctl', '-b', 'kern.boottime'], timeout=1)
++    else:
++        raise store.StoreError('persistent-monotonic-budget-unavailable')
++    if not data:
++        raise store.StoreError('boot-identity-unavailable')
++    return store._hash(data)
++
++
++def own(state, started, script, args):
++    natural(started, 'clock')
++    state = Path(state)
++    # Reuse the initialized store; do not create a second state hierarchy.
++    path = state / 'store/runner.lock'
++    fd = os.open(str(path), os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
++    try:
++        if not stat.S_ISREG(os.fstat(fd).st_mode):
++            raise store.StoreError('invalid-runner-lock')
++        try:
++            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
++        except BlockingIOError as exc:
++            raise store.StoreError('live-lock; another runner owns this run') from exc
++        os.lseek(fd, 0, os.SEEK_SET)
++        previous_receipt = os.read(fd, 4096)
++        if previous_receipt:
++            previous_receipt = json.loads(previous_receipt)
++            if (not isinstance(previous_receipt, dict) or set(previous_receipt) != {'version', 'pid', 'started'}
++                    or type(previous_receipt['version']) is not int or previous_receipt['version'] != 1
++                    or type(previous_receipt['pid']) is not int or previous_receipt['pid'] <= 1
++                    or type(previous_receipt['started']) is not int or previous_receipt['started'] < 0):
++                raise store.StoreError('invalid-runner-lock-receipt')
++        receipt = store._close_path(state, 'lock')
++        if receipt.exists():
++            lines = receipt.read_text().splitlines()
++            if len(lines) != 2 or not all(v.isascii() and v.isdigit() for v in lines) or int(lines[0]) <= 1:
++                raise store.StoreError('invalid-legacy-runner-lock')
++            owned_receipt = previous_receipt and (previous_receipt['pid'], previous_receipt['started']) == tuple(map(int, lines))
++            if not owned_receipt:
++                try:
++                    os.kill(int(lines[0]), 0)
++                except ProcessLookupError:
++                    pass
++                else:
++                    raise store.StoreError('live-lock pid=' + lines[0])
++        os.lseek(fd, 0, os.SEEK_SET)
++        os.ftruncate(fd, 0)
++        os.write(fd, store._encode(dict(version=1, pid=os.getpid(), started=int(started))))
++        os.fsync(fd)
++        store._atomic(receipt, ('%s\n%s\n' % (os.getpid(), started)).encode('ascii'))
++        env = os.environ.copy()
++        env.update(GOAL_RUNNER_FD=str(fd), GOAL_RUNNER_EXEC_PID=str(os.getpid()),
++                   GOAL_RUNNER_OWNER_PID=str(os.getpid()), GOAL_RUNNER_STARTED_AT=started,
++                   GOAL_RUNNER_MONOTONIC_START=str(time.monotonic()))
++        env.pop('GOAL_RUNNER_MONOTONIC_END', None)
++        os.set_inheritable(fd, True)
++        os.execvpe('bash', ['bash', script, *args], env)
++    finally:
++        os.close(fd)
++
++
++@contextlib.contextmanager
++def ledger(state):
++    fd = os.open(str(state), os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
++    try:
++        try:
++            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
++        except BlockingIOError as exc:
++            raise store.StoreError('ledger-busy; budget observation refused') from exc
++        if (state / 'store/pending').exists():
++            raise store.StoreError('recovery-required')
++        store.verify_views(state)
++        yield
++    finally:
++        os.close(fd)
++
++
++def runner_data(data):
++    value = json.loads(data)
++    if (not isinstance(value, dict) or set(value) != {'version', 'run', 'scope', 'started', 'deadline', 'clock', 'monotonic', 'result'}
++            or type(value['version']) is not int or value['version'] != 1
++            or not isinstance(value['run'], str) or not store._OPERATION.fullmatch(value['run'])
++            or value['scope'] != 'script-entry'
++            or any(type(value[n]) is not int or value[n] < 0 for n in ('started', 'deadline', 'clock'))):
++        raise store.StoreError('invalid-runner-state')
++    mono = value['monotonic']
++    if (not isinstance(mono, dict) or set(mono) != {'boot', 'deadline'}
++            or not isinstance(mono['boot'], str) or not store._SHA256.fullmatch(mono['boot'])
++            or type(mono['deadline']) not in (int, float) or not math.isfinite(mono['deadline']) or mono['deadline'] < 0):
++        raise store.StoreError('invalid-persisted-monotonic-budget')
++    result = value['result']
++    if result is not None and (not isinstance(result, dict) or set(result) != {'outcome', 'gate_completed', 'elapsed', 'timely'}
++            or result['outcome'] not in ('delivered', 'incomplete') or type(result['gate_completed']) is not int
++            or result['gate_completed'] < 0 or type(result['elapsed']) not in (int, float)
++            or not math.isfinite(result['elapsed']) or result['elapsed'] < 0 or type(result['timely']) is not bool):
++        raise store.StoreError('invalid-runner-result')
++    return value
++
++
++def budget(state, action, started, wallclock, now):
++    state = Path(state)
++    started = natural(started, 'clock')
++    wallclock = natural(wallclock, 'wallclock')
++    now = natural(now, 'clock')
++    mono_start = float(os.environ['GOAL_RUNNER_MONOTONIC_START'])
++    mono_now = time.monotonic()
++    boot = boot_identity()
++    if not math.isfinite(mono_start) or mono_start > mono_now:
++        raise store.StoreError('invalid-monotonic-origin')
++    with ledger(state):
++        commits = store.Store(state / 'store/commits')
++        head, snapshot = commits.read()
++        meta = json.loads(snapshot[store._VIEW_META])
++        previous = runner_data(snapshot['runner.json']) if 'runner.json' in snapshot else None
++        high = started
++        deadlines = [started + wallclock]
++        if previous:
++            high = max(high, previous['clock'])
++            deadlines.append(previous['deadline'])
++        # Import legacy sidecars once, without forgiving corruption or rollback.
++        for name in ('runner.clock', 'runner.deadline'):
++            path = store._close_path(state, name)
++            if path.exists():
++                value = natural(path.read_text().strip(), name.replace('.', '-'))
++                if name.endswith('clock'):
++                    high = max(high, value)
++                else:
++                    deadlines.append(value)
++        if now < high or started < (previous['clock'] if previous else 0) and action == 'begin':
++            raise store.StoreError('clock-regressed')
++        rows = [line[9:] for line in snapshot['state.rec'].decode('ascii').splitlines() if line.startswith('deadline=')]
++        if len(rows) != 1:
++            raise store.StoreError('invalid-contract-deadline')
++        contract = natural(rows[0], 'contract-deadline')
++        if contract:
++            deadlines.append(contract)
++        deadline = min(deadlines)
++        mono_end = min(mono_start + wallclock, mono_now + max(0, deadline - now))
++        if previous:
++            if previous['monotonic']['boot'] == boot:
++                mono_end = min(mono_end, previous['monotonic']['deadline'])
++            elif now <= previous['clock']:
++                raise store.StoreError('clock-regressed-across-reboot')
++        if os.environ.get('GOAL_RUNNER_MONOTONIC_END'):
++            mono_end = min(mono_end, float(os.environ['GOAL_RUNNER_MONOTONIC_END']))
++        if not math.isfinite(mono_end):
++            raise store.StoreError('invalid-monotonic-deadline')
++        value = previous or dict(version=1, run=uuid.uuid4().hex, scope='script-entry',
++                                 started=started, deadline=deadline, clock=now, result=None)
++        value.update(deadline=deadline, clock=now, monotonic=dict(boot=boot, deadline=mono_end))
++        if action == 'begin':
++            value['result'] = None
++        if action in ('delivered', 'incomplete'):
++            value['result'] = dict(outcome=action, gate_completed=now,
++                                   elapsed=mono_now-mono_start,
++                                   timely=action == 'delivered' and now < deadline and mono_now < mono_end)
++        elif action not in ('begin', 'observe'):
++            raise store.StoreError('unknown-budget-action')
++        files = {'runner.json': store._encode(value), 'runner.clock': ('%s\n' % now).encode('ascii'),
++                 'runner.deadline': ('%s\n' % deadline).encode('ascii')}
++        # Prepare a complete snapshot without first changing live files.
++        if any(snapshot.get(name) != data for name, data in files.items()):
++            updated = dict(snapshot)
++            # Operation-specific retry receipts do not belong to this commit.
++            updated.pop(store._CLOSE_META, None)
++            updated.pop(store._MUTATION_META, None)
++            updated.update(files)
++            meta['views'].update({name: store._hash(data) for name, data in files.items()})
++            updated[store._VIEW_META] = store._encode(meta)
++            def fault(stage):
++                if os.environ.get('GOAL_RUNNER_FAULT') == stage:
++                    os._exit(91)
++            commits.commit('runner-' + uuid.uuid4().hex, store._encode({'action': action, 'clock': now}), updated,
++                           expected_head=head, fault=fault)
++            # A crash here leaves a mismatched projection, never valid old time.
++            store._restore_views(state, files)
++        remaining = max(0, math.ceil(min(deadline-now, mono_end-time.monotonic())))
++        print('%s %s %s %.9f' % (deadline, now, remaining, mono_end))
++        if action in ('delivered', 'incomplete'):
++            print('GOAL_LOOP: RESULT outcome=%s timing=%s scope=script-entry' %
++                  (action, 'within-budget' if value['result']['timely'] else 'after-deadline' if action == 'delivered' else 'incomplete'),
++                  file=sys.stderr)
++
++
++if __name__ == '__main__':
++    try:
++        if len(sys.argv) >= 6 and sys.argv[1] == 'own':
++            own(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5:])
++        elif len(sys.argv) == 7 and sys.argv[1] == 'budget':
++            budget(*sys.argv[2:])
++        else:
++            raise store.StoreError('invalid-runner-command')
++    except (store.StoreError, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:
++        print('GOAL_LOOP: ERROR %s' % exc, file=sys.stderr)
++        sys.exit(4)
+diff --git a/tests/test_runner_lifecycle.py b/tests/test_runner_lifecycle.py
+new file mode 100644
+index 0000000..2f27264
+--- /dev/null
++++ b/tests/test_runner_lifecycle.py
+@@ -0,0 +1,227 @@
++"""Production entrypoints: concurrent ownership, budget commits and cancellation."""
++import json
++import os
++from pathlib import Path
++import signal
++import subprocess
++import tempfile
++import time
++import unittest
++
++ROOT = Path(__file__).resolve().parents[1]
++CTL = ROOT / 'scripts/goal_ctl.sh'
++LOOP = ROOT / 'scripts/goal_loop.sh'
++GATE = ROOT / 'scripts/goal_gate.sh'
++
++
++class Lifecycle(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory(prefix='goal-lifecycle-')
++        self.addCleanup(self.temp.cleanup)
++        self.project = Path(self.temp.name)
++        self.state = self.project / '.goal'
++        self.call(CTL, 'init')
++
++    def call(self, script, *args, env=None, timeout=15):
++        return subprocess.run(['bash', str(script), *args, '--project', str(self.project)],
++                              capture_output=True, env=env, timeout=timeout)
++
++    def contract(self, command='true', knobs=''):
++        (self.state / 'goal.md').write_text(
++            '# Goal\n\n## Acceptance criteria\n\n'
++            '- AC-1 | output | check: `' + command + '` | expected: exit=0\n\n'
++            '## Budgets\n\n' + knobs + '\n\n## Approval\n\napproved: PENDING\n')
++        result = self.call(CTL, 'stamp', '--auto')
++        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++
++    def mock(self, source):
++        path = self.project / 'executor'
++        path.write_text('#!/bin/bash\n' + source)
++        path.chmod(0o755)
++        return dict(os.environ, CLAUDE_BIN=str(path))
++
++    def start(self, script, *args, env=None):
++        process = subprocess.Popen(['bash', str(script), *args, '--project', str(self.project)],
++                                   env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
++        def cleanup():
++            if process.poll() is None:
++                process.kill()
++            process.communicate(timeout=6)
++        self.addCleanup(cleanup)
++        return process
++
++    def wait_file(self, name, process):
++        until = time.monotonic() + 6
++        path = self.state / name
++        while not path.exists():
++            if process.poll() is not None:
++                out, err = process.communicate()
++                self.fail('process exited before ready: %r' % (out + err))
++            self.assertLess(time.monotonic(), until, 'no readiness marker')
++            time.sleep(0.01)
++        return path
++
++    def test_competing_runners_dispatch_exactly_one_worker(self):
++        self.contract()
++        env = self.mock('echo call >> .goal/calls\ntouch .goal/ready\nsleep 2\n')
++        jobs = [self.start(LOOP, '--continue', '--wallclock=8', '--max-iterations=1', env=env) for _ in range(6)]
++        results = []
++        for job in jobs:
++            out, err = job.communicate(timeout=12)
++            results.append((job.returncode, out + err))
++        self.assertEqual((self.state / 'calls').read_text().count('call'), 1, results)
++        self.assertEqual(sum(rc == 3 for rc, _ in results), 1, results)
++        self.assertEqual(sum(rc == 4 and b'live-lock' in out for rc, out in results), 5, results)
++        self.assertFalse((self.state / 'lock').exists())
++
++    def test_runner_death_before_reaping_stops_group_and_releases_ownership(self):
++        if not hasattr(os, 'waitid') or not hasattr(os, 'WNOWAIT'):
++            self.skipTest('requires waitid WNOWAIT')
++        self.contract()
++        env = self.mock('(sleep 1.5; echo leaked > .goal/leak) &\ntouch .goal/ready\nwait\n')
++        owner = self.start(LOOP, '--continue', '--wallclock=10', env=env)
++        self.wait_file('ready', owner)
++        owner.kill()
++        status = os.waitid(os.P_PID, owner.pid, os.WEXITED | os.WNOWAIT)
++        self.assertEqual(status.si_status, signal.SIGKILL)
++        time.sleep(1.8)
++        os.kill(owner.pid, 0)  # Still an unreaped zombie, not a dead PID probe.
++        self.assertFalse((self.state / 'leak').exists())
++        retry = self.call(LOOP, '--continue', '--resume', '--dry-run', '--wallclock=10', '--max-iterations=1')
++        self.assertEqual(retry.returncode, 3, retry.stdout + retry.stderr)
++        self.assertEqual(os.waitid(os.P_PID, owner.pid, os.WEXITED | os.WNOWAIT).si_pid, owner.pid)
++        self.assertEqual(owner.wait(timeout=3), -signal.SIGKILL)
++
++    def test_budget_commit_failure_sides_and_exact_recovery(self):
++        self.contract()
++        before = (self.state / 'store/commits/current').read_bytes()
++        env = dict(os.environ, GOAL_RUNNER_FAULT='generation-published')
++        failed = self.call(LOOP, '--continue', '--dry-run', '--wallclock=20', '--max-iterations=1', env=env)
++        self.assertNotEqual(failed.returncode, 0)
++        self.assertEqual((self.state / 'store/commits/current').read_bytes(), before)
++        self.assertFalse((self.state / 'runner.deadline').exists())
++        self.assertEqual(self.call(CTL, 'status').returncode, 0)
++
++        env['GOAL_RUNNER_FAULT'] = 'pointer-published'
++        failed = self.call(LOOP, '--continue', '--dry-run', '--wallclock=20', '--max-iterations=1', env=env)
++        self.assertNotEqual(failed.returncode, 0)
++        self.assertNotEqual((self.state / 'store/commits/current').read_bytes(), before)
++        rejected = self.call(GATE, '--verify')
++        self.assertEqual(rejected.returncode, 4, rejected.stdout + rejected.stderr)
++        self.assertIn(b'ledger-view-mismatch', rejected.stderr)
++        result = self.call(CTL, 'recover')
++        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++        value = json.loads((self.state / 'runner.json').read_bytes())
++        deadline = (self.state / 'runner.deadline').read_bytes()
++        self.assertEqual(int(deadline), value['deadline'])
++        self.assertEqual(int((self.state / 'runner.clock').read_bytes()), value['clock'])
++        self.assertEqual(self.call(GATE, '--verify').returncode, 0)
++        retry = self.call(LOOP, '--continue', '--resume', '--dry-run', '--wallclock=200', '--max-iterations=1')
++        self.assertEqual(retry.returncode, 3, retry.stdout + retry.stderr)
++        self.assertEqual((self.state / 'runner.deadline').read_bytes(), deadline)
++
++    def test_runner_views_cannot_extend_budget_outside_commit(self):
++        self.contract()
++        result = self.call(LOOP, '--continue', '--dry-run', '--wallclock=10', '--max-iterations=1')
++        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
++        originals = {name: (self.state / name).read_bytes() for name in ('runner.clock', 'runner.deadline', 'runner.json')}
++        for name, data in originals.items():
++            with self.subTest(name=name):
++                (self.state / name).write_bytes(data + b' ')
++                result = self.call(CTL, 'status')
++                self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
++                self.assertIn(b'ledger-view-mismatch', result.stderr)
++                self.assertEqual(self.call(CTL, 'recover').returncode, 0)
++                self.assertEqual((self.state / name).read_bytes(), data)
++
++    def test_late_product_go_is_not_counted_as_timely_success(self):
++        self.contract()
++        env = self.mock('echo unexpected > .goal/worker-started\n')
++        (self.project / 'artifact.txt').write_text('delivered\n')
++        closed = self.call(CTL, 'close-iteration', '--task', 'T1', '--files', 'artifact.txt',
++                           '--checks-pass', '1', '--checks-fail', '0', '--checks-unverifiable', '0',
++                           '--progress', 'yes', '--exit-signal', 'yes', '--adversarial', 'clear',
++                           '--adversarial-note', 'reviewed', '--no-gate')
++        self.assertEqual(closed.returncode, 0, closed.stdout + closed.stderr)
++        (self.state / 'runner.deadline').write_text('1\n')  # legacy expired run, imported once
++        result = self.call(LOOP, '--continue', '--wallclock=20', '--max-iterations=1', env=env)
++        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
++        self.assertIn(b'GATE: GO', result.stdout + result.stderr)
++        self.assertIn(b'timing=after-deadline', result.stdout + result.stderr)
++        self.assertFalse((self.state / 'worker-started').exists())
++        receipt = json.loads((self.state / 'runner.json').read_bytes())['result']
++        self.assertEqual(receipt['outcome'], 'delivered')
++        self.assertFalse(receipt['timely'])
++
++    def test_frozen_wall_clock_cannot_renew_monotonic_budget(self):
++        self.contract()
++        env = self.mock('echo call >> .goal/calls\nsleep 3\n')
++        bindir = self.project / 'bin'
++        bindir.mkdir()
++        date = bindir / 'date'
++        date.write_text('#!/bin/bash\nif [ "$1" = +%s ]; then echo ' + str(int(time.time())) + '; else /bin/date "$@"; fi\n')
++        date.chmod(0o755)
++        env['PATH'] = str(bindir) + os.pathsep + env['PATH']
++        start = time.monotonic()
++        result = self.call(LOOP, '--continue', '--wallclock=2', '--max-iterations=3', env=env)
++        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
++        # Two seconds search + at most three seconds final settlement + setup.
++        self.assertLess(time.monotonic() - start, 6)
++        self.assertEqual((self.state / 'calls').read_text().count('call'), 1)
++        retry = self.call(LOOP, '--continue', '--resume', '--wallclock=200', '--max-iterations=1', env=env)
++        self.assertEqual(retry.returncode, 3, retry.stdout + retry.stderr)
++        self.assertEqual((self.state / 'calls').read_text().count('call'), 1, 'resume renewed frozen-clock budget')
++
++    def slow_check(self, timeout=1):
++        self.contract('if test -f .goal/evidence/slow; then (sleep 2; echo leaked > .goal/evidence/leak) & '
++                      'touch .goal/evidence/ready; wait; fi; true', 'check_timeout=' + str(timeout))
++        (self.state / 'evidence/slow').touch()
++
++    def test_standalone_gate_ignores_unbounded_timeout_tool(self):
++        self.slow_check()
++        bindir = self.project / 'bin'
++        bindir.mkdir()
++        timeout = bindir / 'timeout'
++        timeout.write_text('#!/bin/bash\necho used > "$UNSAFE_TIMEOUT_MARKER"\nshift\nexec "$@"\n')
++        timeout.chmod(0o755)
++        env = dict(os.environ, PATH=str(bindir) + os.pathsep + os.environ['PATH'],
++                   UNSAFE_TIMEOUT_MARKER=str(self.state / 'timeout-used'))
++        start = time.monotonic()
++        result = self.call(GATE, '--verify', env=env)
++        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
++        self.assertLess(time.monotonic()-start, 2)
++        self.assertIn(b'124', result.stdout + result.stderr)
++        self.assertFalse((self.state / 'timeout-used').exists())
++        time.sleep(1.3)
++        self.assertFalse((self.state / 'evidence/leak').exists())
++
++    def test_standalone_gate_zombie_cannot_leave_check_running(self):
++        if not hasattr(os, 'waitid') or not hasattr(os, 'WNOWAIT'):
++            self.skipTest('requires waitid WNOWAIT')
++        self.slow_check(timeout=10)
++        owner = self.start(GATE, '--verify')
++        self.wait_file('evidence/ready', owner)
++        owner.kill()
++        os.waitid(os.P_PID, owner.pid, os.WEXITED | os.WNOWAIT)
++        time.sleep(2.2)
++        self.assertFalse((self.state / 'evidence/leak').exists())
++        self.assertEqual(os.waitid(os.P_PID, owner.pid, os.WEXITED | os.WNOWAIT).si_pid, owner.pid)
++        self.assertEqual(owner.wait(timeout=3), -signal.SIGKILL)
++
++    def test_outer_executor_cancellation_cleans_nested_check_group(self):
++        self.slow_check(timeout=10)
++        env = self.mock('bash "$NESTED_GATE" --verify --project .\n')
++        env['NESTED_GATE'] = str(GATE)
++        owner = self.start(LOOP, '--continue', '--wallclock=20', '--max-iterations=1', env=env)
++        self.wait_file('evidence/ready', owner)
++        owner.kill()
++        os.waitid(os.P_PID, owner.pid, os.WEXITED | os.WNOWAIT)
++        # Nested checks create their own command group. Killing an outer
++        # executor must leave their supervisor alive long enough to clean it.
++        time.sleep(2.3)
++        self.assertFalse((self.state / 'evidence/leak').exists(), 'nested group outlived its executor')
++        self.assertEqual(owner.wait(timeout=3), -signal.SIGKILL)
++
++
++if __name__ == '__main__':
++    unittest.main()

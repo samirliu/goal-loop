@@ -1,0 +1,22 @@
+--- a/scripts/goal_ctl.sh
++++ b/scripts/goal_ctl.sh
+@@ -448,7 +448,7 @@
+     if [ -n "$obj_ac" ] && [ -n "$score" ]; then
+       mobs=""
+       if measured=$(bash "$here/goal_gate.sh" --verify "$obj_ac" --project "$project" 2>/dev/null); then
+-        mobs=$(printf '%s\n' "$measured" | sed -nE "s/^GATE: VERIFY $obj_ac[|]PASS[|]observed=([-0-9.]+) .*$/\1/p")
++        mobs=$(printf '%s\n' "$measured" | sed -nE "s/^GATE: VERIFY ${obj_ac}[|]PASS[|]observed=([-0-9.]+) .*$/\1/p")
+       fi
+       if [ -n "$mobs" ]; then
+         [ "$mobs" = "$score" ] || echo "CTL: NOTE score-measured-override (claimed=$score measured=$mobs)" >&2
+--- a/scripts/goal_loop.sh
++++ b/scripts/goal_loop.sh
+@@ -87,7 +87,7 @@
+   local action=${1:-observe} observation
+   clock_now=$(date +%s) || { echo 'GOAL_LOOP: ERROR clock-unavailable' >&2; return 4; }
+   observation=$(python3 -I "$here/goal_runner.py" budget "$sd" "$action" "$started_at" "$wallclock" "$clock_now") || return 4
+-  read -r deadline clock_now remaining GOAL_RUNNER_MONOTONIC_END <<< "$observation"
++  read -r _ clock_now remaining GOAL_RUNNER_MONOTONIC_END <<< "$observation"
+   export GOAL_RUNNER_MONOTONIC_END
+ }
+ 

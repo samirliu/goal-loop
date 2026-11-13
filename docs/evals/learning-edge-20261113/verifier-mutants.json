@@ -1,0 +1,27 @@
+{
+  "accepted": 3,
+  "mutants": [
+    {
+      "mutation": "forged-missing-contract-go",
+      "reason": "unsupported acceptance claim",
+      "rejected": true
+    },
+    {
+      "mutation": "source-hash-replaced",
+      "reason": "frozen plugin source differs from pre-registration",
+      "rejected": true
+    },
+    {
+      "mutation": "failed-position-dropped",
+      "reason": "incomplete pilot; retain every scheduled position",
+      "rejected": true
+    },
+    {
+      "mutation": "deadline-flag-forged",
+      "reason": "unsupported acceptance claim",
+      "rejected": true
+    }
+  ],
+  "positive_verified": true,
+  "scope": "memory-only mutations; original SDK events, reports and frozen sources unchanged"
+}

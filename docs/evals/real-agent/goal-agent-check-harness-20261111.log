@@ -1,0 +1,12 @@
+test_actual_grader_failure_is_retained (__main__.Harness.test_actual_grader_failure_is_retained) ... ok
+test_actual_host_identity_cannot_be_silently_replaced (__main__.Harness.test_actual_host_identity_cannot_be_silently_replaced) ... ok
+test_broken_native_receipt_cannot_crash_or_claim_protocol_success (__main__.Harness.test_broken_native_receipt_cannot_crash_or_claim_protocol_success) ... ok
+test_done_does_not_change_artifact_and_result_is_immutable (__main__.Harness.test_done_does_not_change_artifact_and_result_is_immutable) ... ok
+test_frozen_evaluator_tamper_is_rejected (__main__.Harness.test_frozen_evaluator_tamper_is_rejected) ... ok
+test_protected_public_tamper_is_rejected_even_with_correct_solution (__main__.Harness.test_protected_public_tamper_is_rejected_even_with_correct_solution) ... ok
+test_timeout_retains_correctness_and_does_not_modify_artifact (__main__.Harness.test_timeout_retains_correctness_and_does_not_modify_artifact) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 1.073s
+
+OK

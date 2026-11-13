@@ -39,7 +39,7 @@ operation_id="" operation_id_seen=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    init|stamp|bind|close-iteration|status|recover) cmd="$1" ;;
+    init|stamp|bind|close-iteration|status|context|recover|migrate) cmd="$1" ;;
     --project) [ $# -ge 2 ] || { echo "CTL: ERROR missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
     --auto) auto=1 ;;
     --time-budget=*) time_budget="${1#*=}" ;;
@@ -71,6 +71,11 @@ while [ $# -gt 0 ]; do
   shift
 done
 [ -n "$cmd" ] || { echo "CTL: ERROR no-command (init|stamp|bind|close-iteration|status)" >&2; exit 4; }
+if [ "$operation_id_seen" -eq 1 ]; then
+  case "$cmd" in init|stamp|bind|close-iteration) : ;; *) echo 'CTL: ERROR operation-id-needs-writer-command' >&2; exit 4 ;; esac
+  printf '%s' "$operation_id" | grep -qE '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$' \
+    || { echo 'CTL: ERROR invalid-operation-id (1-128 ASCII letters/digits/._-, start with letter/digit)' >&2; exit 4; }
+fi
 
 sd="$project/.goal"
 if [ "$cmd" = init ]; then
@@ -81,7 +86,8 @@ if [ "$cmd" = init ] && [ ! -d "$sd" ]; then
   mkdir -p "$sd" || exit 4
 fi
 if [ -d "$sd" ] && [ "${GOAL_ACCESS_EXEC_PID:-}" != "$$" ]; then
-  access_mode="write"; [ "$cmd" != status ] || access_mode="read"
+  access_mode="write"; case "$cmd" in status|context) access_mode="read" ;; esac
+  case "$cmd" in init|recover|migrate) access_mode="$cmd" ;; esac
   exec python3 -I "$here/goal_store.py" access-exec "$sd" "$access_mode" "$here/goal_ctl.sh" "${_goal_ctl_args[@]}"
 fi
 if [ "$cmd" != recover ] && [ -e "$sd/store/pending" ]; then
@@ -94,11 +100,6 @@ r(){ gp_r; }
 # MUST match goal_gate.sh hash_std - stamp and verify share one digest rule
 hash_std(){ gp_hash_std; }
 state_get(){ gp_state_get "$project" "$1"; }
-if [ "$operation_id_seen" -eq 1 ]; then
-  case "$cmd" in init|stamp|bind|close-iteration) : ;; *) echo 'CTL: ERROR operation-id-needs-writer-command' >&2; exit 4 ;; esac
-  printf '%s' "$operation_id" | grep -qE '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$' \
-    || { echo 'CTL: ERROR invalid-operation-id (1-128 ASCII letters/digits/._-, start with letter/digit)' >&2; exit 4; }
-fi
 if [ -n "$operation_id" ] && { [ "$cmd" = init ] || [ "$cmd" = stamp ]; }; then
   python3 -I "$here/goal_store.py" mutation-retry "$sd" "$cmd" "${_goal_ctl_args[@]}"; replay_rc=$?
   [ "$replay_rc" -eq 100 ] || exit "$replay_rc"
@@ -110,13 +111,22 @@ if [ "$cmd" = stamp ] && [ -n "$time_budget" ]; then
 fi
 
 case "$cmd" in
+  context)
+    [ "$auto" -ne 1 ] || exec python3 -I "$here/goal_context.py" show "$project" --auto
+    exec python3 -I "$here/goal_context.py" show "$project" ;;
+  migrate)
+    python3 -I "$here/goal_store.py" migrate-views "$sd" || exit 4
+    if [ "$(gp_contract_mode "$project")" = forge ]; then
+      python3 -I "$here/goal_forge.py" adopt --project "$project" || exit 4
+    fi
+    exit 0 ;;
   recover)
     python3 -I "$here/goal_store.py" close-journal "$sd" recover || exit 4
-    echo 'CTL: RECOVER ok (ledger only; checks were not replayed)'
+    echo 'CTL: RECOVER ok (checks were not replayed)'
     exit 0 ;;
   init)
     [ -d "$sd" ] || mkdir -p "$sd/logs"
-    if [ -f "$sd/goal.md" ]; then echo "CTL: ERROR already-initialized ($sd/goal.md)" >&2; exit 2; fi
+    if [ -f "$sd/goal.md" ] || [ -f "$sd/state.rec" ]; then echo "CTL: ERROR already-initialized ($sd)" >&2; exit 2; fi
     mutation_id=$(python3 -I "$here/goal_store.py" mutation-journal "$sd" begin init "${_goal_ctl_args[@]}") || exit 4
     printf 'iteration=0\nbreaker=CLOSED\nfalse_completes=0\nreplans=0\nno_progress_streak=0\nlast_progress_iteration=0\nmax_iterations=%s\nno_progress_limit=2\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=0\ndry_limit=3\ncheck_timeout=120\ntime_budget=0\ndeadline=0\n' "$max_iterations" > "$sd/state.rec" || exit 4
     : > "$sd/loop-log.md" || exit 4
@@ -156,6 +166,14 @@ case "$cmd" in
       [ -n "$exp" ] \
         || { echo "CTL: ERROR stamp-refused: $ac_id expected: token is empty after parse (single-line AC required)" >&2; exit 2; }
     done
+    forge_freeze=""
+    # The declared finite probe scope is approved with the existing freeze.
+    if [ "$(gp_contract_mode "$project")" = forge ]; then
+      forge_freeze=$(python3 -I "$here/goal_forge.py" freeze --project "$project") || {
+        echo 'CTL: ERROR stamp-refused: forge needs a valid .goal/forge-plan.json' >&2
+        exit 2
+      }
+    fi
     # forge contracts: baseline must cover every delta metric AC BEFORE the
     # stamp - t=0 exposure, never a mid-loop rc=4 surprise (v1.5)
     if grep -qE '^exit: *forge' "$sd/goal.md" 2>/dev/null; then
@@ -264,7 +282,12 @@ case "$cmd" in
         printf '%s=%s;' "$scr" "$h"
       done
     )
-    printf '%s\n' "$freeze" > "$sd/check_freeze" || exit 4
+    printf '%s\n' "$freeze$forge_freeze" > "$sd/check_freeze" || exit 4
+    if [ -n "$forge_freeze" ]; then
+      mkdir -p "$sd/evidence/raw" || exit 4
+      python3 -I "$here/goal_forge.py" archive --project "$project" --expected "$forge_freeze" \
+        > "$sd/evidence/raw/0.txt" || exit 4
+    fi
     marker=""; [ "$auto" -eq 1 ] && marker=" auto"
     gp_sed_inplace "s/^approved: .*/approved: $h $(date +%F)$marker/" "$sd/goal.md" \
       || { echo "CTL: ERROR stamp-failed: could not write the approved: line" >&2; exit 4; }
@@ -442,9 +465,10 @@ case "$cmd" in
     obj_dir=$(gp_objective_dir "$project")
     [ -n "$obj_dir" ] || obj_dir=maximize
     if [ -n "$obj_ac" ] && [ -n "$score" ]; then
-      vline=$(bash "$here/goal_gate.sh" --verify "$obj_ac" --project "$project" 2>/dev/null \
-              | grep -E "^GATE: VERIFY $obj_ac\|" | tail -1)
-      mobs=$(printf '%s' "$vline" | sed -nE 's/.*observed=([0-9.\-]+).*/\1/p')
+      mobs=""
+      if measured=$(bash "$here/goal_gate.sh" --verify "$obj_ac" --project "$project" 2>/dev/null); then
+        mobs=$(printf '%s\n' "$measured" | sed -nE "s/^GATE: VERIFY ${obj_ac}[|]PASS[|]observed=([-0-9.]+) .*$/\1/p")
+      fi
       if [ -n "$mobs" ]; then
         [ "$mobs" = "$score" ] || echo "CTL: NOTE score-measured-override (claimed=$score measured=$mobs)" >&2
         score="$mobs"
@@ -493,35 +517,37 @@ case "$cmd" in
     fi
     mi=$(state_get max_iterations); [ -n "$mi" ] || mi=$max_iterations
     drys=$(state_get dry_streak); [ -n "$drys" ] || drys=0
-    # best_score: water mark for the objective (R11). maximize -> high-water
-    # (keep the larger); minimize -> low-water (keep the smaller).
+    # Raw observations stay in scores.rec. Only the full quality qualification
+    # below may advance the objective water mark; an infeasible score cannot.
     best=$(state_get best_score); [ -n "$best" ] || best=none
-    if [ -n "$score" ]; then
-      if [ "$best" = none ]; then
-        best=$score
-      else
-        if [ "$obj_dir" = minimize ]; then
-          better=$(awk -v c="$score" -v b="$best" 'BEGIN{print (c+0<b+0)?1:0}')
-        else
-          better=$(awk -v c="$score" -v b="$best" 'BEGIN{print (c+0>b+0)?1:0}')
-        fi
-        [ "$better" = 1 ] && best=$score
-      fi
-    fi
+    best_basis=$(state_get best_score_basis)
+    quality_score=$(state_get last_quality_score)
+    quality_judge=$(state_get last_quality_judge)
     if [ "$dry" = yes ]; then drys=$((drys+1)); else drys=0; fi
     dlimit=$(state_get dry_limit); [ -n "$dlimit" ] || dlimit=3
     ctmo=$(state_get check_timeout); [ -n "$ctmo" ] || ctmo=120
     tb=$(state_get time_budget); [ -n "$tb" ] || tb=0
     dl=$(state_get deadline); [ -n "$dl" ] || dl=0
-    printf 'iteration=%s\nbreaker=%s\nfalse_completes=%s\nreplans=%s\nno_progress_streak=%s\nlast_progress_iteration=%s\nmax_iterations=%s\nno_progress_limit=%s\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=%s\ndry_limit=%s\ncheck_timeout=%s\ntime_budget=%s\ndeadline=%s\nbest_score=%s\n' \
-      "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" "$best" > "$sd/state.rec" || exit 4
+    printf 'iteration=%s\nbreaker=%s\nfalse_completes=%s\nreplans=%s\nno_progress_streak=%s\nlast_progress_iteration=%s\nmax_iterations=%s\nno_progress_limit=%s\nmax_replans=2\nper_check_fail_cap=3\npanel_max=4\ndry_streak=%s\ndry_limit=%s\ncheck_timeout=%s\ntime_budget=%s\ndeadline=%s\nbest_score=%s\nbest_score_basis=%s\nlast_quality_score=%s\nlast_quality_judge=%s\n' \
+      "$new" "$breaker" "$fc" "$(state_get replans)" "$streak" "$lpi" "$mi" "$(state_get no_progress_limit)" "$drys" "$dlimit" "$ctmo" "$tb" "$dl" "$best" "$best_basis" "$quality_score" "$quality_judge" > "$sd/state.rec" || exit 4
     # Two-pass + sensor dump (harness engineering). Raw verify output is the
     # mechanical evidence a claim must carry; the adversarial receipt is the
     # second pass and is written only when the controller has run one
     # (--adversarial clear|finding). Never auto-clear.
     mkdir -p "$sd/evidence/raw" || exit 4
-    bash "$here/goal_gate.sh" --verify --project "$project" > "$sd/evidence/raw/$new.txt" 2>&1 || true
+    verify_rc=0
+    GOAL_RAW_OUTPUT_ITERATION="$new" bash "$here/goal_gate.sh" --verify --project "$project" > "$sd/evidence/raw/$new.txt" 2>&1 || verify_rc=$?
     [ -s "$sd/evidence/raw/$new.txt" ] || { printf 'CTL: WARN raw-empty (verify produced no output - claim will fail raw-evidence-missing)\n' > "$sd/evidence/raw/$new.txt" || exit 4; }
+    if [ "$dry" = yes ] && [ "$(gp_contract_mode "$project")" = forge ]; then
+      forge_record=$(python3 -I "$here/goal_forge.py" run --project "$project" --iteration "$new" --artifact "$digest" --floor-result "$verify_rc")
+      forge_rc=$?
+      printf '%s\n' "$forge_record" >> "$sd/evidence/raw/$new.txt" || exit 4
+      [ "$forge_rc" -eq 0 ] || [ "$forge_rc" -eq 2 ] || exit 4
+      if [ "$forge_rc" -ne 0 ]; then
+        gp_sed_inplace 's/^dry_streak=.*/dry_streak=0/' "$sd/state.rec" || exit 4
+        echo 'CTL: NOTE forge-not-dry (executed probes found a finding, failed, or exhausted their budget)' >&2
+      fi
+    fi
     if [ -n "$adversarial" ]; then
       case "$adversarial" in
         clear|finding) : ;;
@@ -541,6 +567,9 @@ case "$cmd" in
       fnote=$(printf '%s' "${fault_note:-none}" | tr '|\n\r' '   ')
       printf '%s|%s|%s|%s|%s\n' "$fbase" "$fault" "$fsuf" "$fnote" "$(date +%s)" >> "$sd/evidence/faults.rec" || exit 4
       echo "CTL: FAULT task=$fbase class=$fault suffix=($fsuf) note=$fnote"
+    fi
+    if [ -n "$obj_ac" ]; then
+      python3 -I "$here/goal_store.py" qualify-objective "$sd" || exit 4
     fi
     if [ "$no_gate" -eq 1 ]; then
       python3 -I "$here/goal_store.py" close-journal "$sd" finish 0 || exit 4
@@ -595,6 +624,9 @@ case "$cmd" in
   status)
     [ ! -e "$sd/store/pending" ] || { echo 'CTL: ERROR recovery-required' >&2; exit 4; }
     [ -f "$sd/state.rec" ] || { echo "CTL: STATUS no active goal-loop ledger ($sd/state.rec missing)" >&2; exit 4; }
+    if [ "$(gp_contract_mode "$project")" = forge ]; then
+      python3 -I "$here/goal_forge.py" status --project "$project" || echo 'CTL: FORGE coverage=unverified'
+    fi
     g(){ state_get "$1"; }
     left="off"
     d=$(g deadline); if [ -n "$d" ] && [ "$d" != 0 ]; then left=$(( d - $(date +%s) ))s; [ "$left" = "" ] && left=0s; fi
@@ -662,7 +694,7 @@ case "$cmd" in
       [ -z "$(gp_ac_sd_re "$project" "$obj_ac")$(gp_ac_var_re "$project" "$obj_ac")" ] || uncertain=1
     fi
     strategy_advice=""; pick_prefer=""; pick_avoid=""
-    if [ -n "$obj_ac" ] || [ "$stalled" = 1 ]; then
+    if [ -n "$obj_ac" ] || [ "$stalled" = 1 ] || [ -s "$sd/loop-log.md" ]; then
       sf=/dev/null; [ -s "$sd/scores.rec" ] && sf="$sd/scores.rec"
       lf=/dev/null; [ -s "$sd/loop-log.md" ] && lf="$sd/loop-log.md"
       strategy_advice=$(gawk -v obj="${obj_dir:-none}" -v tol="$tol" -v stalled="$stalled" -v uncertain="$uncertain" \
@@ -730,5 +762,8 @@ case "$cmd" in
       echo "CTL:   -> $next"
     fi
     [ -z "$strategy_advice" ] || printf '%s\n' "$strategy_advice" | sed '/^CTL: STRATEGY-PICK /d'
+    # Runtime records are observations, not completion evidence. Missing or
+    # damaged telemetry reports unknown without changing the product ledger.
+    python3 -I "$here/goal_trace.py" summary "$project" || true
     exit 0 ;;
 esac

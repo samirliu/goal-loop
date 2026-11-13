@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_context_cannot_relabel_a_borrowed_reader_as_writer (__main__.LearningFlow.test_context_cannot_relabel_a_borrowed_reader_as_writer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_learning_flow.py", line 227, in test_context_cannot_relabel_a_borrowed_reader_as_writer
+    self.assertEqual(result.returncode,4,result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 4 : b'approved: a04c938e 2026-11-12 auto\n'
+
+----------------------------------------------------------------------
+Ran 1 test in 1.198s
+
+FAILED (failures=1)

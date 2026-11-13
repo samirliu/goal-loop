@@ -1,6 +1,7 @@
 ---
 name: goal-checker-req
-description: Cold requirements checker of the goal-loop checker panel
+description: >-
+  Cold requirements checker of the goal-loop checker panel
   (v1.2; read-only). Since the gate re-runs all deterministic checks itself,
   this seat covers only what needs judgment: AC coverage and internal
   consistency of the finished artifact against the verbatim acceptance

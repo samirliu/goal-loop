@@ -1,0 +1,30 @@
+{
+  "archives": [
+    {
+      "archive_manifest_sha256": "98aa5edf7c23e6a5440abc1b597fee573b60d53bc02d19e9f361d914fb9df9f0",
+      "bytes": 6095796,
+      "path": "source139.tar.xz",
+      "payload_files": 143,
+      "sha256": "0692672d679aa9999cb5501668766846adfd0c963a9251b02ada860df92e47d4"
+    },
+    {
+      "archive_manifest_sha256": "7cb676e758176ac064188a730d2aa49eee38258f10accf227d9ee1de4c150303",
+      "bytes": 22376,
+      "path": "full-results.tar.xz",
+      "payload_files": 17,
+      "sha256": "2d6d4120ee8f231065bc5cc189cbfdfa18e02c533406ec62af14a3d7a60eca15"
+    },
+    {
+      "archive_manifest_sha256": "6646fb7dcdcd6463b742cd3858f2a13378385f125591de800ec9e21a291d6c26",
+      "bytes": 35156,
+      "path": "targeted-followups.tar.xz",
+      "payload_files": 47,
+      "sha256": "6d0616a4555301b1ad2fcb26fc8ea0b51fe252f00d935aeecb2e600c65595264"
+    }
+  ],
+  "captured_utc": "2026-11-12T08:51:49.842068+00:00",
+  "full_matrix_green": false,
+  "namespace_delta_separate": true,
+  "original_full_outputs_unchanged": true,
+  "source_manifest_items_verified": 139
+}

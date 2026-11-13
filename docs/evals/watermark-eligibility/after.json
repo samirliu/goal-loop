@@ -1,0 +1,179 @@
+[
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+      "init"
+    ],
+    "rc": 0,
+    "stdout": "CTL: INIT ok operation=init-8d15cf7b0a8d4a6a8eb0920c813b005a - fill /tmp/goal-qualified-watermark-repro-v4-20261111/.goal/goal.md, then: goal_ctl.sh stamp --project /tmp/goal-qualified-watermark-repro-v4-20261111\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+      "stamp",
+      "--auto"
+    ],
+    "rc": 0,
+    "stdout": "approved: 69cd62a4 2026-11-11 auto\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+      "close-iteration",
+      "--task",
+      "T1",
+      "--files",
+      "artifact.txt,score.txt",
+      "--checks-pass",
+      "1",
+      "--checks-fail",
+      "0",
+      "--checks-unverifiable",
+      "0",
+      "--progress",
+      "yes",
+      "--exit-signal",
+      "no",
+      "--adversarial",
+      "clear",
+      "--adversarial-note",
+      "read floor result",
+      "--no-gate",
+      "--strategy",
+      "baseline",
+      "--score",
+      "10"
+    ],
+    "rc": 0,
+    "stdout": "GATE: QUALITY-OK digest=v2-7024f81432019300f72ee9b0d8eb704735f63364c2752917e698caab37ec2494 iter=1 score=10\nCTL: CLOSE ok iter=1 digest=v2-7024f81432019300f72ee9b0d8eb704735f63364c2752917e698caab37ec2494 operation=9be7b6fe082c45a8a4632c6d981dae22\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-I",
+      "/Users/m/repo/goal-loop/scripts/goal_store.py",
+      "incumbent",
+      "save",
+      "--intermediate",
+      "--file",
+      "artifact.txt",
+      "--file",
+      "score.txt"
+    ],
+    "rc": 0,
+    "stdout": "6fba26b0c22e0efe7a6e4d1e6633b11cb7049b8a844b1ce7e74783d823f9a7ca\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+      "close-iteration",
+      "--task",
+      "T1",
+      "--files",
+      "artifact.txt,score.txt",
+      "--checks-pass",
+      "1",
+      "--checks-fail",
+      "0",
+      "--checks-unverifiable",
+      "0",
+      "--progress",
+      "yes",
+      "--exit-signal",
+      "no",
+      "--adversarial",
+      "clear",
+      "--adversarial-note",
+      "read floor result",
+      "--no-gate",
+      "--strategy",
+      "baseline",
+      "--score",
+      "100"
+    ],
+    "rc": 0,
+    "stdout": "CTL: QUALITY not-qualified result=2 reason=GATE: NO-GO reason=open-FAIL:AC-2 (gate rerun: exit=1 ) hint=fix-AC\nCTL: CLOSE ok iter=2 digest=v2-0bd7b5da848f2ce0164bf6818a02c613ae0596ea2471da6da848dd7dde0c30d3 operation=71737935db2e465b9af7af8ad6254eda\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-I",
+      "/Users/m/repo/goal-loop/scripts/goal_store.py",
+      "incumbent",
+      "candidate",
+      "--base",
+      "6fba26b0c22e0efe7a6e4d1e6633b11cb7049b8a844b1ce7e74783d823f9a7ca"
+    ],
+    "rc": 0,
+    "stdout": "3e0d6f5a7cd72b182f3d2e3e5b36c05a4b9b56a6ae334984c7ca8d8e32a00c6f\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-I",
+      "/Users/m/repo/goal-loop/scripts/goal_store.py",
+      "incumbent",
+      "restore",
+      "--base",
+      "6fba26b0c22e0efe7a6e4d1e6633b11cb7049b8a844b1ce7e74783d823f9a7ca",
+      "--candidate",
+      "3e0d6f5a7cd72b182f3d2e3e5b36c05a4b9b56a6ae334984c7ca8d8e32a00c6f"
+    ],
+    "rc": 0,
+    "stdout": "INCUMBENT: restored 6fba26b0c22e0efe7a6e4d1e6633b11cb7049b8a844b1ce7e74783d823f9a7ca (fresh gate required)\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_ctl.sh",
+      "close-iteration",
+      "--task",
+      "T1",
+      "--files",
+      "artifact.txt,score.txt",
+      "--checks-pass",
+      "1",
+      "--checks-fail",
+      "0",
+      "--checks-unverifiable",
+      "0",
+      "--progress",
+      "yes",
+      "--exit-signal",
+      "yes",
+      "--adversarial",
+      "clear",
+      "--adversarial-note",
+      "read floor result",
+      "--no-gate",
+      "--strategy",
+      "baseline",
+      "--score",
+      "10"
+    ],
+    "rc": 0,
+    "stdout": "GATE: QUALITY-OK digest=v2-7024f81432019300f72ee9b0d8eb704735f63364c2752917e698caab37ec2494 iter=3 score=10\nCTL: CLOSE ok iter=3 digest=v2-7024f81432019300f72ee9b0d8eb704735f63364c2752917e698caab37ec2494 operation=fe108b71d14a46519bfca9df5ad95381\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "bash",
+      "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+      "--check"
+    ],
+    "rc": 0,
+    "stdout": "GATE: GO digest=v2-7024f81432019300f72ee9b0d8eb704735f63364c2752917e698caab37ec2494 iter=3 ac=2 pass=2 unverified=0 mode=threshold score=10 best=10\n",
+    "stderr": ""
+  }
+]

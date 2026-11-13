@@ -1,5 +1,6 @@
-import os, subprocess, tempfile, time, unittest
+import json, os, shlex, subprocess, sys, tempfile, time, unittest
 from pathlib import Path
+from view_fixture import publish_fixture
 R=Path(__file__).resolve().parents[1]
 class Budget(unittest.TestCase):
  def test_executor_nonzero_still_checks_gate(self):
@@ -11,8 +12,10 @@ class Budget(unittest.TestCase):
     subprocess.run(['bash',str(ctl),'stamp','--project',d,'--auto'],check=True,capture_output=True)
     mock=p/'mock'; mock.write_text('#!/bin/bash\necho artifact > a.txt\nbash "$PROBE_CTL" close-iteration --project . --task T1 --files a.txt --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes --adversarial clear --adversarial-note reviewed >/dev/null\nexit "$PROBE_RC"\n'); mock.chmod(0o755)
     env=dict(os.environ,CLAUDE_BIN=str(mock),PROBE_CTL=str(ctl),PROBE_RC=str(code))
-    r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--wallclock=20','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=25)
+    r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--wallclock=20','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=25)
     self.assertEqual(r.returncode,0, r.stdout+r.stderr); self.assertIn(b'GATE: GO',r.stdout+r.stderr)
+    result=json.loads((p/'.goal/runner.json').read_bytes())['result']
+    self.assertEqual(result['outcome'],'delivered'); self.assertTrue(result['timely'],result)
  def test_supervisor_setup_failure_is_state_error(self):
   for code in (0,1,2,3,4,125):
    with self.subTest(code=code), tempfile.TemporaryDirectory() as d:
@@ -20,9 +23,10 @@ class Budget(unittest.TestCase):
     subprocess.run(['bash',str(ctl),'init','--project',d],check=True,capture_output=True)
     (p/'.goal/goal.md').write_text('# Goal\n\n## Acceptance criteria\n\n- AC-1 | ok | check: `true` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n')
     subprocess.run(['bash',str(ctl),'stamp','--project',d,'--auto'],check=True,capture_output=True)
-    bindir=p/'bin'; bindir.mkdir(); py=bindir/'python3'; py.write_text(f'#!/bin/bash\nexit {code}\n'); py.chmod(0o755)
+    # Break the supervisor itself, leaving ownership/storage startup real.
+    bindir=p/'bin'; bindir.mkdir(); py=bindir/'python3'; py.write_text(f'#!/bin/bash\ncase "${{2:-}}" in */goal_bounded.py) exit {code} ;; esac\nexec {shlex.quote(sys.executable)} "$@"\n'); py.chmod(0o755)
     env=dict(os.environ,PATH=str(bindir)+os.pathsep+os.environ['PATH'])
-    r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--wallclock=20','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=25)
+    r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--wallclock=20','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=25)
     self.assertEqual(r.returncode,4, r.stdout+r.stderr); self.assertIn(b'executor-unavailable',r.stdout+r.stderr)
  def test_missing_executor_fails_closed(self):
   with tempfile.TemporaryDirectory() as d:
@@ -31,14 +35,14 @@ class Budget(unittest.TestCase):
    (p/'.goal/goal.md').write_text('# Goal\n\n## Acceptance criteria\n\n- AC-1 | ok | check: `true` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n')
    subprocess.run(['bash',str(ctl),'stamp','--project',d,'--auto'],check=True,capture_output=True)
    env=dict(os.environ,CLAUDE_BIN=str(p/'missing-executor'))
-   r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--wallclock=20','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=25)
+   r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--wallclock=20','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=25)
    self.assertEqual(r.returncode,4); self.assertIn(b'executor-unavailable',r.stdout+r.stderr)
  def test_resume_cannot_override_live_owner(self):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d); subprocess.run(['bash',str(R/'scripts/goal_ctl.sh'),'init','--project',d],check=True,capture_output=True)
    (p/'.goal/goal.md').write_text('placeholder')
    (p/'.goal/lock').write_text(f'{os.getpid()}\n{int(time.time())}\n')
-   r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--resume','--wallclock=5','--project',d],capture_output=True,timeout=10)
+   r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--resume','--wallclock=5','--project',d],capture_output=True,timeout=10)
    self.assertEqual(r.returncode,4); self.assertIn(b'live-lock',r.stderr); self.assertTrue((p/'.goal/lock').exists())
  def test_expired_contract_prevents_any_worker(self):
   with tempfile.TemporaryDirectory() as d:
@@ -46,24 +50,29 @@ class Budget(unittest.TestCase):
    (p/'.goal/goal.md').write_text('# Goal\n\n## Acceptance criteria\n\n- AC-1 | ok | check: `true` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n')
    subprocess.run(['bash',str(R/'scripts/goal_ctl.sh'),'stamp','--project',d,'--auto'],check=True,capture_output=True)
    state=p/'.goal/state.rec'; state.write_text(state.read_text().replace('deadline=0','deadline=1'))
+   publish_fixture(p,p)  # expired committed deadline, not an uncommitted edit
    mock=p/'mock'; mock.write_text('#!/bin/bash\necho x >> "$PROBE_CALLS"\n'); mock.chmod(0o755)
    env=dict(os.environ,CLAUDE_BIN=str(mock),PROBE_CALLS=str(p/'.goal/calls'))
-   r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--wallclock=30','--project',d],env=env,capture_output=True,timeout=10)
+   r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--wallclock=30','--project',d],env=env,capture_output=True,timeout=10)
    self.assertEqual(r.returncode,3); self.assertFalse((p/'.goal/calls').exists())
  def test_deadline_limits_workers_and_resume(self):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d); subprocess.run(['bash',str(R/'scripts/goal_ctl.sh'),'init','--project',d],check=True,capture_output=True)
    (p/'.goal/goal.md').write_text('# Goal\n\n## Acceptance criteria\n\n- AC-1 | ok | check: `true` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n')
    subprocess.run(['bash',str(R/'scripts/goal_ctl.sh'),'stamp','--project',d,'--auto'],check=True,capture_output=True)
-   mock=p/'mock'; mock.write_text('#!/bin/bash\necho x >> "$PROBE_CALLS"\n(sleep 3; echo leaked > "$PROBE_LEAK") &\nwait\n');mock.chmod(0o755)
+   # The budget includes real startup/fingerprint cost. Two seconds could
+   # expire before dispatch on a loaded host, which is valid behavior but
+   # does not exercise cancellation. Keep the leak later than the allowance.
+   mock=p/'mock'; mock.write_text('#!/bin/bash\necho x >> "$PROBE_CALLS"\n(sleep 8; echo leaked > "$PROBE_LEAK") &\nwait\n');mock.chmod(0o755)
    env=dict(os.environ,CLAUDE_BIN=str(mock),PROBE_CALLS=str(p/'.goal/calls'),PROBE_LEAK=str(p/'.goal/leak'))
-   args=['bash',str(R/'scripts/goal_loop.sh'),'--continue','--max-iterations=2','--wallclock=2','--project',d]
-   start=time.monotonic(); subprocess.run(args,env=env,capture_output=True,timeout=25); elapsed=time.monotonic()-start
+   args=['bash',str(R/'devtools/goal_loop.sh'),'--continue','--max-iterations=2','--wallclock=5','--project',d]
+   start=time.monotonic(); observed=subprocess.run(args,env=env,capture_output=True,timeout=25); elapsed=time.monotonic()-start
+   self.assertTrue((p/'.goal/calls').exists(), (elapsed,observed.returncode,observed.stdout,observed.stderr))
    calls=(p/'.goal/calls').read_text().count('x')
-   self.assertEqual(calls,1); self.assertLess(elapsed,5)
+   self.assertEqual(calls,1); self.assertLess(elapsed,9)
    subprocess.run(args+['--resume'],env=env,capture_output=True,timeout=10)
    self.assertEqual((p/'.goal/calls').read_text().count('x'),1)
-   time.sleep(3.2); self.assertFalse((p/'.goal/leak').exists())
+   time.sleep(8.2); self.assertFalse((p/'.goal/leak').exists())
  def test_wall_clock_regression_does_not_extend_budget(self):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d); ctl=R/'scripts/goal_ctl.sh'
@@ -74,7 +83,7 @@ class Budget(unittest.TestCase):
    clock=bindir/'date'; clock.write_text('#!/bin/bash\nif [ "$1" = +%s ]; then\n  if [ -f "$CLOCK_COUNTER" ]; then echo 900; else echo x > "$CLOCK_COUNTER"; echo 1000; fi\nelse /bin/date "$@"; fi\n'); clock.chmod(0o755)
    mock=p/'mock'; mock.write_text('#!/bin/bash\necho x >> "$PROBE_CALLS"\n'); mock.chmod(0o755)
    env=dict(os.environ,PATH=str(bindir)+os.pathsep+os.environ['PATH'],CLOCK_COUNTER=str(p/'.goal/clock-counter'),CLAUDE_BIN=str(mock),PROBE_CALLS=str(p/'.goal/calls'))
-   r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--wallclock=1','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=15)
+   r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--wallclock=1','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=15)
    self.assertIn(b'clock-regressed',r.stdout+r.stderr)
    self.assertFalse((p/'.goal/calls').exists())
  def test_resume_rejects_persisted_clock_rollback(self):
@@ -87,7 +96,7 @@ class Budget(unittest.TestCase):
    (p/'.goal/runner.clock').write_text(high+'\n'); (p/'.goal/runner.deadline').write_text(deadline+'\n')
    mock=p/'mock'; mock.write_text('#!/bin/bash\necho x >> "$PROBE_CALLS"\n'); mock.chmod(0o755)
    env=dict(os.environ,CLAUDE_BIN=str(mock),PROBE_CALLS=str(p/'.goal/calls'))
-   r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--resume','--wallclock=10','--project',d],env=env,capture_output=True,timeout=10)
+   r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--resume','--wallclock=10','--project',d],env=env,capture_output=True,timeout=10)
    self.assertEqual(r.returncode,4); self.assertIn(b'clock-regressed',r.stdout+r.stderr)
    self.assertFalse((p/'.goal/calls').exists())
    self.assertEqual((p/'.goal/runner.clock').read_text(),high+'\n')
@@ -98,7 +107,7 @@ class Budget(unittest.TestCase):
    subprocess.run(['bash',str(ctl),'init','--project',d],check=True,capture_output=True)
    (p/'.goal/goal.md').write_text('# Goal\n\n## Acceptance criteria\n\n- AC-1 | ok | check: `true` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n')
    subprocess.run(['bash',str(ctl),'stamp','--project',d,'--auto'],check=True,capture_output=True)
-   r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--dry-run','--wallclock=08','--max-iterations=1','--project',d],capture_output=True,timeout=12)
+   r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--dry-run','--wallclock=08','--max-iterations=1','--project',d],capture_output=True,timeout=12)
    self.assertEqual(r.returncode,3,r.stdout+r.stderr)
    self.assertNotIn(b'value too great for base',r.stdout+r.stderr)
  def test_supervisor_ignores_ambient_python_startup(self):
@@ -111,7 +120,7 @@ class Budget(unittest.TestCase):
    (mods/'sitecustomize.py').write_text("import os\nopen(os.environ['GOAL_SITE_MARKER'],'w').write('loaded')\n")
    mock=p/'mock'; mock.write_text('#!/bin/bash\nexit 0\n'); mock.chmod(0o755)
    env=dict(os.environ,PYTHONPATH=str(mods),GOAL_SITE_MARKER=str(p/'.goal/loaded'),CLAUDE_BIN=str(mock))
-   r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--wallclock=5','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=12)
+   r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--wallclock=5','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=12)
    self.assertEqual(r.returncode,3,r.stdout+r.stderr)
    self.assertFalse((p/'.goal/loaded').exists())
  def test_budget_temp_symlinks_do_not_overwrite_user_files(self):
@@ -123,7 +132,7 @@ class Budget(unittest.TestCase):
    for name in ('clock','deadline'):
     target=p/('valuable-'+name); target.write_text('do not overwrite\n')
     (p/'.goal'/('runner.'+name+'.tmp')).symlink_to(target)
-   r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--dry-run','--wallclock=5','--max-iterations=1','--project',d],capture_output=True,timeout=12)
+   r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--dry-run','--wallclock=5','--max-iterations=1','--project',d],capture_output=True,timeout=12)
    self.assertEqual(r.returncode,3,r.stdout+r.stderr)
    for name in ('clock','deadline'):
     self.assertEqual((p/('valuable-'+name)).read_text(),'do not overwrite\n')
@@ -136,7 +145,7 @@ class Budget(unittest.TestCase):
    subprocess.run(['bash',str(ctl),'stamp','--project',d,'--auto'],check=True,capture_output=True)
    mock=p/'mock'; mock.write_text('#!/bin/bash\n(sleep 2; echo leaked > "$PROBE_LEAK") &\necho ready > "$PROBE_READY"\nwait\n'); mock.chmod(0o755)
    env=dict(os.environ,CLAUDE_BIN=str(mock),PROBE_LEAK=str(p/'.goal/leak'),PROBE_READY=str(p/'.goal/ready'))
-   runner=subprocess.Popen(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--wallclock=10','--project',d],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+   runner=subprocess.Popen(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--wallclock=10','--project',d],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
    try:
     end=time.monotonic()+5
     while not (p/'.goal/ready').exists() and time.monotonic()<end: time.sleep(0.02)
@@ -154,7 +163,7 @@ class Budget(unittest.TestCase):
    subprocess.run(['bash',str(ctl),'stamp','--project',d,'--auto'],check=True,capture_output=True)
    mock=p/'mock'; mock.write_text('#!/bin/bash\n(sleep 2; echo leaked > "$PROBE_LEAK") &\nexit 0\n'); mock.chmod(0o755)
    env=dict(os.environ,CLAUDE_BIN=str(mock),PROBE_LEAK=str(p/'.goal/leak'))
-   r=subprocess.run(['bash',str(R/'scripts/goal_loop.sh'),'--continue','--wallclock=5','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=10)
+   r=subprocess.run(['bash',str(R/'devtools/goal_loop.sh'),'--continue','--wallclock=5','--max-iterations=1','--project',d],env=env,capture_output=True,timeout=10)
    self.assertEqual(r.returncode,3,r.stdout+r.stderr)
    time.sleep(2.5)
    self.assertFalse((p/'.goal/leak').exists(),'background child survived executor')

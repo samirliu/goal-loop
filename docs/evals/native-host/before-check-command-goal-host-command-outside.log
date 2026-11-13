@@ -1,0 +1,8 @@
+test_pre_cancel_never_releases_command (__main__.HostCommand.test_pre_cancel_never_releases_command) ... ok
+test_ticket_cancel_stops_descendants_and_keeps_sibling_and_parent_trace (__main__.HostCommand.test_ticket_cancel_stops_descendants_and_keeps_sibling_and_parent_trace) ... ok
+test_wrapper_rechecks_shortened_budget_instead_of_ticket_original_deadline (__main__.HostCommand.test_wrapper_rechecks_shortened_budget_instead_of_ticket_original_deadline) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 3.775s
+
+OK

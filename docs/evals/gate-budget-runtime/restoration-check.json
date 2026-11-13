@@ -1,0 +1,32 @@
+{
+  "source_checks": {
+    "scripts/goal_ctl.sh": true,
+    "scripts/goal_gate.sh": true,
+    "scripts/goal_loop.sh": true,
+    "scripts/goal_owner_watch.py": true,
+    "scripts/goal_parse.sh": true,
+    "scripts/goal_store.py": true,
+    "scripts/goal_strategy.awk": true,
+    "tests/cases.inc.sh": true,
+    "tests/lib.sh": true,
+    "tests/test_budget.py": true,
+    "tests/test_ledger_access.py": true,
+    "tests/test_owner_watch.py": true,
+    "examples/evolution-dedupe/README.md": true,
+    "examples/evolution-dedupe/run.py": true,
+    "scripts/goal_bounded.py": true,
+    "scripts/goal_evolve.py": true,
+    "scripts/goal_runner.py": true,
+    "scripts/goal_trace.py": true,
+    "tests/test_evolve.py": true,
+    "tests/test_gate_budget.py": true,
+    "tests/test_mutation_commit.py": true,
+    "tests/test_runner_lifecycle.py": true,
+    "tests/test_runtime_trace.py": true,
+    "tests/test_strategy_events.py": true,
+    "tests/test_view_authority.py": true,
+    "tests/test_worktree_scope.py": true,
+    "tests/view_fixture.py": true
+  },
+  "restored_test_exit": 0
+}

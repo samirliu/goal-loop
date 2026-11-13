@@ -1,0 +1,37 @@
+Command: python3.12 -m pytest -q -s --tb=short tests/test_medium_grader.py
+Exit: 1
+MEDIUM_GRADER_OBSERVATION {"fixture": "control", "returncode": 0, "ok": true, "checks": 21, "failed": [], "error": null, "grader_sha256": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19"}
+.MEDIUM_GRADER_OBSERVATION {"fixture": "missing-input", "returncode": 0, "ok": true, "checks": 21, "failed": [], "error": null, "grader_sha256": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19"}
+uMEDIUM_GRADER_OBSERVATION {"fixture": "physical-line", "returncode": 0, "ok": true, "checks": 21, "failed": [], "error": null, "grader_sha256": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19"}
+uMEDIUM_GRADER_OBSERVATION {"fixture": "integer-amount", "returncode": 0, "ok": true, "checks": 21, "failed": [], "error": null, "grader_sha256": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19"}
+uMEDIUM_GRADER_OBSERVATION {"fixture": "skip-fields", "returncode": 0, "ok": true, "checks": 21, "failed": [], "error": null, "grader_sha256": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19"}
+uMEDIUM_GRADER_OBSERVATION {"fixture": "literal-utf8", "returncode": 0, "ok": true, "checks": 21, "failed": [], "error": null, "grader_sha256": "59cf1124c29f9dc80230bd1f9c745c487f60131f3465ef25f3b0729dffb15a19"}
+u.
+=================================== FAILURES ===================================
+_ MediumGrader.test_five_single_defect_mutants_are_rejected (mutant='missing-input') _
+tests/test_medium_grader.py:125: in test_five_single_defect_mutants_are_rejected
+    self.assertEqual(result.returncode, 1, 'accepted mutant: ' + name)
+E   AssertionError: 0 != 1 : accepted mutant: missing-input
+_ MediumGrader.test_five_single_defect_mutants_are_rejected (mutant='physical-line') _
+tests/test_medium_grader.py:125: in test_five_single_defect_mutants_are_rejected
+    self.assertEqual(result.returncode, 1, 'accepted mutant: ' + name)
+E   AssertionError: 0 != 1 : accepted mutant: physical-line
+_ MediumGrader.test_five_single_defect_mutants_are_rejected (mutant='integer-amount') _
+tests/test_medium_grader.py:125: in test_five_single_defect_mutants_are_rejected
+    self.assertEqual(result.returncode, 1, 'accepted mutant: ' + name)
+E   AssertionError: 0 != 1 : accepted mutant: integer-amount
+_ MediumGrader.test_five_single_defect_mutants_are_rejected (mutant='skip-fields') _
+tests/test_medium_grader.py:125: in test_five_single_defect_mutants_are_rejected
+    self.assertEqual(result.returncode, 1, 'accepted mutant: ' + name)
+E   AssertionError: 0 != 1 : accepted mutant: skip-fields
+_ MediumGrader.test_five_single_defect_mutants_are_rejected (mutant='literal-utf8') _
+tests/test_medium_grader.py:125: in test_five_single_defect_mutants_are_rejected
+    self.assertEqual(result.returncode, 1, 'accepted mutant: ' + name)
+E   AssertionError: 0 != 1 : accepted mutant: literal-utf8
+=========================== short test summary info ============================
+SUBFAILED(mutant='missing-input') tests/test_medium_grader.py::MediumGrader::test_five_single_defect_mutants_are_rejected
+SUBFAILED(mutant='physical-line') tests/test_medium_grader.py::MediumGrader::test_five_single_defect_mutants_are_rejected
+SUBFAILED(mutant='integer-amount') tests/test_medium_grader.py::MediumGrader::test_five_single_defect_mutants_are_rejected
+SUBFAILED(mutant='skip-fields') tests/test_medium_grader.py::MediumGrader::test_five_single_defect_mutants_are_rejected
+SUBFAILED(mutant='literal-utf8') tests/test_medium_grader.py::MediumGrader::test_five_single_defect_mutants_are_rejected
+5 failed, 2 passed in 1.02s

@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import subprocess
 import signal
+import sys
 import tempfile
 import time
 import unittest
@@ -15,6 +16,22 @@ AUDIT = ROOT / 'scripts/goal_audit.sh'
 
 
 class LedgerAccess(unittest.TestCase):
+    @staticmethod
+    def child_running(pid):
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return False
+        if sys.platform.startswith('linux'):
+            # A non-reaping container PID1 can retain killed grandchildren.
+            # Zombies execute no code and hold no locks; signal 0 still works.
+            try:
+                state = (Path('/proc')/str(pid)/'stat').read_text().rpartition(')')[2].split()[0]
+            except FileNotFoundError:
+                return False
+            return state not in ('Z', 'X')
+        return True
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix='goal-access-')
         self.addCleanup(self.tmp.cleanup)
@@ -127,7 +144,7 @@ class LedgerAccess(unittest.TestCase):
                                               GOAL_ACCESS_OWNER_PID=str(os.getpid()), GOAL_ACCESS_MODE='read'))
             self.assertIn('invalid inherited ledger lock', result.stderr)
 
-    def test_background_check_cannot_keep_access_or_store_lock(self):
+    def test_background_check_is_cancelled_and_cannot_keep_access_or_store_lock(self):
         (self.state / 'goal.md').write_text(
             '# Goal\n\n## Acceptance criteria\n\n'
             '- AC-1 | spawn | check: `sleep 30 </dev/null >/dev/null 2>&1 & '
@@ -146,7 +163,10 @@ class LedgerAccess(unittest.TestCase):
                                     '--checks-unverifiable', '0', '--no-gate', expected=0)
                 child = int((self.state / 'evidence/childpid').read_text())
                 children.append(child)
-                os.kill(child, 0)  # The child really is alive while we test locks.
+                until = time.monotonic() + 2
+                while self.child_running(child):
+                    self.assertLess(time.monotonic(), until, 'background check escaped cancellation')
+                    time.sleep(0.01)
                 self.run_script(CTL, 'bind', expected=0, input='AC-1|PASS|x|x|x|x\n')
                 if command == 'close':
                     with (self.state / 'store/writer.lock').open('rb') as lock:
@@ -232,7 +252,8 @@ class LedgerAccess(unittest.TestCase):
                     self.fail('controller did not enter raw verification')
                 time.sleep(0.02)
             controller.kill()
-            controller.wait(timeout=5)
+            observed = os.waitid(os.P_PID, controller.pid, os.WEXITED | os.WNOWAIT)
+            self.assertEqual(observed.si_code, os.CLD_KILLED)
             fd = os.open(self.state, os.O_RDONLY | os.O_DIRECTORY)
             try:
                 until = time.monotonic() + 3
@@ -250,6 +271,10 @@ class LedgerAccess(unittest.TestCase):
                 os.close(fd)
             self.run_script(CTL, 'recover', expected=0)
             self.assertIn('iteration=0\n', (self.state / 'state.rec').read_text())
+            # Still unreaped: exit events, rather than kill(pid, 0), released
+            # the locks and allowed recovery despite the zombie PID existing.
+            os.kill(controller.pid, 0)
+            self.assertEqual(controller.wait(timeout=5), -signal.SIGKILL)
         finally:
             try:
                 os.killpg(controller.pid, signal.SIGKILL)

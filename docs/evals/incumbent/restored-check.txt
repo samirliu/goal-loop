@@ -1,0 +1,9 @@
+test_failed_gate_or_unsafe_scope_cannot_be_saved_as_incumbent (__main__.Incumbent.test_failed_gate_or_unsafe_scope_cannot_be_saved_as_incumbent) ... ok
+test_interrupted_restore_blocks_gate_and_recovery_preserves_conflicts (__main__.Incumbent.test_interrupted_restore_blocks_gate_and_recovery_preserves_conflicts) ... ok
+test_owned_user_edit_refuses_all_writes_unowned_edit_survives (__main__.Incumbent.test_owned_user_edit_refuses_all_writes_unowned_edit_survives) ... ok
+test_restored_bytes_and_permissions_reproduce_original_go (__main__.Incumbent.test_restored_bytes_and_permissions_reproduce_original_go) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 13.835s
+
+OK

@@ -1,6 +1,6 @@
 # Pack: gradient (GRADIENT)
 
-**Open when:** contract has `objective:` · `exit: forge` · horizon / `horizon-waived:` · CLI uses `--strategy` · you are reading EFFICIENCY output.
+**Open when:** contract has `objective:` · `exit: forge` · horizon / `horizon-waived:` · CLI uses `--strategy` · comparing policy costs or autonomous promotion · you are reading EFFICIENCY output.
 
 **Invariant: GRADIENT** — optimization never delivers below the water mark; blind spots are declared; waves are labeled for attribution.
 **Also touches FENCE** — `progress=no` must carry `strategy_delta=` (honest next direction).
@@ -13,7 +13,7 @@ Legacy aliases: `R10 R11 R13 R17b R19` → GRADIENT / FENCE.
 
 - Contract line: `objective: maximize AC-N` or `objective: minimize AC-N` (primary score AC).
 - `best_score` is the water mark: high-water for maximize, low-water for minimize.
-- Claim refuses a score worse than the water mark in that direction (`score-regressed`). A number is not a recoverable artifact: before a risky candidate, retain a scoped patch/artifact of the incumbent and its digest under evidence; restore only owned files if it loses.
+- Claim refuses a score worse than the water mark in that direction (`score-regressed`). Before changing a qualified artifact, save its owned files with `goal_store.py incumbent save`. Use `--intermediate` during exploration after floors and horizon pass. Capture the trial's exact output before rollback. The [checkpoint procedure](../../docs/transaction-state.md#accepted-artifact-checkpoints) explains how to recover and recheck the restored artifact.
 - `tolerance:` (and data-driven `sd:`/`var:` bands from `packs/instrument.md`) widen the compare so noise is “holds”, not “regressed”.
 - Band math uses `|best|*tol` so negative water marks do not flip direction.
 
@@ -48,11 +48,46 @@ GO requires **all** of:
 - Metric ACs default `baseline: delta`; stamp requires `.goal/baseline.md` (pre-stamp smoke run **is** the baseline measurement, repeats≥2).
 - Threshold exit (default) is the other policy: deliver when every AC floor passes. Exit policy is a **contract field**, not a mode matrix.
 
+Before stamping a forge contract, declare `.goal/forge-plan.json`. Each case
+names a dimension, a frozen input file, and a command that reads that input
+from stdin. List the probe instruments and the remaining blind spots.
+
+```json
+{
+  "version": 1,
+  "instruments": ["probe.py"],
+  "cases": [
+    {"id": "signed", "dimension": "integer-sign", "input": "cases/signed.json",
+     "command": ["python3", "-B", "probe.py"]}
+  ],
+  "blind_spots": ["Inputs outside the declared cases"]
+}
+```
+
+Give goal-critic the next iteration, current artifact digest, approved probe
+scope digest, and recent raw results. Its existing
+`critic-iter-<N>.md` file now carries `ITERATION`, `ARTIFACT`, and `PLAN`
+bindings before FINDING/CLEAR. On `--dry yes`, the controller archives the
+critic and runs the declared probes under the remaining budget. A missing
+critic, a finding, a failed floor, or an incomplete probe batch earns no dry
+credit. Repeated successful inputs count as stability checks. New coverage is
+reported separately. Final GO includes `coverage=declared`.
+
+Stamp archives the plan and input/instrument bytes in
+`evidence/raw/0.txt`. Each dry attempt keeps its actual inputs' identities,
+outputs, elapsed time, failures, remaining cases and blind spots in its
+canonical raw record. Use `status` for the latest bounded result.
+For an older forge run, author the plan and run `goal_ctl.sh migrate`.
+Migration preserves history and starts fresh dry evidence. The same entry
+point can add probes while retaining all earlier cases and materials.
+
 ## 6 EFFICIENCY / STRATEGY-PICK / eval-gap / promote
 
 Printed by `ctl status` when optimizing or stalled. **Advisory to the gate** — never changes gate rc or hint. **STRATEGY-PICK is what the next wave uses** (brief + replan/delta NEXT text).
 
-- **EFFICIENCY** — one kernel (`scripts/goal_strategy.awk`) computes both display and pick. Score at t is AFTER wave t: `delta(t) = score(t) - score(t-1)` belongs to label(t), including its entry wave. First recorded score is an anchor, not credited gain. Missing/non-numeric scores or ledger gaps break the chain; only the latest contiguous measured suffix counts.
+- **EFFICIENCY** — one kernel (`scripts/goal_strategy.awk`) computes both display and pick. For a newly observed artifact, score at t is the AFTER measurement: `delta(t) = score(t) - score(t-1)` belongs to label(t), including its entry wave. First recorded score is an anchor, not credited gain. Missing/non-numeric scores, missing artifact identities, unchanged/restored artifacts or ledger gaps break attribution; only the latest eligible measured suffix counts.
+- **EVENTS** — status separates observed artifact versions, acceptance claims, unchanged-artifact rounds, restorations and new score readings. Unchanged/restored artifacts do not earn fresh artifact-strategy gain or role-promotion credit. Artifact stagnation is derived from content identities, not reset by a self-reported `progress=yes`. A changed reading on unchanged bytes is information, not evidence of a successful artifact edit. Legacy digests are marked unverified; these counts cannot observe failed worker attempts that left no new artifact or replace missing duration/cost telemetry.
+- **RUNTIME** — actual supervised command spans under `.goal/evidence/runtime/`, with input artifact, contract/checker identities, parent span, elapsed time and result. Timeout/cancelled spans remain in the data; interrupted/incomplete traces and unavailable costs stay unknown. Executor/measurement durations include nested work and are not summed as wall time. Runtime observations do not count as artifact gains, and transitive/external inputs may still be unknown. Missing telemetry is not zero cost; crew decisions must wait for usable comparable samples.
 - **STRATEGY-PICK** — latest window for each label supersedes its history. Prefer the greatest direction-adjusted gain per measured wave beyond `tolerance:`; avoid regressions or ≥3 flat deltas (whole observed range inside band). Unmeasured/oscillating is `prefer=none`, not invented confidence. Ties use first appearance. A label cannot be both prefer and avoid. Historical EFFICIENCY lines describe history; use the pick for current routing.
 - Paste the pick into every wave brief. `avoid` means change the hypothesis before a deliberate retry; record the counterevidence in `strategy_delta`, rather than rename the same tactic. After retry, new evidence supersedes the old window.
 - **eval-gap** — latest three adjacent measured rounds flat while stalled: inspect raw failures first, then ask goal-critic for candidate AC proposals in `.goal/proposals/`. Plateau alone does not prove the metric is wrong. Contract changes require approval.
@@ -70,3 +105,34 @@ For a reusable strategy/skill change, use the existing `.goal/proposals/` channe
 ## 7 Breaker (direction honesty)
 
 `CLOSED → HALF_OPEN (progress=no) → OPEN → BLOCKED`. Progress=yes resets. Every HALF_OPEN landing owes a `strategy_delta`. Two gate-caught false claims → BLOCKED (see GATE / ratchet in `gate.md`).
+
+## 8 Executable local policy experiments
+
+Use the [paired protocol](../../examples/evolution-dedupe/README.md) when a
+worker proposes a reusable Python policy with a frozen independent evaluator.
+Run `goal_evolve.py protocol.json --state .goal/proposals/evolution`. Version 1
+takes standalone programs. Version 2 also takes `--project` and a matched
+incumbent/candidate checkpoint pair, so it can compare multiple owned files,
+including additions and removals. Keep shared dependencies inside the recorded
+scope and use a separate state directory per policy scope.
+
+The runner gives both variants the same input in fresh workspaces and measures
+setup, worker, and grading under a single trial allowance. Promotion requires
+complete paired development and fresh holdout evidence above the preset floor
+and horizon. An underpowered holdout is skipped before dispatch. A verified
+regression can withdraw the active candidate. An instrument failure or an
+inconclusive timeout preserves the active selection. Route later tasks in this
+scope through `goal_evolve.py run-enabled --state … --seconds …`. To restore
+owned files in the live project, use the [checkpoint restore procedure](../../docs/transaction-state.md#accepted-artifact-checkpoints)
+and run a fresh gate. Candidate generation and cross-task transfer still
+require an agent and independent task evidence.
+
+For an actual proposal, retain the raw failure/cost trigger and a scoped
+hypothesis, then have the agent write candidate source without changing the
+grader or success definition. Freeze the comparison and inspect the returned
+enabled/retained/withdrawn decision; exercise run-enabled on a later task.
+Monitor the exact archived active bytes. After a counterexample, preserve the
+withdrawal and generate a repair against new development/holdout inputs in
+the same statistical-budget state. The [recorded agent proposal](../../docs/evals/agent-evolution/README.md)
+demonstrates this sequence with independently reconstructed raw outcomes;
+its local execution gains do not measure total agent cost or generalization.

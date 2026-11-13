@@ -1,0 +1,8 @@
+Command: python3.12 -B /tmp/goal-medium-grader-posthoc-six-20261112.py
+Exit: 0
+{"case": "single-1", "returncode": 0, "ok": true, "checks": 28, "failed": []}
+{"case": "crew-1", "returncode": 0, "ok": true, "checks": 28, "failed": []}
+{"case": "crew-2", "returncode": 0, "ok": true, "checks": 28, "failed": []}
+{"case": "single-2", "returncode": 0, "ok": true, "checks": 28, "failed": []}
+{"case": "single-3", "returncode": 0, "ok": true, "checks": 28, "failed": []}
+{"case": "crew-3", "returncode": 0, "ok": true, "checks": 28, "failed": []}

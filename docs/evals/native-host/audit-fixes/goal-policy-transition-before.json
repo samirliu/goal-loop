@@ -1,0 +1,9 @@
+{
+  "source_sha256": "fabae22d1506b52177e93fa9a5d6b1230a70e7653f39579baecc51c44dcdf4fa",
+  "origin": "Actual audit fault reproduction retained in docs/evals/native-host/p0-p1-review.md F3; not a new model or benchmark run",
+  "controlled_telemetry_fault_repro": true,
+  "report_status": "withdrawn",
+  "report_enabled": "f60fabe523988670cf59c8508f9869964b0b1ffe73e0800462bcbf1b9479018e",
+  "actual_policy": "b1b5ba90c098a185c4d07e423f324505bd5a7ec2b15b8037aac61d5a5e3c4f4d",
+  "still_selects_regressed_candidate": true
+}
