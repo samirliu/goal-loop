@@ -1,0 +1,910 @@
+﻿2026-11-13T01:31:35.8880893Z Current runner version: '2.338.2'
+2026-11-13T01:31:35.8906819Z ##[group]Runner Image Provisioner
+2026-11-13T01:31:35.8907698Z Hosted Compute Agent
+2026-11-13T01:31:35.8908396Z Version: 20261028.624
+2026-11-13T01:31:35.8909070Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-13T01:31:35.8909781Z Build Date: 2026-10-28T21:51:42Z
+2026-11-13T01:31:35.8910530Z Worker ID: {31e3f622-7bfc-466d-8673-149eda861004}
+2026-11-13T01:31:35.8911238Z Region: westus
+2026-11-13T01:31:35.8911815Z Cloud: Azure
+2026-11-13T01:31:35.8912373Z ##[endgroup]
+2026-11-13T01:31:35.8914214Z ##[group]Operating System
+2026-11-13T01:31:35.8914969Z Ubuntu
+2026-11-13T01:31:35.8915489Z 26.04.1
+2026-11-13T01:31:35.8916074Z LTS
+2026-11-13T01:31:35.8916639Z ##[endgroup]
+2026-11-13T01:31:35.8917191Z ##[group]Runner Image
+2026-11-13T01:31:35.8917825Z Image: ubuntu-26.04
+2026-11-13T01:31:35.8918410Z Version: 20261101.186.1
+2026-11-13T01:31:35.8919717Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-13T01:31:35.8921307Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+2026-11-13T01:31:35.8922309Z ##[endgroup]
+2026-11-13T01:31:35.8923689Z ##[group]GITHUB_TOKEN Permissions
+2026-11-13T01:31:35.8925910Z Contents: read
+2026-11-13T01:31:35.8926568Z Metadata: read
+2026-11-13T01:31:35.8927464Z Packages: read
+2026-11-13T01:31:35.8928142Z ##[endgroup]
+2026-11-13T01:31:35.8930311Z Secret source: Actions
+2026-11-13T01:31:35.8931401Z Cache mode: write
+2026-11-13T01:31:35.8932094Z Prepare workflow directory
+2026-11-13T01:31:35.9327743Z Prepare all required actions
+2026-11-13T01:31:35.9401076Z Getting action download info
+2026-11-13T01:31:36.2840169Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-13T01:31:36.5202422Z Complete job name: lint (ubuntu-latest)
+2026-11-13T01:31:36.6237101Z ##[group]Run actions/checkout@v4
+2026-11-13T01:31:36.6238109Z with:
+2026-11-13T01:31:36.6238634Z   repository: samirliu/goal-loop
+2026-11-13T01:31:36.6242746Z   token: ***
+2026-11-13T01:31:36.6243428Z   ssh-strict: true
+2026-11-13T01:31:36.6243936Z   ssh-user: git
+2026-11-13T01:31:36.6244452Z   persist-credentials: true
+2026-11-13T01:31:36.6245000Z   clean: true
+2026-11-13T01:31:36.6245507Z   sparse-checkout-cone-mode: true
+2026-11-13T01:31:36.6246090Z   fetch-depth: 1
+2026-11-13T01:31:36.6246580Z   fetch-tags: false
+2026-11-13T01:31:36.6247104Z   show-progress: true
+2026-11-13T01:31:36.6247618Z   lfs: false
+2026-11-13T01:31:36.6248096Z   submodules: false
+2026-11-13T01:31:36.6248598Z   set-safe-directory: true
+2026-11-13T01:31:36.6249167Z   allow-unsafe-pr-checkout: false
+2026-11-13T01:31:36.6250013Z ##[endgroup]
+2026-11-13T01:31:36.9709970Z Syncing repository: samirliu/goal-loop
+2026-11-13T01:31:36.9713409Z ##[group]Getting Git version info
+2026-11-13T01:31:36.9715108Z Working directory is '/home/runner/work/goal-loop/goal-loop'
+2026-11-13T01:31:36.9717535Z [command]/usr/bin/git version
+2026-11-13T01:31:36.9718792Z git version 2.56.0
+2026-11-13T01:31:36.9731072Z ##[endgroup]
+2026-11-13T01:31:36.9739591Z Temporarily overriding HOME='/home/runner/work/_temp/b86c95ff-9fde-4930-a598-82e59041bdd7' before making global git config changes
+2026-11-13T01:31:36.9743365Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-13T01:31:36.9746206Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/goal-loop/goal-loop
+2026-11-13T01:31:36.9829649Z Deleting the contents of '/home/runner/work/goal-loop/goal-loop'
+2026-11-13T01:31:36.9834376Z ##[group]Initializing the repository
+2026-11-13T01:31:36.9839667Z [command]/usr/bin/git init /home/runner/work/goal-loop/goal-loop
+2026-11-13T01:31:36.9994497Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-13T01:31:36.9997088Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-13T01:31:36.9998859Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-13T01:31:37.0000613Z hint: call:
+2026-11-13T01:31:37.0001308Z hint:
+2026-11-13T01:31:37.0002178Z hint: 	git config --global init.defaultBranch <name>
+2026-11-13T01:31:37.0003525Z hint:
+2026-11-13T01:31:37.0004543Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-13T01:31:37.0005960Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-13T01:31:37.0007035Z hint:
+2026-11-13T01:31:37.0007639Z hint: 	git branch -m <name>
+2026-11-13T01:31:37.0008347Z hint:
+2026-11-13T01:31:37.0009259Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-13T01:31:37.0018031Z Initialized empty Git repository in /home/runner/work/goal-loop/goal-loop/.git/
+2026-11-13T01:31:37.0031587Z [command]/usr/bin/git remote add origin https://github.com/samirliu/goal-loop
+2026-11-13T01:31:37.0092348Z ##[endgroup]
+2026-11-13T01:31:37.0093676Z ##[group]Disabling automatic garbage collection
+2026-11-13T01:31:37.0096913Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-13T01:31:37.0131665Z ##[endgroup]
+2026-11-13T01:31:37.0132598Z ##[group]Setting up auth
+2026-11-13T01:31:37.0139265Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-13T01:31:37.0172874Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-13T01:31:37.0652329Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-13T01:31:37.0687536Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-13T01:31:37.0954715Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-13T01:31:37.0987445Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-13T01:31:37.1267123Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-13T01:31:37.1305986Z ##[endgroup]
+2026-11-13T01:31:37.1307022Z ##[group]Fetching the repository
+2026-11-13T01:31:37.1320150Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c475b255106e9c93696817b199b94f8500b95de0:refs/remotes/origin/main
+2026-11-13T01:31:40.0818898Z From https://github.com/samirliu/goal-loop
+2026-11-13T01:31:40.0820579Z  * [new ref]         c475b255106e9c93696817b199b94f8500b95de0 -> origin/main
+2026-11-13T01:31:40.0824049Z ##[endgroup]
+2026-11-13T01:31:40.0824622Z ##[group]Determining the checkout info
+2026-11-13T01:31:40.0826594Z ##[endgroup]
+2026-11-13T01:31:40.0832389Z [command]/usr/bin/git sparse-checkout disable
+2026-11-13T01:31:40.0911383Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-13T01:31:40.0939540Z ##[group]Checking out the ref
+2026-11-13T01:31:40.0943526Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-11-13T01:31:40.2128945Z Switched to a new branch 'main'
+2026-11-13T01:31:40.2134315Z branch 'main' set up to track 'origin/main'.
+2026-11-13T01:31:40.2165866Z ##[endgroup]
+2026-11-13T01:31:40.2221525Z [command]/usr/bin/git log -1 --format=%H
+2026-11-13T01:31:40.2248818Z c475b255106e9c93696817b199b94f8500b95de0
+2026-11-13T01:31:40.2565060Z ##[group]Run shellcheck --severity=warning scripts/*.sh devtools/*.sh
+2026-11-13T01:31:40.2565853Z [36;1mshellcheck --severity=warning scripts/*.sh devtools/*.sh[0m
+2026-11-13T01:31:40.2622194Z shell: /usr/bin/bash -e {0}
+2026-11-13T01:31:40.2622579Z ##[endgroup]
+2026-11-13T01:31:44.5754250Z ##[group]Run echo "Running bash -n on all shipped scripts"
+2026-11-13T01:31:44.5754742Z [36;1mecho "Running bash -n on all shipped scripts"[0m
+2026-11-13T01:31:44.5755436Z [36;1mfor s in scripts/*.sh devtools/*.sh assets/*.sh companions/contract-forge/scripts/*.sh companions/contract-forge/tests/*.sh; do[0m
+2026-11-13T01:31:44.5756300Z [36;1m  bash -n "$s" || exit 1[0m
+2026-11-13T01:31:44.5756565Z [36;1mdone[0m
+2026-11-13T01:31:44.5756823Z [36;1mecho "All shipped scripts passed bash -n"[0m
+2026-11-13T01:31:44.5804681Z shell: /usr/bin/bash -e {0}
+2026-11-13T01:31:44.5804959Z ##[endgroup]
+2026-11-13T01:31:44.5871691Z Running bash -n on all shipped scripts
+2026-11-13T01:31:44.6077945Z All shipped scripts passed bash -n
+2026-11-13T01:31:44.6113506Z ##[group]Run bash tests/docs_consistency.sh
+2026-11-13T01:31:44.6113943Z [36;1mbash tests/docs_consistency.sh[0m
+2026-11-13T01:31:44.6160919Z shell: /usr/bin/bash -e {0}
+2026-11-13T01:31:44.6161203Z ##[endgroup]
+2026-11-13T01:31:44.6961401Z   ok   - C1 companion reference resolves: contract-forge/tests/run_fixtures.sh
+2026-11-13T01:31:44.7062009Z   ok   - C1 companion reference resolves: tests/run_fixtures.sh
+2026-11-13T01:31:44.7737184Z   ok   - C1 companion reference resolves: contract-forge/tests/run_fixtures.sh
+2026-11-13T01:31:44.8794653Z   ok   - C1 all internal cited files exist (external skipped=0)
+2026-11-13T01:31:44.8839477Z   ok   - C2 SKILL.md title says v4.1.1
+2026-11-13T01:31:44.8975000Z   ok   - C3 references/patterns.md TOC 1 has a heading
+2026-11-13T01:31:44.8988592Z   ok   - C3 references/patterns.md TOC 2 has a heading
+2026-11-13T01:31:44.9001949Z   ok   - C3 references/patterns.md TOC 3 has a heading
+2026-11-13T01:31:44.9017456Z   ok   - C5 references/crew.md has: NEVER a GO signal
+2026-11-13T01:31:44.9032161Z   ok   - C5 references/crew.md has: work-plan.md
+2026-11-13T01:31:44.9046922Z   ok   - C5 references/crew.md has: No `isolation: worktree`
+2026-11-13T01:31:44.9061720Z   ok   - C5 references/crew.md has: Do not invent new loop-log keys
+2026-11-13T01:31:44.9076075Z   ok   - C5 references/gate.md has: never WRITE `.goal/`
+2026-11-13T01:31:44.9090319Z   ok   - C5 references/crew.md has: INLINED
+2026-11-13T01:31:44.9104866Z   ok   - C5 SKILL.md has: 禁止
+2026-11-13T01:31:44.9119135Z   ok   - C5 SKILL.md has: worktree
+2026-11-13T01:31:44.9133952Z   ok   - C5 references/gate.md has: R9
+2026-11-13T01:31:44.9148103Z   ok   - C5 references/gate.md has: R10
+2026-11-13T01:31:44.9162573Z   ok   - C5 references/gate.md has: R11
+2026-11-13T01:31:44.9177333Z   ok   - C5 references/gate.md has: probe:
+2026-11-13T01:31:44.9192108Z   ok   - C5 references/gate.md has: R12
+2026-11-13T01:31:44.9206726Z   ok   - C5 SKILL.md has: goal_audit.sh
+2026-11-13T01:31:44.9221089Z   ok   - C5 references/crew.md has: calibration anchors
+2026-11-13T01:31:44.9235665Z   ok   - C5 SKILL.md has: 指标批评席
+2026-11-13T01:31:44.9250303Z   ok   - C5 references/gate.md has: R13
+2026-11-13T01:31:44.9264900Z   ok   - C5 references/gate.md has: DIVERGENCE
+2026-11-13T01:31:44.9279346Z   ok   - C5 scripts/goal_gate.sh has: DIVERGENCE
+2026-11-13T01:31:44.9294049Z   ok   - C5 scripts/goal_ctl.sh has: judge-score
+2026-11-13T01:31:44.9309049Z   ok   - C5 scripts/goal_gate.sh has: probe-failed
+2026-11-13T01:31:44.9324756Z   ok   - C5 scripts/goal_gate.sh has: score-regressed
+2026-11-13T01:31:44.9340334Z   ok   - C5 scripts/goal_gate.sh has: missing-strategy-delta
+2026-11-13T01:31:44.9355949Z   ok   - C5 scripts/goal_ctl.sh has: strategy-delta
+2026-11-13T01:31:44.9370662Z   ok   - C5 scripts/goal_parse.sh has: (exit|objective|horizon-waived):
+2026-11-13T01:31:44.9385097Z   ok   - C5 scripts/goal_ctl.sh has: gp_ac_body_hash
+2026-11-13T01:31:44.9399850Z   ok   - C5 scripts/goal_gate.sh has: gp_ac_body_hash
+2026-11-13T01:31:44.9414564Z   ok   - C5 scripts/goal_ctl.sh has: gp_hash_std
+2026-11-13T01:31:44.9428650Z   ok   - C5 SKILL.md has: minimize
+2026-11-13T01:31:44.9443458Z   ok   - C5 references/gate.md has: low-water for minimize
+2026-11-13T01:31:44.9458112Z   ok   - C5 scripts/goal_parse.sh has: minimize)  echo "minimize"
+2026-11-13T01:31:44.9473262Z   ok   - C5 scripts/goal_gate.sh has: dir=minimize
+2026-11-13T01:31:44.9487846Z   ok   - C5 scripts/goal_ctl.sh has: obj_dir
+2026-11-13T01:31:44.9502579Z   ok   - C5 SKILL.md has: 盖戳时绑定
+2026-11-13T01:31:44.9517435Z   ok   - C5 scripts/goal_ctl.sh has: BIND at stamp
+2026-11-13T01:31:44.9531908Z   ok   - C5 scripts/goal_gate.sh has: hint=fix-AC
+2026-11-13T01:31:44.9547187Z   ok   - C5 scripts/goal_gate.sh has: verdict-unbound
+2026-11-13T01:31:44.9561702Z   ok   - C5 scripts/goal_gate.sh has: contract-malformed
+2026-11-13T01:31:44.9576662Z   ok   - C5 scripts/goal_ctl.sh has: false-complete-counted
+2026-11-13T01:31:44.9591467Z   ok   - C5 scripts/goal_gate.sh has: calibration-missing
+2026-11-13T01:31:44.9606320Z   ok   - C5 scripts/goal_gate.sh has: calibration-broken
+2026-11-13T01:31:44.9620445Z   ok   - C5 references/gate.md has: R15
+2026-11-13T01:31:44.9635554Z   ok   - C5 references/gate.md has: calibration-missing
+2026-11-13T01:31:44.9649986Z   ok   - C5 references/crew.md has: calibration is MANDATORY
+2026-11-13T01:31:44.9664588Z   ok   - C5 assets/goal.contract.md has: calib:
+2026-11-13T01:31:44.9678595Z   ok   - C5 SKILL.md has: calib:
+2026-11-13T01:31:44.9693079Z   ok   - C5 SKILL.md has: 小任务快车道
+2026-11-13T01:31:44.9707900Z   ok   - C5 scripts/goal_ctl.sh has: CTL: NEXT
+2026-11-13T01:31:44.9723518Z   ok   - C5 scripts/goal_ctl.sh has: last_hint=
+2026-11-13T01:31:44.9738385Z   ok   - C5 references/gate.md has: crew:1]
+2026-11-13T01:31:44.9754300Z   ok   - C5 scripts/goal_ctl.sh has: bad-task:
+2026-11-13T01:31:44.9769339Z   ok   - C5 scripts/goal_gate.sh has: check-mutated-ledger
+2026-11-13T01:31:44.9786229Z   ok   - C5 scripts/goal_gate.sh has: ledger_digest
+2026-11-13T01:31:44.9807983Z   ok   - C5 scripts/goal_gate.sh has: unknown-ac-id
+2026-11-13T01:31:44.9825132Z   ok   - C5 scripts/goal_gate.sh has: duplicate AC id
+2026-11-13T01:31:44.9842132Z   ok   - C5 scripts/goal_gate.sh has: unparseable-state:
+2026-11-13T01:31:44.9858928Z   ok   - C5 scripts/goal_ctl.sh has: never produce a score
+2026-11-13T01:31:44.9875126Z   ok   - C5 scripts/goal_ctl.sh has: stamp-refused: goal.md has no
+2026-11-13T01:31:44.9890615Z   ok   - C5 scripts/goal_ctl.sh has: false-complete-flag-ignored
+2026-11-13T01:31:44.9905742Z   ok   - C5 references/gate.md has: check-mutated-ledger
+2026-11-13T01:31:44.9920446Z   ok   - C5 references/gate.md has: NEGATIVE water marks
+2026-11-13T01:31:44.9935777Z   ok   - C5 scripts/goal_gate.sh has: metric-flat
+2026-11-13T01:31:44.9950513Z   ok   - C5 scripts/goal_gate.sh has: extract_metric
+2026-11-13T01:31:44.9965725Z   ok   - C5 scripts/goal_gate.sh has: strip_ansi
+2026-11-13T01:31:44.9980248Z   ok   - C5 scripts/goal_gate.sh has: tolerance
+2026-11-13T01:31:44.9995088Z   ok   - C5 references/gate.md has: R14
+2026-11-13T01:31:45.0009339Z   ok   - C5 SKILL.md has: hint=
+2026-11-13T01:31:45.0024281Z   ok   - C5 SKILL.md has: bind-seat
+2026-11-13T01:31:45.0038790Z   ok   - C5 scripts/goal_gate.sh has: graceful delivery of passing work
+2026-11-13T01:31:45.0053302Z   ok   - C5 SKILL.md has: 不没收已通过的交付
+2026-11-13T01:31:45.0067704Z   ok   - C5 references/gate.md has: strategy=<label>
+2026-11-13T01:31:45.0082855Z   ok   - C5 references/gate.md has: peer-notes
+2026-11-13T01:31:45.0103345Z   ok   - C5 references/crew.md has: peer-notes
+2026-11-13T01:31:45.0121533Z   ok   - C5 references/patterns.md has: complex-goal contract shapes
+2026-11-13T01:31:45.0138243Z   ok   - C5 SKILL.md has: --strategy
+2026-11-13T01:31:45.0153956Z   ok   - C5 SKILL.md has: peer-notes
+2026-11-13T01:31:45.0169518Z   ok   - C5 SKILL.md has: EFFICIENCY
+2026-11-13T01:31:45.0185207Z   ok   - C5 scripts/goal_ctl.sh has: --strategy
+2026-11-13T01:31:45.0200740Z   ok   - C5 scripts/goal_ctl.sh has: strat_show
+2026-11-13T01:31:45.0216970Z   ok   - C5 scripts/goal_ctl.sh has: CTL: EFFICIENCY
+2026-11-13T01:31:45.0233320Z   ok   - C5 scripts/goal_ctl.sh has: eval-gap:
+2026-11-13T01:31:45.0249399Z   ok   - C5 scripts/goal_ctl.sh has: promote:
+2026-11-13T01:31:45.0265731Z   ok   - C5 scripts/goal_ctl.sh has: attribution-unused:
+2026-11-13T01:31:45.0281265Z   ok   - C5 scripts/goal_audit.sh has: recovery-vocabulary
+2026-11-13T01:31:45.0296503Z   ok   - C5 scripts/goal_parse.sh has: stall-recovered
+2026-11-13T01:31:45.0311533Z   ok   - C5 references/crew.md has: stall-recovered
+2026-11-13T01:31:45.0326812Z   ok   - C5 references/crew.md has: tool-error-fixed
+2026-11-13T01:31:45.0341920Z   ok   - C5 references/crew.md has: re-run:stall
+2026-11-13T01:31:45.0357264Z   ok   - C5 references/crew.md has: `[ ]` (OPEN)
+2026-11-13T01:31:45.0372135Z   ok   - C5 references/crew.md has: fallback:provider-fatal
+2026-11-13T01:31:45.0386871Z   ok   - C5 scripts/goal_audit.sh has: fallback-vocabulary
+2026-11-13T01:31:45.0401331Z   ok   - C5 SKILL.md has: --fault
+2026-11-13T01:31:45.0416102Z   ok   - C5 references/crew.md has: breakpoint brief
+2026-11-13T01:31:45.0430473Z   ok   - C5 references/crew.md has: take-over
+2026-11-13T01:31:45.0445259Z   ok   - C5 references/crew.md has: faults.rec
+2026-11-13T01:31:45.0459941Z   ok   - C5 references/crew.md has: open-items
+2026-11-13T01:31:45.0475320Z   ok   - C5 references/gate.md has: faults.rec
+2026-11-13T01:31:45.0489654Z   ok   - C5 references/gate.md has: open-items
+2026-11-13T01:31:45.0505229Z   ok   - C5 scripts/goal_ctl.sh has: CTL: FAULT
+2026-11-13T01:31:45.0519723Z   ok   - C5 scripts/goal_ctl.sh has: bad-fault-class
+2026-11-13T01:31:45.0535014Z   ok   - C5 scripts/goal_ctl.sh has: unbacked-task-suffix
+2026-11-13T01:31:45.0549483Z   ok   - C5 scripts/goal_audit.sh has: unbacked-suffix
+2026-11-13T01:31:45.0564184Z   ok   - C5 scripts/goal_audit.sh has: unbooked-fault
+2026-11-13T01:31:45.0578572Z   ok   - C5 scripts/goal_gate.sh has: open-items
+2026-11-13T01:31:45.0593741Z   ok   - C5 scripts/goal_gate.sh has: close-open-item
+2026-11-13T01:31:45.0608311Z   ok   - C5 scripts/goal_parse.sh has: gp_fault_suffix
+2026-11-13T01:31:45.0623332Z   ok   - C5 examples/quickstart-one-shot/run.sh has: --adversarial clear
+2026-11-13T01:31:45.0662452Z   ok   - C6 no case knowledge leaked into generic skill files
+2026-11-13T01:31:45.0675750Z   ok   - C7 SKILL has invariant GATE
+2026-11-13T01:31:45.0689352Z   ok   - C7 SKILL has invariant BIND
+2026-11-13T01:31:45.0702515Z   ok   - C7 SKILL has invariant PROVE
+2026-11-13T01:31:45.0716266Z   ok   - C7 SKILL has invariant GRADIENT
+2026-11-13T01:31:45.0729885Z   ok   - C7 SKILL has invariant FENCE
+2026-11-13T01:31:45.0743966Z   ok   - C7 SKILL.md free of R-numbers
+2026-11-13T01:31:45.0744577Z   ok   - C7 pack exists: instrument.md
+2026-11-13T01:31:45.0747211Z   ok   - C7 pack exists: gradient.md
+2026-11-13T01:31:45.0747878Z   ok   - C7 pack exists: external.md
+2026-11-13T01:31:45.0758505Z   ok   - C7 gate.md maps GATE
+2026-11-13T01:31:45.0771866Z   ok   - C7 gate.md maps BIND
+2026-11-13T01:31:45.0785832Z   ok   - C7 gate.md maps PROVE
+2026-11-13T01:31:45.0799520Z   ok   - C7 gate.md maps GRADIENT
+2026-11-13T01:31:45.0812838Z   ok   - C7 gate.md maps FENCE
+2026-11-13T01:31:45.0826801Z   ok   - C7 legacy R1 retained
+2026-11-13T01:31:45.0840488Z   ok   - C7 legacy R2 retained
+2026-11-13T01:31:45.0853927Z   ok   - C7 legacy R3 retained
+2026-11-13T01:31:45.0867194Z   ok   - C7 legacy R4 retained
+2026-11-13T01:31:45.0880505Z   ok   - C7 legacy R5 retained
+2026-11-13T01:31:45.0893993Z   ok   - C7 legacy R6 retained
+2026-11-13T01:31:45.0907677Z   ok   - C7 legacy R7 retained
+2026-11-13T01:31:45.0920960Z   ok   - C7 legacy R8 retained
+2026-11-13T01:31:45.0934510Z   ok   - C7 legacy R9 retained
+2026-11-13T01:31:45.0947874Z   ok   - C7 legacy R10 retained
+2026-11-13T01:31:45.0961157Z   ok   - C7 legacy R11 retained
+2026-11-13T01:31:45.0974259Z   ok   - C7 legacy R12 retained
+2026-11-13T01:31:45.0988084Z   ok   - C7 legacy R13 retained
+2026-11-13T01:31:45.1001376Z   ok   - C7 legacy R14 retained
+2026-11-13T01:31:45.1014794Z   ok   - C7 legacy R15 retained
+2026-11-13T01:31:45.1028216Z   ok   - C7 legacy R16 retained
+2026-11-13T01:31:45.1041333Z   ok   - C7 legacy R17 retained
+2026-11-13T01:31:45.1054978Z   ok   - C7 legacy R18 retained
+2026-11-13T01:31:45.1068195Z   ok   - C7 legacy R19 retained
+2026-11-13T01:31:45.1082228Z   ok   - C7 SKILL activates pack instrument.md
+2026-11-13T01:31:45.1095816Z   ok   - C7 SKILL activates pack gradient.md
+2026-11-13T01:31:45.1109933Z   ok   - C7 SKILL activates pack external.md
+2026-11-13T01:31:45.1116052Z == docs consistency: CONSISTENT ==
+2026-11-13T01:31:45.1155410Z ##[group]Run bash tests/run_tests.sh
+2026-11-13T01:31:45.1155774Z [36;1mbash tests/run_tests.sh[0m
+2026-11-13T01:31:45.1202020Z shell: /usr/bin/bash -e {0}
+2026-11-13T01:31:45.1202300Z ##[endgroup]
+2026-11-13T01:36:06.7133858Z   ok   - 01 help exits 0 (rc=0)
+2026-11-13T01:36:06.7134497Z   ok   - 01 help mentions --verify
+2026-11-13T01:36:06.7134984Z   ok   - 09 contract-tampered -> rc2 (rc=2)
+2026-11-13T01:36:06.7135626Z   ok   - 17a forge close w/o --dry -> rc4 (rc=4)
+2026-11-13T01:36:06.7136219Z   ok   - 17a refusal leaves no orphan loop-log block
+2026-11-13T01:36:06.7136845Z   ok   - 24 exit=1 negative GO -> rc0 (rc=0)
+2026-11-13T01:36:06.7137433Z   ok   - 24 --verify PASS on rc match
+2026-11-13T01:36:06.7138113Z   ok   - 31a cache hit replays metric 42
+2026-11-13T01:36:06.7138833Z   ok   - 31b command ran once for unchanged input
+2026-11-13T01:36:06.7139503Z   ok   - 31c stdout archived under .goal/evidence
+2026-11-13T01:36:06.7140066Z   ok   - 31d rerun after input change
+2026-11-13T01:36:06.7140963Z   ok   - 47 status echoes crew wave marker
+2026-11-13T01:36:06.7141706Z   ok   - 47b teams marker refused (rc=4)
+2026-11-13T01:36:06.7142418Z   ok   - 47b names bad-task
+2026-11-13T01:36:06.7143116Z   ok   - 61 mismatch noted
+2026-11-13T01:36:06.7143655Z   ok   - 61 measured score recorded
+2026-11-13T01:36:06.7144306Z   ok   - 61 best_score from measurement
+2026-11-13T01:36:06.7144978Z   ok   - 72 minimize agree -> GO (rc=0)
+2026-11-13T01:36:06.7145635Z   ok   - 72 no DIVERGENCE
+2026-11-13T01:36:06.7146193Z   ok   - 83 catch1 auto-counted
+2026-11-13T01:36:06.7146743Z   ok   - 83 catch2 auto-counted
+2026-11-13T01:36:06.7147118Z   ok   - 83 third claim frozen -> rc3 (rc=3)
+2026-11-13T01:36:06.7147527Z   ok   - 83 state holds count
+2026-11-13T01:36:06.7147919Z   ok   - 90 manual flag noted not double-counted
+2026-11-13T01:36:06.7148354Z   ok   - 90 fc counted exactly 1
+2026-11-13T01:36:06.7148751Z   ok   - 98a pruned dir change invisible
+2026-11-13T01:36:06.7149178Z   ok   - 98b real source change still detected
+2026-11-13T01:36:06.7149483Z   ok   - 98c digest deterministic
+2026-11-13T01:36:06.7149976Z   ok   - 99a .goalignore prunes named dir
+2026-11-13T01:36:06.7150520Z   ok   - 99b GOAL_PRUNE override deterministic
+2026-11-13T01:36:06.7151070Z   ok   - 99c GOAL_PRUNE drops src from watch
+2026-11-13T01:36:06.7151635Z   ok   - 108a claim with illegal task id -> rc2 (rc=2)
+2026-11-13T01:36:06.7152332Z   ok   - 108a names bad-task
+2026-11-13T01:36:06.7152771Z   ok   - 108a hint routes the fix
+2026-11-13T01:36:06.7153490Z   ok   - 108b bare legacy id still claims (rc=0)
+2026-11-13T01:36:06.7154024Z   ok   - 108b legacy NOTE emitted
+2026-11-13T01:36:06.7154489Z   ok   - 115c NEXT routes fix-AC
+2026-11-13T01:36:06.7154974Z   ok   - 115c NEXT sentence present
+2026-11-13T01:36:06.7155468Z   ok   - 117c rc75 -> deferred rc2 (rc=2)
+2026-11-13T01:36:06.7155983Z   ok   - 117c deferred routing
+2026-11-13T01:36:06.7156442Z   ok   - 117c wait hint
+2026-11-13T01:36:06.7156908Z   ok   - 120a legacy rows parse, claim GO (rc=0)
+2026-11-13T01:36:06.7157510Z   ok   - 120b status survives mixed-field ledger
+2026-11-13T01:36:06.7158087Z   ok   - 123c invented suffix fails A1/A3 (rc=1)
+2026-11-13T01:36:06.7158628Z   ok   - 123c rejected at schema/vocab gate
+2026-11-13T01:36:06.7159149Z   ok   - 126c exploit-only pick
+2026-11-13T01:36:06.7159630Z   ok   - 127a status rc0 without goal.md (rc=0)
+2026-11-13T01:36:06.7160170Z   ok   - 127a STEP says fill contract
+2026-11-13T01:36:06.7160679Z   ok   - 127a parse silent on missing goal.md
+2026-11-13T01:36:06.7161208Z   ok   - 127a no goal_parse.sh traceback
+2026-11-13T01:36:06.7161720Z   ok   - 130c finding refuses claim (rc=2)
+2026-11-13T01:36:06.7162233Z   ok   - 130c reason adversarial-finding
+2026-11-13T01:36:06.7162715Z   ok   - 130c clear receipt GO (rc=0)
+2026-11-13T01:36:06.7163561Z   ok   - 133c audit fails on ticked-but-unbooked (rc=1)
+2026-11-13T01:36:06.7164484Z   ok   - 133c A9 named
+2026-11-13T01:36:06.7164914Z   ok   - 133f audit clean after close (rc=0)
+2026-11-13T01:36:06.7165710Z   ok   - 135b unbacked suffix refused (rc=4)
+2026-11-13T01:36:06.7166262Z   ok   - 135b names unbacked-task-suffix
+2026-11-13T01:36:06.7166824Z   ok   - 137a check-only preserves gate rc (rc=2)
+2026-11-13T01:36:06.7167415Z   ok   - 137a check-only preserves foreign lock
+2026-11-13T01:36:06.7167955Z   ok   - 137b live owner refused (rc=4)
+2026-11-13T01:36:06.7168461Z   ok   - 137b refusal preserves foreign lock
+2026-11-13T01:36:06.7169012Z   ok   - 137c normal exhausted run rc intact (rc=3)
+2026-11-13T01:36:06.7169588Z   ok   - 137c executor runs at project root
+2026-11-13T01:36:06.7170089Z   ok   - 137c owned lock cleaned
+2026-11-13T01:36:06.7170673Z   ok   - 149 finding cannot be replaced by note injection (rc=2)
+2026-11-13T01:36:06.7171384Z   ok   - 149 gate reports real finding
+2026-11-13T01:36:06.7171799Z   ok   - 149 receipt remains one record
+2026-11-13T01:36:06.7172153Z   ok   - 153 vanished untracked file refuses digest (rc=4)
+2026-11-13T01:36:06.7172546Z   ok   - 159 deadline mutation refuses verification (rc=2)
+2026-11-13T01:36:06.7173192Z   ok   - 159 deadline mutation names ledger guard
+2026-11-13T01:36:06.7173587Z   ok   - 159 clock mutation refuses verification (rc=2)
+2026-11-13T01:36:06.7173924Z   ok   - 159 clock mutation names ledger guard
+2026-11-13T01:36:06.7174230Z == results: pass=73 fail=0 ==
+2026-11-13T01:36:06.7204988Z   ok   - 02 no-goal-dir -> rc4 (rc=4)
+2026-11-13T01:36:06.7205512Z   ok   - 10 metric FAIL -> rc2 (rc=2)
+2026-11-13T01:36:06.7206011Z   ok   - 10 reason open-FAIL w/ gate rerun
+2026-11-13T01:36:06.7206515Z   ok   - 16 prose->judged GO -> rc0 (rc=0)
+2026-11-13T01:36:06.7207034Z   ok   - 23a exit flip after stamp -> rc2 (rc=2)
+2026-11-13T01:36:06.7207561Z   ok   - 23a reason contract-tampered
+2026-11-13T01:36:06.7208055Z   ok   - 23b exit line smuggled -> rc2 (rc=2)
+2026-11-13T01:36:06.7208564Z   ok   - 23b reason contract-tampered
+2026-11-13T01:36:06.7208903Z   ok   - 36 hook claimed+NO-GO blocks (rc2) (rc=2)
+2026-11-13T01:36:06.7209295Z   ok   - 36 block reason carries GOAL_LOOP_GATE prefix
+2026-11-13T01:36:06.7209756Z   ok   - 36 gate reason preserved in block message
+2026-11-13T01:36:06.7210178Z   ok   - 45 single-run baseline refused rc2 (rc=2)
+2026-11-13T01:36:06.7210493Z   ok   - 55b probe-ok GO (rc=0)
+2026-11-13T01:36:06.7210784Z   ok   - 65a crew invented recovery rc1 (rc=1)
+2026-11-13T01:36:06.7211087Z   ok   - 65a rejected at schema gate
+2026-11-13T01:36:06.7211373Z   ok   - 65e crew recovery suffix clean (rc=0)
+2026-11-13T01:36:06.7211668Z   ok   - 65e clean
+2026-11-13T01:36:06.7211880Z   ok   - 73 max_iterations bound
+2026-11-13T01:36:06.7212131Z   ok   - 73 check_timeout bound
+2026-11-13T01:36:06.7212375Z   ok   - 73 wallclock bound
+2026-11-13T01:36:06.7212611Z   ok   - 73 deadline seeded
+2026-11-13T01:36:06.7213053Z   ok   - 78 metric regex extracts through ANSI
+2026-11-13T01:36:06.7213463Z   ok   - 78b regex miss -> BROKEN named
+2026-11-13T01:36:06.7213763Z   ok   - 86 verify unknown id -> rc4 (rc=4)
+2026-11-13T01:36:06.7214051Z   ok   - 86 unknown id named
+2026-11-13T01:36:06.7214313Z   ok   - 87 alpha numeric-key -> rc4 (rc=4)
+2026-11-13T01:36:06.7214694Z   ok   - 87 offending key named
+2026-11-13T01:36:06.7215135Z   ok   - 95a regression -> rc2 (rc=2)
+2026-11-13T01:36:06.7215594Z   ok   - 95a hint restore-best
+2026-11-13T01:36:06.7216026Z   ok   - 95b tampered -> rc2 (rc=2)
+2026-11-13T01:36:06.7216492Z   ok   - 95b hint proposal-to-user
+2026-11-13T01:36:06.7216970Z   ok   - 102 dead fixture -> rc2 (rc=2)
+2026-11-13T01:36:06.7217458Z   ok   - 102 reason calibration-broken
+2026-11-13T01:36:06.7217905Z   ok   - 102 hint routes
+2026-11-13T01:36:06.7218296Z   ok   - 109a strategy written
+2026-11-13T01:36:06.7218723Z   ok   - 109d label trimmed
+2026-11-13T01:36:06.7219197Z   ok   - 109g strategy label does not excuse R10 (rc=4)
+2026-11-13T01:36:06.7219755Z   ok   - 110f two A windows + one B window
+2026-11-13T01:36:06.7220538Z   ok   - 110f window order follows file order
+2026-11-13T01:36:06.7221388Z   ok   - 115e garbage row skipped rc0 (rc=0)
+2026-11-13T01:36:06.7221927Z   ok   - 115e slope still computed
+2026-11-13T01:36:06.7222444Z   ok   - 116a horizon-less objective -> rc2 (rc=2)
+2026-11-13T01:36:06.7223240Z   ok   - 116a refusal names horizon
+2026-11-13T01:36:06.7223748Z   ok   - 116b waived stamps -> rc0 (rc=0)
+2026-11-13T01:36:06.7224252Z   ok   - 116d waiver strip -> rc2 (rc=2)
+2026-11-13T01:36:06.7224728Z   ok   - 116d tamper named
+2026-11-13T01:36:06.7225151Z   ok   - 121b real FAIL still counted
+2026-11-13T01:36:06.7225613Z   ok   - 124c real FAIL counted
+2026-11-13T01:36:06.7226068Z   ok   - 124c2 contract-defect not counted
+2026-11-13T01:36:06.7226604Z   ok   - 124c2 ratchet stayed 0 on contract defect
+2026-11-13T01:36:06.7227132Z   ok   - 134e no soft claim NEXT
+2026-11-13T01:36:06.7227575Z   ok   - 134e routes close or degrade
+2026-11-13T01:36:06.7228085Z   ok   - 135f open item blocks the claim (rc=2)
+2026-11-13T01:36:06.7228612Z   ok   - 135f names open-items
+2026-11-13T01:36:06.7229057Z   ok   - 135f routes to close-open-item
+2026-11-13T01:36:06.7229694Z   ok   - 142 symlink target changes non-Git digest
+2026-11-13T01:36:06.7230230Z   ok   - 142 mode changes non-Git digest
+2026-11-13T01:36:06.7230759Z   ok   - 142 newline path remains content-bound
+2026-11-13T01:36:06.7231321Z   ok   - 142 option-like path remains content-bound
+2026-11-13T01:36:06.7231905Z   ok   - 150 strategy-pipe rejected before mutation
+2026-11-13T01:36:06.7232502Z   ok   - 150 signature-newline rejected before mutation
+2026-11-13T01:36:06.7233309Z   ok   - 150 files-newline rejected before mutation
+2026-11-13T01:36:06.7233881Z   ok   - 150 delta-blank rejected before mutation
+2026-11-13T01:36:06.7234442Z   ok   - 150 delta-none rejected before mutation
+2026-11-13T01:36:06.7235082Z   ok   - 150 whitespace objective label rejected before measurement
+2026-11-13T01:36:06.7235810Z   ok   - 150 multiword objective label rejected before measurement
+2026-11-13T01:36:06.7236440Z == results: pass=66 fail=0 ==
+2026-11-13T01:36:06.7273320Z   ok   - 03 threshold GO deterministic (rc=0)
+2026-11-13T01:36:06.7273920Z   ok   - 03 GO line says mode=threshold
+2026-11-13T01:36:06.7274409Z   ok   - 15 budget-fuse -> rc3 (rc=3)
+2026-11-13T01:36:06.7274878Z   ok   - 15 reason budget-fuse
+2026-11-13T01:36:06.7275313Z   ok   - 22 state seeds dry_streak
+2026-11-13T01:36:06.7275762Z   ok   - 22 state seeds dry_limit
+2026-11-13T01:36:06.7276222Z   ok   - 22 state seeds check_timeout
+2026-11-13T01:36:06.7276720Z   ok   - 30 close preserves time_budget
+2026-11-13T01:36:06.7277078Z   ok   - 30 close preserves deadline
+2026-11-13T01:36:06.7277379Z   ok   - 37 hook unclaimed allows stop (rc=0)
+2026-11-13T01:36:06.7277702Z   ok   - 46 status prints iteration line
+2026-11-13T01:36:06.7277990Z   ok   - 46 status prints last block
+2026-11-13T01:36:06.7278257Z   ok   - 46 status prints next task
+2026-11-13T01:36:06.7278584Z   ok   - 58 strategy_delta single line
+2026-11-13T01:36:06.7278962Z   ok   - 58 loop-log block intact
+2026-11-13T01:36:06.7279321Z   ok   - 60 status best_score
+2026-11-13T01:36:06.7279599Z   ok   - 71 minimize divergence -> rc2 (rc=2)
+2026-11-13T01:36:06.7280045Z   ok   - 71 DIVERGENCE token
+2026-11-13T01:36:06.7280299Z   ok   - 71 dir named
+2026-11-13T01:36:06.7280545Z   ok   - 84 notes never block -> GO (rc=0)
+2026-11-13T01:36:06.7280830Z   ok   - 84 tautology suspect named
+2026-11-13T01:36:06.7281112Z   ok   - 88 negative score extracted with sign
+2026-11-13T01:36:06.7281422Z   ok   - 88 negative band holds -> GO (rc=0)
+2026-11-13T01:36:06.7281707Z   ok   - 97 A8 warns (stdout)
+2026-11-13T01:36:06.7281981Z   ok   - 97 no stderr noise for missing scores.rec
+2026-11-13T01:36:06.7282351Z   ok   - 101e calib literal inside check -> stamps clean (rc=0)
+2026-11-13T01:36:06.7282712Z   ok   - 101e gate must not invent calibration
+2026-11-13T01:36:06.7283271Z   ok   - 99d empty project digest rc0 (rc=0)
+2026-11-13T01:36:06.7283577Z   ok   - 99d empty digest well-formed
+2026-11-13T01:36:06.7284281Z   ok   - 107a unstamped => step 1
+2026-11-13T01:36:06.7284961Z   ok   - 107b stamped, no work => step 2
+2026-11-13T01:36:06.7285456Z   ok   - 107c work unclaimed => step 3
+2026-11-13T01:36:06.7285930Z   ok   - 107d claimed => step 4
+2026-11-13T01:36:06.7286404Z   ok   - 109f audit clean w/ strategy (rc=0)
+2026-11-13T01:36:06.7286897Z   ok   - 109f audit says clean
+2026-11-13T01:36:06.7287338Z   ok   - 110c no comparable pair
+2026-11-13T01:36:06.7287790Z   ok   - 110i negative slope shown
+2026-11-13T01:36:06.7288272Z   ok   - 110i beyond tight band is regression
+2026-11-13T01:36:06.7288868Z   ok   - 114a gate still GO with peer-note present (rc=0)
+2026-11-13T01:36:06.7289479Z   ok   - 114a tree digest blind to peer-notes
+2026-11-13T01:36:06.7290028Z   ok   - 114a rc stable across peer-note
+2026-11-13T01:36:06.7290630Z   ok   - 114c gate.md documents peer-notes
+2026-11-13T01:36:06.7291163Z   ok   - 114c crew.md documents peer-notes
+2026-11-13T01:36:06.7291693Z   ok   - 114c R6 never-WRITE clause intact
+2026-11-13T01:36:06.7292223Z   ok   - 114d docs consistency green (rc=0)
+2026-11-13T01:36:06.7292755Z   ok   - 114e patterns C3 for section 12
+2026-11-13T01:36:06.7293469Z   ok   - 118a drift inside z-band -> GO (rc=0)
+2026-11-13T01:36:06.7294040Z   ok   - 118b drift beyond z-band -> rc2 (rc=2)
+2026-11-13T01:36:06.7294566Z   ok   - 118b band source named
+2026-11-13T01:36:06.7295008Z   ok   - 118c silent sd -> BROKEN
+2026-11-13T01:36:06.7295460Z   ok   - 128b deadline not rebased
+2026-11-13T01:36:06.7295905Z   ok   - 128b deadline still 1
+2026-11-13T01:36:06.7296354Z   ok   - 131b builtin check still GO (rc=0)
+2026-11-13T01:36:06.7296857Z   ok   - 133a pre-reg seeded at stamp
+2026-11-13T01:36:06.7297319Z   ok   - 133a has kill lines
+2026-11-13T01:36:06.7297736Z   ok   - 133a has strategy slot
+2026-11-13T01:36:06.7298192Z   ok   - 133e NEXT forces close-iteration
+2026-11-13T01:36:06.7298684Z   ok   - 133e not soft-claim NEXT
+2026-11-13T01:36:06.7299181Z   ok   - 134f claim with ghost file refused (rc=4)
+2026-11-13T01:36:06.7299743Z   ok   - 134f names missing-claimed-file
+2026-11-13T01:36:06.7300240Z   ok   - 136a entry gain belongs to B
+2026-11-13T01:36:06.7300717Z   ok   - 136a entry measured as one delta
+2026-11-13T01:36:06.7301246Z   ok   - 136b no unsupported last-label preference
+2026-11-13T01:36:06.7301828Z   ok   - 136c missing measurement breaks attribution
+2026-11-13T01:36:06.7302412Z   ok   - 136d latest A supersedes historical exploit
+2026-11-13T01:36:06.7303102Z   ok   - 136d pick disjoint
+2026-11-13T01:36:06.7303600Z   ok   - 136e retry with new evidence clears old prune
+2026-11-13T01:36:06.7304159Z   ok   - 136f oscillation is not a dry plateau
+2026-11-13T01:36:06.7304683Z   ok   - 136g regression avoids strategy
+2026-11-13T01:36:06.7305210Z   ok   - 136h negative minimize entry gain
+2026-11-13T01:36:06.7305723Z   ok   - 136i orphan ignored for eval-gap
+2026-11-13T01:36:06.7306239Z   ok   - 136j ledger gap cannot earn exploit
+2026-11-13T01:36:06.7306836Z   ok   - 136k spread declaration suppresses false confidence
+2026-11-13T01:36:06.7307431Z   ok   - 136k missing spread identified
+2026-11-13T01:36:06.7307908Z == results: pass=74 fail=0 ==
+2026-11-13T01:36:06.7351354Z   ok   - 04 not-claimed -> rc2 (rc=2)
+2026-11-13T01:36:06.7352080Z   ok   - 11a check-broken rc127 -> rc2 (rc=2)
+2026-11-13T01:36:06.7352735Z   ok   - 11a reason check-broken
+2026-11-13T01:36:06.7353407Z   ok   - 17b --dry yes + fail -> rc4 (rc=4)
+2026-11-13T01:36:06.7354067Z   ok   - 17b refusal leaves no orphan loop-log block
+2026-11-13T01:36:06.7354623Z   ok   - 25 exit=3 vs rc1 -> rc2 (rc=2)
+2026-11-13T01:36:06.7355125Z   ok   - 25 reason open-FAIL w/ expect
+2026-11-13T01:36:06.7355591Z   ok   - 32 docs consistency (rc=0)
+2026-11-13T01:36:06.7355993Z   ok   - 34 hook no-goal allows stop (rc=0)
+2026-11-13T01:36:06.7356321Z   ok   - 39 hook rc4 fail-open allows stop (rc=0)
+2026-11-13T01:36:06.7356735Z   ok   - 53 maximize GO at score 7 (rc=0)
+2026-11-13T01:36:06.7357100Z   ok   - 53 GO line carries score
+2026-11-13T01:36:06.7357745Z   ok   - 53 best_score stored
+2026-11-13T01:36:06.7358015Z   ok   - 54 score-regressed -> rc2 (rc=2)
+2026-11-13T01:36:06.7358531Z   ok   - 54 reason score-regressed
+2026-11-13T01:36:06.7358834Z   ok   - 69 minimize classified deterministic
+2026-11-13T01:36:06.7359118Z   ok   - 69 not judged
+2026-11-13T01:36:06.7359353Z   ok   - 69 minimize GO at score 7 (rc=0)
+2026-11-13T01:36:06.7359627Z   ok   - 69 best_score stored
+2026-11-13T01:36:06.7359934Z   ok   - 70 score-regressed (minimize 7>5) -> rc2 (rc=2)
+2026-11-13T01:36:06.7360276Z   ok   - 70 reason score-regressed
+2026-11-13T01:36:06.7360545Z   ok   - 70 direction named
+2026-11-13T01:36:06.7360806Z   ok   - 79 noise-band holds -> GO (rc=0)
+2026-11-13T01:36:06.7361092Z   ok   - 80 below band -> rc2 (rc=2)
+2026-11-13T01:36:06.7361360Z   ok   - 80 regressed names tol
+2026-11-13T01:36:06.7361648Z   ok   - 91 objective-on-judged refused (rc=2)
+2026-11-13T01:36:06.7361962Z   ok   - 91 stamp refusal names the AC
+2026-11-13T01:36:06.7362453Z   ok   - 92 stamp without placeholder rc4 (rc=4)
+2026-11-13T01:36:06.7363183Z   ok   - 92 placeholder refusal named
+2026-11-13T01:36:06.7363741Z   ok   - 103a status prints NEXT
+2026-11-13T01:36:06.7364196Z   ok   - 103a NEXT names the hint
+2026-11-13T01:36:06.7364692Z   ok   - 103a NEXT is one actionable sentence
+2026-11-13T01:36:06.7365232Z   ok   - 103b clean claim => nothing pending
+2026-11-13T01:36:06.7365802Z   ok   - 106a disagreeing same-binding pair -> rc2 (rc=2)
+2026-11-13T01:36:06.7366152Z   ok   - 106a reason verdict-conflict
+2026-11-13T01:36:06.7366432Z   ok   - 106a hint routes rebind
+2026-11-13T01:36:06.7366756Z   ok   - 106b identical double-bind is NOT a conflict (rc=0)
+2026-11-13T01:36:06.7367164Z   ok   - 106c conflict cleared by fresh binding on new state (rc=0)
+2026-11-13T01:36:06.7367522Z   ok   - 113a promote after 3 waves
+2026-11-13T01:36:06.7367826Z   ok   - 113b normalized ids count as one domain
+2026-11-13T01:36:06.7368142Z   ok   - 113c interleaved stays silent
+2026-11-13T01:36:06.7368426Z   ok   - 113d run of two stays silent
+2026-11-13T01:36:06.7368703Z   ok   - 113e promote wording is consider
+2026-11-13T01:36:06.7368997Z   ok   - 113f unstalled promote silent
+2026-11-13T01:36:06.7369289Z   ok   - 117g floor FAIL beats DEFERRED (rc=2)
+2026-11-13T01:36:06.7369602Z   ok   - 117g in-tree FAIL surfaced not masked
+2026-11-13T01:36:06.7369903Z   ok   - 123b re-run suffix clean (rc=0)
+2026-11-13T01:36:06.7370176Z   ok   - 123b clean said
+2026-11-13T01:36:06.7370406Z   ok   - 126a rc0 (rc=0)
+2026-11-13T01:36:06.7370702Z   ok   - 126a STRATEGY-PICK prefer=B avoid=A
+2026-11-13T01:36:06.7370997Z   ok   - 126d NEXT carries pick
+2026-11-13T01:36:06.7371249Z   ok   - 126d NEXT hint intact
+2026-11-13T01:36:06.7371521Z   ok   - 130b stale receipt refuses claim (rc=2)
+2026-11-13T01:36:06.7371831Z   ok   - 130b still adversarial-missing
+2026-11-13T01:36:06.7372123Z   ok   - 132b empty raw still NO-GO (rc=2)
+2026-11-13T01:36:06.7372413Z   ok   - 132b raw-evidence-missing
+2026-11-13T01:36:06.7372698Z   ok   - 134a false-tick fails audit (rc=1)
+2026-11-13T01:36:06.7373257Z   ok   - 134a A10 named
+2026-11-13T01:36:06.7373623Z   ok   - 134a names missing path
+2026-11-13T01:36:06.7373897Z   ok   - 135c bad class refused (rc=4)
+2026-11-13T01:36:06.7374178Z   ok   - 135c names bad-fault-class
+2026-11-13T01:36:06.7374461Z   ok   - 135c illegal pair refused (rc=4)
+2026-11-13T01:36:06.7374748Z   ok   - 135c names bad-fault-outcome
+2026-11-13T01:36:06.7375040Z   ok   - 141 progress rejected without mutation
+2026-11-13T01:36:06.7375385Z   ok   - 141 exit-signal rejected without mutation
+2026-11-13T01:36:06.7375733Z   ok   - 141 false-complete rejected without mutation
+2026-11-13T01:36:06.7376068Z   ok   - 141 dry rejected without mutation
+2026-11-13T01:36:06.7376379Z   ok   - 141 checks-pass rejected without mutation
+2026-11-13T01:36:06.7376717Z   ok   - 141 checks-fail rejected without mutation
+2026-11-13T01:36:06.7377074Z   ok   - 141 checks-unverifiable rejected without mutation
+2026-11-13T01:36:06.7377432Z   ok   - 141 invalid task rejected before measurement
+2026-11-13T01:36:06.7378176Z   ok   - 146 watched directory content
+2026-11-13T01:36:06.7378776Z   ok   - 146 watched empty directory
+2026-11-13T01:36:06.7379117Z   ok   - 146 changing watched scope refuses claim (rc=2)
+2026-11-13T01:36:06.7379456Z   ok   - 146 scope change is contract tampering
+2026-11-13T01:36:06.7379796Z   ok   - 152 empty hash sensor refuses identity (rc=4)
+2026-11-13T01:36:06.7380156Z   ok   - 152 constant hash sensor refuses identity (rc=4)
+2026-11-13T01:36:06.7380505Z   ok   - 158 isolated Python digest succeeds (rc=0)
+2026-11-13T01:36:06.7380843Z   ok   - 158 ambient Python startup hook not executed
+2026-11-13T01:36:06.7381151Z == results: pass=79 fail=0 ==
+2026-11-13T01:36:06.7421828Z   ok   - 05 stale -> rc2 (rc=2)
+2026-11-13T01:36:06.7422313Z   ok   - 05 reason verdicts-stale
+2026-11-13T01:36:06.7422828Z   ok   - 13 forge not-dry -> rc2 (rc=2)
+2026-11-13T01:36:06.7423480Z   ok   - 13 reason not-dry
+2026-11-13T01:36:06.7423888Z   ok   - 14 forge GO -> rc0 (rc=0)
+2026-11-13T01:36:06.7424348Z   ok   - 14 GO line says mode=forge
+2026-11-13T01:36:06.7424818Z   ok   - 29 future deadline GO -> rc0 (rc=0)
+2026-11-13T01:36:06.7425320Z   ok   - 33 shellcheck clean
+2026-11-13T01:36:06.7425681Z   ok   - 40 stamp without baseline refused rc2 (rc=2)
+2026-11-13T01:36:06.7425998Z   ok   - 40 goal.md left unstamped
+2026-11-13T01:36:06.7426278Z   ok   - 41 stamp with baseline ok (rc=0)
+2026-11-13T01:36:06.7426598Z   ok   - 41 forge GO with baseline satisfied (rc=0)
+2026-11-13T01:36:06.7426915Z   ok   - 59 bad-score refused (rc=4)
+2026-11-13T01:36:06.7427257Z   ok   - 63 clean ledger rc0 (rc=0)
+2026-11-13T01:36:06.7427583Z   ok   - 63 clean said
+2026-11-13T01:36:06.7427886Z   ok   - 65 bad vocab+score+delta rc1 (rc=1)
+2026-11-13T01:36:06.7428194Z   ok   - 65 vocab
+2026-11-13T01:36:06.7428405Z   ok   - 65 score-format
+2026-11-13T01:36:06.7428643Z   ok   - 65 missing strategy_delta
+2026-11-13T01:36:06.7428909Z   ok   - 74 not-covered -> rc2 (rc=2)
+2026-11-13T01:36:06.7429189Z   ok   - 74 reason not-covered
+2026-11-13T01:36:06.7429430Z   ok   - 74 hint bind-seat
+2026-11-13T01:36:06.7429666Z   ok   - 75 status shows T1
+2026-11-13T01:36:06.7430014Z   ok   - 75 status shows T2
+2026-11-13T01:36:06.7459930Z   ok   - 75 status counts 2 open
+2026-11-13T01:36:06.7460480Z   ok   - 75 status drops ticked T1
+2026-11-13T01:36:06.7460966Z   ok   - 75 ticked item hidden
+2026-11-13T01:36:06.7461456Z   ok   - 84b artifact with spaces -> GO (rc=0)
+2026-11-13T01:36:06.7462074Z   ok   - 89 ledger-mutating check never ends GO (rc=4)
+2026-11-13T01:36:06.7462677Z   ok   - 89b verify self-rewrite caught (rc=2)
+2026-11-13T01:36:06.7463512Z   ok   - 89b ledger mutation named
+2026-11-13T01:36:06.7464070Z   ok   - 100a calib declared, no grades -> rc2 (rc=2)
+2026-11-13T01:36:06.7464650Z   ok   - 100a reason calibration-missing
+2026-11-13T01:36:06.7465156Z   ok   - 100a hint routes the controller
+2026-11-13T01:36:06.7465646Z   ok   - 100b lenient seat -> rc2 (rc=2)
+2026-11-13T01:36:06.7466140Z   ok   - 100b names the bad fixture
+2026-11-13T01:36:06.7466664Z   ok   - 100c calibrated claim -> GO (rc=0)
+2026-11-13T01:36:06.7467194Z   ok   - 100e unbound grade -> rc2 (rc=2)
+2026-11-13T01:36:06.7467672Z   ok   - 100e reason good side
+2026-11-13T01:36:06.7468137Z   ok   - 100d stale grades voided -> rc2 (rc=2)
+2026-11-13T01:36:06.7468552Z   ok   - 100d stale calibration flagged
+2026-11-13T01:36:06.7468844Z   ok   - 109c folded to one line
+2026-11-13T01:36:06.7469109Z   ok   - 109c no block shred
+2026-11-13T01:36:06.7469393Z   ok   - 109c gate still GO with folded label (rc=0)
+2026-11-13T01:36:06.7469705Z   ok   - 110b unmeasured window
+2026-11-13T01:36:06.7469976Z   ok   - 110b numeric window still slopes
+2026-11-13T01:36:06.7470260Z   ok   - 110g flat prune
+2026-11-13T01:36:06.7470538Z   ok   - 111a healthy loop prints no efficiency block
+2026-11-13T01:36:06.7470872Z   ok   - 115a status rc0 (rc=0)
+2026-11-13T01:36:06.7471135Z   ok   - 115a iteration line intact
+2026-11-13T01:36:06.7471404Z   ok   - 115a last block intact
+2026-11-13T01:36:06.7471942Z   ok   - 115a work-plan NEXT intact
+2026-11-13T01:36:06.7472403Z   ok   - 116c judged+calib horizon stamps (rc=0)
+2026-11-13T01:36:06.7472764Z   ok   - 117d window cache: one query per window
+2026-11-13T01:36:06.7473491Z   ok   - 117e expired window re-queries
+2026-11-13T01:36:06.7473903Z   ok   - 124b missing expected refused (rc=2)
+2026-11-13T01:36:06.7474303Z   ok   - 124b names expected
+2026-11-13T01:36:06.7474599Z   ok   - 126e NEXT carries pick
+2026-11-13T01:36:06.7474944Z   ok   - 126e NEXT hint intact
+2026-11-13T01:36:06.7475243Z   ok   - 129a no evidence at n=1
+2026-11-13T01:36:06.7475512Z   ok   - 129a efficiency unmeasured
+2026-11-13T01:36:06.7475825Z   ok   - 132a claim without raw dump is NO-GO (rc=2)
+2026-11-13T01:36:06.7476165Z   ok   - 132a reason raw-evidence-missing
+2026-11-13T01:36:06.7476465Z   ok   - 132a GO with raw dump (rc=0)
+2026-11-13T01:36:06.7476745Z   ok   - 132c close auto-writes raw
+2026-11-13T01:36:06.7477032Z   ok   - 132c GO after auto raw + adv (rc=0)
+2026-11-13T01:36:06.7477395Z   ok   - 135a fault close ok (rc=0)
+2026-11-13T01:36:06.7477725Z   ok   - 135a names the fault
+2026-11-13T01:36:06.7478021Z   ok   - 135a ledger carries the derived suffix
+2026-11-13T01:36:06.7478327Z   ok   - 135a fault row written
+2026-11-13T01:36:06.7478587Z   ok   - 135a audit clean (rc=0)
+2026-11-13T01:36:06.7478879Z   ok   - 139 invalid receipt rejected (rc=4)
+2026-11-13T01:36:06.7479214Z   ok   - 139 reason names bad receipt
+2026-11-13T01:36:06.7479520Z   ok   - 139 refusal leaves all state unchanged
+2026-11-13T01:36:06.7479885Z   ok   - 144 explicitly watched Git-ignored artifact bound
+2026-11-13T01:36:06.7480294Z   ok   - 144 explicitly watched pruned artifact bound
+2026-11-13T01:36:06.7480699Z   ok   - 144 watched ignored artifact may claim GO (rc=0)
+2026-11-13T01:36:06.7481062Z   ok   - 144 ignored artifact change revokes GO (rc=2)
+2026-11-13T01:36:06.7481417Z   ok   - 144 ignored change names stale digest
+2026-11-13T01:36:06.7481788Z   ok   - 154 tracked deletion is digestible (rc=0)
+2026-11-13T01:36:06.7482153Z   ok   - 154 tracked deletion changes identity
+2026-11-13T01:36:06.7482496Z   ok   - 157 Git accelerator matches fallback
+2026-11-13T01:36:06.7482855Z   ok   - 157 Git backends detect ignored artifact change
+2026-11-13T01:36:06.7483693Z == results: pass=83 fail=0 ==
+2026-11-13T01:36:06.7500784Z   ok   - 06 judged open-FAIL -> rc2 (rc=2)
+2026-11-13T01:36:06.7501351Z   ok   - 11b non-numeric metric -> rc2 (rc=2)
+2026-11-13T01:36:06.7501855Z   ok   - 11b reason check-broken
+2026-11-13T01:36:06.7502272Z   ok   - 18 missing dry_streak -> rc4 (rc=4)
+2026-11-13T01:36:06.7502588Z   ok   - 26 carry-forward GO -> rc0 (rc=0)
+2026-11-13T01:36:06.7503130Z   ok   - 27 stale re-bind -> rc2 (rc=2)
+2026-11-13T01:36:06.7503602Z   ok   - 27 reason not-covered
+2026-11-13T01:36:06.7504018Z   ok   - 42 cmd mismatch rc2 (rc=2)
+2026-11-13T01:36:06.7504373Z   ok   - 42 reason baseline-cmd-mismatch
+2026-11-13T01:36:06.7504680Z   ok   - 55 probe-failed -> rc2 (rc=2)
+2026-11-13T01:36:06.7504982Z   ok   - 55 reason check-broken probe
+2026-11-13T01:36:06.7505291Z   ok   - 62 unmeasurable records ok rc0 (rc=0)
+2026-11-13T01:36:06.7505595Z   ok   - 62 warns unmeasurable
+2026-11-13T01:36:06.7505901Z   ok   - 62 score=none recorded
+2026-11-13T01:36:06.7506325Z   FAIL - 76 expired wallclock green claim -> GO (want rc=0 got rc=3)
+2026-11-13T01:36:06.7506777Z   ok   - 76 NOTE fuse
+2026-11-13T01:36:06.7507009Z   FAIL - 76 still GO
+2026-11-13T01:36:06.7507254Z   ok   - 81 unbound PASS -> rc2 (rc=2)
+2026-11-13T01:36:06.7507546Z   ok   - 81 verdict-unbound named
+2026-11-13T01:36:06.7507830Z   ok   - 82 bound artifact GO -> rc0 (rc=0)
+2026-11-13T01:36:06.7508138Z   ok   - 82b stale artifact hash -> rc2 (rc=2)
+2026-11-13T01:36:06.7508433Z   ok   - 82b mismatch named
+2026-11-13T01:36:06.7508704Z   ok   - 94 two same error_signature -> rc3 (rc=3)
+2026-11-13T01:36:06.7509018Z   ok   - 94 grind detector named
+2026-11-13T01:36:06.7509298Z   ok   - 94b none signatures never trip (rc=0)
+2026-11-13T01:36:06.7509904Z   ok   - 101a calib on non-judged AC -> stamp refused (rc=2)
+2026-11-13T01:36:06.7510369Z   ok   - 101a reason named
+2026-11-13T01:36:06.7510657Z   ok   - 101b missing bad fixture -> stamp refused (rc=2)
+2026-11-13T01:36:06.7510983Z   ok   - 101b names the fixture
+2026-11-13T01:36:06.7511268Z   ok   - 101c one-sided calib -> stamp refused (rc=2)
+2026-11-13T01:36:06.7511807Z   ok   - 101c needs both
+2026-11-13T01:36:06.7512261Z   ok   - 101d one ruler both ends -> stamp refused (rc=2)
+2026-11-13T01:36:06.7512835Z   ok   - 101d names the single-ruler problem
+2026-11-13T01:36:06.7513506Z   ok   - 110d negative slope format
+2026-11-13T01:36:06.7513978Z   ok   - 110d negative maximize is pruned
+2026-11-13T01:36:06.7514459Z   ok   - 111b forge stall fires
+2026-11-13T01:36:06.7514858Z   ok   - 115b step line intact
+2026-11-13T01:36:06.7515214Z   ok   - 115f golden STEP present
+2026-11-13T01:36:06.7515592Z   ok   - 115f golden NEXT present
+2026-11-13T01:36:06.7516051Z   ok   - 115f no v2.8 lines on legacy ledger
+2026-11-13T01:36:06.7516603Z   ok   - 117f window-without-external -> rc2 (rc=2)
+2026-11-13T01:36:06.7517147Z   ok   - 117f refusal names window/external
+2026-11-13T01:36:06.7517659Z   ok   - 121a deferred claim -> rc2 (rc=2)
+2026-11-13T01:36:06.7518166Z   ok   - 121a waits, not counted
+2026-11-13T01:36:06.7518656Z   ok   - 121a ratchet stayed at 0
+2026-11-13T01:36:06.7519246Z   ok   - 125e provider-fatal suffix accepted (rc=0)
+2026-11-13T01:36:06.7519795Z   ok   - 125e audit clean
+2026-11-13T01:36:06.7520225Z   ok   - 126f pick present while stalled
+2026-11-13T01:36:06.7520782Z   ok   - 126f2 gate GO untouched by pick work (rc=0)
+2026-11-13T01:36:06.7521325Z   ok   - 126f2 gate silent on pick
+2026-11-13T01:36:06.7521863Z   ok   - 131a check-script mutation refuses claim (rc=2)
+2026-11-13T01:36:06.7522468Z   ok   - 131a reason check-script-tampered
+2026-11-13T01:36:06.7523166Z   ok   - 134b range files= refused (rc=1)
+2026-11-13T01:36:06.7523664Z   ok   - 134b A10 or unverifiable
+2026-11-13T01:36:06.7524154Z   ok   - 135d unbacked suffix fails audit (rc=1)
+2026-11-13T01:36:06.7524652Z   ok   - 135d names A11
+2026-11-13T01:36:06.7525172Z   ok   - 138 documented fast lane reaches GO on first claim (rc=0)
+2026-11-13T01:36:06.7525775Z   ok   - 138 actual gate output
+2026-11-13T01:36:06.7526254Z   ok   - 138 no false complete from missing receipt
+2026-11-13T01:36:06.7526800Z   ok   - 145 unsafe path rejected: ../outside
+2026-11-13T01:36:06.7527328Z   ok   - 145 unsafe path rejected: /tmp/outside
+2026-11-13T01:36:06.7527882Z   ok   - 145 unsafe path rejected: .goal/state.rec
+2026-11-13T01:36:06.7528451Z   ok   - 145 unsafe path rejected: build/../outside
+2026-11-13T01:36:06.7529020Z   ok   - 145 symlink parent rejected (rc=2)
+2026-11-13T01:36:06.7529585Z   ok   - 145 watch decoy inside command ignored (rc=0)
+2026-11-13T01:36:06.7530165Z   ok   - 148 legacy claim requires rebind (rc=2)
+2026-11-13T01:36:06.7530697Z   ok   - 148 identifies legacy identity
+2026-11-13T01:36:06.7531231Z   ok   - 148 legacy seat still refuses new claim (rc=2)
+2026-11-13T01:36:06.7531792Z   ok   - 148 stale seat names migration
+2026-11-13T01:36:06.7532352Z   ok   - 148 migration does not count as false completion
+2026-11-13T01:36:06.7533124Z   ok   - 148 fresh judged evidence resumes GO (rc=0)
+2026-11-13T01:36:06.7533690Z   ok   - 148 successful rebind preserves ratchet
+2026-11-13T01:36:06.7534253Z   ok   - 155 accelerator and fallback identities match
+2026-11-13T01:36:06.7534825Z   ok   - 155 both backends detect watched mutation
+2026-11-13T01:36:06.7535385Z == results: pass=72 fail=2 ==
+2026-11-13T01:36:06.7574985Z   ok   - 07 evidence-missing -> rc2 (rc=2)
+2026-11-13T01:36:06.7575611Z   ok   - 12 --verify mutated-tree -> rc2 (rc=2)
+2026-11-13T01:36:06.7576151Z   ok   - 12 reason check-mutated-tree
+2026-11-13T01:36:06.7576652Z   ok   - 19 dry_streak=2 after two dry rounds
+2026-11-13T01:36:06.7577249Z   FAIL - 28 expired green claim -> GO (want rc=0 got rc=3)
+2026-11-13T01:36:06.7577797Z   ok   - 28 NOTE fuse
+2026-11-13T01:36:06.7578431Z   FAIL - 28 still GO
+2026-11-13T01:36:06.7578684Z   ok   - 38 hook rc3 state allows stop (rc=0)
+2026-11-13T01:36:06.7579163Z   ok   - 44 baseline-check not-forge ok (rc=0)
+2026-11-13T01:36:06.7579498Z   ok   - 44 threshold GO without baseline (rc=0)
+2026-11-13T01:36:06.7579911Z   ok   - 56 progress=no without strategy_delta refused (rc=4)
+2026-11-13T01:36:06.7580336Z   ok   - 56 error names strategy-delta
+2026-11-13T01:36:06.7580695Z   ok   - 56 strategy_delta recorded
+2026-11-13T01:36:06.7581008Z   ok   - 65c removed teams fallback token rc1 (rc=1)
+2026-11-13T01:36:06.7581340Z   ok   - 65c names fallback-vocabulary
+2026-11-13T01:36:06.7581648Z   ok   - 66 divergence refuses claim rc2 (rc=2)
+2026-11-13T01:36:06.7581953Z   ok   - 66 names DIVERGENCE
+2026-11-13T01:36:06.7582221Z   ok   - 67 no DIVERGENCE on same-direction
+2026-11-13T01:36:06.7582506Z   ok   - 67 no DIVERGENCE token
+2026-11-13T01:36:06.7582795Z   ok   - 68 A8 warn does not block rc0 (rc=0)
+2026-11-13T01:36:06.7583361Z   ok   - 68 A8 warns judge-score-unrecorded
+2026-11-13T01:36:06.7583686Z   ok   - 96a claim at dry=limit (3>=3) GO (rc=0)
+2026-11-13T01:36:06.7583989Z   ok   - 96a forge GO line
+2026-11-13T01:36:06.7584233Z   ok   - 96a dry_streak reached limit
+2026-11-13T01:36:06.7584542Z   ok   - 96b premature forge claim (dry 2<3) rc2 (rc=2)
+2026-11-13T01:36:06.7584871Z   ok   - 96b not-dry named
+2026-11-13T01:36:06.7585118Z   ok   - 96b counted by ratchet
+2026-11-13T01:36:06.7585403Z   ok   - 105a bare T1 normalizes to crew:1
+2026-11-13T01:36:06.7585799Z   ok   - 105b free-form task -> write refused (rc=4)
+2026-11-13T01:36:06.7586364Z   ok   - 105b names the task schema
+2026-11-13T01:36:06.7586829Z   ok   - 105c junk task kept out of ledger
+2026-11-13T01:36:06.7587332Z   ok   - 109b default strategy none
+2026-11-13T01:36:06.7587796Z   ok   - 109e legacy block status rc0 (rc=0)
+2026-11-13T01:36:06.7588307Z   ok   - 109e attribution-unused fires
+2026-11-13T01:36:06.7588781Z   ok   - 110h tol-band flat prune
+2026-11-13T01:36:06.7589172Z   ok   - 112a eval-gap fires
+2026-11-13T01:36:06.7589573Z   ok   - 112a names goal-critic
+2026-11-13T01:36:06.7590033Z   ok   - 112b two points stay silent
+2026-11-13T01:36:06.7590494Z   ok   - 112c unstalled stays silent
+2026-11-13T01:36:06.7590949Z   ok   - 112d no objective stays silent
+2026-11-13T01:36:06.7591428Z   ok   - 112e tol-band flat fires
+2026-11-13T01:36:06.7591905Z   ok   - 117a external PASS -> GO (rc=0)
+2026-11-13T01:36:06.7592446Z   ok   - 117b external FAIL -> rc2 (rc=2)
+2026-11-13T01:36:06.7593247Z   ok   - 117b external fail named
+2026-11-13T01:36:06.7593748Z   ok   - 123a recovery suffix clean (rc=0)
+2026-11-13T01:36:06.7594240Z   ok   - 123a clean said
+2026-11-13T01:36:06.7594711Z   ok   - 124a multi-line AC stamp refused (rc=2)
+2026-11-13T01:36:06.7595268Z   ok   - 124a refusal names single-line
+2026-11-13T01:36:06.7595757Z   ok   - 124a left unstamped
+2026-11-13T01:36:06.7596262Z   ok   - 126g threshold without objective prints no pick
+2026-11-13T01:36:06.7596906Z   ok   - 129c bare T accepted (rc=0)
+2026-11-13T01:36:06.7597388Z   ok   - 129c ledger has crew:1
+2026-11-13T01:36:06.7597848Z   ok   - 129c teams marker refused (rc=4)
+2026-11-13T01:36:06.7598324Z   ok   - 129c names bad-task
+2026-11-13T01:36:06.7598845Z   ok   - 133d audit fails on zero-bookkeeping under clock (rc=1)
+2026-11-13T01:36:06.7599435Z   ok   - 133d A9 clock named
+2026-11-13T01:36:06.7599874Z   ok   - 134c clean when files exist (rc=0)
+2026-11-13T01:36:06.7600340Z   ok   - 134c no A10
+2026-11-13T01:36:06.7600735Z   ok   - 135g claim goes through (rc=0)
+2026-11-13T01:36:06.7601205Z   ok   - 135g gate GO
+2026-11-13T01:36:06.7601605Z   ok   - 143 judged Git candidate GO (rc=0)
+2026-11-13T01:36:06.7602186Z   ok   - 143 changed dirty file refuses prior verdict (rc=2)
+2026-11-13T01:36:06.7602773Z   ok   - 143 refusal identifies staleness
+2026-11-13T01:36:06.7603566Z   ok   - 147 newly created watched artifact changes digest
+2026-11-13T01:36:06.7604198Z   ok   - 151 malformed watch refused at stamp (rc=2)
+2026-11-13T01:36:06.7605059Z   ok   - 151 malformed watch named
+2026-11-13T01:36:06.7605558Z   ok   - 151 multiple watch fields accepted (rc=0)
+2026-11-13T01:36:06.7606283Z   ok   - 151 second watched path is bound
+2026-11-13T01:36:06.7606818Z   ok   - 151 sort failure refuses digest (rc=4)
+2026-11-13T01:36:06.7607368Z   ok   - 151 sha256sum failure refuses digest (rc=4)
+2026-11-13T01:36:06.7608028Z   ok   - 160 a numeric line from a failed command cannot deliver GO (rc=2)
+2026-11-13T01:36:06.7608688Z   ok   - 160 nonzero metric exit is broken
+2026-11-13T01:36:06.7609296Z   ok   - 160 malformed objective reading is refused (rc=2)
+2026-11-13T01:36:06.7609874Z   ok   - 160 malformed decimal is broken
+2026-11-13T01:36:06.7610489Z   ok   - 160 per-check timeout refuses partial numeric output (rc=2)
+2026-11-13T01:36:06.7611138Z   ok   - 160 timed out measurement is broken
+2026-11-13T01:36:06.7611799Z   ok   - 160 signed decimal and explicit expected nonzero still pass (rc=0)
+2026-11-13T01:36:06.7612545Z   ok   - 160 signed decimal is recorded in score grammar
+2026-11-13T01:36:06.7613375Z   ok   - 160 broken sensor stderr does not set a water mark
+2026-11-13T01:36:06.7613980Z == results: pass=77 fail=2 ==
+2026-11-13T01:36:06.7648854Z   ok   - 08 unverifiable-excessive -> rc2 (rc=2)
+2026-11-13T01:36:06.7649747Z   ok   - 20 --verify OK -> rc0 (rc=0)
+2026-11-13T01:36:06.7650419Z   ok   - 20 --verify skips judged
+2026-11-13T01:36:06.7650858Z   ok   - 20 --verify reruns deterministic
+2026-11-13T01:36:06.7651308Z   ok   - 21 --verify AC-1 only -> rc0 (rc=0)
+2026-11-13T01:36:06.7651737Z   ok   - 21 filtered run omitted AC-2
+2026-11-13T01:36:06.7652168Z   ok   - 35 hook claimed+GO allows stop (rc=0)
+2026-11-13T01:36:06.7652639Z   ok   - 43 abs stamp ok without baseline (rc=0)
+2026-11-13T01:36:06.7653478Z   ok   - 43 abs forge GO (rc=0)
+2026-11-13T01:36:06.7653864Z   ok   - 57 tampered objective -> rc2 (rc=2)
+2026-11-13T01:36:06.7654357Z   ok   - 57 reason contract-tampered
+2026-11-13T01:36:06.7654888Z   ok   - 65d provider-fatal suffix clean (rc=0)
+2026-11-13T01:36:06.7655361Z   ok   - 65d clean
+2026-11-13T01:36:06.7655720Z   ok   - 70b minimize GO at improved score 3 (rc=0)
+2026-11-13T01:36:06.7656191Z   ok   - 77 expired+fail -> BLOCKED rc3 (rc=3)
+2026-11-13T01:36:06.7656601Z   ok   - 77 BLOCKED fuse
+2026-11-13T01:36:06.7656956Z   ok   - 85 duplicate AC id -> rc2 (rc=2)
+2026-11-13T01:36:06.7657351Z   ok   - 85 duplicate named
+2026-11-13T01:36:06.7657737Z   ok   - 93a no-progress alone refused (R10) (rc=4)
+2026-11-13T01:36:06.7658196Z   ok   - 93b no-progress+delta -> HALF_OPEN
+2026-11-13T01:36:06.7658661Z   ok   - 93c HALF_OPEN claim w/o strategy -> rc2 (rc=2)
+2026-11-13T01:36:06.7659102Z   ok   - 93c R10 duty named
+2026-11-13T01:36:06.7659545Z   ok   - 93d progress reset + claim GO (rc=0)
+2026-11-13T01:36:06.7660236Z   ok   - 93d breaker back CLOSED
+2026-11-13T01:36:06.7660730Z   ok   - 93e streak 3>2 -> OPEN
+2026-11-13T01:36:06.7661206Z   ok   - 93f claim at OPEN -> rc3 (rc=3)
+2026-11-13T01:36:06.7661752Z   ok   - 93f breaker-open named
+2026-11-13T01:36:06.7662236Z   ok   - 104a init seeds contract (rc=0)
+2026-11-13T01:36:06.7662767Z   ok   - 104a goal.md seeded from template
+2026-11-13T01:36:06.7663447Z   ok   - 104a re-init -> rc2 (rc=2)
+2026-11-13T01:36:06.7664012Z   ok   - 104a re-init points at R3
+2026-11-13T01:36:06.7664641Z   ok   - 104b unclaimed -> iterations-exhausted (rc=3)
+2026-11-13T01:36:06.7665337Z   ok   - 104b loops without API (dry-run plan line)
+2026-11-13T01:36:06.7665908Z   ok   - 104b fuse reason
+2026-11-13T01:36:06.7666427Z   ok   - 104c claim verified -> DELIVERED (rc=0)
+2026-11-13T01:36:06.7667109Z   ok   - 104c delivery line
+2026-11-13T01:36:06.7667608Z   ok   - 104d continue without contract -> rc4 (rc=4)
+2026-11-13T01:36:06.7668173Z   ok   - 110a rc0 (rc=0)
+2026-11-13T01:36:06.7668637Z   ok   - 110a missing point stays unmeasured
+2026-11-13T01:36:06.7669210Z   ok   - 110e minimize direction exploit
+2026-11-13T01:36:06.7669749Z   ok   - 111c orphan row rc0 (rc=0)
+2026-11-13T01:36:06.7670260Z   ok   - 111c no pair from orphan rows
+2026-11-13T01:36:06.7671047Z   ok   - 115d empty-score status rc0 (rc=0)
+2026-11-13T01:36:06.7671744Z   ok   - 115d score-data none
+2026-11-13T01:36:06.7672208Z   ok   - 115g advisory order deterministic
+2026-11-13T01:36:06.7672694Z   ok   - 115g promote present too
+2026-11-13T01:36:06.7673474Z   ok   - 119a objective unlabeled wave refused (rc=4)
+2026-11-13T01:36:06.7674025Z   ok   - 119a names the strategy duty
+2026-11-13T01:36:06.7674539Z   ok   - 119b scores.rec carries the strategy column
+2026-11-13T01:36:06.7675076Z   ok   - 126b prune-only pick
+2026-11-13T01:36:06.7675548Z   ok   - 126h gradient documents STRATEGY-PICK
+2026-11-13T01:36:06.7676080Z   ok   - 126h crew briefs cite STRATEGY-PICK
+2026-11-13T01:36:06.7676638Z   ok   - 130a claim without adversarial is NO-GO (rc=2)
+2026-11-13T01:36:06.7677194Z   ok   - 130a reason adversarial-missing
+2026-11-13T01:36:06.7677735Z   ok   - 130a GO with bound adversarial receipt (rc=0)
+2026-11-13T01:36:06.7678262Z   ok   - 130a GO line
+2026-11-13T01:36:06.7678717Z   ok   - 133b first close without --score refused (rc=4)
+2026-11-13T01:36:06.7679270Z   ok   - 133b names missing-score
+2026-11-13T01:36:06.7679749Z   ok   - 133b first close with --score ok (rc=0)
+2026-11-13T01:36:06.7680305Z   ok   - 134d open item missing files allowed (rc=0)
+2026-11-13T01:36:06.7680856Z   ok   - 135e unbooked fault fails audit (rc=1)
+2026-11-13T01:36:06.7681414Z   ok   - 135e names A11
+2026-11-13T01:36:06.7681821Z   ok   - 140 dirty tracked bytes change digest
+2026-11-13T01:36:06.7682357Z   ok   - 140 untracked nested bytes change digest
+2026-11-13T01:36:06.7683066Z   ok   - 140 symlink target changes digest
+2026-11-13T01:36:06.7683589Z   ok   - 140 executable mode changes digest
+2026-11-13T01:36:06.7684146Z   ok   - 140 verify refuses dirty-file mutation (rc=2)
+2026-11-13T01:36:06.7684681Z   ok   - 140 names mutation
+2026-11-13T01:36:06.7685115Z   ok   - 140 Git candidate claims GO (rc=0)
+2026-11-13T01:36:06.7685639Z   ok   - 140 dirty edit stales prior claim (rc=2)
+2026-11-13T01:36:06.7686168Z   ok   - 140 stale claim named
+2026-11-13T01:36:06.7686698Z   ok   - 156 tracked entry under symlink parent refuses digest (rc=4)
+2026-11-13T01:36:06.7687431Z   ok   - 156 shell fallback refuses symlink parent (rc=4)
+2026-11-13T01:36:06.7688184Z   ok   - 161 inflated dry count without recorded rounds refuses GO (rc=2)
+2026-11-13T01:36:06.7688866Z   ok   - 161 missing executed coverage named
+2026-11-13T01:36:06.7689389Z == results: pass=75 fail=0 ==
+2026-11-13T01:36:06.7700386Z == total: pass=599 fail=4 shards=8 ==
+2026-11-13T01:36:06.7742679Z ##[error]Process completed with exit code 1.
+2026-11-13T01:36:06.7885411Z Post job cleanup.
+2026-11-13T01:36:06.8745158Z [command]/usr/bin/git version
+2026-11-13T01:36:06.8785365Z git version 2.56.0
+2026-11-13T01:36:06.8823651Z Temporarily overriding HOME='/home/runner/work/_temp/38c03437-fdea-4bf4-8c6b-e292552e0946' before making global git config changes
+2026-11-13T01:36:06.8824887Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-13T01:36:06.8828477Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/goal-loop/goal-loop
+2026-11-13T01:36:06.8870103Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-13T01:36:06.8907834Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-13T01:36:06.9195843Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-13T01:36:06.9221780Z http.https://github.com/.extraheader
+2026-11-13T01:36:06.9232111Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-13T01:36:06.9266997Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-13T01:36:06.9542298Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-13T01:36:06.9577184Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-13T01:36:07.0020811Z Cleaning up orphan processes
+2026-11-13T01:36:07.0430770Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

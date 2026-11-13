@@ -1,0 +1,10 @@
+{
+  "baseline_commit": "c475b255106e9c93696817b199b94f8500b95de0",
+  "files": {
+    "tests/run_tests.sh": "258cd7312da07672e573b2e48ee37e613fed3266ee5b43e9631e43afc0da3e12",
+    "tests/cases.inc.sh": "e34ef9190abc5ee19a791c802a363a7479b18dcfd07f6470f9f8bf2a0a57874d",
+    "tests/test_scenario_resources.py": "53d42cbced10e49a0e5e8a7e4a1d088e4110ccc1486352dc81632f8bdfa76ff7"
+  },
+  "comparison": "same Gate, assertion, three-second settlement and per-check timeout; shared vs isolated resource pressure only",
+  "controlled_fault": "A real named check sleeps while the shared resource is occupied; not utility data."
+}

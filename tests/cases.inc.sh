@@ -195,7 +195,7 @@ printf 'AC-1|PASS|3|%s|cmd|"ok carried=yes"\n' "$dOld" | bash "$CTL" bind --proj
 out=$(bash "$GATE" --check --project "$T/t27" 2>&1); assert_rc "27 stale re-bind -> rc2" 2 $?
 assert_has "27 reason not-covered" 'not-covered:AC-1' "$out"
 
-# 28 expired wallclock + GREEN claim still delivers (fuse is not a delivery veto)
+# 28 [timing-isolated] expired wallclock + GREEN claim still delivers (fuse is not a delivery veto)
 mkproj t28 >/dev/null; TB=1 contract t28 "- AC-1 | f | check: \`true\` | expected: exit=0"
 # deterministically expired: deadline=1 (epoch 1) is always in the past - no
 # reliance on machine speed (a fast runner used to hit the same-second
@@ -754,7 +754,7 @@ out=$(bash "$CTL" status --project "$T/t74" 2>&1)
 assert_has "75 status drops ticked T1" 'OPEN \(1 items\)' "$out"
 printf '%s' "$out" | grep -q 'T1 |' && no "75 ticked item still listed" || ok "75 ticked item hidden"
 
-# 76 expired wallclock still delivers a green claim (fuse != delivery veto)
+# 76 [timing-isolated] expired wallclock still delivers a green claim (fuse != delivery veto)
 mkproj t76
 {
   printf '# Goal contract - test\n\n## Objective\n\ntest\n\n'

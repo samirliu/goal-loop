@@ -8,6 +8,7 @@
 #   bash tests/run_tests.sh --only 78-90    # inclusive id range
 #   bash tests/run_tests.sh --only 53,74    # list
 #   bash tests/run_tests.sh --list          # show blocks / clusters / shards
+#   bash tests/run_tests.sh --shared-timing # diagnose contention; same assertions
 #
 # Exit 0 = all green. Parallel shards share no mutable state (each gets its
 # own mktemp root). Dependency clusters (tests that share a $T/tNN project)
@@ -21,6 +22,7 @@ BODY="$here/tests/cases.inc.sh"
 jobs=8
 only=""
 list_only=0
+shared_timing=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -29,6 +31,7 @@ while [ $# -gt 0 ]; do
     --only=*) only="${1#*=}" ;;
     --only) [ $# -ge 2 ] || { echo "run_tests: --only needs SPEC" >&2; exit 4; }; only="$2"; shift ;;
     --list) list_only=1 ;;
+    --shared-timing) shared_timing=1 ;;
     --help|-h)
       sed -n '2,16p' "$0"; exit 0 ;;
     *)
@@ -227,6 +230,7 @@ fi
 # unique clusters in order of first appearance
 declare -a CLUSTERS
 declare -a cl_lines cl_members
+declare -a isolated
 ncl=0
 for i in $(seq 1 "$nsel"); do
   b=${SEL[$i]}
@@ -236,18 +240,25 @@ for i in $(seq 1 "$nsel"); do
   fi
   cl_members[$c]="${cl_members[$c]:-} $b"
   cl_lines[$c]=$(( ${cl_lines[$c]:-0} + END[$b] - START[$b] + 1 ))
+  if [ "$shared_timing" -eq 0 ]; then
+    case "${BLAB[$b]}" in *'[timing-isolated]'*) isolated[$c]=1 ;; esac
+  fi
 done
 
 # greedy pack clusters into min(jobs, ncl) buckets by line weight
 nj=$jobs
-[ "$nj" -gt "$ncl" ] && nj=$ncl
-[ "$nj" -lt 1 ] && nj=1
+regular=$ncl
+for c in "${CLUSTERS[@]}"; do
+  [ -z "${isolated[$c]:-}" ] || regular=$((regular-1))
+done
+[ "$nj" -gt "$regular" ] && nj=$regular
 
 declare -a bucket_w
-for j in $(seq 1 "$nj"); do bucket_w[$j]=0; done
+for ((j=1;j<=nj;j++)); do bucket_w[$j]=0; done
 declare -a cluster_bucket
 for k in $(seq 1 "$ncl"); do
   c=${CLUSTERS[$k]}
+  [ -z "${isolated[$c]:-}" ] || continue
   best=1; bestw=${bucket_w[1]}
   for j in $(seq 1 "$nj"); do
     if [ "${bucket_w[$j]}" -lt "$bestw" ]; then best=$j; bestw=${bucket_w[$j]}; fi
@@ -291,13 +302,14 @@ emit_shard() {
 declare -a bucket_blocks
 for k in $(seq 1 "$ncl"); do
   c=${CLUSTERS[$k]}
+  [ -z "${isolated[$c]:-}" ] || continue
   j=${cluster_bucket[$c]}
   bucket_blocks[$j]="${bucket_blocks[$j]:-} ${cl_members[$c]:-}"
 done
 
 pids=""
 outfiles=""
-for j in $(seq 1 "$nj"); do
+for ((j=1;j<=nj;j++)); do
   s="$work/shard-$j.sh"
   o="$work/shard-$j.out"
   emit_shard "$s" ${bucket_blocks[$j]:-}
@@ -313,6 +325,21 @@ done
 fail_launch=0
 for p in $pids; do
   wait "$p" || fail_launch=1
+done
+
+# A finite settlement success fixture needs actual CPU time inside its three
+# seconds. Eight process-heavy shards on a small runner can starve even true.
+# Run these whole dependency clusters after the shared load has joined. Checks
+# and deadlines are unchanged; --shared-timing retains the failing comparator.
+shards=$nj
+for c in "${CLUSTERS[@]}"; do
+  [ -n "${isolated[$c]:-}" ] || continue
+  shards=$((shards+1))
+  s="$work/shard-$shards.sh"; o="$work/shard-$shards.out"
+  emit_shard "$s" ${cl_members[$c]:-}
+  outfiles="$outfiles $o"
+  echo "run_tests: isolated finite-settlement cluster=$c"
+  bash "$s" > "$o" 2>&1 || fail_launch=1
 done
 
 # merge outputs (shard order) + sum results
@@ -333,5 +360,5 @@ for o in $outfiles; do
   fi
 done
 
-echo "== total: pass=$total_pass fail=$total_fail shards=$nj =="
+echo "== total: pass=$total_pass fail=$total_fail shards=$shards =="
 [ "$total_fail" -eq 0 ] && exit 0 || exit 1

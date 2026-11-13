@@ -1,0 +1,7 @@
+test_same_gate_and_assertion_under_shared_and_isolated_pressure (test_scenario_resources.ScenarioResources.test_same_gate_and_assertion_under_shared_and_isolated_pressure) ... RESOURCE_PRESSURE_OBSERVATION [{'shared': True, 'result': 1, 'elapsed': 7.094404500210658, 'stdout': '  ok   - pressure producer joined\n== results: pass=1 fail=0 ==\nGATE: BLOCKED reason=time-budget-exhausted\n  FAIL - same green settlement (want rc=0 got rc=3)\n== results: pass=0 fail=1 ==\n== total: pass=1 fail=1 shards=2 ==\n', 'stderr': ''}, {'shared': False, 'result': 0, 'elapsed': 9.686308917123824, 'stdout': 'run_tests: isolated finite-settlement cluster=2\n  ok   - pressure producer joined\n== results: pass=1 fail=0 ==\nGATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-656d1c99b9c6fe7011a5057f8d9571f612229705a84279e7615eb5d4a8e84bc7 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n  ok   - same green settlement (rc=0)\n== results: pass=1 fail=0 ==\n== total: pass=2 fail=0 shards=2 ==\n', 'stderr': ''}]
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 16.783s
+
+OK
