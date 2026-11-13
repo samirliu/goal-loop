@@ -10,6 +10,7 @@
 #   bash goal_ctl.sh context --project DIR [--auto] [--brief]
 #   bash goal_ctl.sh close-iteration --project DIR --task ID --files LIST
 #        --checks-pass N --checks-fail N --checks-unverifiable N
+#        [--checks-from-verify] [--receipt] # opt-in deterministic close + fresh audit/Gate
 #        [--progress yes|no] [--exit-signal yes|no] [--error-signature none]
 #        [--false-complete no] [--dry yes|no] [--no-gate]
 #        [--score N] [--judge-score N] [--strategy-delta TEXT] [--strategy TEXT]
@@ -37,6 +38,7 @@ task="" files="" cp="" cf="" cu="" progress=yes exit_signal=no errsig=none fcomp
 score="" judge_score="" strategy_delta="" strategy="" adversarial="" adv_note=""
 fault="" fault_outcome="" fault_note=""
 operation_id="" operation_id_seen=0
+checks_from_verify=0 checks_seen=0 close_receipt=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -49,9 +51,11 @@ while [ $# -gt 0 ]; do
     --max-iterations=*) max_iterations="${1#*=}" ;;
     --task) [ $# -ge 2 ] || { echo "CTL: ERROR missing-task" >&2; exit 4; }; task="$2"; shift ;;
     --files) [ $# -ge 2 ] || { echo "CTL: ERROR missing-files" >&2; exit 4; }; files="$2"; shift ;;
-    --checks-pass) [ $# -ge 2 ] || { echo "CTL: ERROR missing-checks-pass" >&2; exit 4; }; cp="$2"; shift ;;
-    --checks-fail) [ $# -ge 2 ] || { echo "CTL: ERROR missing-checks-fail" >&2; exit 4; }; cf="$2"; shift ;;
-    --checks-unverifiable) [ $# -ge 2 ] || { echo "CTL: ERROR missing-checks-unverifiable" >&2; exit 4; }; cu="$2"; shift ;;
+    --checks-pass) [ $# -ge 2 ] || { echo "CTL: ERROR missing-checks-pass" >&2; exit 4; }; cp="$2"; checks_seen=1; shift ;;
+    --checks-fail) [ $# -ge 2 ] || { echo "CTL: ERROR missing-checks-fail" >&2; exit 4; }; cf="$2"; checks_seen=1; shift ;;
+    --checks-unverifiable) [ $# -ge 2 ] || { echo "CTL: ERROR missing-checks-unverifiable" >&2; exit 4; }; cu="$2"; checks_seen=1; shift ;;
+    --checks-from-verify) checks_from_verify=1 ;;
+    --receipt) close_receipt=1 ;;
     --progress) [ $# -ge 2 ] || { echo "CTL: ERROR missing-progress" >&2; exit 4; }; progress="$2"; shift ;;
     --exit-signal) [ $# -ge 2 ] || { echo "CTL: ERROR missing-exit-signal" >&2; exit 4; }; exit_signal="$2"; shift ;;
     --error-signature) [ $# -ge 2 ] || { echo "CTL: ERROR missing-error-signature" >&2; exit 4; }; errsig="$2"; shift ;;
@@ -80,6 +84,9 @@ if [ "$operation_id_seen" -eq 1 ]; then
 fi
 
 sd="$project/.goal"
+[ "$checks_from_verify$close_receipt" = 00 ] || [ "$cmd" = close-iteration ] || { echo 'CTL: ERROR measured-close-flags-need-close-iteration' >&2; exit 4; }
+[ "$close_receipt$no_gate" != 11 ] || { echo 'CTL: ERROR receipt-needs-gate' >&2; exit 4; }
+[ "$checks_from_verify$checks_seen" != 11 ] || { echo 'CTL: ERROR measured-close-rejects-manual-counts' >&2; exit 4; }
 [ "$brief" -eq 0 ] || [ "$cmd" = context ] || { echo 'CTL: ERROR brief-needs-context' >&2; exit 4; }
 if [ "$cmd" = context ]; then
   # The read-only compiler owns its directory lock and can describe recovery
@@ -323,6 +330,11 @@ case "$cmd" in
   close-iteration)
     if [ -n "$operation_id" ]; then
       python3 -I "$here/goal_store.py" close-retry "$sd" "${_goal_ctl_args[@]}"; replay_rc=$?
+      if [ "$close_receipt" -eq 1 ]; then
+        # A historical close is not current completion. Keep its exact intent,
+        # then run the original receipt against the current artifact and cap.
+        case "$replay_rc" in 0|2|3) exec python3 -I "$here/goal_context.py" receipt "$project" ;; esac
+      fi
       [ "$replay_rc" -eq 100 ] || exit "$replay_rc"
     fi
     # Reject malformed receipts before any ledger or evidence mutation.
@@ -330,10 +342,26 @@ case "$cmd" in
       ''|clear|finding) : ;;
       *) echo "CTL: ERROR bad-adversarial:$adversarial (use clear|finding)" >&2; exit 4 ;;
     esac
+    if [ "$checks_from_verify" -eq 1 ]; then
+      [ "$(gp_contract_mode "$project")" != forge ] && [ -z "$(gp_objective_ac "$project")" ] \
+        || { echo 'CTL: ERROR measured-close-needs-deterministic-exit-checks' >&2; exit 4; }
+      measured_ids=$(gp_all_ac_ids "$project")
+      [ -n "$measured_ids" ] || { echo 'CTL: ERROR measured-close-needs-checks' >&2; exit 4; }
+      for id in $measured_ids; do
+        expected=$(gp_ac_expected "$project" "$id" | tr -d '[:space:]')
+        printf '%s\n' "$expected" | grep -qE '^exit=[0-9]+$' \
+          && [ -z "$(gp_ac_external_cmd "$project" "$id")" ] \
+          || { echo "CTL: ERROR measured-close-unsupported:$id (use the existing manual close)" >&2; exit 4; }
+      done
+      # These values exist only inside the original pending transaction.
+      # Readers refuse pending state; no zero or PASS is invented in advance.
+      cp=unmeasured cf=unmeasured cu=unmeasured
+    fi
     for v in "$task" "$files" "$cp" "$cf" "$cu"; do
       [ -n "$v" ] || { echo "CTL: ERROR close-iteration needs --task --files --checks-pass --checks-fail --checks-unverifiable" >&2; exit 4; }
     done
     for v in "$cp" "$cf" "$cu"; do
+      [ "$checks_from_verify" -eq 0 ] || break
       gp_is_natural "$v" || { echo "CTL: ERROR bad-check-count:$v" >&2; exit 4; }
     done
     case "$progress" in yes|no) : ;; *) echo "CTL: ERROR bad-progress:$progress" >&2; exit 4 ;; esac
@@ -546,6 +574,47 @@ case "$cmd" in
     verify_rc=0
     GOAL_RAW_OUTPUT_ITERATION="$new" bash "$here/goal_gate.sh" --verify --project "$project" > "$sd/evidence/raw/$new.txt" 2>&1 || verify_rc=$?
     [ -s "$sd/evidence/raw/$new.txt" ] || { printf 'CTL: WARN raw-empty (verify produced no output - claim will fail raw-evidence-missing)\n' > "$sd/evidence/raw/$new.txt" || exit 4; }
+    if [ "$checks_from_verify" -eq 1 ]; then
+      # Consume only the original verifier's complete, guarded batch. A tree
+      # mutation, timeout or incomplete dump cannot turn partial PASS into GO.
+      counts=$(gawk -v ids="$measured_ids" -v result="$verify_rc" '
+        BEGIN { n=split(ids, a, /[[:space:]]+/); for(i=1;i<=n;i++) expected[a[i]]=1 }
+        /^GATE: VERIFY / {
+          line=$0; sub(/^GATE: VERIFY /,"",line); split(line,f,"|")
+          if(terminal || !expected[f[1]] || seen[f[1]]++) bad=1
+          if(f[2]=="PASS") p++; else if(f[2]=="FAIL") fail++;
+          else if(f[2]=="BROKEN") broken++; else bad=1
+          rows++; next
+        }
+        /^GATE: VERIFY-OK / {
+          if(terminal++ || result!=0 || $0!="GATE: VERIFY-OK checked=" rows || fail+broken) bad=1
+          next
+        }
+        /^GATE: NO-GO / {
+          if(terminal++ || result!=2 || fail+broken==0 ||
+             $0!="GATE: NO-GO reason=verify-failures:fail=" (fail+0) " broken=" (broken+0)) bad=1
+          next
+        }
+        /^GATE:/ { bad=1 }
+        END {
+          if(bad || terminal!=1 || rows!=n) exit 1
+          for(id in expected) if(seen[id]!=1) exit 1
+          print p+0, fail+broken, 0
+        }' "$sd/evidence/raw/$new.txt") || {
+          cat "$sd/evidence/raw/$new.txt" >&2
+          echo 'CTL: ERROR measured-close-incomplete (recover the original transaction; no counts inferred)' >&2
+          exit 4
+        }
+      read -r cp cf cu <<< "$counts"
+      gawk -v iteration="$new" -v p="$cp" -v f="$cf" -v u="$cu" '
+        /^## iteration / { active=($0=="## iteration " iteration) }
+        active && /^checks_pass=/ { $0="checks_pass=" p }
+        active && /^checks_fail=/ { $0="checks_fail=" f }
+        active && /^checks_unverifiable=/ { $0="checks_unverifiable=" u }
+        { print }
+      ' "$sd/loop-log.md" > "$sd/loop-log.md.new" \
+        && mv "$sd/loop-log.md.new" "$sd/loop-log.md" || exit 4
+    fi
     if [ "$dry" = yes ] && [ "$(gp_contract_mode "$project")" = forge ]; then
       forge_record=$(python3 -I "$here/goal_forge.py" run --project "$project" --iteration "$new" --artifact "$digest" --floor-result "$verify_rc")
       forge_rc=$?
@@ -627,6 +696,7 @@ case "$cmd" in
     fi
     python3 -I "$here/goal_store.py" close-journal "$sd" finish "$grc" || exit 4
     echo "CTL: CLOSE ok iter=$new digest=$digest operation=$GOAL_CLOSE_OPERATION"
+    [ "$close_receipt" -eq 0 ] || exec python3 -I "$here/goal_context.py" receipt "$project"
     exit "$grc" ;;
 
   status)

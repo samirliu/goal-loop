@@ -103,10 +103,23 @@ def close_input(root, state, head, counters, contract, plan):
         template.update(score=None, strategy=None)
     if re.search(r'^exit: *forge', contract, re.M):
         template['dry'] = None
+    # Opt-in template: the original close measures these counts itself. Keep
+    # the existing template and manual protocol unchanged for all callers.
+    criteria = re.findall(r'^- AC-[0-9]+ \|.*?expected: *([^|\n]*)$', contract, re.M)
+    measurable = bool(criteria) and not objective and 'dry' not in template and not re.search(r'\bexternal:', contract)
+    measurable = measurable and all(re.fullmatch(r'exit=[0-9]+', re.sub(r'\s', '', value)) for value in criteria)
+    measured_template = {key: value for key, value in template.items() if not key.startswith('checks_')}
+    measured_template.update(checks_source='verify', receipt='yes')
     request = json.loads(data) if data is not None else template
     fields = set(template) | {'score', 'judge_score', 'strategy', 'strategy_delta', 'dry',
-                              'error_signature', 'fault', 'fault_outcome', 'fault_note'}
+                              'error_signature', 'fault', 'fault_outcome', 'fault_note', 'checks_source', 'receipt'}
     crew.require(isinstance(request, dict) and set(request) <= fields, 'unknown close input fields')
+    crew.require(request.get('checks_source') in (None, 'verify'), 'invalid close checks_source')
+    crew.require(request.get('receipt') in (None, 'yes'), 'invalid close receipt')
+    measured = request.get('checks_source') == 'verify'
+    crew.require(not measured or measurable, 'measured close needs deterministic exit checks')
+    crew.require(not measured or not any(request.get(key) is not None for key in
+                     ('checks_pass', 'checks_fail', 'checks_unverifiable')), 'measured close rejects manual counts')
     sources = dict(operation_id='Use this ID for this request and every retry; never replace it after interruption.',
         task=str(state/'work-plan.md')+' or the actual wave task identity',
         files=str(state/'work-plan.md')+' and the actual changed output scope; existence does not prove acceptance',
@@ -122,6 +135,8 @@ def close_input(root, state, head, counters, contract, plan):
         dry='Actual critic receipt and executed frozen probes; never infer dry from checks alone.',
         strategy_delta='Observed reason and changed next approach when progress=no.')
     required = {'operation_id', 'task', 'files', 'checks_pass', 'checks_fail', 'checks_unverifiable', 'progress', 'exit_signal'}
+    if measured:
+        required -= {'checks_pass', 'checks_fail', 'checks_unverifiable'}
     if request.get('exit_signal') == 'yes':
         required.update(('adversarial', 'adversarial_note'))
     if objective:
@@ -138,7 +153,7 @@ def close_input(root, state, head, counters, contract, plan):
     for name, value in request.items():
         if value is None:
             continue
-        if name.startswith('checks_'):
+        if name in ('checks_pass', 'checks_fail', 'checks_unverifiable'):
             crew.require(type(value) is int and value >= 0, 'invalid close count: '+name)
         else:
             crew.require(isinstance(value, str) and value and '\0' not in value, 'invalid close input: '+name)
@@ -154,9 +169,14 @@ def close_input(root, state, head, counters, contract, plan):
                  'strategy', 'strategy_delta', 'dry', 'error_signature', 'fault', 'fault_outcome', 'fault_note'):
         if request.get(name) is not None:
             argv.extend(('--'+name.replace('_', '-'), str(request[name])))
+    if measured:
+        argv.append('--checks-from-verify')
+    if request.get('receipt') == 'yes':
+        argv.append('--receipt')
     if data is None:
         missing.insert(0, dict(name='request_file', source='Write the template to '+str(path)+'; fill required nulls from real evidence, then regenerate context.'))
-    return dict(path=str(path), template=template, values=request, missing=missing, sources=sources,
+    return dict(path=str(path), template=template, measured_template=measured_template if measurable else None,
+                values=request, missing=missing, sources=sources,
                 sha256=store._hash(data) if data is not None else None), argv
 
 
