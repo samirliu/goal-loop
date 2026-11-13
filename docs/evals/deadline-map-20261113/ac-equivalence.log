@@ -1,0 +1,7 @@
+test_field_reads_current_bytes_after_change (test_ac_parse.ACParsing.test_field_reads_current_bytes_after_change) ... ok
+test_matches_six_hundred_frozen_original_outputs (test_ac_parse.ACParsing.test_matches_six_hundred_frozen_original_outputs) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.145s
+
+OK

@@ -205,6 +205,7 @@ close_iter t28
 out=$(bash "$GATE" --check --project "$T/t28" 2>&1); assert_rc "28 expired green claim -> GO" 0 $?
 assert_has "28 NOTE fuse" 'time-budget-exhausted' "$out"
 assert_has "28 still GO" 'GATE: GO' "$out"
+python3 -I "$here/tests/gate_observation.py" "$T/t28" "$out"
 
 # 29 time-budget in the future: loop runs normally -> GO
 mkproj t29 >/dev/null; TB=3600 contract t29 "- AC-1 | f | check: \`true\` | expected: exit=0"
@@ -773,6 +774,7 @@ two_pass t76
 out=$(bash "$GATE" --check --project "$T/t76" 2>&1); assert_rc "76 expired wallclock green claim -> GO" 0 $?
 assert_has "76 NOTE fuse" 'time-budget-exhausted' "$out"
 assert_has "76 still GO" 'GATE: GO' "$out"
+python3 -I "$here/tests/gate_observation.py" "$T/t76" "$out"
 
 # 77 expired wallclock + failing claim escalates to BLOCKED (stop grinding)
 mkproj t77

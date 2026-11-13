@@ -1,0 +1,8 @@
+test_expired_green_claim_with_ac_reader_process_latency (test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_ac_reader_process_latency)
+The finite window includes repeated AC field process startup too. ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_ac_reader_process_latency", "completed": ["0", "0"], "contexts": [["1724342.954435583", "1724345.913147743"], ["1724343.702193416", "1724346.661324461"]], "delayed_ac_processes": ["s/.*check: *`([^`]*)`.*/\\1/p", "s/.*probe: *`([^`]*)`.*/\\1/p"], "elapsed": 1.9979713750071824, "fresh_access_entries": [], "limits": [], "phases": [], "returncode": 0, "spans": [{"elapsed": 1.8494729169178754, "kind": "acceptance", "label": "check", "result": 0, "start_monotonic": 1724343.796175458, "state": "complete"}, {"elapsed": 0.007309083128347993, "kind": "measurement", "label": "check:AC-1", "result": 0, "start_monotonic": 1724345.436160375, "state": "complete"}], "started_monotonic": 1724343.654531916, "stderr": "", "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-9a9cedba1bd0208136b7d46707b80dee7bccab22e8d9fc999529a99b200ea998 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n"}
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 4.732s
+
+OK

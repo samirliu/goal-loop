@@ -283,6 +283,29 @@ class GateEntryBudget(unittest.TestCase):
         self.assertIn('time-budget-exhausted', result.stdout, observed)
         self.assertLess(observed['elapsed'], 4.2, observed)
 
+    def test_expired_green_claim_with_ac_reader_process_latency(self):
+        """The finite window includes repeated AC field process startup too."""
+        self.contract(checks=1, duration=0)
+        (self.project/'answer').write_text('landed')
+        self.call(CTL, 'close-iteration', '--operation-id', 'ac-latency', '--task', 'T1', '--files', 'answer',
+                  '--checks-pass', '1', '--checks-fail', '0', '--checks-unverifiable', '0',
+                  '--exit-signal', 'yes', '--no-gate', '--adversarial', 'clear',
+                  '--adversarial-note', 'fixture command and landed answer reviewed', expected=0)
+        bindir=self.state/'ac-bin';bindir.mkdir()
+        sed=subprocess.check_output(['which','sed'],text=True).strip()
+        shim=bindir/'sed'
+        shim.write_text('#!/bin/bash\ncase "${2:-}" in *check:*|*expected:*|*external:*|*metric:*|*sd:*|*var:*|*probe:*|*window:*) '
+                        'printf "%s\\n" "$2" >> "$AC_PROCESS_LOG"; sleep .18 ;; esac\nexec '+shlex.quote(sed)+' "$@"\n')
+        shim.chmod(0o755)
+        marker=self.state/'evidence/ac-processes'
+        env=dict(os.environ,PATH=str(bindir)+os.pathsep+os.environ['PATH'],AC_PROCESS_LOG=str(marker))
+        started=time.monotonic()
+        result=self.call(GATE,'--check',env=env)
+        observed=self.observation(result,started,delayed_ac_processes=marker.read_text().splitlines() if marker.exists() else [])
+        self.assertEqual(result.returncode,0,observed)
+        self.assertIn('GATE: GO ',result.stdout,observed)
+        self.assertLess(observed['elapsed'],4.2,observed)
+
 
 if __name__ == '__main__':
     unittest.main()

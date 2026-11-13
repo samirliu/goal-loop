@@ -356,7 +356,7 @@ def compile_view(root, state, fd, auto=False):
         stamped and not expired and not claimed and not unbooked)
     binding['execution'] = execution
     binding['implementation'] = {name: store._hash((HERE/name).read_bytes()) for name in
-        ('goal_context.py', 'goal_ctl.sh', 'goal_gate.sh', 'goal_store.py', 'goal_runner.py', 'goal_crew.py', 'goal_host.py')}
+        ('goal_context.py', 'goal_ctl.sh', 'goal_gate.sh', 'goal_parse.sh', 'goal_store.py', 'goal_runner.py', 'goal_crew.py', 'goal_host.py')}
     revision = store._hash(store._encode(binding))
     commands = {'status': ['bash', str(HERE / 'goal_ctl.sh'), 'status', '--project', str(root)],
                 'audit': ['bash', str(HERE / 'goal_audit.sh'), '--project', str(root)],

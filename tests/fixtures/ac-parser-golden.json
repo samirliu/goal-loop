@@ -1,0 +1,807 @@
+{
+  "source_commit": "872c781dd7d93bc6ab3f018630abf065279d5e86",
+  "source_sha256": "89549e59831652fbdf2647985c7d200472039bbb18cc658c066a6e2a008e500f",
+  "comparison": "observable shell command-substitution values; no check commands executed",
+  "cases": [
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | yes | check: `true` | expected: exit=0\n- AC-1 | check: `last` | expected: exit=7\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | yes | check: `true` | expected: exit=0\n- AC-1 | check: `last` | expected: exit=7",
+        "gp_ac_check_cmd": "last",
+        "gp_ac_expected": "exit=7",
+        "gp_ac_baseline_marker": "",
+        "gp_ac_probe_cmd": "",
+        "gp_ac_metric_re": "",
+        "gp_ac_tolerance": "",
+        "gp_ac_calib_line": "- AC-1 | yes | check:  | expected: exit=0\n- AC-1 | check:  | expected: exit=7",
+        "gp_ac_calib_good": "",
+        "gp_ac_calib_bad": "",
+        "gp_ac_calib_declared": "no",
+        "gp_ac_external_cmd": "",
+        "gp_ac_window": "",
+        "gp_ac_var_re": "",
+        "gp_ac_sd_re": ""
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1| check: `echo a | cat` | probe: `false` | metric: `v=([0-9]+)` | sd: `s=([0-9.]+)` | var: `v=([0-9.]+)` | tolerance: .1 | baseline: abs | expected: >=60  \n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1| check: `echo a | cat` | probe: `false` | metric: `v=([0-9]+)` | sd: `s=([0-9.]+)` | var: `v=([0-9.]+)` | tolerance: .1 | baseline: abs | expected: >=60  ",
+        "gp_ac_check_cmd": "echo a | cat",
+        "gp_ac_expected": ">=60  ",
+        "gp_ac_baseline_marker": "abs",
+        "gp_ac_probe_cmd": "false",
+        "gp_ac_metric_re": "v=([0-9]+)",
+        "gp_ac_tolerance": ".1",
+        "gp_ac_calib_line": "- AC-1| check:  | probe:  | metric:  | sd:  | var:  | tolerance: .1 | baseline: abs | expected: >=60  ",
+        "gp_ac_calib_good": "",
+        "gp_ac_calib_bad": "",
+        "gp_ac_calib_declared": "no",
+        "gp_ac_external_cmd": "",
+        "gp_ac_window": "",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | check: `echo \"calib: good=fake bad=fake\"` | calib: good=g.txt bad=b.txt | expected: judged\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | check: `echo \"calib: good=fake bad=fake\"` | calib: good=g.txt bad=b.txt | expected: judged",
+        "gp_ac_check_cmd": "echo \"calib: good=fake bad=fake\"",
+        "gp_ac_expected": "judged",
+        "gp_ac_baseline_marker": "",
+        "gp_ac_probe_cmd": "",
+        "gp_ac_metric_re": "",
+        "gp_ac_tolerance": "",
+        "gp_ac_calib_line": "- AC-1 | check:  | calib: good=g.txt bad=b.txt | expected: judged",
+        "gp_ac_calib_good": "g.txt",
+        "gp_ac_calib_bad": "b.txt",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "",
+        "gp_ac_window": "",
+        "gp_ac_var_re": "",
+        "gp_ac_sd_re": ""
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | check: `echo external: x` | external: `query | sort` | window: 123 | expected: exit=1\r\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | check: `echo external: x` | external: `query | sort` | window: 123 | expected: exit=1",
+        "gp_ac_check_cmd": "echo external: x",
+        "gp_ac_expected": "exit=1",
+        "gp_ac_baseline_marker": "",
+        "gp_ac_probe_cmd": "",
+        "gp_ac_metric_re": "",
+        "gp_ac_tolerance": "",
+        "gp_ac_calib_line": "- AC-1 | check:  | external:  | window: 123 | expected: exit=1",
+        "gp_ac_calib_good": "",
+        "gp_ac_calib_bad": "",
+        "gp_ac_calib_declared": "no",
+        "gp_ac_external_cmd": "query | sort",
+        "gp_ac_window": "123",
+        "gp_ac_var_re": "",
+        "gp_ac_sd_re": ""
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | check: `old` | check: `new` | expected: exit=0 | expected: judged\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | check: `old` | check: `new` | expected: exit=0 | expected: judged",
+        "gp_ac_check_cmd": "new",
+        "gp_ac_expected": "judged",
+        "gp_ac_baseline_marker": "",
+        "gp_ac_probe_cmd": "",
+        "gp_ac_metric_re": "",
+        "gp_ac_tolerance": "",
+        "gp_ac_calib_line": "- AC-1 | check:  | check:  | expected: exit=0 | expected: judged",
+        "gp_ac_calib_good": "",
+        "gp_ac_calib_bad": "",
+        "gp_ac_calib_declared": "no",
+        "gp_ac_external_cmd": "",
+        "gp_ac_window": "",
+        "gp_ac_var_re": "",
+        "gp_ac_sd_re": ""
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | check: `` | expected: ",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | check: `` | expected: ",
+        "gp_ac_check_cmd": "",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "",
+        "gp_ac_probe_cmd": "",
+        "gp_ac_metric_re": "",
+        "gp_ac_tolerance": "",
+        "gp_ac_calib_line": "- AC-1 | check:  | expected: ",
+        "gp_ac_calib_good": "",
+        "gp_ac_calib_bad": "",
+        "gp_ac_calib_declared": "no",
+        "gp_ac_external_cmd": "",
+        "gp_ac_window": "",
+        "gp_ac_var_re": "",
+        "gp_ac_sd_re": ""
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-10 | check: `other` | expected: exit=0\r\n",
+      "expected": {
+        "gp_ac_line_for": "",
+        "gp_ac_check_cmd": "",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "",
+        "gp_ac_probe_cmd": "",
+        "gp_ac_metric_re": "",
+        "gp_ac_tolerance": "",
+        "gp_ac_calib_line": "",
+        "gp_ac_calib_good": "",
+        "gp_ac_calib_bad": "",
+        "gp_ac_calib_declared": "no",
+        "gp_ac_external_cmd": "",
+        "gp_ac_window": "",
+        "gp_ac_var_re": "",
+        "gp_ac_sd_re": ""
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | unterminated `calib: good=x bad=y | expected: judged\n\n- AC-1 | check: `last` | expected: exit=7\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | unterminated `calib: good=x bad=y | expected: judged\n- AC-1 | check: `last` | expected: exit=7",
+        "gp_ac_check_cmd": "last",
+        "gp_ac_expected": "exit=7",
+        "gp_ac_baseline_marker": "",
+        "gp_ac_probe_cmd": "",
+        "gp_ac_metric_re": "",
+        "gp_ac_tolerance": "",
+        "gp_ac_calib_line": "- AC-1 | unterminated `calib: good=x bad=y | expected: judged\n- AC-1 | check:  | expected: exit=7",
+        "gp_ac_calib_good": "x",
+        "gp_ac_calib_bad": "y",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "",
+        "gp_ac_window": "",
+        "gp_ac_var_re": "",
+        "gp_ac_sd_re": ""
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | check: `true` | expected: >=1 | tail\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | check: `true` | expected: >=1 | tail",
+        "gp_ac_check_cmd": "true",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "",
+        "gp_ac_probe_cmd": "",
+        "gp_ac_metric_re": "",
+        "gp_ac_tolerance": "",
+        "gp_ac_calib_line": "- AC-1 | check:  | expected: >=1 | tail",
+        "gp_ac_calib_good": "",
+        "gp_ac_calib_bad": "",
+        "gp_ac_calib_declared": "no",
+        "gp_ac_external_cmd": "",
+        "gp_ac_window": "",
+        "gp_ac_var_re": "",
+        "gp_ac_sd_re": ""
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1\t| check: `ignored tab delimiter` | expected: exit=0\r\n",
+      "expected": {
+        "gp_ac_line_for": "",
+        "gp_ac_check_cmd": "",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "",
+        "gp_ac_probe_cmd": "",
+        "gp_ac_metric_re": "",
+        "gp_ac_tolerance": "",
+        "gp_ac_calib_line": "",
+        "gp_ac_calib_good": "",
+        "gp_ac_calib_bad": "",
+        "gp_ac_calib_declared": "no",
+        "gp_ac_external_cmd": "",
+        "gp_ac_window": "",
+        "gp_ac_var_re": "",
+        "gp_ac_sd_re": ""
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | baseline: delta | var: `v=([0-9.]+)` | probe: `test -f x` | metric: `x=([0-9]+)` | external: `test -e ok` | window: 12 | sd: `s=([0-9.]+)` | check: `echo 0 | cat` | calib: good=good bad=bad | expected: exit=0 | tolerance: 0.05",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | baseline: delta | var: `v=([0-9.]+)` | probe: `test -f x` | metric: `x=([0-9]+)` | external: `test -e ok` | window: 12 | sd: `s=([0-9.]+)` | check: `echo 0 | cat` | calib: good=good bad=bad | expected: exit=0 | tolerance: 0.05",
+        "gp_ac_check_cmd": "echo 0 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | baseline: delta | var:  | probe:  | metric:  | external:  | window: 12 | sd:  | check:  | calib: good=good bad=bad | expected: exit=0 | tolerance: 0.05",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | baseline: delta | var: `v=([0-9.]+)` | metric: `x=([0-9]+)` | external: `test -e ok` | window: 12 | tolerance: 0.05 | sd: `s=([0-9.]+)` | probe: `test -f x` | expected: exit=0 | calib: good=good bad=bad | check: `echo 1 | cat`\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | baseline: delta | var: `v=([0-9.]+)` | metric: `x=([0-9]+)` | external: `test -e ok` | window: 12 | tolerance: 0.05 | sd: `s=([0-9.]+)` | probe: `test -f x` | expected: exit=0 | calib: good=good bad=bad | check: `echo 1 | cat`",
+        "gp_ac_check_cmd": "echo 1 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | baseline: delta | var:  | metric:  | external:  | window: 12 | tolerance: 0.05 | sd:  | probe:  | expected: exit=0 | calib: good=good bad=bad | check: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | expected: exit=0 | metric: `x=([0-9]+)` | tolerance: 0.05 | baseline: delta | external: `test -e ok` | window: 12 | probe: `test -f x` | check: `echo 2 | cat` | calib: good=good bad=bad | sd: `s=([0-9.]+)` | var: `v=([0-9.]+)`\r\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | expected: exit=0 | metric: `x=([0-9]+)` | tolerance: 0.05 | baseline: delta | external: `test -e ok` | window: 12 | probe: `test -f x` | check: `echo 2 | cat` | calib: good=good bad=bad | sd: `s=([0-9.]+)` | var: `v=([0-9.]+)`",
+        "gp_ac_check_cmd": "echo 2 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | expected: exit=0 | metric:  | tolerance: 0.05 | baseline: delta | external:  | window: 12 | probe:  | check:  | calib: good=good bad=bad | sd:  | var: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | check: `echo 3 | cat` | expected: exit=0 | window: 12 | metric: `x=([0-9]+)` | baseline: delta | sd: `s=([0-9.]+)` | probe: `test -f x` | external: `test -e ok` | calib: good=good bad=bad | var: `v=([0-9.]+)` | tolerance: 0.05\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | check: `echo 3 | cat` | expected: exit=0 | window: 12 | metric: `x=([0-9]+)` | baseline: delta | sd: `s=([0-9.]+)` | probe: `test -f x` | external: `test -e ok` | calib: good=good bad=bad | var: `v=([0-9.]+)` | tolerance: 0.05",
+        "gp_ac_check_cmd": "echo 3 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | check:  | expected: exit=0 | window: 12 | metric:  | baseline: delta | sd:  | probe:  | external:  | calib: good=good bad=bad | var:  | tolerance: 0.05",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | check: `echo 4 | cat` | expected: exit=0 | probe: `test -f x` | window: 12 | var: `v=([0-9.]+)` | baseline: delta | calib: good=good bad=bad | sd: `s=([0-9.]+)` | tolerance: 0.05 | external: `test -e ok` | metric: `x=([0-9]+)`\n\n- AC-1 | check: `last` | expected: exit=7\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | check: `echo 4 | cat` | expected: exit=0 | probe: `test -f x` | window: 12 | var: `v=([0-9.]+)` | baseline: delta | calib: good=good bad=bad | sd: `s=([0-9.]+)` | tolerance: 0.05 | external: `test -e ok` | metric: `x=([0-9]+)`\n- AC-1 | check: `last` | expected: exit=7",
+        "gp_ac_check_cmd": "last",
+        "gp_ac_expected": "exit=7",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | check:  | expected: exit=0 | probe:  | window: 12 | var:  | baseline: delta | calib: good=good bad=bad | sd:  | tolerance: 0.05 | external:  | metric: \n- AC-1 | check:  | expected: exit=7",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | probe: `test -f x` | expected: exit=0 | tolerance: 0.05 | sd: `s=([0-9.]+)` | metric: `x=([0-9]+)` | calib: good=good bad=bad | baseline: delta | check: `echo 5 | cat` | var: `v=([0-9.]+)` | window: 12 | external: `test -e ok`",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | probe: `test -f x` | expected: exit=0 | tolerance: 0.05 | sd: `s=([0-9.]+)` | metric: `x=([0-9]+)` | calib: good=good bad=bad | baseline: delta | check: `echo 5 | cat` | var: `v=([0-9.]+)` | window: 12 | external: `test -e ok`",
+        "gp_ac_check_cmd": "echo 5 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | probe:  | expected: exit=0 | tolerance: 0.05 | sd:  | metric:  | calib: good=good bad=bad | baseline: delta | check:  | var:  | window: 12 | external: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | expected: exit=0 | external: `test -e ok` | sd: `s=([0-9.]+)` | metric: `x=([0-9]+)` | check: `echo 6 | cat` | probe: `test -f x` | var: `v=([0-9.]+)` | tolerance: 0.05 | calib: good=good bad=bad | baseline: delta | window: 12\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | expected: exit=0 | external: `test -e ok` | sd: `s=([0-9.]+)` | metric: `x=([0-9]+)` | check: `echo 6 | cat` | probe: `test -f x` | var: `v=([0-9.]+)` | tolerance: 0.05 | calib: good=good bad=bad | baseline: delta | window: 12",
+        "gp_ac_check_cmd": "echo 6 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | expected: exit=0 | external:  | sd:  | metric:  | check:  | probe:  | var:  | tolerance: 0.05 | calib: good=good bad=bad | baseline: delta | window: 12",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | metric: `x=([0-9]+)` | check: `echo 7 | cat` | probe: `test -f x` | var: `v=([0-9.]+)` | calib: good=good bad=bad | tolerance: 0.05 | expected: exit=0 | external: `test -e ok` | baseline: delta | window: 12 | sd: `s=([0-9.]+)`\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | metric: `x=([0-9]+)` | check: `echo 7 | cat` | probe: `test -f x` | var: `v=([0-9.]+)` | calib: good=good bad=bad | tolerance: 0.05 | expected: exit=0 | external: `test -e ok` | baseline: delta | window: 12 | sd: `s=([0-9.]+)`",
+        "gp_ac_check_cmd": "echo 7 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | metric:  | check:  | probe:  | var:  | calib: good=good bad=bad | tolerance: 0.05 | expected: exit=0 | external:  | baseline: delta | window: 12 | sd: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | baseline: delta | window: 12 | tolerance: 0.05 | probe: `test -f x` | check: `echo 8 | cat` | external: `test -e ok` | metric: `x=([0-9]+)` | var: `v=([0-9.]+)` | expected: exit=0 | sd: `s=([0-9.]+)` | calib: good=good bad=bad\r\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | baseline: delta | window: 12 | tolerance: 0.05 | probe: `test -f x` | check: `echo 8 | cat` | external: `test -e ok` | metric: `x=([0-9]+)` | var: `v=([0-9.]+)` | expected: exit=0 | sd: `s=([0-9.]+)` | calib: good=good bad=bad",
+        "gp_ac_check_cmd": "echo 8 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | baseline: delta | window: 12 | tolerance: 0.05 | probe:  | check:  | external:  | metric:  | var:  | expected: exit=0 | sd:  | calib: good=good bad=bad",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | window: 12 | baseline: delta | var: `v=([0-9.]+)` | calib: good=good bad=bad | expected: exit=0 | tolerance: 0.05 | probe: `test -f x` | external: `test -e ok` | sd: `s=([0-9.]+)` | check: `echo 9 | cat` | metric: `x=([0-9]+)`\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | window: 12 | baseline: delta | var: `v=([0-9.]+)` | calib: good=good bad=bad | expected: exit=0 | tolerance: 0.05 | probe: `test -f x` | external: `test -e ok` | sd: `s=([0-9.]+)` | check: `echo 9 | cat` | metric: `x=([0-9]+)`",
+        "gp_ac_check_cmd": "echo 9 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | window: 12 | baseline: delta | var:  | calib: good=good bad=bad | expected: exit=0 | tolerance: 0.05 | probe:  | external:  | sd:  | check:  | metric: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | expected: exit=0 | tolerance: 0.05 | check: `echo 10 | cat` | external: `test -e ok` | var: `v=([0-9.]+)` | probe: `test -f x` | calib: good=good bad=bad | metric: `x=([0-9]+)` | sd: `s=([0-9.]+)` | window: 12 | baseline: delta",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | expected: exit=0 | tolerance: 0.05 | check: `echo 10 | cat` | external: `test -e ok` | var: `v=([0-9.]+)` | probe: `test -f x` | calib: good=good bad=bad | metric: `x=([0-9]+)` | sd: `s=([0-9.]+)` | window: 12 | baseline: delta",
+        "gp_ac_check_cmd": "echo 10 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | expected: exit=0 | tolerance: 0.05 | check:  | external:  | var:  | probe:  | calib: good=good bad=bad | metric:  | sd:  | window: 12 | baseline: delta",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | calib: good=good bad=bad | var: `v=([0-9.]+)` | external: `test -e ok` | window: 12 | baseline: delta | tolerance: 0.05 | probe: `test -f x` | metric: `x=([0-9]+)` | check: `echo 11 | cat` | sd: `s=([0-9.]+)` | expected: exit=0\r\n\n- AC-1 | check: `last` | expected: exit=7\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | calib: good=good bad=bad | var: `v=([0-9.]+)` | external: `test -e ok` | window: 12 | baseline: delta | tolerance: 0.05 | probe: `test -f x` | metric: `x=([0-9]+)` | check: `echo 11 | cat` | sd: `s=([0-9.]+)` | expected: exit=0\n- AC-1 | check: `last` | expected: exit=7",
+        "gp_ac_check_cmd": "last",
+        "gp_ac_expected": "exit=7",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | calib: good=good bad=bad | var:  | external:  | window: 12 | baseline: delta | tolerance: 0.05 | probe:  | metric:  | check:  | sd:  | expected: exit=0\n- AC-1 | check:  | expected: exit=7",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | metric: `x=([0-9]+)` | expected: exit=0 | check: `echo 12 | cat` | tolerance: 0.05 | var: `v=([0-9.]+)` | baseline: delta | external: `test -e ok` | sd: `s=([0-9.]+)` | window: 12 | probe: `test -f x` | calib: good=good bad=bad\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | metric: `x=([0-9]+)` | expected: exit=0 | check: `echo 12 | cat` | tolerance: 0.05 | var: `v=([0-9.]+)` | baseline: delta | external: `test -e ok` | sd: `s=([0-9.]+)` | window: 12 | probe: `test -f x` | calib: good=good bad=bad",
+        "gp_ac_check_cmd": "echo 12 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | metric:  | expected: exit=0 | check:  | tolerance: 0.05 | var:  | baseline: delta | external:  | sd:  | window: 12 | probe:  | calib: good=good bad=bad",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | var: `v=([0-9.]+)` | calib: good=good bad=bad | baseline: delta | expected: exit=0 | tolerance: 0.05 | check: `echo 13 | cat` | sd: `s=([0-9.]+)` | metric: `x=([0-9]+)` | probe: `test -f x` | window: 12 | external: `test -e ok`\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | var: `v=([0-9.]+)` | calib: good=good bad=bad | baseline: delta | expected: exit=0 | tolerance: 0.05 | check: `echo 13 | cat` | sd: `s=([0-9.]+)` | metric: `x=([0-9]+)` | probe: `test -f x` | window: 12 | external: `test -e ok`",
+        "gp_ac_check_cmd": "echo 13 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | var:  | calib: good=good bad=bad | baseline: delta | expected: exit=0 | tolerance: 0.05 | check:  | sd:  | metric:  | probe:  | window: 12 | external: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | sd: `s=([0-9.]+)` | external: `test -e ok` | window: 12 | calib: good=good bad=bad | baseline: delta | expected: exit=0 | metric: `x=([0-9]+)` | var: `v=([0-9.]+)` | check: `echo 14 | cat` | probe: `test -f x` | tolerance: 0.05\r\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | sd: `s=([0-9.]+)` | external: `test -e ok` | window: 12 | calib: good=good bad=bad | baseline: delta | expected: exit=0 | metric: `x=([0-9]+)` | var: `v=([0-9.]+)` | check: `echo 14 | cat` | probe: `test -f x` | tolerance: 0.05",
+        "gp_ac_check_cmd": "echo 14 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | sd:  | external:  | window: 12 | calib: good=good bad=bad | baseline: delta | expected: exit=0 | metric:  | var:  | check:  | probe:  | tolerance: 0.05",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | calib: good=good bad=bad | external: `test -e ok` | check: `echo 15 | cat` | probe: `test -f x` | var: `v=([0-9.]+)` | baseline: delta | metric: `x=([0-9]+)` | sd: `s=([0-9.]+)` | tolerance: 0.05 | expected: exit=0 | window: 12",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | calib: good=good bad=bad | external: `test -e ok` | check: `echo 15 | cat` | probe: `test -f x` | var: `v=([0-9.]+)` | baseline: delta | metric: `x=([0-9]+)` | sd: `s=([0-9.]+)` | tolerance: 0.05 | expected: exit=0 | window: 12",
+        "gp_ac_check_cmd": "echo 15 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | calib: good=good bad=bad | external:  | check:  | probe:  | var:  | baseline: delta | metric:  | sd:  | tolerance: 0.05 | expected: exit=0 | window: 12",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | check: `echo 16 | cat` | calib: good=good bad=bad | tolerance: 0.05 | external: `test -e ok` | expected: exit=0 | baseline: delta | var: `v=([0-9.]+)` | metric: `x=([0-9]+)` | probe: `test -f x` | window: 12 | sd: `s=([0-9.]+)`\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | check: `echo 16 | cat` | calib: good=good bad=bad | tolerance: 0.05 | external: `test -e ok` | expected: exit=0 | baseline: delta | var: `v=([0-9.]+)` | metric: `x=([0-9]+)` | probe: `test -f x` | window: 12 | sd: `s=([0-9.]+)`",
+        "gp_ac_check_cmd": "echo 16 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | check:  | calib: good=good bad=bad | tolerance: 0.05 | external:  | expected: exit=0 | baseline: delta | var:  | metric:  | probe:  | window: 12 | sd: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | check: `echo 17 | cat` | expected: exit=0 | external: `test -e ok` | window: 12 | metric: `x=([0-9]+)` | calib: good=good bad=bad | tolerance: 0.05 | var: `v=([0-9.]+)` | sd: `s=([0-9.]+)` | baseline: delta | probe: `test -f x`\r\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | check: `echo 17 | cat` | expected: exit=0 | external: `test -e ok` | window: 12 | metric: `x=([0-9]+)` | calib: good=good bad=bad | tolerance: 0.05 | var: `v=([0-9.]+)` | sd: `s=([0-9.]+)` | baseline: delta | probe: `test -f x`",
+        "gp_ac_check_cmd": "echo 17 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | check:  | expected: exit=0 | external:  | window: 12 | metric:  | calib: good=good bad=bad | tolerance: 0.05 | var:  | sd:  | baseline: delta | probe: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | var: `v=([0-9.]+)` | tolerance: 0.05 | metric: `x=([0-9]+)` | window: 12 | external: `test -e ok` | expected: exit=0 | baseline: delta | calib: good=good bad=bad | check: `echo 18 | cat` | probe: `test -f x` | sd: `s=([0-9.]+)`\n\n- AC-1 | check: `last` | expected: exit=7\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | var: `v=([0-9.]+)` | tolerance: 0.05 | metric: `x=([0-9]+)` | window: 12 | external: `test -e ok` | expected: exit=0 | baseline: delta | calib: good=good bad=bad | check: `echo 18 | cat` | probe: `test -f x` | sd: `s=([0-9.]+)`\n- AC-1 | check: `last` | expected: exit=7",
+        "gp_ac_check_cmd": "last",
+        "gp_ac_expected": "exit=7",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | var:  | tolerance: 0.05 | metric:  | window: 12 | external:  | expected: exit=0 | baseline: delta | calib: good=good bad=bad | check:  | probe:  | sd: \n- AC-1 | check:  | expected: exit=7",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | tolerance: 0.05 | sd: `s=([0-9.]+)` | baseline: delta | calib: good=good bad=bad | expected: exit=0 | external: `test -e ok` | metric: `x=([0-9]+)` | probe: `test -f x` | window: 12 | check: `echo 19 | cat` | var: `v=([0-9.]+)`\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | tolerance: 0.05 | sd: `s=([0-9.]+)` | baseline: delta | calib: good=good bad=bad | expected: exit=0 | external: `test -e ok` | metric: `x=([0-9]+)` | probe: `test -f x` | window: 12 | check: `echo 19 | cat` | var: `v=([0-9.]+)`",
+        "gp_ac_check_cmd": "echo 19 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | tolerance: 0.05 | sd:  | baseline: delta | calib: good=good bad=bad | expected: exit=0 | external:  | metric:  | probe:  | window: 12 | check:  | var: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | metric: `x=([0-9]+)` | window: 12 | var: `v=([0-9.]+)` | check: `echo 20 | cat` | calib: good=good bad=bad | baseline: delta | probe: `test -f x` | expected: exit=0 | external: `test -e ok` | tolerance: 0.05 | sd: `s=([0-9.]+)`",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | metric: `x=([0-9]+)` | window: 12 | var: `v=([0-9.]+)` | check: `echo 20 | cat` | calib: good=good bad=bad | baseline: delta | probe: `test -f x` | expected: exit=0 | external: `test -e ok` | tolerance: 0.05 | sd: `s=([0-9.]+)`",
+        "gp_ac_check_cmd": "echo 20 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | metric:  | window: 12 | var:  | check:  | calib: good=good bad=bad | baseline: delta | probe:  | expected: exit=0 | external:  | tolerance: 0.05 | sd: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | var: `v=([0-9.]+)` | sd: `s=([0-9.]+)` | probe: `test -f x` | external: `test -e ok` | expected: exit=0 | calib: good=good bad=bad | window: 12 | baseline: delta | check: `echo 21 | cat` | tolerance: 0.05 | metric: `x=([0-9]+)`\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | var: `v=([0-9.]+)` | sd: `s=([0-9.]+)` | probe: `test -f x` | external: `test -e ok` | expected: exit=0 | calib: good=good bad=bad | window: 12 | baseline: delta | check: `echo 21 | cat` | tolerance: 0.05 | metric: `x=([0-9]+)`",
+        "gp_ac_check_cmd": "echo 21 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | var:  | sd:  | probe:  | external:  | expected: exit=0 | calib: good=good bad=bad | window: 12 | baseline: delta | check:  | tolerance: 0.05 | metric: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | external: `test -e ok` | calib: good=good bad=bad | expected: exit=0 | sd: `s=([0-9.]+)` | check: `echo 22 | cat` | metric: `x=([0-9]+)` | tolerance: 0.05 | baseline: delta | window: 12 | probe: `test -f x` | var: `v=([0-9.]+)`\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | external: `test -e ok` | calib: good=good bad=bad | expected: exit=0 | sd: `s=([0-9.]+)` | check: `echo 22 | cat` | metric: `x=([0-9]+)` | tolerance: 0.05 | baseline: delta | window: 12 | probe: `test -f x` | var: `v=([0-9.]+)`",
+        "gp_ac_check_cmd": "echo 22 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | external:  | calib: good=good bad=bad | expected: exit=0 | sd:  | check:  | metric:  | tolerance: 0.05 | baseline: delta | window: 12 | probe:  | var: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | metric: `x=([0-9]+)` | var: `v=([0-9.]+)` | probe: `test -f x` | external: `test -e ok` | window: 12 | calib: good=good bad=bad | expected: exit=0 | baseline: delta | sd: `s=([0-9.]+)` | tolerance: 0.05 | check: `echo 23 | cat`\r\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | metric: `x=([0-9]+)` | var: `v=([0-9.]+)` | probe: `test -f x` | external: `test -e ok` | window: 12 | calib: good=good bad=bad | expected: exit=0 | baseline: delta | sd: `s=([0-9.]+)` | tolerance: 0.05 | check: `echo 23 | cat`",
+        "gp_ac_check_cmd": "echo 23 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | metric:  | var:  | probe:  | external:  | window: 12 | calib: good=good bad=bad | expected: exit=0 | baseline: delta | sd:  | tolerance: 0.05 | check: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | var: `v=([0-9.]+)` | metric: `x=([0-9]+)` | tolerance: 0.05 | external: `test -e ok` | baseline: delta | expected: exit=0 | window: 12 | sd: `s=([0-9.]+)` | check: `echo 24 | cat` | calib: good=good bad=bad | probe: `test -f x`\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | var: `v=([0-9.]+)` | metric: `x=([0-9]+)` | tolerance: 0.05 | external: `test -e ok` | baseline: delta | expected: exit=0 | window: 12 | sd: `s=([0-9.]+)` | check: `echo 24 | cat` | calib: good=good bad=bad | probe: `test -f x`",
+        "gp_ac_check_cmd": "echo 24 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | var:  | metric:  | tolerance: 0.05 | external:  | baseline: delta | expected: exit=0 | window: 12 | sd:  | check:  | calib: good=good bad=bad | probe: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | var: `v=([0-9.]+)` | external: `test -e ok` | probe: `test -f x` | metric: `x=([0-9]+)` | sd: `s=([0-9.]+)` | check: `echo 25 | cat` | calib: good=good bad=bad | tolerance: 0.05 | expected: exit=0 | window: 12 | baseline: delta\n- AC-1 | check: `last` | expected: exit=7\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | var: `v=([0-9.]+)` | external: `test -e ok` | probe: `test -f x` | metric: `x=([0-9]+)` | sd: `s=([0-9.]+)` | check: `echo 25 | cat` | calib: good=good bad=bad | tolerance: 0.05 | expected: exit=0 | window: 12 | baseline: delta\n- AC-1 | check: `last` | expected: exit=7",
+        "gp_ac_check_cmd": "last",
+        "gp_ac_expected": "exit=7",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | var:  | external:  | probe:  | metric:  | sd:  | check:  | calib: good=good bad=bad | tolerance: 0.05 | expected: exit=0 | window: 12 | baseline: delta\n- AC-1 | check:  | expected: exit=7",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | expected: exit=0 | external: `test -e ok` | calib: good=good bad=bad | probe: `test -f x` | sd: `s=([0-9.]+)` | metric: `x=([0-9]+)` | window: 12 | var: `v=([0-9.]+)` | check: `echo 26 | cat` | baseline: delta | tolerance: 0.05\r\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | expected: exit=0 | external: `test -e ok` | calib: good=good bad=bad | probe: `test -f x` | sd: `s=([0-9.]+)` | metric: `x=([0-9]+)` | window: 12 | var: `v=([0-9.]+)` | check: `echo 26 | cat` | baseline: delta | tolerance: 0.05",
+        "gp_ac_check_cmd": "echo 26 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | expected: exit=0 | external:  | calib: good=good bad=bad | probe:  | sd:  | metric:  | window: 12 | var:  | check:  | baseline: delta | tolerance: 0.05",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | window: 12 | sd: `s=([0-9.]+)` | check: `echo 27 | cat` | probe: `test -f x` | var: `v=([0-9.]+)` | external: `test -e ok` | tolerance: 0.05 | expected: exit=0 | calib: good=good bad=bad | metric: `x=([0-9]+)` | baseline: delta\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | window: 12 | sd: `s=([0-9.]+)` | check: `echo 27 | cat` | probe: `test -f x` | var: `v=([0-9.]+)` | external: `test -e ok` | tolerance: 0.05 | expected: exit=0 | calib: good=good bad=bad | metric: `x=([0-9]+)` | baseline: delta",
+        "gp_ac_check_cmd": "echo 27 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | window: 12 | sd:  | check:  | probe:  | var:  | external:  | tolerance: 0.05 | expected: exit=0 | calib: good=good bad=bad | metric:  | baseline: delta",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\n\n## Acceptance criteria\n\n- AC-1 | calib: good=good bad=bad | sd: `s=([0-9.]+)` | probe: `test -f x` | metric: `x=([0-9]+)` | external: `test -e ok` | window: 12 | expected: exit=0 | var: `v=([0-9.]+)` | check: `echo 28 | cat` | tolerance: 0.05 | baseline: delta\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | calib: good=good bad=bad | sd: `s=([0-9.]+)` | probe: `test -f x` | metric: `x=([0-9]+)` | external: `test -e ok` | window: 12 | expected: exit=0 | var: `v=([0-9.]+)` | check: `echo 28 | cat` | tolerance: 0.05 | baseline: delta",
+        "gp_ac_check_cmd": "echo 28 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | calib: good=good bad=bad | sd:  | probe:  | metric:  | external:  | window: 12 | expected: exit=0 | var:  | check:  | tolerance: 0.05 | baseline: delta",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    },
+    {
+      "text": "# Goal\r\n\r\n## Acceptance criteria\r\n\r\n- AC-1 | probe: `test -f x` | check: `echo 29 | cat` | external: `test -e ok` | calib: good=good bad=bad | window: 12 | tolerance: 0.05 | sd: `s=([0-9.]+)` | baseline: delta | metric: `x=([0-9]+)` | expected: exit=0 | var: `v=([0-9.]+)`\r\n",
+      "expected": {
+        "gp_ac_line_for": "- AC-1 | probe: `test -f x` | check: `echo 29 | cat` | external: `test -e ok` | calib: good=good bad=bad | window: 12 | tolerance: 0.05 | sd: `s=([0-9.]+)` | baseline: delta | metric: `x=([0-9]+)` | expected: exit=0 | var: `v=([0-9.]+)`",
+        "gp_ac_check_cmd": "echo 29 | cat",
+        "gp_ac_expected": "",
+        "gp_ac_baseline_marker": "delta",
+        "gp_ac_probe_cmd": "test -f x",
+        "gp_ac_metric_re": "x=([0-9]+)",
+        "gp_ac_tolerance": "0.05",
+        "gp_ac_calib_line": "- AC-1 | probe:  | check:  | external:  | calib: good=good bad=bad | window: 12 | tolerance: 0.05 | sd:  | baseline: delta | metric:  | expected: exit=0 | var: ",
+        "gp_ac_calib_good": "good",
+        "gp_ac_calib_bad": "bad",
+        "gp_ac_calib_declared": "yes",
+        "gp_ac_external_cmd": "test -e ok",
+        "gp_ac_window": "12",
+        "gp_ac_var_re": "v=([0-9.]+)",
+        "gp_ac_sd_re": "s=([0-9.]+)"
+      }
+    }
+  ]
+}

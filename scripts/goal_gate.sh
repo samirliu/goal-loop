@@ -116,6 +116,14 @@ latest_verdicts(){                                     # id|verdict|iter|digest|
   gp_latest_verdicts "$project"
 }
 
+block_get(){
+  local line value=""
+  while IFS= read -r line; do
+    case "$line" in "$1="*) value=${line#*=} ;; esac
+  done <<< "$lb"
+  printf '%s\n' "$value"
+}
+
 fail(){
   # reason=$1 ; optional hint token routes the controller's next batch
   # (open-FAIL -> fix that AC's domain; not-covered -> dispatch the seat).
@@ -596,10 +604,10 @@ lb=$(last_block) || fail "empty-loop-log"
 loop_keys="task files_modified checks_pass checks_fail checks_unverifiable error_signature progress exit_signal false_complete digest score strategy_delta"
 missing_lk=""
 for k in $loop_keys; do
-  printf '%s\n' "$lb" | grep -qE "^$k=" || missing_lk="$missing_lk $k"
+  case "$lb" in "$k="*|*$'\n'"$k="*) : ;; *) missing_lk="$missing_lk $k" ;; esac
 done
 [ -z "$missing_lk" ] || echo "GATE: NOTE loop-log-missing-keys:${missing_lk# }" >&2
-claim=$(printf '%s\n' "$lb" | grep -E '^exit_signal=' | tail -1 | cut -d= -f2-)
+claim=$(block_get exit_signal)
 [ "$claim" = yes ] || [ "$mode" = checkpoint ] || [ "$mode" = quality ] || fail "not-claimed"
 # (5c/5d two-pass + raw run immediately before GO - after mechanical ACs)
 # R12 tooth at the arbiter (v2.7): the CLAIMING block must carry a schema-valid
@@ -607,14 +615,14 @@ claim=$(printf '%s\n' "$lb" | grep -E '^exit_signal=' | tail -1 | cut -d= -f2-)
 # (the documented rescue path) could smuggle an id past the audit. History
 # blocks stay readable for v1.x-compatible ledgers - only what claims done
 # is held to the law.
-lbt=$(printf '%s\n' "$lb" | grep -E '^task=' | tail -1 | cut -d= -f2-)
+lbt=$(block_get task)
 if ! gp_task_ok "$lbt"; then
   # bare T<n> is a v1.x ledger form: valid but noted (ctl normalizes it at write).
   printf '%s' "$lbt" | grep -qE '^T[0-9]+$' \
     || fail "bad-task:$lbt (claiming block needs task=T<n>[crew:N]; see R12)"
   echo "GATE: NOTE task-id-legacy (bare $lbt: wave backend not stated; write it as T<n>[crew:1])" >&2
 fi
-lbdigest=$(printf '%s\n' "$lb" | grep -E '^digest=' | tail -1 | cut -d= -f2-)
+lbdigest=$(block_get digest)
 # Old worktree identities cannot be compared with v2. Migration requires fresh
 # bookkeeping and judging, but is not evidence that the controller lied.
 if [[ "$digest" == v2-* ]] && printf '%s' "$lbdigest" | grep -qE '^[0-9a-f]{1,12}$'; then
@@ -785,7 +793,7 @@ fi
 # -12. strategy-delta duty (R10): landing on HALF_OPEN without a recorded
 # strategy change is make-work; refuse the claim until one is written.
 if [ "$breaker" = HALF_OPEN ]; then
-  sdelt=$(printf '%s\n' "$lb" | grep -E '^strategy_delta=' | tail -1 | cut -d= -f2-)
+  sdelt=$(block_get strategy_delta)
   case "$sdelt" in
     ''|none) fail "missing-strategy-delta (breaker=HALF_OPEN requires strategy_delta= <what you are changing>)" ;;
   esac

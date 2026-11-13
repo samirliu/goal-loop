@@ -1,5 +1,5 @@
 {
-  "scope": "all shipped scripts and tests; no caches; generated before final commit",
+  "scope": "all shipped scripts, tests and parser fixtures; no caches; before final commit",
   "files": {
     "scripts/goal_audit.sh": {
       "sha256": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb",
@@ -10,7 +10,7 @@
       "mode": "0o644"
     },
     "scripts/goal_context.py": {
-      "sha256": "d8aeea8c3289694700f03f9c32481caad8dc70e70df0333f463676e412e8c0dd",
+      "sha256": "e227cb8201c787078910b7836d8084ef86bf897a9a6b31d8570e440e2823703c",
       "mode": "0o644"
     },
     "scripts/goal_crew.py": {
@@ -30,7 +30,7 @@
       "mode": "0o644"
     },
     "scripts/goal_gate.sh": {
-      "sha256": "4ba8c3e47945cf34c15e1f84170fe73e53a95b33c406a2736ccf2d9c1612885e",
+      "sha256": "ac2571808ae804f57c9ef5376698f8b54fb4632676d6424bf78ca79f1a94f824",
       "mode": "0o644"
     },
     "scripts/goal_hook.sh": {
@@ -58,7 +58,7 @@
       "mode": "0o644"
     },
     "scripts/goal_parse.sh": {
-      "sha256": "89549e59831652fbdf2647985c7d200472039bbb18cc658c066a6e2a008e500f",
+      "sha256": "1c33a08b2df1a5764672ee9953783e681a640fa0481197f7e266ee0b22e23b70",
       "mode": "0o644"
     },
     "scripts/goal_runner.py": {
@@ -86,11 +86,19 @@
       "mode": "0o644"
     },
     "tests/cases.inc.sh": {
-      "sha256": "e34ef9190abc5ee19a791c802a363a7479b18dcfd07f6470f9f8bf2a0a57874d",
+      "sha256": "394e4bf9e3a83e37620d361294d669da0d68c7a4ac8732e19026a4a5d5ccdac8",
       "mode": "0o644"
     },
     "tests/docs_consistency.sh": {
       "sha256": "ec9ef27dd43faa4b17bec6825ad905c186ef855e2bf6eb41f191962d9b1e09a0",
+      "mode": "0o644"
+    },
+    "tests/fixtures/ac-parser-golden.json": {
+      "sha256": "b28cd1b4698175c3361ce479eeffd45ea5a3ce58ef5398701e8c878b78dce63d",
+      "mode": "0o644"
+    },
+    "tests/gate_observation.py": {
+      "sha256": "ee177f76281596a9981a35544c6f4ff1df2e11e0d17979eca314eb0222cf133a",
       "mode": "0o644"
     },
     "tests/lib.sh": {
@@ -99,6 +107,10 @@
     },
     "tests/run_tests.sh": {
       "sha256": "258cd7312da07672e573b2e48ee37e613fed3266ee5b43e9631e43afc0da3e12",
+      "mode": "0o644"
+    },
+    "tests/test_ac_parse.py": {
+      "sha256": "04b03db1cf199404a561934b9337388443776e5b5d442b5f82090ba379b00ef2",
       "mode": "0o644"
     },
     "tests/test_budget.py": {
@@ -138,7 +150,7 @@
       "mode": "0o644"
     },
     "tests/test_gate_entry_budget.py": {
-      "sha256": "4a75b31a4a0edd0c59111a48ac328b7d93cd966b6aa38876b10950d17a3cabb8",
+      "sha256": "982407ac543a6f67774fb7cd41374d8c55ffe957ce2d8fc972ea96940bf8d0f3",
       "mode": "0o644"
     },
     "tests/test_goal_store.py": {

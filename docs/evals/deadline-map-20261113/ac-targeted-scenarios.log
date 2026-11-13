@@ -1,0 +1,16 @@
+run_tests: isolated finite-settlement cluster=30
+run_tests: isolated finite-settlement cluster=78
+  ok   - 77 expired+fail -> BLOCKED rc3 (rc=3)
+  ok   - 77 BLOCKED fuse
+== results: pass=2 fail=0 ==
+  ok   - 28 expired green claim -> GO (rc=0)
+  ok   - 28 NOTE fuse
+  ok   - 28 still GO
+GATE_SETTLEMENT_OBSERVATION {"case": "t28", "cpu_count": 12, "gate_output": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: NOTE tautology-suspect:AC-1 (check cannot fail across rounds - strengthen it or the gate is decorative)\nGATE: GO digest=v2-656d1c99b9c6fe7011a5057f8d9571f612229705a84279e7615eb5d4a8e84bc7 iter=1 ac=1 pass=1 unverified=0 mode=threshold", "kind": "posthoc; no time granted", "python": "3.14.8", "sources": {"goal_gate.sh": "ac2571808ae804f57c9ef5376698f8b54fb4632676d6424bf78ca79f1a94f824", "goal_parse.sh": "1c33a08b2df1a5764672ee9953783e681a640fa0481197f7e266ee0b22e23b70", "goal_runner.py": "19d7857fe9e1249071dac1ec105050b6d56b1d778aeb2613e2867ff1f10b7d01"}, "spans": [{"elapsed": 0.6462653339840472, "kind": "acceptance", "label": "check", "result": 0, "start_monotonic": 1724874.189438791, "state": "complete"}, {"elapsed": 0.005045749945566058, "kind": "measurement", "label": "check:AC-1", "result": 0, "start_monotonic": 1724874.627635041, "state": "complete"}]}
+== results: pass=3 fail=0 ==
+  ok   - 76 expired wallclock green claim -> GO (rc=0)
+  ok   - 76 NOTE fuse
+  ok   - 76 still GO
+GATE_SETTLEMENT_OBSERVATION {"case": "t76", "cpu_count": 12, "gate_output": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: NOTE tautology-suspect:AC-1 (check cannot fail across rounds - strengthen it or the gate is decorative)\nGATE: GO digest=v2-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 iter=1 ac=1 pass=1 unverified=0 mode=threshold", "kind": "posthoc; no time granted", "python": "3.14.8", "sources": {"goal_gate.sh": "ac2571808ae804f57c9ef5376698f8b54fb4632676d6424bf78ca79f1a94f824", "goal_parse.sh": "1c33a08b2df1a5764672ee9953783e681a640fa0481197f7e266ee0b22e23b70", "goal_runner.py": "19d7857fe9e1249071dac1ec105050b6d56b1d778aeb2613e2867ff1f10b7d01"}, "spans": [{"elapsed": 0.004874125123023987, "kind": "measurement", "label": "check:AC-1", "result": 0, "start_monotonic": 1724877.221969083, "state": "complete"}, {"elapsed": 0.610216167056933, "kind": "acceptance", "label": "check", "result": 0, "start_monotonic": 1724876.803044166, "state": "complete"}]}
+== results: pass=3 fail=0 ==
+== total: pass=8 fail=0 shards=3 ==

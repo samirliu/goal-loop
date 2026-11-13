@@ -284,22 +284,49 @@ gp_state_get(){                                          # $1 project $2 key -> 
 gp_goal_r(){ [ -f "$1/.goal/goal.md" ] || return 0; gp_r < "$1/.goal/goal.md"; }
 gp_contract_mode(){ gp_goal_r "$1" | grep -qE '^exit: *forge' && echo forge || echo threshold; }
 gp_all_ac_ids(){ gp_goal_r "$1" | grep -oE '^- AC-[0-9]+' | sort -u | sed 's/^- //'; }
-gp_ac_line_for(){ gp_goal_r "$1" | awk -v id="$2" '$0 ~ "^- "id"[ |]"'; }
+gp_ac_line_for(){
+  local f="$1/.goal/goal.md" line prefix="- $2"
+  [ -f "$f" ] || return 0
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=${line//$'\r'/}
+    case "$line" in "$prefix "*|"$prefix|"*) printf '%s\n' "$line" ;; esac
+  done < "$f"
+}
+# The same ERE grammar, evaluated in the current Bash instead of starting
+# tr/awk/sed/tail for every field. Every call reads current contract bytes;
+# no field cache survives a check or controller mutation.
+gp_ac_field(){
+  local line value="" matched=0 pattern="$3"
+  while IFS= read -r line; do
+    if [[ "$line" =~ $pattern ]]; then value=${BASH_REMATCH[1]}; matched=1; fi
+  done < <(if [ "${4:-}" = calib ]; then gp_ac_calib_line "$1" "$2"; else gp_ac_line_for "$1" "$2"; fi)
+  [ "$matched" -eq 0 ] || printf '%s\n' "$value"
+  return 0
+}
 # Commands stay in backticks; AC lines are never split on '|' (commands
 # contain pipes). The expectation is the line tail after "expected:".
-gp_ac_check_cmd(){  gp_ac_line_for "$1" "$2" | sed -nE 's/^.*check: *`([^`]*)`.*/\1/p' | tail -1; }
-gp_ac_expected(){   gp_ac_line_for "$1" "$2" | sed -nE 's/^.*expected: *([^|]*)[[:space:]]*$/\1/p' | tail -1; }
-gp_ac_baseline_marker(){ gp_ac_line_for "$1" "$2" | sed -nE 's/^.*baseline: *(delta|abs).*/\1/p' | tail -1; }
-gp_ac_probe_cmd(){  gp_ac_line_for "$1" "$2" | sed -nE 's/^.*probe: *`([^`]*)`.*/\1/p' | tail -1; }
-gp_ac_metric_re(){  gp_ac_line_for "$1" "$2" | sed -nE 's/^.*metric: *`([^`]*)`.*/\1/p' | tail -1; }
-gp_ac_tolerance(){  gp_ac_line_for "$1" "$2" | sed -nE 's/^.*tolerance: *([0-9.]+).*/\1/p' | tail -1; }
+gp_ac_check_cmd(){ gp_ac_field "$1" "$2" '^.*check: *`([^`]*)`.*$'; }
+gp_ac_expected(){ gp_ac_field "$1" "$2" '^.*expected: *([^|]*)[[:space:]]*$'; }
+gp_ac_baseline_marker(){ gp_ac_field "$1" "$2" '^.*baseline: *(delta|abs).*$'; }
+gp_ac_probe_cmd(){ gp_ac_field "$1" "$2" '^.*probe: *`([^`]*)`.*$'; }
+gp_ac_metric_re(){ gp_ac_field "$1" "$2" '^.*metric: *`([^`]*)`.*$'; }
+gp_ac_tolerance(){ gp_ac_field "$1" "$2" '^.*tolerance: *([0-9.]+).*$'; }
 # Calib fixtures belong to judged ACs. Backtick spans are command text, not
 # calib declarations: strip them first, or an AC whose check greps the literal
 # "calib:" is mistaken for a calibrated seat (v2.6 fix, kept here as law).
-gp_ac_calib_line(){  gp_ac_line_for "$1" "$2" | sed -E 's/`[^`]*`//g'; }
-gp_ac_calib_good(){  gp_ac_calib_line "$1" "$2" | sed -nE 's/^.*calib:[^|]*good *= *([^ |]+).*/\1/p' | tail -1; }
-gp_ac_calib_bad(){   gp_ac_calib_line "$1" "$2" | sed -nE 's/^.*calib:[^|]*bad *= *([^ |]+).*/\1/p' | tail -1; }
-gp_ac_calib_declared(){ gp_ac_calib_line "$1" "$2" | grep -qE 'calib:[^|]*(good|bad) *=' && echo yes || echo no; }
+gp_ac_calib_line(){
+  local line pattern='^([^`]*)`[^`]*`(.*)$'
+  while IFS= read -r line; do
+    while [[ "$line" =~ $pattern ]]; do line=${BASH_REMATCH[1]}${BASH_REMATCH[2]}; done
+    printf '%s\n' "$line"
+  done < <(gp_ac_line_for "$1" "$2")
+}
+gp_ac_calib_good(){ gp_ac_field "$1" "$2" '^.*calib:[^|]*good *= *([^ |]+).*$' calib; }
+gp_ac_calib_bad(){ gp_ac_field "$1" "$2" '^.*calib:[^|]*bad *= *([^ |]+).*$' calib; }
+gp_ac_calib_declared(){
+  local value; value=$(gp_ac_field "$1" "$2" '^.*calib:[^|]*(good|bad) *=.*$' calib)
+  [ -z "$value" ] && echo no || echo yes
+}
 # External/deferred check surface (v2.9): an `external:` command settles an AC
 # against an OUT-OF-TREE source (CRM, prod metrics, an async peer review) that
 # no in-tree file captures; `window:` = validity of the cached result in whole
@@ -310,8 +337,8 @@ gp_ac_calib_declared(){ gp_ac_calib_line "$1" "$2" | grep -qE 'calib:[^|]*(good|
 # delete the very declaration it is looking for (v2.9 self-inflicted bug caught
 # by t117). Greedy .* means the LAST external: span wins: a decoy inside the
 # check: command sits earlier in the line than the real trailing declaration.
-gp_ac_external_cmd(){ gp_ac_line_for "$1" "$2" | sed -nE 's/^.*external: *`([^`]*)`.*/\1/p' | tail -1; }
-gp_ac_window(){       gp_ac_calib_line "$1" "$2" | sed -nE 's/^.*window: *([0-9]+).*/\1/p' | tail -1; }
+gp_ac_external_cmd(){ gp_ac_field "$1" "$2" '^.*external: *`([^`]*)`.*$'; }
+gp_ac_window(){ gp_ac_field "$1" "$2" '^.*window: *([0-9]+).*$' calib; }
 # Horizon layer (v2.9): a contract may declare `horizon-waived: <reason>` to
 # accept an objective whose blind spot is unguarded. The parser only finds it;
 # the refuse-at-stamp tooth lives in goal_ctl.sh.
@@ -319,11 +346,11 @@ gp_horizon_waived(){ gp_goal_r "$1" | grep -iE '^horizon-waived:[[:space:]]*[^[:
 # var: (v2.9) a second capture-group regex pinning WHERE the measurement's
 # dispersion comes from, so the significance band is computed from data
 # instead of the AC author's memory of typical noise.
-gp_ac_var_re(){ gp_ac_line_for "$1" "$2" | sed -nE 's/^.*var: *`([^`]*)`.*/\1/p' | tail -1; }
+gp_ac_var_re(){ gp_ac_field "$1" "$2" '^.*var: *`([^`]*)`.*$'; }
 # sd: (v2.9) stddev regex for significance bands on an objective metric -
 # one capture group; extracts the measurement's spread (what benchmark
 # harnesses actually print: "stddev: 1.4"), sqrt'd into the z-band.
-gp_ac_sd_re(){ gp_ac_line_for "$1" "$2" | sed -nE 's/^.*sd: *`([^`]*)`.*/\1/p' | tail -1; }
+gp_ac_sd_re(){ gp_ac_field "$1" "$2" '^.*sd: *`([^`]*)`.*$'; }
 # ---- deferred.rec grammar (v2.9 external checks) ---------------------------
 # Lives under .goal/evidence/ (digest-excluded, R6-fair) because the GATE
 # writes it during a rerun batch - it is a measurement cache, not ledger state.
@@ -351,7 +378,7 @@ gp_ac_body_hash(){ gp_ac_body "$1" | gp_hash_std | cut -c1-8; }
 
 # expected token -> a routing class the gate understands
 gp_classify_expected(){
-  local v; v=$(printf '%s' "$1" | tr -d '[:space:]')
+  local v=${1//[[:space:]]/}
   case "$v" in
     ''|exit=0) echo "exit0" ;;
     judged)    echo "judged" ;;
@@ -359,10 +386,9 @@ gp_classify_expected(){
     minimize)  echo "minimize" ;;
     exit=[0-9]*) echo "rc ${v#exit=}" ;;
     *)
-      local op num
-      op=$(printf '%s' "$v" | sed -nE 's/^([<>=!]+)[0-9].*/\1/p')
-      num=$(printf '%s' "$v" | sed -nE 's/^[<>=!]+([0-9][0-9.]*)$/\1/p')
-      if [ -n "$op" ] && [ -n "$num" ]; then
+      local op num pattern='^([<>=!]+)([0-9][0-9.]*)$'
+      if [[ "$v" =~ $pattern ]]; then
+        op=${BASH_REMATCH[1]}; num=${BASH_REMATCH[2]}
         case "$op" in
           '>='|'<='|'>'|'<'|'=='|'!=') echo "metric $op $num"; return ;;
         esac
