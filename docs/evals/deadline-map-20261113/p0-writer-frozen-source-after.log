@@ -1,0 +1,9 @@
+test_contended_writer_respects_expired_deadline (test_controller_writers.ControllerWriters.test_contended_writer_respects_expired_deadline) ... ok
+test_killed_close_blocks_readers_and_recovers_without_replaying_checks (test_controller_writers.ControllerWriters.test_killed_close_blocks_readers_and_recovers_without_replaying_checks) ... ok
+test_malformed_deadline_refuses_writer_without_changing_ledger (test_controller_writers.ControllerWriters.test_malformed_deadline_refuses_writer_without_changing_ledger) ... ok
+test_two_writers_never_commit_the_same_iteration (test_controller_writers.ControllerWriters.test_two_writers_never_commit_the_same_iteration) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 4.780s
+
+OK

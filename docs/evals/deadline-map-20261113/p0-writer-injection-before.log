@@ -1,0 +1,15 @@
+test_killed_close_blocks_readers_and_recovers_without_replaying_checks (test_controller_writers.ControllerWriters.test_killed_close_blocks_readers_and_recovers_without_replaying_checks) ... FAIL
+
+======================================================================
+FAIL: test_killed_close_blocks_readers_and_recovers_without_replaying_checks (test_controller_writers.ControllerWriters.test_killed_close_blocks_readers_and_recovers_without_replaying_checks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/goal-loop-p0-resource-source/tests/test_controller_writers.py", line 45, in test_killed_close_blocks_readers_and_recovers_without_replaying_checks
+    self.assertNotEqual(result.returncode, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 1 test in 2.253s
+
+FAILED (failures=1)

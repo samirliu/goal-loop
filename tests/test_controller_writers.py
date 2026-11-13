@@ -4,6 +4,8 @@ import fcntl
 from pathlib import Path
 import re
 import subprocess
+import shlex
+import sys
 import tempfile
 import time
 import unittest
@@ -28,21 +30,23 @@ class ControllerWriters(unittest.TestCase):
             before = {name: (state / name).read_bytes() if (state / name).exists() else None for name in names}
             bindir = project / 'bin'
             bindir.mkdir()
-            shim = bindir / 'grep'
-            shim.write_text('''#!/usr/bin/env bash
-if [ "${1:-}" = -E ] && [ "${2:-}" = '^false_completes=' ] && [ -n "${GOAL_WRITER_OWNER_PID:-}" ]; then
-  kill -KILL "$GOAL_WRITER_OWNER_PID"
-  exit 1
-fi
-exec /usr/bin/grep "$@"
+            shim = bindir / 'after-log-append.sh'
+            shim.write_text('''printf() {
+  builtin printf "$@" || return $?
+  if [ "${2:-}" = '## iteration 1' ] && [ -n "${GOAL_WRITER_OWNER_PID:-}" ]; then
+    : > "$GOAL_TEST_KILLED_AT_APPEND"
+    kill -KILL "$GOAL_WRITER_OWNER_PID"
+  fi
+}
 ''')
-            shim.chmod(0o755)
-            env = dict(os.environ, PATH=str(bindir) + os.pathsep + os.environ['PATH'])
+            marker = state/'evidence/killed-at-append'
+            env = dict(os.environ, BASH_ENV=str(shim), GOAL_TEST_KILLED_AT_APPEND=str(marker))
             result = subprocess.run(['bash', str(CTL), 'close-iteration', '--project', str(project),
                                      '--task', 'T1', '--files', 'a.txt', '--checks-pass', '1',
                                      '--checks-fail', '0', '--checks-unverifiable', '0', '--no-gate'],
                                     env=env, capture_output=True, timeout=20)
             self.assertNotEqual(result.returncode, 0)
+            self.assertTrue(marker.exists(), 'fault injection did not reach the actual log append')
             self.assertTrue((state / 'store/pending').is_file())
             self.assertIn('## iteration 1', (state / 'loop-log.md').read_text())
             for cmd in (['bash', str(CTL), 'status'], ['bash', str(ROOT / 'scripts/goal_gate.sh'), '--check']):
@@ -149,17 +153,15 @@ exec /usr/bin/grep "$@"
             (project / 'a.txt').write_text('artifact\n')
             bindir, barrier = root / 'bin', root / 'barrier'
             bindir.mkdir(); barrier.mkdir()
-            grep = bindir / 'grep'
-            grep.write_text('''#!/usr/bin/env bash
-if [ "${1:-}" = -E ] && [ "${2:-}" = '^iteration=' ]; then
-  value=$(/usr/bin/grep "$@"); rc=$?
+            shim = bindir / 'python3'
+            shim.write_text('''#!/usr/bin/env bash
+if [ "${3:-}" = access-exec ] && [ "${5:-}" = write ]; then
   mkdir "$GOAL_TEST_BARRIER/$$"
   while [ ! -e "$GOAL_TEST_BARRIER/release" ]; do sleep 0.02; done
-  printf '%s\\n' "$value"; exit "$rc"
 fi
-exec /usr/bin/grep "$@"
+exec '''+shlex.quote(sys.executable)+''' "$@"
 ''')
-            grep.chmod(0o755)
+            shim.chmod(0o755)
             env = dict(os.environ, PATH=str(bindir) + os.pathsep + os.environ['PATH'],
                        GOAL_TEST_BARRIER=str(barrier))
             cmd = ['bash', str(CTL), 'close-iteration', '--project', str(project),
@@ -174,6 +176,8 @@ exec /usr/bin/grep "$@"
                     if sum(path.is_dir() for path in barrier.iterdir()) >= 2:
                         break
                     time.sleep(0.02)
+                self.assertEqual(sum(path.is_dir() for path in barrier.iterdir()), 2,
+                                 'both real writers must reach the pre-lock barrier')
                 (barrier / 'release').touch()
                 results = [process.communicate(timeout=30) for process in processes]
             finally:

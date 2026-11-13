@@ -1,0 +1,1289 @@
+﻿2026-11-13T01:41:52.0039908Z Current runner version: '2.338.2'
+2026-11-13T01:41:52.0062705Z ##[group]Runner Image Provisioner
+2026-11-13T01:41:52.0063494Z Hosted Compute Agent
+2026-11-13T01:41:52.0064152Z Version: 20261028.624
+2026-11-13T01:41:52.0064741Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-13T01:41:52.0065376Z Build Date: 2026-10-28T21:51:42Z
+2026-11-13T01:41:52.0065946Z Worker ID: {9aa163dd-928a-4403-9f6d-92c6aed90294}
+2026-11-13T01:41:52.0066645Z Region: westus2
+2026-11-13T01:41:52.0067115Z Cloud: Azure
+2026-11-13T01:41:52.0067650Z ##[endgroup]
+2026-11-13T01:41:52.0068858Z ##[group]Operating System
+2026-11-13T01:41:52.0069361Z Ubuntu
+2026-11-13T01:41:52.0069903Z 26.04.1
+2026-11-13T01:41:52.0070339Z LTS
+2026-11-13T01:41:52.0070794Z ##[endgroup]
+2026-11-13T01:41:52.0071275Z ##[group]Runner Image
+2026-11-13T01:41:52.0071768Z Image: ubuntu-26.04
+2026-11-13T01:41:52.0072303Z Version: 20261101.186.1
+2026-11-13T01:41:52.0073373Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-13T01:41:52.0074798Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+2026-11-13T01:41:52.0075589Z ##[endgroup]
+2026-11-13T01:41:52.0076688Z ##[group]GITHUB_TOKEN Permissions
+2026-11-13T01:41:52.0078551Z Contents: read
+2026-11-13T01:41:52.0079152Z Metadata: read
+2026-11-13T01:41:52.0079623Z Packages: read
+2026-11-13T01:41:52.0080449Z ##[endgroup]
+2026-11-13T01:41:52.0082308Z Secret source: Actions
+2026-11-13T01:41:52.0083068Z Cache mode: write
+2026-11-13T01:41:52.0083773Z Prepare workflow directory
+2026-11-13T01:41:52.0369610Z Prepare all required actions
+2026-11-13T01:41:52.0413047Z Getting action download info
+2026-11-13T01:41:52.3873529Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-13T01:41:52.8441716Z Complete job name: lint (ubuntu-latest)
+2026-11-13T01:41:52.9207868Z ##[group]Run actions/checkout@v4
+2026-11-13T01:41:52.9208621Z with:
+2026-11-13T01:41:52.9209030Z   repository: samirliu/goal-loop
+2026-11-13T01:41:52.9212681Z   token: ***
+2026-11-13T01:41:52.9213072Z   ssh-strict: true
+2026-11-13T01:41:52.9213464Z   ssh-user: git
+2026-11-13T01:41:52.9213857Z   persist-credentials: true
+2026-11-13T01:41:52.9214446Z   clean: true
+2026-11-13T01:41:52.9214849Z   sparse-checkout-cone-mode: true
+2026-11-13T01:41:52.9215297Z   fetch-depth: 1
+2026-11-13T01:41:52.9215678Z   fetch-tags: false
+2026-11-13T01:41:52.9216082Z   show-progress: true
+2026-11-13T01:41:52.9216487Z   lfs: false
+2026-11-13T01:41:52.9216870Z   submodules: false
+2026-11-13T01:41:52.9217281Z   set-safe-directory: true
+2026-11-13T01:41:52.9217727Z   allow-unsafe-pr-checkout: false
+2026-11-13T01:41:52.9218398Z ##[endgroup]
+2026-11-13T01:41:53.1420773Z Syncing repository: samirliu/goal-loop
+2026-11-13T01:41:53.1422529Z ##[group]Getting Git version info
+2026-11-13T01:41:53.1423276Z Working directory is '/home/runner/work/goal-loop/goal-loop'
+2026-11-13T01:41:53.1424524Z [command]/usr/bin/git version
+2026-11-13T01:41:53.1432539Z git version 2.56.0
+2026-11-13T01:41:53.1449121Z ##[endgroup]
+2026-11-13T01:41:53.1461086Z Temporarily overriding HOME='/home/runner/work/_temp/358c63bc-9230-403c-a3c5-c5418c79a4cb' before making global git config changes
+2026-11-13T01:41:53.1462324Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-13T01:41:53.1466137Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/goal-loop/goal-loop
+2026-11-13T01:41:53.1730147Z Deleting the contents of '/home/runner/work/goal-loop/goal-loop'
+2026-11-13T01:41:53.1733770Z ##[group]Initializing the repository
+2026-11-13T01:41:53.1738737Z [command]/usr/bin/git init /home/runner/work/goal-loop/goal-loop
+2026-11-13T01:41:53.2179767Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-13T01:41:53.2180903Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-13T01:41:53.2181713Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-13T01:41:53.2182639Z hint: call:
+2026-11-13T01:41:53.2183008Z hint:
+2026-11-13T01:41:53.2183501Z hint: 	git config --global init.defaultBranch <name>
+2026-11-13T01:41:53.2184326Z hint:
+2026-11-13T01:41:53.2185123Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-13T01:41:53.2185962Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-13T01:41:53.2186699Z hint:
+2026-11-13T01:41:53.2187203Z hint: 	git branch -m <name>
+2026-11-13T01:41:53.2187623Z hint:
+2026-11-13T01:41:53.2188322Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-13T01:41:53.2193116Z Initialized empty Git repository in /home/runner/work/goal-loop/goal-loop/.git/
+2026-11-13T01:41:53.2204789Z [command]/usr/bin/git remote add origin https://github.com/samirliu/goal-loop
+2026-11-13T01:41:53.2518272Z ##[endgroup]
+2026-11-13T01:41:53.2519072Z ##[group]Disabling automatic garbage collection
+2026-11-13T01:41:53.2521719Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-13T01:41:53.2767432Z ##[endgroup]
+2026-11-13T01:41:53.2768139Z ##[group]Setting up auth
+2026-11-13T01:41:53.2774543Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-13T01:41:53.2808858Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-13T01:41:53.3303622Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-13T01:41:53.3333608Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-13T01:41:53.3580144Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-13T01:41:53.3610875Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-13T01:41:53.3876598Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-13T01:41:53.4253711Z ##[endgroup]
+2026-11-13T01:41:53.4254810Z ##[group]Fetching the repository
+2026-11-13T01:41:53.4263058Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b38647b1df73740bcd6c2cee249d9c6633b1f114:refs/remotes/origin/main
+2026-11-13T01:41:54.4723261Z From https://github.com/samirliu/goal-loop
+2026-11-13T01:41:54.4728157Z  * [new ref]         b38647b1df73740bcd6c2cee249d9c6633b1f114 -> origin/main
+2026-11-13T01:41:54.4731384Z ##[endgroup]
+2026-11-13T01:41:54.4732502Z ##[group]Determining the checkout info
+2026-11-13T01:41:54.4733872Z ##[endgroup]
+2026-11-13T01:41:54.4734758Z [command]/usr/bin/git sparse-checkout disable
+2026-11-13T01:41:54.4795763Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-13T01:41:54.4828252Z ##[group]Checking out the ref
+2026-11-13T01:41:54.4832687Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+2026-11-13T01:41:54.5836120Z Switched to a new branch 'main'
+2026-11-13T01:41:54.5837757Z branch 'main' set up to track 'origin/main'.
+2026-11-13T01:41:54.5863201Z ##[endgroup]
+2026-11-13T01:41:54.5904407Z [command]/usr/bin/git log -1 --format=%H
+2026-11-13T01:41:54.5929550Z b38647b1df73740bcd6c2cee249d9c6633b1f114
+2026-11-13T01:41:54.6223844Z ##[group]Run shellcheck --severity=warning scripts/*.sh devtools/*.sh
+2026-11-13T01:41:54.6225917Z [36;1mshellcheck --severity=warning scripts/*.sh devtools/*.sh[0m
+2026-11-13T01:41:54.6279638Z shell: /usr/bin/bash -e {0}
+2026-11-13T01:41:54.6280643Z ##[endgroup]
+2026-11-13T01:41:58.5970908Z ##[group]Run echo "Running bash -n on all shipped scripts"
+2026-11-13T01:41:58.5971319Z [36;1mecho "Running bash -n on all shipped scripts"[0m
+2026-11-13T01:41:58.5971827Z [36;1mfor s in scripts/*.sh devtools/*.sh assets/*.sh companions/contract-forge/scripts/*.sh companions/contract-forge/tests/*.sh; do[0m
+2026-11-13T01:41:58.5972534Z [36;1m  bash -n "$s" || exit 1[0m
+2026-11-13T01:41:58.5972743Z [36;1mdone[0m
+2026-11-13T01:41:58.5972947Z [36;1mecho "All shipped scripts passed bash -n"[0m
+2026-11-13T01:41:58.6017931Z shell: /usr/bin/bash -e {0}
+2026-11-13T01:41:58.6018167Z ##[endgroup]
+2026-11-13T01:41:58.6079299Z Running bash -n on all shipped scripts
+2026-11-13T01:41:58.6253865Z All shipped scripts passed bash -n
+2026-11-13T01:41:58.6281593Z ##[group]Run bash tests/docs_consistency.sh
+2026-11-13T01:41:58.6281919Z [36;1mbash tests/docs_consistency.sh[0m
+2026-11-13T01:41:58.6325779Z shell: /usr/bin/bash -e {0}
+2026-11-13T01:41:58.6326017Z ##[endgroup]
+2026-11-13T01:41:58.7021053Z   ok   - C1 companion reference resolves: contract-forge/tests/run_fixtures.sh
+2026-11-13T01:41:58.7107638Z   ok   - C1 companion reference resolves: tests/run_fixtures.sh
+2026-11-13T01:41:58.7701204Z   ok   - C1 companion reference resolves: contract-forge/tests/run_fixtures.sh
+2026-11-13T01:41:58.8774799Z   ok   - C1 all internal cited files exist (external skipped=0)
+2026-11-13T01:41:58.8776338Z   ok   - C2 SKILL.md title says v4.1.1
+2026-11-13T01:41:58.8888375Z   ok   - C3 references/patterns.md TOC 1 has a heading
+2026-11-13T01:41:58.8899647Z   ok   - C3 references/patterns.md TOC 2 has a heading
+2026-11-13T01:41:58.8911615Z   ok   - C3 references/patterns.md TOC 3 has a heading
+2026-11-13T01:41:58.8926177Z   ok   - C5 references/crew.md has: NEVER a GO signal
+2026-11-13T01:41:58.8939411Z   ok   - C5 references/crew.md has: work-plan.md
+2026-11-13T01:41:58.8952670Z   ok   - C5 references/crew.md has: No `isolation: worktree`
+2026-11-13T01:41:58.8965949Z   ok   - C5 references/crew.md has: Do not invent new loop-log keys
+2026-11-13T01:41:58.8978671Z   ok   - C5 references/gate.md has: never WRITE `.goal/`
+2026-11-13T01:41:58.8991204Z   ok   - C5 references/crew.md has: INLINED
+2026-11-13T01:41:58.9004634Z   ok   - C5 SKILL.md has: 禁止
+2026-11-13T01:41:58.9017045Z   ok   - C5 SKILL.md has: worktree
+2026-11-13T01:41:58.9029796Z   ok   - C5 references/gate.md has: R9
+2026-11-13T01:41:58.9042853Z   ok   - C5 references/gate.md has: R10
+2026-11-13T01:41:58.9055336Z   ok   - C5 references/gate.md has: R11
+2026-11-13T01:41:58.9068052Z   ok   - C5 references/gate.md has: probe:
+2026-11-13T01:41:58.9080570Z   ok   - C5 references/gate.md has: R12
+2026-11-13T01:41:58.9092821Z   ok   - C5 SKILL.md has: goal_audit.sh
+2026-11-13T01:41:58.9106225Z   ok   - C5 references/crew.md has: calibration anchors
+2026-11-13T01:41:58.9119479Z   ok   - C5 SKILL.md has: 指标批评席
+2026-11-13T01:41:58.9132008Z   ok   - C5 references/gate.md has: R13
+2026-11-13T01:41:58.9146167Z   ok   - C5 references/gate.md has: DIVERGENCE
+2026-11-13T01:41:58.9159350Z   ok   - C5 scripts/goal_gate.sh has: DIVERGENCE
+2026-11-13T01:41:58.9172458Z   ok   - C5 scripts/goal_ctl.sh has: judge-score
+2026-11-13T01:41:58.9185620Z   ok   - C5 scripts/goal_gate.sh has: probe-failed
+2026-11-13T01:41:58.9198676Z   ok   - C5 scripts/goal_gate.sh has: score-regressed
+2026-11-13T01:41:58.9212813Z   ok   - C5 scripts/goal_gate.sh has: missing-strategy-delta
+2026-11-13T01:41:58.9226365Z   ok   - C5 scripts/goal_ctl.sh has: strategy-delta
+2026-11-13T01:41:58.9240090Z   ok   - C5 scripts/goal_parse.sh has: (exit|objective|horizon-waived):
+2026-11-13T01:41:58.9253308Z   ok   - C5 scripts/goal_ctl.sh has: gp_ac_body_hash
+2026-11-13T01:41:58.9266835Z   ok   - C5 scripts/goal_gate.sh has: gp_ac_body_hash
+2026-11-13T01:41:58.9280577Z   ok   - C5 scripts/goal_ctl.sh has: gp_hash_std
+2026-11-13T01:41:58.9293603Z   ok   - C5 SKILL.md has: minimize
+2026-11-13T01:41:58.9306999Z   ok   - C5 references/gate.md has: low-water for minimize
+2026-11-13T01:41:58.9320411Z   ok   - C5 scripts/goal_parse.sh has: minimize)  echo "minimize"
+2026-11-13T01:41:58.9333440Z   ok   - C5 scripts/goal_gate.sh has: dir=minimize
+2026-11-13T01:41:58.9347186Z   ok   - C5 scripts/goal_ctl.sh has: obj_dir
+2026-11-13T01:41:58.9360102Z   ok   - C5 SKILL.md has: 盖戳时绑定
+2026-11-13T01:41:58.9373298Z   ok   - C5 scripts/goal_ctl.sh has: BIND at stamp
+2026-11-13T01:41:58.9386821Z   ok   - C5 scripts/goal_gate.sh has: hint=fix-AC
+2026-11-13T01:41:58.9399911Z   ok   - C5 scripts/goal_gate.sh has: verdict-unbound
+2026-11-13T01:41:58.9413065Z   ok   - C5 scripts/goal_gate.sh has: contract-malformed
+2026-11-13T01:41:58.9426742Z   ok   - C5 scripts/goal_ctl.sh has: false-complete-counted
+2026-11-13T01:41:58.9440195Z   ok   - C5 scripts/goal_gate.sh has: calibration-missing
+2026-11-13T01:41:58.9453172Z   ok   - C5 scripts/goal_gate.sh has: calibration-broken
+2026-11-13T01:41:58.9465890Z   ok   - C5 references/gate.md has: R15
+2026-11-13T01:41:58.9479054Z   ok   - C5 references/gate.md has: calibration-missing
+2026-11-13T01:41:58.9492309Z   ok   - C5 references/crew.md has: calibration is MANDATORY
+2026-11-13T01:41:58.9505324Z   ok   - C5 assets/goal.contract.md has: calib:
+2026-11-13T01:41:58.9517764Z   ok   - C5 SKILL.md has: calib:
+2026-11-13T01:41:58.9533101Z   ok   - C5 SKILL.md has: 小任务快车道
+2026-11-13T01:41:58.9547804Z   ok   - C5 scripts/goal_ctl.sh has: CTL: NEXT
+2026-11-13T01:41:58.9562460Z   ok   - C5 scripts/goal_ctl.sh has: last_hint=
+2026-11-13T01:41:58.9575954Z   ok   - C5 references/gate.md has: crew:1]
+2026-11-13T01:41:58.9589815Z   ok   - C5 scripts/goal_ctl.sh has: bad-task:
+2026-11-13T01:41:58.9603164Z   ok   - C5 scripts/goal_gate.sh has: check-mutated-ledger
+2026-11-13T01:41:58.9616120Z   ok   - C5 scripts/goal_gate.sh has: ledger_digest
+2026-11-13T01:41:58.9629224Z   ok   - C5 scripts/goal_gate.sh has: unknown-ac-id
+2026-11-13T01:41:58.9641862Z   ok   - C5 scripts/goal_gate.sh has: duplicate AC id
+2026-11-13T01:41:58.9655054Z   ok   - C5 scripts/goal_gate.sh has: unparseable-state:
+2026-11-13T01:41:58.9667571Z   ok   - C5 scripts/goal_ctl.sh has: never produce a score
+2026-11-13T01:41:58.9680373Z   ok   - C5 scripts/goal_ctl.sh has: stamp-refused: goal.md has no
+2026-11-13T01:41:58.9693265Z   ok   - C5 scripts/goal_ctl.sh has: false-complete-flag-ignored
+2026-11-13T01:41:58.9706316Z   ok   - C5 references/gate.md has: check-mutated-ledger
+2026-11-13T01:41:58.9719156Z   ok   - C5 references/gate.md has: NEGATIVE water marks
+2026-11-13T01:41:58.9732532Z   ok   - C5 scripts/goal_gate.sh has: metric-flat
+2026-11-13T01:41:58.9746364Z   ok   - C5 scripts/goal_gate.sh has: extract_metric
+2026-11-13T01:41:58.9759757Z   ok   - C5 scripts/goal_gate.sh has: strip_ansi
+2026-11-13T01:41:58.9772928Z   ok   - C5 scripts/goal_gate.sh has: tolerance
+2026-11-13T01:41:58.9786388Z   ok   - C5 references/gate.md has: R14
+2026-11-13T01:41:58.9799040Z   ok   - C5 SKILL.md has: hint=
+2026-11-13T01:41:58.9811797Z   ok   - C5 SKILL.md has: bind-seat
+2026-11-13T01:41:58.9825101Z   ok   - C5 scripts/goal_gate.sh has: graceful delivery of passing work
+2026-11-13T01:41:58.9838116Z   ok   - C5 SKILL.md has: 不没收已通过的交付
+2026-11-13T01:41:58.9850286Z   ok   - C5 references/gate.md has: strategy=<label>
+2026-11-13T01:41:58.9863535Z   ok   - C5 references/gate.md has: peer-notes
+2026-11-13T01:41:58.9876128Z   ok   - C5 references/crew.md has: peer-notes
+2026-11-13T01:41:58.9888742Z   ok   - C5 references/patterns.md has: complex-goal contract shapes
+2026-11-13T01:41:58.9901285Z   ok   - C5 SKILL.md has: --strategy
+2026-11-13T01:41:58.9913492Z   ok   - C5 SKILL.md has: peer-notes
+2026-11-13T01:41:58.9926474Z   ok   - C5 SKILL.md has: EFFICIENCY
+2026-11-13T01:41:58.9939276Z   ok   - C5 scripts/goal_ctl.sh has: --strategy
+2026-11-13T01:41:58.9952321Z   ok   - C5 scripts/goal_ctl.sh has: strat_show
+2026-11-13T01:41:58.9964823Z   ok   - C5 scripts/goal_ctl.sh has: CTL: EFFICIENCY
+2026-11-13T01:41:58.9977246Z   ok   - C5 scripts/goal_ctl.sh has: eval-gap:
+2026-11-13T01:41:58.9990210Z   ok   - C5 scripts/goal_ctl.sh has: promote:
+2026-11-13T01:41:59.0003212Z   ok   - C5 scripts/goal_ctl.sh has: attribution-unused:
+2026-11-13T01:41:59.0016147Z   ok   - C5 scripts/goal_audit.sh has: recovery-vocabulary
+2026-11-13T01:41:59.0029389Z   ok   - C5 scripts/goal_parse.sh has: stall-recovered
+2026-11-13T01:41:59.0043717Z   ok   - C5 references/crew.md has: stall-recovered
+2026-11-13T01:41:59.0056619Z   ok   - C5 references/crew.md has: tool-error-fixed
+2026-11-13T01:41:59.0069001Z   ok   - C5 references/crew.md has: re-run:stall
+2026-11-13T01:41:59.0081630Z   ok   - C5 references/crew.md has: `[ ]` (OPEN)
+2026-11-13T01:41:59.0094131Z   ok   - C5 references/crew.md has: fallback:provider-fatal
+2026-11-13T01:41:59.0106932Z   ok   - C5 scripts/goal_audit.sh has: fallback-vocabulary
+2026-11-13T01:41:59.0119508Z   ok   - C5 SKILL.md has: --fault
+2026-11-13T01:41:59.0132110Z   ok   - C5 references/crew.md has: breakpoint brief
+2026-11-13T01:41:59.0145845Z   ok   - C5 references/crew.md has: take-over
+2026-11-13T01:41:59.0158589Z   ok   - C5 references/crew.md has: faults.rec
+2026-11-13T01:41:59.0171012Z   ok   - C5 references/crew.md has: open-items
+2026-11-13T01:41:59.0183428Z   ok   - C5 references/gate.md has: faults.rec
+2026-11-13T01:41:59.0198377Z   ok   - C5 references/gate.md has: open-items
+2026-11-13T01:41:59.0211350Z   ok   - C5 scripts/goal_ctl.sh has: CTL: FAULT
+2026-11-13T01:41:59.0224831Z   ok   - C5 scripts/goal_ctl.sh has: bad-fault-class
+2026-11-13T01:41:59.0238199Z   ok   - C5 scripts/goal_ctl.sh has: unbacked-task-suffix
+2026-11-13T01:41:59.0251009Z   ok   - C5 scripts/goal_audit.sh has: unbacked-suffix
+2026-11-13T01:41:59.0263598Z   ok   - C5 scripts/goal_audit.sh has: unbooked-fault
+2026-11-13T01:41:59.0276515Z   ok   - C5 scripts/goal_gate.sh has: open-items
+2026-11-13T01:41:59.0290266Z   ok   - C5 scripts/goal_gate.sh has: close-open-item
+2026-11-13T01:41:59.0302604Z   ok   - C5 scripts/goal_parse.sh has: gp_fault_suffix
+2026-11-13T01:41:59.0315310Z   ok   - C5 examples/quickstart-one-shot/run.sh has: --adversarial clear
+2026-11-13T01:41:59.0349550Z   ok   - C6 no case knowledge leaked into generic skill files
+2026-11-13T01:41:59.0360747Z   ok   - C7 SKILL has invariant GATE
+2026-11-13T01:41:59.0372771Z   ok   - C7 SKILL has invariant BIND
+2026-11-13T01:41:59.0384395Z   ok   - C7 SKILL has invariant PROVE
+2026-11-13T01:41:59.0395829Z   ok   - C7 SKILL has invariant GRADIENT
+2026-11-13T01:41:59.0407577Z   ok   - C7 SKILL has invariant FENCE
+2026-11-13T01:41:59.0419352Z   ok   - C7 SKILL.md free of R-numbers
+2026-11-13T01:41:59.0419740Z   ok   - C7 pack exists: instrument.md
+2026-11-13T01:41:59.0420099Z   ok   - C7 pack exists: gradient.md
+2026-11-13T01:41:59.0420477Z   ok   - C7 pack exists: external.md
+2026-11-13T01:41:59.0431885Z   ok   - C7 gate.md maps GATE
+2026-11-13T01:41:59.0443486Z   ok   - C7 gate.md maps BIND
+2026-11-13T01:41:59.0455018Z   ok   - C7 gate.md maps PROVE
+2026-11-13T01:41:59.0466206Z   ok   - C7 gate.md maps GRADIENT
+2026-11-13T01:41:59.0477477Z   ok   - C7 gate.md maps FENCE
+2026-11-13T01:41:59.0489091Z   ok   - C7 legacy R1 retained
+2026-11-13T01:41:59.0500237Z   ok   - C7 legacy R2 retained
+2026-11-13T01:41:59.0511825Z   ok   - C7 legacy R3 retained
+2026-11-13T01:41:59.0522978Z   ok   - C7 legacy R4 retained
+2026-11-13T01:41:59.0534659Z   ok   - C7 legacy R5 retained
+2026-11-13T01:41:59.0546271Z   ok   - C7 legacy R6 retained
+2026-11-13T01:41:59.0557518Z   ok   - C7 legacy R7 retained
+2026-11-13T01:41:59.0569189Z   ok   - C7 legacy R8 retained
+2026-11-13T01:41:59.0580397Z   ok   - C7 legacy R9 retained
+2026-11-13T01:41:59.0592133Z   ok   - C7 legacy R10 retained
+2026-11-13T01:41:59.0603303Z   ok   - C7 legacy R11 retained
+2026-11-13T01:41:59.0614972Z   ok   - C7 legacy R12 retained
+2026-11-13T01:41:59.0626493Z   ok   - C7 legacy R13 retained
+2026-11-13T01:41:59.0637909Z   ok   - C7 legacy R14 retained
+2026-11-13T01:41:59.0649495Z   ok   - C7 legacy R15 retained
+2026-11-13T01:41:59.0660803Z   ok   - C7 legacy R16 retained
+2026-11-13T01:41:59.0671944Z   ok   - C7 legacy R17 retained
+2026-11-13T01:41:59.0683728Z   ok   - C7 legacy R18 retained
+2026-11-13T01:41:59.0695050Z   ok   - C7 legacy R19 retained
+2026-11-13T01:41:59.0706933Z   ok   - C7 SKILL activates pack instrument.md
+2026-11-13T01:41:59.0719423Z   ok   - C7 SKILL activates pack gradient.md
+2026-11-13T01:41:59.0731070Z   ok   - C7 SKILL activates pack external.md
+2026-11-13T01:41:59.0736612Z == docs consistency: CONSISTENT ==
+2026-11-13T01:41:59.0771437Z ##[group]Run bash tests/run_tests.sh
+2026-11-13T01:41:59.0771709Z [36;1mbash tests/run_tests.sh[0m
+2026-11-13T01:41:59.0816748Z shell: /usr/bin/bash -e {0}
+2026-11-13T01:41:59.0816970Z ##[endgroup]
+2026-11-13T01:45:39.7484110Z run_tests: isolated finite-settlement cluster=30
+2026-11-13T01:45:42.3349522Z run_tests: isolated finite-settlement cluster=78
+2026-11-13T01:45:45.4571472Z   ok   - 01 help exits 0 (rc=0)
+2026-11-13T01:45:45.4571848Z   ok   - 01 help mentions --verify
+2026-11-13T01:45:45.4572206Z   ok   - 09 contract-tampered -> rc2 (rc=2)
+2026-11-13T01:45:45.4572554Z   ok   - 17a forge close w/o --dry -> rc4 (rc=4)
+2026-11-13T01:45:45.4572945Z   ok   - 17a refusal leaves no orphan loop-log block
+2026-11-13T01:45:45.4573293Z   ok   - 24 exit=1 negative GO -> rc0 (rc=0)
+2026-11-13T01:45:45.4573619Z   ok   - 24 --verify PASS on rc match
+2026-11-13T01:45:45.4574143Z   ok   - 33 shellcheck clean
+2026-11-13T01:45:45.4574446Z   ok   - 43 abs stamp ok without baseline (rc=0)
+2026-11-13T01:45:45.4574843Z   ok   - 43 abs forge GO (rc=0)
+2026-11-13T01:45:45.4575121Z   ok   - 57 tampered objective -> rc2 (rc=2)
+2026-11-13T01:45:45.4575423Z   ok   - 57 reason contract-tampered
+2026-11-13T01:45:45.4575725Z   ok   - 65d provider-fatal suffix clean (rc=0)
+2026-11-13T01:45:45.4576025Z   ok   - 65d clean
+2026-11-13T01:45:45.4576457Z   ok   - 70b minimize GO at improved score 3 (rc=0)
+2026-11-13T01:45:45.4576806Z   ok   - 78 metric regex extracts through ANSI
+2026-11-13T01:45:45.4577160Z   ok   - 78b regex miss -> BROKEN named
+2026-11-13T01:45:45.4577492Z   ok   - 86 verify unknown id -> rc4 (rc=4)
+2026-11-13T01:45:45.4577775Z   ok   - 86 unknown id named
+2026-11-13T01:45:45.4577986Z   ok   - 87 alpha numeric-key -> rc4 (rc=4)
+2026-11-13T01:45:45.4578203Z   ok   - 87 offending key named
+2026-11-13T01:45:45.4578418Z   ok   - 93a no-progress alone refused (R10) (rc=4)
+2026-11-13T01:45:45.4578685Z   ok   - 93b no-progress+delta -> HALF_OPEN
+2026-11-13T01:45:45.4578941Z   ok   - 93c HALF_OPEN claim w/o strategy -> rc2 (rc=2)
+2026-11-13T01:45:45.4579182Z   ok   - 93c R10 duty named
+2026-11-13T01:45:45.4579386Z   ok   - 93d progress reset + claim GO (rc=0)
+2026-11-13T01:45:45.4579628Z   ok   - 93d breaker back CLOSED
+2026-11-13T01:45:45.4579840Z   ok   - 93e streak 3>2 -> OPEN
+2026-11-13T01:45:45.4580060Z   ok   - 93f claim at OPEN -> rc3 (rc=3)
+2026-11-13T01:45:45.4580280Z   ok   - 93f breaker-open named
+2026-11-13T01:45:45.4580487Z   ok   - 105a bare T1 normalizes to crew:1
+2026-11-13T01:45:45.4580737Z   ok   - 105b free-form task -> write refused (rc=4)
+2026-11-13T01:45:45.4580977Z   ok   - 105b names the task schema
+2026-11-13T01:45:45.4581187Z   ok   - 105c junk task kept out of ledger
+2026-11-13T01:45:45.4581401Z   ok   - 109b default strategy none
+2026-11-13T01:45:45.4581610Z   ok   - 109e legacy block status rc0 (rc=0)
+2026-11-13T01:45:45.4581844Z   ok   - 109e attribution-unused fires
+2026-11-13T01:45:45.4582077Z   ok   - 110b unmeasured window
+2026-11-13T01:45:45.4582296Z   ok   - 110b numeric window still slopes
+2026-11-13T01:45:45.4582515Z   ok   - 110g flat prune
+2026-11-13T01:45:45.4582697Z   ok   - 111b forge stall fires
+2026-11-13T01:45:45.4582892Z   ok   - 115c NEXT routes fix-AC
+2026-11-13T01:45:45.4583094Z   ok   - 115c NEXT sentence present
+2026-11-13T01:45:45.4583309Z   ok   - 117c rc75 -> deferred rc2 (rc=2)
+2026-11-13T01:45:45.4583516Z   ok   - 117c deferred routing
+2026-11-13T01:45:45.4583707Z   ok   - 117c wait hint
+2026-11-13T01:45:45.4583905Z   ok   - 120a legacy rows parse, claim GO (rc=0)
+2026-11-13T01:45:45.4584380Z   ok   - 120b status survives mixed-field ledger
+2026-11-13T01:45:45.4584615Z   ok   - 123c invented suffix fails A1/A3 (rc=1)
+2026-11-13T01:45:45.4584848Z   ok   - 123c rejected at schema/vocab gate
+2026-11-13T01:45:45.4585067Z   ok   - 126b prune-only pick
+2026-11-13T01:45:45.4585289Z   ok   - 126h gradient documents STRATEGY-PICK
+2026-11-13T01:45:45.4585841Z   ok   - 126h crew briefs cite STRATEGY-PICK
+2026-11-13T01:45:45.4586383Z   ok   - 130a claim without adversarial is NO-GO (rc=2)
+2026-11-13T01:45:45.4586721Z   ok   - 130a reason adversarial-missing
+2026-11-13T01:45:45.4586973Z   ok   - 130a GO with bound adversarial receipt (rc=0)
+2026-11-13T01:45:45.4587209Z   ok   - 130a GO line
+2026-11-13T01:45:45.4587417Z   ok   - 133b first close without --score refused (rc=4)
+2026-11-13T01:45:45.4587667Z   ok   - 133b names missing-score
+2026-11-13T01:45:45.4587890Z   ok   - 133b first close with --score ok (rc=0)
+2026-11-13T01:45:45.4588140Z   ok   - 134d open item missing files allowed (rc=0)
+2026-11-13T01:45:45.4588387Z   ok   - 135e unbooked fault fails audit (rc=1)
+2026-11-13T01:45:45.4588607Z   ok   - 135e names A11
+2026-11-13T01:45:45.4588809Z   ok   - 140 dirty tracked bytes change digest
+2026-11-13T01:45:45.4589048Z   ok   - 140 untracked nested bytes change digest
+2026-11-13T01:45:45.4589291Z   ok   - 140 symlink target changes digest
+2026-11-13T01:45:45.4589533Z   ok   - 140 executable mode changes digest
+2026-11-13T01:45:45.4589782Z   ok   - 140 verify refuses dirty-file mutation (rc=2)
+2026-11-13T01:45:45.4590024Z   ok   - 140 names mutation
+2026-11-13T01:45:45.4590227Z   ok   - 140 Git candidate claims GO (rc=0)
+2026-11-13T01:45:45.4590461Z   ok   - 140 dirty edit stales prior claim (rc=2)
+2026-11-13T01:45:45.4590693Z   ok   - 140 stale claim named
+2026-11-13T01:45:45.4591099Z   ok   - 156 tracked entry under symlink parent refuses digest (rc=4)
+2026-11-13T01:45:45.4591575Z   ok   - 156 shell fallback refuses symlink parent (rc=4)
+2026-11-13T01:45:45.4592054Z   ok   - 161 inflated dry count without recorded rounds refuses GO (rc=2)
+2026-11-13T01:45:45.4592508Z   ok   - 161 missing executed coverage named
+2026-11-13T01:45:45.4592847Z == results: pass=76 fail=0 ==
+2026-11-13T01:45:45.4643738Z   ok   - 02 no-goal-dir -> rc4 (rc=4)
+2026-11-13T01:45:45.4644301Z   ok   - 10 metric FAIL -> rc2 (rc=2)
+2026-11-13T01:45:45.4644664Z   ok   - 10 reason open-FAIL w/ gate rerun
+2026-11-13T01:45:45.4645073Z   ok   - 16 prose->judged GO -> rc0 (rc=0)
+2026-11-13T01:45:45.4645461Z   ok   - 23a exit flip after stamp -> rc2 (rc=2)
+2026-11-13T01:45:45.4645843Z   ok   - 23a reason contract-tampered
+2026-11-13T01:45:45.4646206Z   ok   - 23b exit line smuggled -> rc2 (rc=2)
+2026-11-13T01:45:45.4646549Z   ok   - 23b reason contract-tampered
+2026-11-13T01:45:45.4646771Z   ok   - 38 hook rc3 state allows stop (rc=0)
+2026-11-13T01:45:45.4647043Z   ok   - 46 status prints iteration line
+2026-11-13T01:45:45.4647272Z   ok   - 46 status prints last block
+2026-11-13T01:45:45.4647490Z   ok   - 46 status prints next task
+2026-11-13T01:45:45.4647705Z   ok   - 58 strategy_delta single line
+2026-11-13T01:45:45.4647916Z   ok   - 58 loop-log block intact
+2026-11-13T01:45:45.4648161Z   ok   - 60 status best_score
+2026-11-13T01:45:45.4648432Z   ok   - 71 minimize divergence -> rc2 (rc=2)
+2026-11-13T01:45:45.4648737Z   ok   - 71 DIVERGENCE token
+2026-11-13T01:45:45.4648949Z   ok   - 71 dir named
+2026-11-13T01:45:45.4649159Z   ok   - 84b artifact with spaces -> GO (rc=0)
+2026-11-13T01:45:45.4649405Z   ok   - 88 negative score extracted with sign
+2026-11-13T01:45:45.4649632Z   ok   - 88 negative band holds -> GO (rc=0)
+2026-11-13T01:45:45.4649861Z   ok   - 96a claim at dry=limit (3>=3) GO (rc=0)
+2026-11-13T01:45:45.4650083Z   ok   - 96a forge GO line
+2026-11-13T01:45:45.4650276Z   ok   - 96a dry_streak reached limit
+2026-11-13T01:45:45.4650516Z   ok   - 96b premature forge claim (dry 2<3) rc2 (rc=2)
+2026-11-13T01:45:45.4650752Z   ok   - 96b not-dry named
+2026-11-13T01:45:45.4650938Z   ok   - 96b counted by ratchet
+2026-11-13T01:45:45.4651138Z   ok   - 104a init seeds contract (rc=0)
+2026-11-13T01:45:45.4651369Z   ok   - 104a goal.md seeded from template
+2026-11-13T01:45:45.4651588Z   ok   - 104a re-init -> rc2 (rc=2)
+2026-11-13T01:45:45.4651792Z   ok   - 104a re-init points at R3
+2026-11-13T01:45:45.4652020Z   ok   - 104b unclaimed -> iterations-exhausted (rc=3)
+2026-11-13T01:45:45.4652280Z   ok   - 104b loops without API (dry-run plan line)
+2026-11-13T01:45:45.4652781Z   ok   - 104b fuse reason
+2026-11-13T01:45:45.4653244Z   ok   - 104c claim verified -> DELIVERED (rc=0)
+2026-11-13T01:45:45.4653589Z   ok   - 104c delivery line
+2026-11-13T01:45:45.4653905Z   ok   - 104d continue without contract -> rc4 (rc=4)
+2026-11-13T01:45:45.4654397Z   ok   - 110i negative slope shown
+2026-11-13T01:45:45.4654729Z   ok   - 110i beyond tight band is regression
+2026-11-13T01:45:45.4655118Z   ok   - 114a gate still GO with peer-note present (rc=0)
+2026-11-13T01:45:45.4655523Z   ok   - 114a tree digest blind to peer-notes
+2026-11-13T01:45:45.4655858Z   ok   - 114a rc stable across peer-note
+2026-11-13T01:45:45.4656190Z   ok   - 114c gate.md documents peer-notes
+2026-11-13T01:45:45.4656541Z   ok   - 114c crew.md documents peer-notes
+2026-11-13T01:45:45.4656885Z   ok   - 114c R6 never-WRITE clause intact
+2026-11-13T01:45:45.4657209Z   ok   - 114d docs consistency green (rc=0)
+2026-11-13T01:45:45.4657554Z   ok   - 114e patterns C3 for section 12
+2026-11-13T01:45:45.4657909Z   ok   - 118a drift inside z-band -> GO (rc=0)
+2026-11-13T01:45:45.4658299Z   ok   - 118b drift beyond z-band -> rc2 (rc=2)
+2026-11-13T01:45:45.4658772Z   ok   - 118b band source named
+2026-11-13T01:45:45.4659069Z   ok   - 118c silent sd -> BROKEN
+2026-11-13T01:45:45.4659393Z   ok   - 127a status rc0 without goal.md (rc=0)
+2026-11-13T01:45:45.4659906Z   ok   - 127a STEP says fill contract
+2026-11-13T01:45:45.4660251Z   ok   - 127a parse silent on missing goal.md
+2026-11-13T01:45:45.4660594Z   ok   - 127a no goal_parse.sh traceback
+2026-11-13T01:45:45.4660928Z   ok   - 130c finding refuses claim (rc=2)
+2026-11-13T01:45:45.4661275Z   ok   - 130c reason adversarial-finding
+2026-11-13T01:45:45.4661596Z   ok   - 130c clear receipt GO (rc=0)
+2026-11-13T01:45:45.4661962Z   ok   - 133c audit fails on ticked-but-unbooked (rc=1)
+2026-11-13T01:45:45.4662326Z   ok   - 133c A9 named
+2026-11-13T01:45:45.4662607Z   ok   - 133f audit clean after close (rc=0)
+2026-11-13T01:45:45.4662975Z   ok   - 135b unbacked suffix refused (rc=4)
+2026-11-13T01:45:45.4663324Z   ok   - 135b names unbacked-task-suffix
+2026-11-13T01:45:45.4663699Z   ok   - 137a check-only preserves gate rc (rc=2)
+2026-11-13T01:45:45.4664236Z   ok   - 137a check-only preserves foreign lock
+2026-11-13T01:45:45.4664584Z   ok   - 137b live owner refused (rc=4)
+2026-11-13T01:45:45.4664917Z   ok   - 137b refusal preserves foreign lock
+2026-11-13T01:45:45.4665273Z   ok   - 137c normal exhausted run rc intact (rc=3)
+2026-11-13T01:45:45.4665636Z   ok   - 137c executor runs at project root
+2026-11-13T01:45:45.4665965Z   ok   - 137c owned lock cleaned
+2026-11-13T01:45:45.4666329Z   ok   - 149 finding cannot be replaced by note injection (rc=2)
+2026-11-13T01:45:45.4666735Z   ok   - 149 gate reports real finding
+2026-11-13T01:45:45.4667054Z   ok   - 149 receipt remains one record
+2026-11-13T01:45:45.4667429Z   ok   - 153 vanished untracked file refuses digest (rc=4)
+2026-11-13T01:45:45.4667851Z   ok   - 159 deadline mutation refuses verification (rc=2)
+2026-11-13T01:45:45.4668258Z   ok   - 159 deadline mutation names ledger guard
+2026-11-13T01:45:45.4668654Z   ok   - 159 clock mutation refuses verification (rc=2)
+2026-11-13T01:45:45.4669036Z   ok   - 159 clock mutation names ledger guard
+2026-11-13T01:45:45.4669375Z == results: pass=78 fail=0 ==
+2026-11-13T01:45:45.4708053Z   ok   - 03 threshold GO deterministic (rc=0)
+2026-11-13T01:45:45.4708518Z   ok   - 03 GO line says mode=threshold
+2026-11-13T01:45:45.4708874Z   ok   - 15 budget-fuse -> rc3 (rc=3)
+2026-11-13T01:45:45.4709206Z   ok   - 15 reason budget-fuse
+2026-11-13T01:45:45.4709508Z   ok   - 22 state seeds dry_streak
+2026-11-13T01:45:45.4709868Z   ok   - 22 state seeds dry_limit
+2026-11-13T01:45:45.4710193Z   ok   - 22 state seeds check_timeout
+2026-11-13T01:45:45.4710522Z   ok   - 31a cache hit replays metric 42
+2026-11-13T01:45:45.4710871Z   ok   - 31b command ran once for unchanged input
+2026-11-13T01:45:45.4711121Z   ok   - 31c stdout archived under .goal/evidence
+2026-11-13T01:45:45.4711642Z   ok   - 31d rerun after input change
+2026-11-13T01:45:45.4711993Z   ok   - 47 status echoes crew wave marker
+2026-11-13T01:45:45.4712225Z   ok   - 47b teams marker refused (rc=4)
+2026-11-13T01:45:45.4712482Z   ok   - 47b names bad-task
+2026-11-13T01:45:45.4712708Z   ok   - 61 mismatch noted
+2026-11-13T01:45:45.4712959Z   ok   - 61 measured score recorded
+2026-11-13T01:45:45.4713219Z   ok   - 61 best_score from measurement
+2026-11-13T01:45:45.4713434Z   ok   - 72 minimize agree -> GO (rc=0)
+2026-11-13T01:45:45.4713634Z   ok   - 72 no DIVERGENCE
+2026-11-13T01:45:45.4713823Z   ok   - 83 catch1 auto-counted
+2026-11-13T01:45:45.4714250Z   ok   - 83 catch2 auto-counted
+2026-11-13T01:45:45.4714464Z   ok   - 83 third claim frozen -> rc3 (rc=3)
+2026-11-13T01:45:45.4714696Z   ok   - 83 state holds count
+2026-11-13T01:45:45.4714933Z   ok   - 94 two same error_signature -> rc3 (rc=3)
+2026-11-13T01:45:45.4715168Z   ok   - 94 grind detector named
+2026-11-13T01:45:45.4715381Z   ok   - 94b none signatures never trip (rc=0)
+2026-11-13T01:45:45.4715676Z   ok   - 101a calib on non-judged AC -> stamp refused (rc=2)
+2026-11-13T01:45:45.4715928Z   ok   - 101a reason named
+2026-11-13T01:45:45.4716145Z   ok   - 101b missing bad fixture -> stamp refused (rc=2)
+2026-11-13T01:45:45.4716388Z   ok   - 101b names the fixture
+2026-11-13T01:45:45.4716612Z   ok   - 101c one-sided calib -> stamp refused (rc=2)
+2026-11-13T01:45:45.4716847Z   ok   - 101c needs both
+2026-11-13T01:45:45.4717059Z   ok   - 101d one ruler both ends -> stamp refused (rc=2)
+2026-11-13T01:45:45.4717319Z   ok   - 101d names the single-ruler problem
+2026-11-13T01:45:45.4717552Z   ok   - 110e minimize direction exploit
+2026-11-13T01:45:45.4717769Z   ok   - 111c orphan row rc0 (rc=0)
+2026-11-13T01:45:45.4718109Z   ok   - 111c no pair from orphan rows
+2026-11-13T01:45:45.4718443Z   ok   - 115d empty-score status rc0 (rc=0)
+2026-11-13T01:45:45.4718776Z   ok   - 115d score-data none
+2026-11-13T01:45:45.4719083Z   ok   - 115g advisory order deterministic
+2026-11-13T01:45:45.4719424Z   ok   - 115g promote present too
+2026-11-13T01:45:45.4719784Z   ok   - 119a objective unlabeled wave refused (rc=4)
+2026-11-13T01:45:45.4720163Z   ok   - 119a names the strategy duty
+2026-11-13T01:45:45.4720526Z   ok   - 119b scores.rec carries the strategy column
+2026-11-13T01:45:45.4720854Z   ok   - 126c exploit-only pick
+2026-11-13T01:45:45.4721150Z   ok   - 128b deadline not rebased
+2026-11-13T01:45:45.4721463Z   ok   - 128b deadline still 1
+2026-11-13T01:45:45.4721770Z   ok   - 131b builtin check still GO (rc=0)
+2026-11-13T01:45:45.4722104Z   ok   - 133a pre-reg seeded at stamp
+2026-11-13T01:45:45.4722418Z   ok   - 133a has kill lines
+2026-11-13T01:45:45.4722714Z   ok   - 133a has strategy slot
+2026-11-13T01:45:45.4723031Z   ok   - 133e NEXT forces close-iteration
+2026-11-13T01:45:45.4723409Z   ok   - 133e not soft-claim NEXT
+2026-11-13T01:45:45.4723790Z   ok   - 134e no soft claim NEXT
+2026-11-13T01:45:45.4724255Z   ok   - 134e routes close or degrade
+2026-11-13T01:45:45.4724593Z   ok   - 135f open item blocks the claim (rc=2)
+2026-11-13T01:45:45.4724941Z   ok   - 135f names open-items
+2026-11-13T01:45:45.4725244Z   ok   - 135f routes to close-open-item
+2026-11-13T01:45:45.4725595Z   ok   - 142 symlink target changes non-Git digest
+2026-11-13T01:45:45.4725957Z   ok   - 142 mode changes non-Git digest
+2026-11-13T01:45:45.4726304Z   ok   - 142 newline path remains content-bound
+2026-11-13T01:45:45.4726683Z   ok   - 142 option-like path remains content-bound
+2026-11-13T01:45:45.4727083Z   ok   - 150 strategy-pipe rejected before mutation
+2026-11-13T01:45:45.4727500Z   ok   - 150 signature-newline rejected before mutation
+2026-11-13T01:45:45.4727909Z   ok   - 150 files-newline rejected before mutation
+2026-11-13T01:45:45.4728303Z   ok   - 150 delta-blank rejected before mutation
+2026-11-13T01:45:45.4728676Z   ok   - 150 delta-none rejected before mutation
+2026-11-13T01:45:45.4729103Z   ok   - 150 whitespace objective label rejected before measurement
+2026-11-13T01:45:45.4729814Z   ok   - 150 multiword objective label rejected before measurement
+2026-11-13T01:45:45.4730377Z == results: pass=69 fail=0 ==
+2026-11-13T01:45:45.4771736Z   ok   - 04 not-claimed -> rc2 (rc=2)
+2026-11-13T01:45:45.4772152Z   ok   - 11a check-broken rc127 -> rc2 (rc=2)
+2026-11-13T01:45:45.4772522Z   ok   - 11a reason check-broken
+2026-11-13T01:45:45.4772857Z   ok   - 17b --dry yes + fail -> rc4 (rc=4)
+2026-11-13T01:45:45.4773245Z   ok   - 17b refusal leaves no orphan loop-log block
+2026-11-13T01:45:45.4773635Z   ok   - 25 exit=3 vs rc1 -> rc2 (rc=2)
+2026-11-13T01:45:45.4774146Z   ok   - 25 reason open-FAIL w/ expect
+2026-11-13T01:45:45.4774496Z   ok   - 34 hook no-goal allows stop (rc=0)
+2026-11-13T01:45:45.4774745Z   ok   - 39 hook rc4 fail-open allows stop (rc=0)
+2026-11-13T01:45:45.4774992Z   ok   - 53 maximize GO at score 7 (rc=0)
+2026-11-13T01:45:45.4775220Z   ok   - 53 GO line carries score
+2026-11-13T01:45:45.4775423Z   ok   - 53 best_score stored
+2026-11-13T01:45:45.4775635Z   ok   - 54 score-regressed -> rc2 (rc=2)
+2026-11-13T01:45:45.4775894Z   ok   - 54 reason score-regressed
+2026-11-13T01:45:45.4776164Z   ok   - 66 divergence refuses claim rc2 (rc=2)
+2026-11-13T01:45:45.4776447Z   ok   - 66 names DIVERGENCE
+2026-11-13T01:45:45.4776715Z   ok   - 67 no DIVERGENCE on same-direction
+2026-11-13T01:45:45.4776973Z   ok   - 67 no DIVERGENCE token
+2026-11-13T01:45:45.4777183Z   ok   - 68 A8 warn does not block rc0 (rc=0)
+2026-11-13T01:45:45.4777425Z   ok   - 68 A8 warns judge-score-unrecorded
+2026-11-13T01:45:45.4777640Z   ok   - 97 A8 warns (stdout)
+2026-11-13T01:45:45.4777864Z   ok   - 97 no stderr noise for missing scores.rec
+2026-11-13T01:45:45.4778146Z   ok   - 101e calib literal inside check -> stamps clean (rc=0)
+2026-11-13T01:45:45.4778423Z   ok   - 101e gate must not invent calibration
+2026-11-13T01:45:45.4778657Z   ok   - 99d empty project digest rc0 (rc=0)
+2026-11-13T01:45:45.4778881Z   ok   - 99d empty digest well-formed
+2026-11-13T01:45:45.4779094Z   ok   - 107a unstamped => step 1
+2026-11-13T01:45:45.4779301Z   ok   - 107b stamped, no work => step 2
+2026-11-13T01:45:45.4779516Z   ok   - 107c work unclaimed => step 3
+2026-11-13T01:45:45.4779759Z   ok   - 107d claimed => step 4
+2026-11-13T01:45:45.4779964Z   ok   - 109f audit clean w/ strategy (rc=0)
+2026-11-13T01:45:45.4780183Z   ok   - 109f audit says clean
+2026-11-13T01:45:45.4780381Z   ok   - 110d negative slope format
+2026-11-13T01:45:45.4780594Z   ok   - 110d negative maximize is pruned
+2026-11-13T01:45:45.4780843Z   ok   - 111a healthy loop prints no efficiency block
+2026-11-13T01:45:45.4781162Z   ok   - 115a status rc0 (rc=0)
+2026-11-13T01:45:45.4781453Z   ok   - 115a iteration line intact
+2026-11-13T01:45:45.4781752Z   ok   - 115a last block intact
+2026-11-13T01:45:45.4782036Z   ok   - 115a work-plan NEXT intact
+2026-11-13T01:45:45.4782383Z   ok   - 116a horizon-less objective -> rc2 (rc=2)
+2026-11-13T01:45:45.4782742Z   ok   - 116a refusal names horizon
+2026-11-13T01:45:45.4783061Z   ok   - 116b waived stamps -> rc0 (rc=0)
+2026-11-13T01:45:45.4783410Z   ok   - 116d waiver strip -> rc2 (rc=2)
+2026-11-13T01:45:45.4783736Z   ok   - 116d tamper named
+2026-11-13T01:45:45.4784195Z   ok   - 121b real FAIL still counted
+2026-11-13T01:45:45.4784511Z   ok   - 124c real FAIL counted
+2026-11-13T01:45:45.4784836Z   ok   - 124c2 contract-defect not counted
+2026-11-13T01:45:45.4785211Z   ok   - 124c2 ratchet stayed 0 on contract defect
+2026-11-13T01:45:45.4785614Z   ok   - 134f claim with ghost file refused (rc=4)
+2026-11-13T01:45:45.4785992Z   ok   - 134f names missing-claimed-file
+2026-11-13T01:45:45.4786341Z   ok   - 136a entry gain belongs to B
+2026-11-13T01:45:45.4786699Z   ok   - 136a entry measured as one delta
+2026-11-13T01:45:45.4787159Z   ok   - 136b no unsupported last-label preference
+2026-11-13T01:45:45.4787556Z   ok   - 136c missing measurement breaks attribution
+2026-11-13T01:45:45.4787947Z   ok   - 136d latest A supersedes historical exploit
+2026-11-13T01:45:45.4788300Z   ok   - 136d pick disjoint
+2026-11-13T01:45:45.4788620Z   ok   - 136e retry with new evidence clears old prune
+2026-11-13T01:45:45.4789346Z   ok   - 136f oscillation is not a dry plateau
+2026-11-13T01:45:45.4789897Z   ok   - 136g regression avoids strategy
+2026-11-13T01:45:45.4790263Z   ok   - 136h negative minimize entry gain
+2026-11-13T01:45:45.4790611Z   ok   - 136i orphan ignored for eval-gap
+2026-11-13T01:45:45.4790962Z   ok   - 136j ledger gap cannot earn exploit
+2026-11-13T01:45:45.4791364Z   ok   - 136k spread declaration suppresses false confidence
+2026-11-13T01:45:45.4791771Z   ok   - 136k missing spread identified
+2026-11-13T01:45:45.4792101Z == results: pass=64 fail=0 ==
+2026-11-13T01:45:45.4836862Z   ok   - 05 stale -> rc2 (rc=2)
+2026-11-13T01:45:45.4837290Z   ok   - 05 reason verdicts-stale
+2026-11-13T01:45:45.4837634Z   ok   - 13 forge not-dry -> rc2 (rc=2)
+2026-11-13T01:45:45.4837971Z   ok   - 13 reason not-dry
+2026-11-13T01:45:45.4838259Z   ok   - 14 forge GO -> rc0 (rc=0)
+2026-11-13T01:45:45.4838586Z   ok   - 14 GO line says mode=forge
+2026-11-13T01:45:45.4838954Z   ok   - 30 close preserves time_budget
+2026-11-13T01:45:45.4839273Z   ok   - 30 close preserves deadline
+2026-11-13T01:45:45.4839603Z   ok   - 35 hook claimed+GO allows stop (rc=0)
+2026-11-13T01:45:45.4839876Z   ok   - 40 stamp without baseline refused rc2 (rc=2)
+2026-11-13T01:45:45.4840120Z   ok   - 40 goal.md left unstamped
+2026-11-13T01:45:45.4840339Z   ok   - 41 stamp with baseline ok (rc=0)
+2026-11-13T01:45:45.4840574Z   ok   - 41 forge GO with baseline satisfied (rc=0)
+2026-11-13T01:45:45.4840815Z   ok   - 59 bad-score refused (rc=4)
+2026-11-13T01:45:45.4841045Z   ok   - 65c removed teams fallback token rc1 (rc=1)
+2026-11-13T01:45:45.4841328Z   ok   - 65c names fallback-vocabulary
+2026-11-13T01:45:45.4841640Z   ok   - 69 minimize classified deterministic
+2026-11-13T01:45:45.4841915Z   ok   - 69 not judged
+2026-11-13T01:45:45.4842124Z   ok   - 69 minimize GO at score 7 (rc=0)
+2026-11-13T01:45:45.4842345Z   ok   - 69 best_score stored
+2026-11-13T01:45:45.4842595Z   ok   - 70 score-regressed (minimize 7>5) -> rc2 (rc=2)
+2026-11-13T01:45:45.4842858Z   ok   - 70 reason score-regressed
+2026-11-13T01:45:45.4843080Z   ok   - 70 direction named
+2026-11-13T01:45:45.4843278Z   ok   - 79 noise-band holds -> GO (rc=0)
+2026-11-13T01:45:45.4843500Z   ok   - 80 below band -> rc2 (rc=2)
+2026-11-13T01:45:45.4843711Z   ok   - 80 regressed names tol
+2026-11-13T01:45:45.4843913Z   ok   - 95a regression -> rc2 (rc=2)
+2026-11-13T01:45:45.4844348Z   ok   - 95a hint restore-best
+2026-11-13T01:45:45.4844549Z   ok   - 95b tampered -> rc2 (rc=2)
+2026-11-13T01:45:45.4844762Z   ok   - 95b hint proposal-to-user
+2026-11-13T01:45:45.4844974Z   ok   - 102 dead fixture -> rc2 (rc=2)
+2026-11-13T01:45:45.4845197Z   ok   - 102 reason calibration-broken
+2026-11-13T01:45:45.4845410Z   ok   - 102 hint routes
+2026-11-13T01:45:45.4868540Z   ok   - 109a strategy written
+2026-11-13T01:45:45.4869014Z   ok   - 109c folded to one line
+2026-11-13T01:45:45.4869334Z   ok   - 109c no block shred
+2026-11-13T01:45:45.4869666Z   ok   - 109c gate still GO with folded label (rc=0)
+2026-11-13T01:45:45.4870035Z   ok   - 110a rc0 (rc=0)
+2026-11-13T01:45:45.4870335Z   ok   - 110a missing point stays unmeasured
+2026-11-13T01:45:45.4870676Z   ok   - 110f two A windows + one B window
+2026-11-13T01:45:45.4871052Z   ok   - 110f window order follows file order
+2026-11-13T01:45:45.4871417Z   ok   - 115e garbage row skipped rc0 (rc=0)
+2026-11-13T01:45:45.4871768Z   ok   - 115e slope still computed
+2026-11-13T01:45:45.4872123Z   ok   - 116c judged+calib horizon stamps (rc=0)
+2026-11-13T01:45:45.4872525Z   ok   - 117d window cache: one query per window
+2026-11-13T01:45:45.4872896Z   ok   - 117e expired window re-queries
+2026-11-13T01:45:45.4873248Z   ok   - 124b missing expected refused (rc=2)
+2026-11-13T01:45:45.4873575Z   ok   - 124b names expected
+2026-11-13T01:45:45.4873861Z   ok   - 126d NEXT carries pick
+2026-11-13T01:45:45.4874378Z   ok   - 126d NEXT hint intact
+2026-11-13T01:45:45.4874686Z   ok   - 130b stale receipt refuses claim (rc=2)
+2026-11-13T01:45:45.4875045Z   ok   - 130b still adversarial-missing
+2026-11-13T01:45:45.4875813Z   ok   - 132b empty raw still NO-GO (rc=2)
+2026-11-13T01:45:45.4876306Z   ok   - 132b raw-evidence-missing
+2026-11-13T01:45:45.4876667Z   ok   - 134a false-tick fails audit (rc=1)
+2026-11-13T01:45:45.4877007Z   ok   - 134a A10 named
+2026-11-13T01:45:45.4877283Z   ok   - 134a names missing path
+2026-11-13T01:45:45.4877601Z   ok   - 135c bad class refused (rc=4)
+2026-11-13T01:45:45.4877935Z   ok   - 135c names bad-fault-class
+2026-11-13T01:45:45.4878252Z   ok   - 135c illegal pair refused (rc=4)
+2026-11-13T01:45:45.4878604Z   ok   - 135c names bad-fault-outcome
+2026-11-13T01:45:45.4878965Z   ok   - 141 progress rejected without mutation
+2026-11-13T01:45:45.4879335Z   ok   - 141 exit-signal rejected without mutation
+2026-11-13T01:45:45.4879711Z   ok   - 141 false-complete rejected without mutation
+2026-11-13T01:45:45.4879974Z   ok   - 141 dry rejected without mutation
+2026-11-13T01:45:45.4880210Z   ok   - 141 checks-pass rejected without mutation
+2026-11-13T01:45:45.4880466Z   ok   - 141 checks-fail rejected without mutation
+2026-11-13T01:45:45.4880736Z   ok   - 141 checks-unverifiable rejected without mutation
+2026-11-13T01:45:45.4881010Z   ok   - 141 invalid task rejected before measurement
+2026-11-13T01:45:45.4881251Z   ok   - 146 watched directory content
+2026-11-13T01:45:45.4881467Z   ok   - 146 watched empty directory
+2026-11-13T01:45:45.4881706Z   ok   - 146 changing watched scope refuses claim (rc=2)
+2026-11-13T01:45:45.4881990Z   ok   - 146 scope change is contract tampering
+2026-11-13T01:45:45.4882251Z   ok   - 152 empty hash sensor refuses identity (rc=4)
+2026-11-13T01:45:45.4882542Z   ok   - 152 constant hash sensor refuses identity (rc=4)
+2026-11-13T01:45:45.4882817Z   ok   - 158 isolated Python digest succeeds (rc=0)
+2026-11-13T01:45:45.4883075Z   ok   - 158 ambient Python startup hook not executed
+2026-11-13T01:45:45.4883313Z == results: pass=77 fail=0 ==
+2026-11-13T01:45:45.4907778Z   ok   - 06 judged open-FAIL -> rc2 (rc=2)
+2026-11-13T01:45:45.4908087Z   ok   - 11b non-numeric metric -> rc2 (rc=2)
+2026-11-13T01:45:45.4908336Z   ok   - 11b reason check-broken
+2026-11-13T01:45:45.4908556Z   ok   - 18 missing dry_streak -> rc4 (rc=4)
+2026-11-13T01:45:45.4908785Z   ok   - 26 carry-forward GO -> rc0 (rc=0)
+2026-11-13T01:45:45.4909009Z   ok   - 27 stale re-bind -> rc2 (rc=2)
+2026-11-13T01:45:45.4909231Z   ok   - 27 reason not-covered
+2026-11-13T01:45:45.4909435Z   ok   - 42 cmd mismatch rc2 (rc=2)
+2026-11-13T01:45:45.4909657Z   ok   - 42 reason baseline-cmd-mismatch
+2026-11-13T01:45:45.4909883Z   ok   - 55 probe-failed -> rc2 (rc=2)
+2026-11-13T01:45:45.4910101Z   ok   - 55 reason check-broken probe
+2026-11-13T01:45:45.4910327Z   ok   - 62 unmeasurable records ok rc0 (rc=0)
+2026-11-13T01:45:45.4910556Z   ok   - 62 warns unmeasurable
+2026-11-13T01:45:45.4910758Z   ok   - 62 score=none recorded
+2026-11-13T01:45:45.4910969Z   ok   - 77 expired+fail -> BLOCKED rc3 (rc=3)
+2026-11-13T01:45:45.4911192Z   ok   - 77 BLOCKED fuse
+2026-11-13T01:45:45.4911426Z   ok   - 84 notes never block -> GO (rc=0)
+2026-11-13T01:45:45.4911649Z   ok   - 84 tautology suspect named
+2026-11-13T01:45:45.4911885Z   ok   - 89 ledger-mutating check never ends GO (rc=4)
+2026-11-13T01:45:45.4912143Z   ok   - 89b verify self-rewrite caught (rc=2)
+2026-11-13T01:45:45.4912408Z   ok   - 89b ledger mutation named
+2026-11-13T01:45:45.4912698Z   ok   - 100a calib declared, no grades -> rc2 (rc=2)
+2026-11-13T01:45:45.4913007Z   ok   - 100a reason calibration-missing
+2026-11-13T01:45:45.4913256Z   ok   - 100a hint routes the controller
+2026-11-13T01:45:45.4913466Z   ok   - 100b lenient seat -> rc2 (rc=2)
+2026-11-13T01:45:45.4913679Z   ok   - 100b names the bad fixture
+2026-11-13T01:45:45.4913916Z   ok   - 100c calibrated claim -> GO (rc=0)
+2026-11-13T01:45:45.4914356Z   ok   - 100e unbound grade -> rc2 (rc=2)
+2026-11-13T01:45:45.4914579Z   ok   - 100e reason good side
+2026-11-13T01:45:45.4914790Z   ok   - 100d stale grades voided -> rc2 (rc=2)
+2026-11-13T01:45:45.4915150Z   ok   - 100d stale calibration flagged
+2026-11-13T01:45:45.4915640Z   ok   - 109d label trimmed
+2026-11-13T01:45:45.4915966Z   ok   - 109g strategy label does not excuse R10 (rc=4)
+2026-11-13T01:45:45.4916213Z   ok   - 110c no comparable pair
+2026-11-13T01:45:45.4916415Z   ok   - 110h tol-band flat prune
+2026-11-13T01:45:45.4916621Z   ok   - 112a eval-gap fires
+2026-11-13T01:45:45.4916817Z   ok   - 112a names goal-critic
+2026-11-13T01:45:45.4917014Z   ok   - 112b two points stay silent
+2026-11-13T01:45:45.4917229Z   ok   - 112c unstalled stays silent
+2026-11-13T01:45:45.4917526Z   ok   - 112d no objective stays silent
+2026-11-13T01:45:45.4917845Z   ok   - 112e tol-band flat fires
+2026-11-13T01:45:45.4918150Z   ok   - 117a external PASS -> GO (rc=0)
+2026-11-13T01:45:45.4918487Z   ok   - 117b external FAIL -> rc2 (rc=2)
+2026-11-13T01:45:45.4918809Z   ok   - 117b external fail named
+2026-11-13T01:45:45.4919118Z   ok   - 123b re-run suffix clean (rc=0)
+2026-11-13T01:45:45.4919430Z   ok   - 123b clean said
+2026-11-13T01:45:45.4919699Z   ok   - 126a rc0 (rc=0)
+2026-11-13T01:45:45.4919992Z   ok   - 126a STRATEGY-PICK prefer=B avoid=A
+2026-11-13T01:45:45.4920333Z   ok   - 126e NEXT carries pick
+2026-11-13T01:45:45.4920598Z   ok   - 126e NEXT hint intact
+2026-11-13T01:45:45.4920894Z   ok   - 129a no evidence at n=1
+2026-11-13T01:45:45.4921213Z   ok   - 129a efficiency unmeasured
+2026-11-13T01:45:45.4921584Z   ok   - 132a claim without raw dump is NO-GO (rc=2)
+2026-11-13T01:45:45.4921958Z   ok   - 132a reason raw-evidence-missing
+2026-11-13T01:45:45.4922295Z   ok   - 132a GO with raw dump (rc=0)
+2026-11-13T01:45:45.4922616Z   ok   - 132c close auto-writes raw
+2026-11-13T01:45:45.4922944Z   ok   - 132c GO after auto raw + adv (rc=0)
+2026-11-13T01:45:45.4923393Z   ok   - 135a fault close ok (rc=0)
+2026-11-13T01:45:45.4923696Z   ok   - 135a names the fault
+2026-11-13T01:45:45.4924189Z   ok   - 135a ledger carries the derived suffix
+2026-11-13T01:45:45.4924535Z   ok   - 135a fault row written
+2026-11-13T01:45:45.4924833Z   ok   - 135a audit clean (rc=0)
+2026-11-13T01:45:45.4925157Z   ok   - 139 invalid receipt rejected (rc=4)
+2026-11-13T01:45:45.4925519Z   ok   - 139 reason names bad receipt
+2026-11-13T01:45:45.4925852Z   ok   - 139 refusal leaves all state unchanged
+2026-11-13T01:45:45.4926259Z   ok   - 144 explicitly watched Git-ignored artifact bound
+2026-11-13T01:45:45.4926719Z   ok   - 144 explicitly watched pruned artifact bound
+2026-11-13T01:45:45.4927133Z   ok   - 144 watched ignored artifact may claim GO (rc=0)
+2026-11-13T01:45:45.4927555Z   ok   - 144 ignored artifact change revokes GO (rc=2)
+2026-11-13T01:45:45.4927943Z   ok   - 144 ignored change names stale digest
+2026-11-13T01:45:45.4928309Z   ok   - 154 tracked deletion is digestible (rc=0)
+2026-11-13T01:45:45.4928697Z   ok   - 154 tracked deletion changes identity
+2026-11-13T01:45:45.4929071Z   ok   - 157 Git accelerator matches fallback
+2026-11-13T01:45:45.4929462Z   ok   - 157 Git backends detect ignored artifact change
+2026-11-13T01:45:45.4929829Z == results: pass=74 fail=0 ==
+2026-11-13T01:45:45.4972809Z   ok   - 07 evidence-missing -> rc2 (rc=2)
+2026-11-13T01:45:45.4973274Z   ok   - 12 --verify mutated-tree -> rc2 (rc=2)
+2026-11-13T01:45:45.4973664Z   ok   - 12 reason check-mutated-tree
+2026-11-13T01:45:45.4974194Z   ok   - 19 dry_streak=2 after two dry rounds
+2026-11-13T01:45:45.4974602Z   ok   - 29 future deadline GO -> rc0 (rc=0)
+2026-11-13T01:45:45.4974966Z   ok   - 32 docs consistency (rc=0)
+2026-11-13T01:45:45.4975317Z   ok   - 37 hook unclaimed allows stop (rc=0)
+2026-11-13T01:45:45.4975697Z   ok   - 45 single-run baseline refused rc2 (rc=2)
+2026-11-13T01:45:45.4975958Z   ok   - 55b probe-ok GO (rc=0)
+2026-11-13T01:45:45.4976179Z   ok   - 65a crew invented recovery rc1 (rc=1)
+2026-11-13T01:45:45.4976415Z   ok   - 65a rejected at schema gate
+2026-11-13T01:45:45.4976635Z   ok   - 65e crew recovery suffix clean (rc=0)
+2026-11-13T01:45:45.4976849Z   ok   - 65e clean
+2026-11-13T01:45:45.4977030Z   ok   - 73 max_iterations bound
+2026-11-13T01:45:45.4977230Z   ok   - 73 check_timeout bound
+2026-11-13T01:45:45.4977811Z   ok   - 73 wallclock bound
+2026-11-13T01:45:45.4978048Z   ok   - 73 deadline seeded
+2026-11-13T01:45:45.4978369Z   ok   - 81 unbound PASS -> rc2 (rc=2)
+2026-11-13T01:45:45.4978599Z   ok   - 81 verdict-unbound named
+2026-11-13T01:45:45.4978811Z   ok   - 82 bound artifact GO -> rc0 (rc=0)
+2026-11-13T01:45:45.4979042Z   ok   - 82b stale artifact hash -> rc2 (rc=2)
+2026-11-13T01:45:45.4979263Z   ok   - 82b mismatch named
+2026-11-13T01:45:45.4979467Z   ok   - 91 objective-on-judged refused (rc=2)
+2026-11-13T01:45:45.4979695Z   ok   - 91 stamp refusal names the AC
+2026-11-13T01:45:45.4979940Z   ok   - 92 stamp without placeholder rc4 (rc=4)
+2026-11-13T01:45:45.4980195Z   ok   - 92 placeholder refusal named
+2026-11-13T01:45:45.4980417Z   ok   - 103a status prints NEXT
+2026-11-13T01:45:45.4980617Z   ok   - 103a NEXT names the hint
+2026-11-13T01:45:45.4980833Z   ok   - 103a NEXT is one actionable sentence
+2026-11-13T01:45:45.4981074Z   ok   - 103b clean claim => nothing pending
+2026-11-13T01:45:45.4981351Z   ok   - 106a disagreeing same-binding pair -> rc2 (rc=2)
+2026-11-13T01:45:45.4981610Z   ok   - 106a reason verdict-conflict
+2026-11-13T01:45:45.4981821Z   ok   - 106a hint routes rebind
+2026-11-13T01:45:45.4982056Z   ok   - 106b identical double-bind is NOT a conflict (rc=0)
+2026-11-13T01:45:45.4982460Z   ok   - 106c conflict cleared by fresh binding on new state (rc=0)
+2026-11-13T01:45:45.4982918Z   ok   - 113a promote after 3 waves
+2026-11-13T01:45:45.4983247Z   ok   - 113b normalized ids count as one domain
+2026-11-13T01:45:45.4983601Z   ok   - 113c interleaved stays silent
+2026-11-13T01:45:45.4983918Z   ok   - 113d run of two stays silent
+2026-11-13T01:45:45.4984401Z   ok   - 113e promote wording is consider
+2026-11-13T01:45:45.4984746Z   ok   - 113f unstalled promote silent
+2026-11-13T01:45:45.4985088Z   ok   - 117g floor FAIL beats DEFERRED (rc=2)
+2026-11-13T01:45:45.4985443Z   ok   - 117g in-tree FAIL surfaced not masked
+2026-11-13T01:45:45.4985748Z   ok   - 123a recovery suffix clean (rc=0)
+2026-11-13T01:45:45.4986085Z   ok   - 123a clean said
+2026-11-13T01:45:45.4986421Z   ok   - 124a multi-line AC stamp refused (rc=2)
+2026-11-13T01:45:45.4986781Z   ok   - 124a refusal names single-line
+2026-11-13T01:45:45.4987099Z   ok   - 124a left unstamped
+2026-11-13T01:45:45.4987438Z   ok   - 126g threshold without objective prints no pick
+2026-11-13T01:45:45.4987820Z   ok   - 129c bare T accepted (rc=0)
+2026-11-13T01:45:45.4988151Z   ok   - 129c ledger has crew:1
+2026-11-13T01:45:45.4988572Z   ok   - 129c teams marker refused (rc=4)
+2026-11-13T01:45:45.4988909Z   ok   - 129c names bad-task
+2026-11-13T01:45:45.4989271Z   ok   - 133d audit fails on zero-bookkeeping under clock (rc=1)
+2026-11-13T01:45:45.4989672Z   ok   - 133d A9 clock named
+2026-11-13T01:45:45.4989962Z   ok   - 134b range files= refused (rc=1)
+2026-11-13T01:45:45.4990294Z   ok   - 134b A10 or unverifiable
+2026-11-13T01:45:45.4990621Z   ok   - 135d unbacked suffix fails audit (rc=1)
+2026-11-13T01:45:45.4990958Z   ok   - 135d names A11
+2026-11-13T01:45:45.4991325Z   ok   - 138 documented fast lane reaches GO on first claim (rc=0)
+2026-11-13T01:45:45.4991749Z   ok   - 138 actual gate output
+2026-11-13T01:45:45.4992078Z   ok   - 138 no false complete from missing receipt
+2026-11-13T01:45:45.4992463Z   ok   - 145 unsafe path rejected: ../outside
+2026-11-13T01:45:45.4992825Z   ok   - 145 unsafe path rejected: /tmp/outside
+2026-11-13T01:45:45.4993205Z   ok   - 145 unsafe path rejected: .goal/state.rec
+2026-11-13T01:45:45.4993584Z   ok   - 145 unsafe path rejected: build/../outside
+2026-11-13T01:45:45.4994112Z   ok   - 145 symlink parent rejected (rc=2)
+2026-11-13T01:45:45.4994492Z   ok   - 145 watch decoy inside command ignored (rc=0)
+2026-11-13T01:45:45.4994878Z   ok   - 148 legacy claim requires rebind (rc=2)
+2026-11-13T01:45:45.4995232Z   ok   - 148 identifies legacy identity
+2026-11-13T01:45:45.4995608Z   ok   - 148 legacy seat still refuses new claim (rc=2)
+2026-11-13T01:45:45.4995970Z   ok   - 148 stale seat names migration
+2026-11-13T01:45:45.4996568Z   ok   - 148 migration does not count as false completion
+2026-11-13T01:45:45.4997130Z   ok   - 148 fresh judged evidence resumes GO (rc=0)
+2026-11-13T01:45:45.4997519Z   ok   - 148 successful rebind preserves ratchet
+2026-11-13T01:45:45.4997913Z   ok   - 155 accelerator and fallback identities match
+2026-11-13T01:45:45.4998307Z   ok   - 155 both backends detect watched mutation
+2026-11-13T01:45:45.4998657Z == results: pass=77 fail=0 ==
+2026-11-13T01:45:45.5039414Z   ok   - 08 unverifiable-excessive -> rc2 (rc=2)
+2026-11-13T01:45:45.5039887Z   ok   - 20 --verify OK -> rc0 (rc=0)
+2026-11-13T01:45:45.5040225Z   ok   - 20 --verify skips judged
+2026-11-13T01:45:45.5040560Z   ok   - 20 --verify reruns deterministic
+2026-11-13T01:45:45.5040932Z   ok   - 21 --verify AC-1 only -> rc0 (rc=0)
+2026-11-13T01:45:45.5041294Z   ok   - 21 filtered run omitted AC-2
+2026-11-13T01:45:45.5041639Z   ok   - 36 hook claimed+NO-GO blocks (rc2) (rc=2)
+2026-11-13T01:45:45.5042002Z   ok   - 36 block reason carries GOAL_LOOP_GATE prefix
+2026-11-13T01:45:45.5042300Z   ok   - 36 gate reason preserved in block message
+2026-11-13T01:45:45.5042568Z   ok   - 44 baseline-check not-forge ok (rc=0)
+2026-11-13T01:45:45.5042813Z   ok   - 44 threshold GO without baseline (rc=0)
+2026-11-13T01:45:45.5043092Z   ok   - 56 progress=no without strategy_delta refused (rc=4)
+2026-11-13T01:45:45.5043359Z   ok   - 56 error names strategy-delta
+2026-11-13T01:45:45.5043605Z   ok   - 56 strategy_delta recorded
+2026-11-13T01:45:45.5043893Z   ok   - 63 clean ledger rc0 (rc=0)
+2026-11-13T01:45:45.5044377Z   ok   - 63 clean said
+2026-11-13T01:45:45.5044631Z   ok   - 65 bad vocab+score+delta rc1 (rc=1)
+2026-11-13T01:45:45.5044848Z   ok   - 65 vocab
+2026-11-13T01:45:45.5045023Z   ok   - 65 score-format
+2026-11-13T01:45:45.5045214Z   ok   - 65 missing strategy_delta
+2026-11-13T01:45:45.5045422Z   ok   - 74 not-covered -> rc2 (rc=2)
+2026-11-13T01:45:45.5045633Z   ok   - 74 reason not-covered
+2026-11-13T01:45:45.5045829Z   ok   - 74 hint bind-seat
+2026-11-13T01:45:45.5046024Z   ok   - 75 status shows T1
+2026-11-13T01:45:45.5046205Z   ok   - 75 status shows T2
+2026-11-13T01:45:45.5046403Z   ok   - 75 status counts 2 open
+2026-11-13T01:45:45.5046611Z   ok   - 75 status drops ticked T1
+2026-11-13T01:45:45.5046814Z   ok   - 75 ticked item hidden
+2026-11-13T01:45:45.5047018Z   ok   - 85 duplicate AC id -> rc2 (rc=2)
+2026-11-13T01:45:45.5047241Z   ok   - 85 duplicate named
+2026-11-13T01:45:45.5047446Z   ok   - 90 manual flag noted not double-counted
+2026-11-13T01:45:45.5047679Z   ok   - 90 fc counted exactly 1
+2026-11-13T01:45:45.5047884Z   ok   - 98a pruned dir change invisible
+2026-11-13T01:45:45.5048109Z   ok   - 98b real source change still detected
+2026-11-13T01:45:45.5048340Z   ok   - 98c digest deterministic
+2026-11-13T01:45:45.5048547Z   ok   - 99a .goalignore prunes named dir
+2026-11-13T01:45:45.5048820Z   ok   - 99b GOAL_PRUNE override deterministic
+2026-11-13T01:45:45.5049173Z   ok   - 99c GOAL_PRUNE drops src from watch
+2026-11-13T01:45:45.5049542Z   ok   - 108a claim with illegal task id -> rc2 (rc=2)
+2026-11-13T01:45:45.5049911Z   ok   - 108a names bad-task
+2026-11-13T01:45:45.5050202Z   ok   - 108a hint routes the fix
+2026-11-13T01:45:45.5050529Z   ok   - 108b bare legacy id still claims (rc=0)
+2026-11-13T01:45:45.5050865Z   ok   - 108b legacy NOTE emitted
+2026-11-13T01:45:45.5051163Z   ok   - 115b step line intact
+2026-11-13T01:45:45.5051460Z   ok   - 115f golden STEP present
+2026-11-13T01:45:45.5051739Z   ok   - 115f golden NEXT present
+2026-11-13T01:45:45.5052027Z   ok   - 115f no v2.8 lines on legacy ledger
+2026-11-13T01:45:45.5052416Z   ok   - 117f window-without-external -> rc2 (rc=2)
+2026-11-13T01:45:45.5052812Z   ok   - 117f refusal names window/external
+2026-11-13T01:45:45.5053156Z   ok   - 121a deferred claim -> rc2 (rc=2)
+2026-11-13T01:45:45.5053490Z   ok   - 121a waits, not counted
+2026-11-13T01:45:45.5053803Z   ok   - 121a ratchet stayed at 0
+2026-11-13T01:45:45.5054351Z   ok   - 125e provider-fatal suffix accepted (rc=0)
+2026-11-13T01:45:45.5055164Z   ok   - 125e audit clean
+2026-11-13T01:45:45.5055455Z   ok   - 126f pick present while stalled
+2026-11-13T01:45:45.5055985Z   ok   - 126f2 gate GO untouched by pick work (rc=0)
+2026-11-13T01:45:45.5056358Z   ok   - 126f2 gate silent on pick
+2026-11-13T01:45:45.5056730Z   ok   - 131a check-script mutation refuses claim (rc=2)
+2026-11-13T01:45:45.5057118Z   ok   - 131a reason check-script-tampered
+2026-11-13T01:45:45.5057459Z   ok   - 134c clean when files exist (rc=0)
+2026-11-13T01:45:45.5057790Z   ok   - 134c no A10
+2026-11-13T01:45:45.5058052Z   ok   - 135g claim goes through (rc=0)
+2026-11-13T01:45:45.5058365Z   ok   - 135g gate GO
+2026-11-13T01:45:45.5058643Z   ok   - 143 judged Git candidate GO (rc=0)
+2026-11-13T01:45:45.5059042Z   ok   - 143 changed dirty file refuses prior verdict (rc=2)
+2026-11-13T01:45:45.5059444Z   ok   - 143 refusal identifies staleness
+2026-11-13T01:45:45.5059835Z   ok   - 147 newly created watched artifact changes digest
+2026-11-13T01:45:45.5060251Z   ok   - 151 malformed watch refused at stamp (rc=2)
+2026-11-13T01:45:45.5060623Z   ok   - 151 malformed watch named
+2026-11-13T01:45:45.5060959Z   ok   - 151 multiple watch fields accepted (rc=0)
+2026-11-13T01:45:45.5061329Z   ok   - 151 second watched path is bound
+2026-11-13T01:45:45.5061681Z   ok   - 151 sort failure refuses digest (rc=4)
+2026-11-13T01:45:45.5062051Z   ok   - 151 sha256sum failure refuses digest (rc=4)
+2026-11-13T01:45:45.5062512Z   ok   - 160 a numeric line from a failed command cannot deliver GO (rc=2)
+2026-11-13T01:45:45.5062958Z   ok   - 160 nonzero metric exit is broken
+2026-11-13T01:45:45.5063333Z   ok   - 160 malformed objective reading is refused (rc=2)
+2026-11-13T01:45:45.5063717Z   ok   - 160 malformed decimal is broken
+2026-11-13T01:45:45.5064278Z   ok   - 160 per-check timeout refuses partial numeric output (rc=2)
+2026-11-13T01:45:45.5064702Z   ok   - 160 timed out measurement is broken
+2026-11-13T01:45:45.5065160Z   ok   - 160 signed decimal and explicit expected nonzero still pass (rc=0)
+2026-11-13T01:45:45.5065666Z   ok   - 160 signed decimal is recorded in score grammar
+2026-11-13T01:45:45.5066092Z   ok   - 160 broken sensor stderr does not set a water mark
+2026-11-13T01:45:45.5066473Z == results: pass=82 fail=0 ==
+2026-11-13T01:45:45.5104732Z   ok   - 28 expired green claim -> GO (rc=0)
+2026-11-13T01:45:45.5105121Z   ok   - 28 NOTE fuse
+2026-11-13T01:45:45.5105399Z   ok   - 28 still GO
+2026-11-13T01:45:45.5105664Z == results: pass=3 fail=0 ==
+2026-11-13T01:45:45.5162480Z   ok   - 76 expired wallclock green claim -> GO (rc=0)
+2026-11-13T01:45:45.5162940Z   ok   - 76 NOTE fuse
+2026-11-13T01:45:45.5163205Z   ok   - 76 still GO
+2026-11-13T01:45:45.5163476Z == results: pass=3 fail=0 ==
+2026-11-13T01:45:45.5199492Z == total: pass=603 fail=0 shards=10 ==
+2026-11-13T01:45:45.5265198Z ##[group]Run bash companions/contract-forge/tests/run_fixtures.sh
+2026-11-13T01:45:45.5265585Z [36;1mbash companions/contract-forge/tests/run_fixtures.sh[0m
+2026-11-13T01:45:45.5308035Z shell: /usr/bin/bash -e {0}
+2026-11-13T01:45:45.5308269Z ##[endgroup]
+2026-11-13T01:45:45.5484817Z ok   usage rc=2
+2026-11-13T01:45:45.6571997Z ok   good-threshold
+2026-11-13T01:45:45.9187889Z ok   good-objective-forge
+2026-11-13T01:45:45.9863245Z ok   good-pipe-in-backtick
+2026-11-13T01:45:46.1085631Z ok   bad-no-horizon
+2026-11-13T01:45:46.1729517Z ok   bad-pipe-spec
+2026-11-13T01:45:46.2607440Z ok   bad-calib-on-metric
+2026-11-13T01:45:46.3271873Z ok   bad-window-no-external
+2026-11-13T01:45:46.5009864Z ok   bad-objective-target
+2026-11-13T01:45:46.6227738Z ok   crlf-threshold
+2026-11-13T01:45:46.6228094Z == fixtures: pass=10 fail=0 ==
+2026-11-13T01:45:46.6281175Z ##[group]Run python3 -B -m unittest discover -s tests -p 'test_*.py' -v
+2026-11-13T01:45:46.6281851Z [36;1mpython3 -B -m unittest discover -s tests -p 'test_*.py' -v[0m
+2026-11-13T01:45:46.6343887Z shell: /usr/bin/bash -e {0}
+2026-11-13T01:45:46.6344375Z ##[endgroup]
+2026-11-13T01:45:48.5999480Z test_budget_temp_symlinks_do_not_overwrite_user_files (test_budget.Budget.test_budget_temp_symlinks_do_not_overwrite_user_files) ... ok
+2026-11-13T01:46:03.6485100Z test_deadline_limits_workers_and_resume (test_budget.Budget.test_deadline_limits_workers_and_resume) ... ok
+2026-11-13T01:46:07.7460903Z test_executor_exit_stops_background_children (test_budget.Budget.test_executor_exit_stops_background_children) ... ok
+2026-11-13T01:46:27.4239588Z test_executor_nonzero_still_checks_gate (test_budget.Budget.test_executor_nonzero_still_checks_gate) ... ok
+2026-11-13T01:46:28.6650991Z test_expired_contract_prevents_any_worker (test_budget.Budget.test_expired_contract_prevents_any_worker) ... ok
+2026-11-13T01:46:29.7748511Z test_missing_executor_fails_closed (test_budget.Budget.test_missing_executor_fails_closed) ... ok
+2026-11-13T01:46:32.9339292Z test_owner_sigkill_stops_owned_process_group (test_budget.Budget.test_owner_sigkill_stops_owned_process_group) ... ok
+2026-11-13T01:46:33.1547813Z test_resume_cannot_override_live_owner (test_budget.Budget.test_resume_cannot_override_live_owner) ... ok
+2026-11-13T01:46:33.7169566Z test_resume_rejects_persisted_clock_rollback (test_budget.Budget.test_resume_rejects_persisted_clock_rollback) ... ok
+2026-11-13T01:46:35.1358644Z test_supervisor_ignores_ambient_python_startup (test_budget.Budget.test_supervisor_ignores_ambient_python_startup) ... ok
+2026-11-13T01:46:39.8967905Z test_supervisor_setup_failure_is_state_error (test_budget.Budget.test_supervisor_setup_failure_is_state_error) ... ok
+2026-11-13T01:46:40.6378609Z test_wall_clock_regression_does_not_extend_budget (test_budget.Budget.test_wall_clock_regression_does_not_extend_budget) ... ok
+2026-11-13T01:46:42.0476773Z test_wallclock_leading_zeros_are_decimal (test_budget.Budget.test_wallclock_leading_zeros_are_decimal) ... ok
+2026-11-13T01:46:45.5115729Z test_crash_after_pointer_rolls_forward_and_retry_does_not_rerun (test_close_commit.CloseCommit.test_crash_after_pointer_rolls_forward_and_retry_does_not_rerun) ... ok
+2026-11-13T01:46:48.7238370Z test_crash_before_pointer_rolls_back_then_same_id_can_retry (test_close_commit.CloseCommit.test_crash_before_pointer_rolls_back_then_same_id_can_retry) ... ok
+2026-11-13T01:46:51.4896356Z test_default_id_is_unique_and_invalid_id_does_not_write (test_close_commit.CloseCommit.test_default_id_is_unique_and_invalid_id_does_not_write) ... ok
+2026-11-13T01:46:53.5326208Z test_lost_acknowledgement_does_not_consume_a_second_iteration (test_close_commit.CloseCommit.test_lost_acknowledgement_does_not_consume_a_second_iteration) ... ok
+2026-11-13T01:46:56.7436084Z test_retry_is_read_only_even_after_newer_commit (test_close_commit.CloseCommit.test_retry_is_read_only_even_after_newer_commit) ... ok
+2026-11-13T01:47:01.1240785Z test_uncommitted_old_journal_cannot_rollback_newer_version (test_close_commit.CloseCommit.test_uncommitted_old_journal_cannot_rollback_newer_version) ... ok
+2026-11-13T01:47:02.2302319Z test_contended_writer_respects_expired_deadline (test_controller_writers.ControllerWriters.test_contended_writer_respects_expired_deadline) ... ok
+2026-11-13T01:47:03.7079163Z test_killed_close_blocks_readers_and_recovers_without_replaying_checks (test_controller_writers.ControllerWriters.test_killed_close_blocks_readers_and_recovers_without_replaying_checks) ... FAIL
+2026-11-13T01:47:04.3411858Z test_malformed_deadline_refuses_writer_without_changing_ledger (test_controller_writers.ControllerWriters.test_malformed_deadline_refuses_writer_without_changing_ledger) ... ok
+2026-11-13T01:47:07.7702192Z test_two_writers_never_commit_the_same_iteration (test_controller_writers.ControllerWriters.test_two_writers_never_commit_the_same_iteration) ... ok
+2026-11-13T01:47:08.4594677Z test_absent_stage_is_unknown_and_explicit_no_operation_is_zero (test_crew.Crew.test_absent_stage_is_unknown_and_explicit_no_operation_is_zero) ... ok
+2026-11-13T01:47:09.1373724Z test_after_adoption_changes_still_fail_even_if_final_checker_is_weak (test_crew.Crew.test_after_adoption_changes_still_fail_even_if_final_checker_is_weak) ... ok
+2026-11-13T01:47:10.5358067Z test_all_cost_history_expires_when_frozen_input_bytes_change (test_crew.Crew.test_all_cost_history_expires_when_frozen_input_bytes_change) ... ok
+2026-11-13T01:47:11.0103097Z test_changed_input_cannot_reuse_frozen_trial (test_crew.Crew.test_changed_input_cannot_reuse_frozen_trial) ... ok
+2026-11-13T01:47:11.5333903Z test_changed_output_cannot_reuse_adoption (test_crew.Crew.test_changed_output_cannot_reuse_adoption) ... ok
+2026-11-13T01:47:13.0690067Z test_cli_records_real_cross_process_lifecycle (test_crew.Crew.test_cli_records_real_cross_process_lifecycle) ... ok
+2026-11-13T01:47:13.7558369Z test_coupled_task_waits_for_adopted_dependency (test_crew.Crew.test_coupled_task_waits_for_adopted_dependency) ... ok
+2026-11-13T01:47:25.1614262Z test_decision_flips_with_observed_startup_cost (test_crew.Crew.test_decision_flips_with_observed_startup_cost) ... ok
+2026-11-13T01:47:26.3201597Z test_different_producer_transports_cannot_be_pooled (test_crew.Crew.test_different_producer_transports_cannot_be_pooled) ... ok
+2026-11-13T01:47:26.9919470Z test_dropped_worker_preserves_adopted_output_and_fault_cost (test_crew.Crew.test_dropped_worker_preserves_adopted_output_and_fault_cost) ... ok
+2026-11-13T01:47:27.4328038Z test_frozen_instrument_cannot_be_swapped (test_crew.Crew.test_frozen_instrument_cannot_be_swapped) ... ok
+2026-11-13T01:47:29.1456779Z test_new_earlier_budget_is_used_before_dispatch_and_undispatched_work_is_booked (test_crew.Crew.test_new_earlier_budget_is_used_before_dispatch_and_undispatched_work_is_booked) ... ok
+2026-11-13T01:47:29.5875639Z test_overlap_adds_serial_precedence_and_invalid_graph_does_not_book (test_crew.Crew.test_overlap_adds_serial_precedence_and_invalid_graph_does_not_book) ... ok
+2026-11-13T01:47:31.1171832Z test_public_cli_reads_api_observations_without_changing_their_transport (test_crew.Crew.test_public_cli_reads_api_observations_without_changing_their_transport) ... ok
+2026-11-13T01:47:32.0967879Z test_repeated_trial_identity_is_not_independent_replication (test_crew.Crew.test_repeated_trial_identity_is_not_independent_replication) ... ok
+2026-11-13T01:47:33.5536631Z test_single_baseline_cannot_cross_different_frozen_input_bytes (test_crew.Crew.test_single_baseline_cannot_cross_different_frozen_input_bytes) ... ok
+2026-11-13T01:47:36.7380004Z test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width (test_crew.Crew.test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width) ... ok
+2026-11-13T01:47:39.6917096Z test_unknown_startup_cannot_become_zero_cost (test_crew.Crew.test_unknown_startup_cannot_become_zero_cost) ... ok
+2026-11-13T01:47:40.5005879Z test_candidate_identity_cannot_borrow_baseline_archive (test_evolution_verifier.EvolutionVerifier.test_candidate_identity_cannot_borrow_baseline_archive) ... ok
+2026-11-13T01:47:42.4352826Z test_final_pointer_identifies_the_run_that_selected_its_bytes (test_evolution_verifier.EvolutionVerifier.test_final_pointer_identifies_the_run_that_selected_its_bytes) ... ok
+2026-11-13T01:47:42.8835798Z test_grader_identity_is_bound_to_frozen_program (test_evolution_verifier.EvolutionVerifier.test_grader_identity_is_bound_to_frozen_program) ... ok
+2026-11-13T01:47:44.7207334Z test_inconclusive_holdout_retains_current_policy (test_evolution_verifier.EvolutionVerifier.test_inconclusive_holdout_retains_current_policy) ... ok
+2026-11-13T01:47:45.1458294Z test_large_but_inconsistent_slowdown_is_not_confirmed_regression (test_evolution_verifier.EvolutionVerifier.test_large_but_inconsistent_slowdown_is_not_confirmed_regression) ... ok
+2026-11-13T01:47:47.0174787Z test_missed_budget_retains_existing_policy_without_promotion (test_evolution_verifier.EvolutionVerifier.test_missed_budget_retains_existing_policy_without_promotion) ... ok
+2026-11-13T01:47:50.9764317Z test_optimized_python_preserves_original_98_pair_verification (test_evolution_verifier.EvolutionVerifier.test_optimized_python_preserves_original_98_pair_verification) ... ok
+2026-11-13T01:47:52.9846765Z test_optimized_python_rejects_candidate_identity_substitution (test_evolution_verifier.EvolutionVerifier.test_optimized_python_rejects_candidate_identity_substitution) ... ok
+2026-11-13T01:47:54.4781648Z test_optimized_python_rejects_unjustified_withdrawal (test_evolution_verifier.EvolutionVerifier.test_optimized_python_rejects_unjustified_withdrawal) ... ok
+2026-11-13T01:47:56.3261960Z test_original_98_pairs_reconstruct_both_directions_and_transitions (test_evolution_verifier.EvolutionVerifier.test_original_98_pairs_reconstruct_both_directions_and_transitions) ... ok
+2026-11-13T01:47:56.6468664Z test_protocol_metadata_cannot_change_frozen_threshold (test_evolution_verifier.EvolutionVerifier.test_protocol_metadata_cannot_change_frozen_threshold) ... ok
+2026-11-13T01:47:57.0670036Z test_regression_flag_cannot_override_frozen_cost_threshold (test_evolution_verifier.EvolutionVerifier.test_regression_flag_cannot_override_frozen_cost_threshold) ... ok
+2026-11-13T01:47:58.4077801Z test_report_cannot_forge_within_budget (test_evolution_verifier.EvolutionVerifier.test_report_cannot_forge_within_budget) ... ok
+2026-11-13T01:47:59.7788777Z test_successful_pairs_cannot_promote_outside_budget (test_evolution_verifier.EvolutionVerifier.test_successful_pairs_cannot_promote_outside_budget) ... ok
+2026-11-13T01:48:00.2011635Z test_ten_percent_slowdown_does_not_justify_withdrawal (test_evolution_verifier.EvolutionVerifier.test_ten_percent_slowdown_does_not_justify_withdrawal) ... ok
+2026-11-13T01:48:00.4781155Z test_broken_grader_does_not_withdraw_an_enabled_policy (test_evolve.Evolution.test_broken_grader_does_not_withdraw_an_enabled_policy) ... ok
+2026-11-13T01:48:00.4902765Z test_changed_grader_leaves_failed_trace_and_preserves_enabled_policy (test_evolve.Evolution.test_changed_grader_leaves_failed_trace_and_preserves_enabled_policy) ... ok
+2026-11-13T01:48:00.6731307Z test_development_gain_then_complete_holdout_regression_keeps_incumbent (test_evolve.Evolution.test_development_gain_then_complete_holdout_regression_keeps_incumbent) ... ok
+2026-11-13T01:48:00.7372578Z test_enough_pairs_before_deadline_does_not_qualify_a_partial_phase (test_evolve.Evolution.test_enough_pairs_before_deadline_does_not_qualify_a_partial_phase) ... ok
+2026-11-13T01:48:00.7652568Z test_former_development_inputs_cannot_be_used_as_holdout (test_evolve.Evolution.test_former_development_inputs_cannot_be_used_as_holdout) ... ok
+2026-11-13T01:48:00.8052844Z test_inconclusive_monitor_retains_incumbent_and_does_not_reset_testing_budget (test_evolve.Evolution.test_inconclusive_monitor_retains_incumbent_and_does_not_reset_testing_budget) ... ok
+2026-11-13T01:48:00.8084646Z test_noop_or_overlapping_tasks_refused_before_state_creation (test_evolve.Evolution.test_noop_or_overlapping_tasks_refused_before_state_creation) ... ok
+2026-11-13T01:48:00.8088928Z test_only_replicated_eligible_cost_improvement_passes (test_evolve.Evolution.test_only_replicated_eligible_cost_improvement_passes) ... ok
+2026-11-13T01:48:00.9390791Z test_real_worker_failure_and_timeout_are_measured_not_dropped (test_evolve.Evolution.test_real_worker_failure_and_timeout_are_measured_not_dropped) ... ok
+2026-11-13T01:48:01.1198421Z test_registry_promotes_and_withdraws_without_reusing_holdout (test_evolve.Evolution.test_registry_promotes_and_withdraws_without_reusing_holdout) ... ok
+2026-11-13T01:48:01.6307989Z test_trial_budget_covers_worker_and_grader_together (test_evolve.Evolution.test_trial_budget_covers_worker_and_grader_together) ... ok
+2026-11-13T01:48:04.0917326Z test_acceptance_check_cannot_replace_the_archived_scope_during_close (test_forge.ForgeCoverage.test_acceptance_check_cannot_replace_the_archived_scope_during_close) ... ok
+2026-11-13T01:48:09.8862509Z test_clear_receipts_without_dry_probes_never_complete_forge (test_forge.ForgeCoverage.test_clear_receipts_without_dry_probes_never_complete_forge) ... ok
+2026-11-13T01:48:14.0802643Z test_coverage_can_grow_without_dropping_earlier_cases_or_failures (test_forge.ForgeCoverage.test_coverage_can_grow_without_dropping_earlier_cases_or_failures) ... ok
+2026-11-13T01:48:20.2045156Z test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe (test_forge.ForgeCoverage.test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe) ... ok
+2026-11-13T01:48:22.1904573Z test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit (test_forge.ForgeCoverage.test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit) ... ok
+2026-11-13T01:48:24.6453548Z test_failed_floor_skips_probe_spend_and_cannot_become_dry (test_forge.ForgeCoverage.test_failed_floor_skips_probe_spend_and_cannot_become_dry) ... ok
+2026-11-13T01:48:37.5201558Z test_legacy_forge_migration_retains_history_and_requires_new_probe_evidence (test_forge.ForgeCoverage.test_legacy_forge_migration_retains_history_and_requires_new_probe_evidence) ... ok
+2026-11-13T01:48:42.1744658Z test_open_critic_finding_and_stale_critic_cannot_earn_dry_credit (test_forge.ForgeCoverage.test_open_critic_finding_and_stale_critic_cannot_earn_dry_credit) ... ok
+2026-11-13T01:48:45.3842420Z test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope (test_forge.ForgeCoverage.test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope) ... ok
+2026-11-13T01:48:48.0396002Z test_probe_ledger_mutation_leaves_a_recoverable_pending_transaction (test_forge.ForgeCoverage.test_probe_ledger_mutation_leaves_a_recoverable_pending_transaction) ... ok
+2026-11-13T01:48:50.7327464Z test_renamed_duplicate_probe_does_not_earn_new_coverage (test_forge.ForgeCoverage.test_renamed_duplicate_probe_does_not_earn_new_coverage) ... ok
+2026-11-13T01:48:57.2316502Z test_repeated_clear_records_stability_and_explicit_blind_spots (test_forge.ForgeCoverage.test_repeated_clear_records_stability_and_explicit_blind_spots) ... ok
+2026-11-13T01:48:57.5323310Z test_stamp_requires_a_declared_probe_scope_before_any_commit (test_forge.ForgeCoverage.test_stamp_requires_a_declared_probe_scope_before_any_commit) ... ok
+2026-11-13T01:49:02.1780545Z test_ambient_supervision_marker_cannot_skip_the_bound (test_gate_budget.GateBudget.test_ambient_supervision_marker_cannot_skip_the_bound) ... ok
+2026-11-13T01:49:06.8878533Z test_expired_standalone_batch_does_not_give_every_ac_new_time (test_gate_budget.GateBudget.test_expired_standalone_batch_does_not_give_every_ac_new_time) ... ok
+2026-11-13T01:49:11.5434748Z test_hash_preparation_is_inside_the_same_bound (test_gate_budget.GateBudget.test_hash_preparation_is_inside_the_same_bound) ... ok
+2026-11-13T01:49:15.6489220Z test_borrowed_nested_gate_keeps_shorter_global_cap (test_gate_entry_budget.GateEntryBudget.test_borrowed_nested_gate_keeps_shorter_global_cap) ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_borrowed_nested_gate_keeps_shorter_global_cap", "completed": [], "contexts": [["463.637203371", "466.137203371"]], "elapsed": 2.518415119999986, "fresh_access_entries": [], "inherited_cap": 466.137203371, "limits": [{"cap": 466.137203371, "expired": true, "inherited_cap": "466.137203371", "observed": 463.752432137, "origin": "463.637203371"}, {"cap": 466.137203371, "expired": true, "inherited_cap": "466.137203371", "observed": 463.903152242, "origin": "463.637203371"}], "phases": [{"end": 463.688637896, "phase": "ledger-verification", "start": 463.687919241}, {"end": 463.843590613, "phase": "ledger-verification", "start": 463.842854993}, {"end": 463.971220147, "phase": "fingerprint", "start": 463.97111616}], "returncode": 2, "spans": [{"elapsed": 1.9983704420000095, "kind": "measurement", "label": "check:AC-1", "result": 124, "start_monotonic": 464.140533538, "state": "complete"}, {"elapsed": 2.3369739589999767, "kind": "verification", "label": "verify", "result": 124, "start_monotonic": 463.80335163, "state": "complete"}], "started_monotonic": 463.637203371, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": ""}
+2026-11-13T01:49:15.6506460Z ok
+2026-11-13T01:49:20.3245262Z test_borrowed_reader_preserves_time_spent_before_nested_gate (test_gate_entry_budget.GateEntryBudget.test_borrowed_reader_preserves_time_spent_before_nested_gate) ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_borrowed_reader_preserves_time_spent_before_nested_gate", "completed": [], "contexts": [["467.814673399", "470.814673399"]], "elapsed": 3.016606259000014, "fresh_access_entries": [], "limits": [{"cap": 470.814673399, "expired": true, "inherited_cap": "475.814673399", "observed": 469.909048142, "origin": "467.814673399"}, {"cap": 470.814673399, "expired": true, "inherited_cap": "470.814673399", "observed": 470.055087881, "origin": "467.814673399"}], "phases": [{"end": 469.851367123, "phase": "ledger-verification", "start": 469.850658203}, {"end": 469.996977234, "phase": "ledger-verification", "start": 469.996304539}, {"end": 470.118172352, "phase": "fingerprint", "start": 470.118084009}], "returncode": 2, "spans": [{"elapsed": 0.8577928220000217, "kind": "verification", "label": "verify", "result": 124, "start_monotonic": 469.958529569, "state": "complete"}, {"elapsed": 0.5293867600000226, "kind": "measurement", "label": "check:AC-1", "result": 124, "start_monotonic": 470.287101356, "state": "complete"}], "started_monotonic": 467.814673399, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": ""}
+2026-11-13T01:49:20.3260867Z ok
+2026-11-13T01:49:20.3262976Z test_expired_green_claim_with_state_reader_process_latency (test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_state_reader_process_latency)
+2026-11-13T01:49:24.3445786Z 28/76 with repeatable process-start pressure, not random CPU load. ... GATE_ENTRY_OBSERVATION {"access_elapsed": 1.1178664349999963, "case": "test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_state_reader_process_latency", "completed": ["0"], "contexts": [["473.733430233", "476.705478959"]], "delayed_lookups": ["^exit_signal=", "^task=", "^digest="], "elapsed": 1.1525192630000447, "fresh_access_entries": [473.733337423], "limits": [{"cap": 476.70547895927245, "expired": true, "inherited_cap": null, "observed": 473.774598563, "origin": "473.733430233"}, {"cap": 476.705478959, "expired": true, "inherited_cap": "476.705478959", "observed": 473.920422716, "origin": "473.733430233"}], "phases": [{"end": 473.733461891, "phase": "lock", "start": 473.733453058}, {"end": 473.734424243, "phase": "ledger-verification", "start": 473.733538446}, {"end": 473.862628607, "phase": "ledger-verification", "start": 473.861745374}, {"end": 473.983447017, "phase": "fingerprint", "start": 473.983265353}, {"end": 474.734026461, "phase": "fingerprint", "start": 474.733820411}], "returncode": 0, "spans": [{"elapsed": 1.0148542099999531, "kind": "acceptance", "label": "check", "result": 0, "start_monotonic": 473.824022123, "state": "complete"}, {"elapsed": 0.007623281000007864, "kind": "measurement", "label": "check:AC-1", "result": 0, "start_monotonic": 474.620806907, "state": "complete"}], "started_monotonic": 473.698684595, "stderr": "", "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-9a9cedba1bd0208136b7d46707b80dee7bccab22e8d9fc999529a99b200ea998 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n"}
+2026-11-13T01:49:24.3472692Z ok
+2026-11-13T01:49:29.0301122Z test_fresh_future_origin_and_supervision_marker_cannot_grant_time (test_gate_entry_budget.GateEntryBudget.test_fresh_future_origin_and_supervision_marker_cannot_grant_time) ... GATE_ENTRY_OBSERVATION {"access_elapsed": 2.9863575800000035, "case": "test_gate_entry_budget.GateEntryBudget.test_fresh_future_origin_and_supervision_marker_cannot_grant_time", "completed": [], "contexts": [["476.550514271", "479.521515650"]], "elapsed": 3.022556776999977, "fresh_access_entries": [476.550418656], "injected_origin": "4076.513946968", "limits": [{"cap": 479.521515650271, "expired": true, "inherited_cap": null, "observed": 478.593874269, "origin": "476.550514271"}, {"cap": 479.52151565, "expired": true, "inherited_cap": "479.521515650", "observed": 478.742153695, "origin": "476.550514271"}], "phases": [{"end": 476.550546089, "phase": "lock", "start": 476.550537275}, {"end": 478.551888304, "phase": "ledger-verification", "start": 476.550625819}, {"end": 478.683471697, "phase": "ledger-verification", "start": 478.682743178}, {"end": 478.806587813, "phase": "fingerprint", "start": 478.806493501}], "returncode": 2, "spans": [{"elapsed": 0.542759320000016, "kind": "measurement", "label": "check:AC-1", "result": 124, "start_monotonic": 478.979364551, "state": "complete"}, {"elapsed": 0.8798583629999825, "kind": "verification", "label": "verify", "result": 124, "start_monotonic": 478.643885303, "state": "complete"}], "started_monotonic": 476.514219459, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": "", "view_read": {"finished": 478.551782535, "real_views_verified": true, "started": 476.550637477}}
+2026-11-13T01:49:29.0319923Z ok
+2026-11-13T01:49:33.7154631Z test_python_startup_delay_spends_the_same_settlement (test_gate_entry_budget.GateEntryBudget.test_python_startup_delay_spends_the_same_settlement) ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_python_startup_delay_spends_the_same_settlement", "completed": [], "contexts": [["482.85356836", "484.206661813"]], "elapsed": 3.023188151999989, "fresh_access_entries": [], "limits": [], "phases": [], "returncode": 2, "spans": [{"elapsed": 1.2592432039999721, "kind": "verification", "label": "verify", "result": 124, "start_monotonic": 482.949078675, "state": "complete"}, {"elapsed": 0.9097025829999552, "kind": "measurement", "label": "check:AC-1", "result": 124, "start_monotonic": 483.298231325, "state": "complete"}], "started_monotonic": 481.199194639, "startup_delay_marker": true, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": ""}
+2026-11-13T01:49:33.7171215Z ok
+2026-11-13T01:49:38.4193517Z test_slow_real_view_preflight_spends_the_same_settlement (test_gate_entry_budget.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement) ... GATE_ENTRY_OBSERVATION {"access_elapsed": 2.983046040999966, "case": "test_gate_entry_budget.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement", "completed": [], "contexts": [["485.943199016", "488.913650550"]], "elapsed": 3.019857411999965, "fresh_access_entries": [485.943100467], "limits": [{"cap": 488.9136505498363, "expired": true, "inherited_cap": null, "observed": 487.988469751, "origin": "485.943199016"}, {"cap": 488.91365055, "expired": true, "inherited_cap": "488.913650550", "observed": 488.136131795, "origin": "485.943199016"}], "phases": [{"end": 485.943230534, "phase": "lock", "start": 485.943222351}, {"end": 487.944764297, "phase": "ledger-verification", "start": 485.943310204}, {"end": 488.078468324, "phase": "ledger-verification", "start": 488.077756791}, {"end": 488.201061656, "phase": "fingerprint", "start": 488.200949356}], "returncode": 2, "spans": [{"elapsed": 0.875987857000041, "kind": "verification", "label": "verify", "result": 124, "start_monotonic": 488.038969933, "state": "complete"}, {"elapsed": 0.540854333000027, "kind": "measurement", "label": "check:AC-1", "result": 124, "start_monotonic": 488.374196157, "state": "complete"}], "started_monotonic": 485.906289096, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": "", "view_read": {"finished": 487.944648181, "real_views_verified": true, "started": 485.943322352}}
+2026-11-13T01:49:38.4209524Z ok
+2026-11-13T01:49:45.2477756Z test_unbudgeted_batch_has_only_individual_check_timeouts (test_gate_entry_budget.GateEntryBudget.test_unbudgeted_batch_has_only_individual_check_timeouts) ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_unbudgeted_batch_has_only_individual_check_timeouts", "completed": ["0", "1", "2"], "contexts": [["489.493079425", "missing"], ["489.493079425", "missing"], ["489.493079425", "missing"], ["489.493079425", "missing"]], "elapsed": 6.308050137000009, "fresh_access_entries": [], "limits": [], "phases": [], "returncode": 2, "spans": [{"elapsed": 2.0022401960000025, "kind": "measurement", "label": "check:AC-4", "result": 124, "start_monotonic": 493.595068191, "state": "complete"}, {"elapsed": 6.15406754199995, "kind": "verification", "label": "verify", "result": 2, "start_monotonic": 489.588495602, "state": "complete"}, {"elapsed": 1.1083285349999983, "kind": "measurement", "label": "check:AC-1", "result": 0, "start_monotonic": 489.927611014, "state": "complete"}, {"elapsed": 1.1079656489999934, "kind": "measurement", "label": "check:AC-2", "result": 0, "start_monotonic": 491.136899312, "state": "complete"}, {"elapsed": 1.1080941430000166, "kind": "measurement", "label": "check:AC-3", "result": 0, "start_monotonic": 492.347442999, "state": "complete"}], "started_monotonic": 489.446296597, "stderr": "GATE: NO-GO reason=verify-failures:fail=0 broken=1\n", "stdout": "GATE: VERIFY AC-1|PASS|exit=0\nGATE: VERIFY AC-2|PASS|exit=0\nGATE: VERIFY AC-3|PASS|exit=0\nGATE: VERIFY AC-4|BROKEN|check not executable (rc=124) \n"}
+2026-11-13T01:49:45.2496029Z ok
+2026-11-13T01:49:45.2504390Z test_begin_refuses_symlink_evidence_parent (test_goal_store.CloseDurability.test_begin_refuses_symlink_evidence_parent) ... ok
+2026-11-13T01:49:45.2545648Z test_failed_view_sync_preserves_recovery_marker_and_old_state (test_goal_store.CloseDurability.test_failed_view_sync_preserves_recovery_marker_and_old_state) ... ok
+2026-11-13T01:49:45.2565209Z test_finish_syncs_file_and_directory_before_removing_marker (test_goal_store.CloseDurability.test_finish_syncs_file_and_directory_before_removing_marker) ... ok
+2026-11-13T01:49:45.2629047Z EVOLVE_HOLDOUT_REJECTION {"status": "holdout-rejected", "development_gain": 0.5, "holdout_gain": -0.5, "holdout_pairs": 8, "holdout_alpha": 0.008333333333333333, "pointer_unchanged": true, "incumbent_sha256": "b1b5ba90c098a185c4d07e423f324505bd5a7ec2b15b8037aac61d5a5e3c4f4d", "history_preserved": true, "run_enabled_exit": 0, "run_enabled_stdout": "candidate\n"}
+2026-11-13T01:49:45.3457798Z test_concurrent_readers_never_mix_views (test_goal_store.StoreTests.test_concurrent_readers_never_mix_views) ... ok
+2026-11-13T01:49:45.3484095Z test_corruption_and_missing_pointer_fail_closed (test_goal_store.StoreTests.test_corruption_and_missing_pointer_fail_closed) ... ok
+2026-11-13T01:49:45.4432122Z test_crash_before_and_after_pointer (test_goal_store.StoreTests.test_crash_before_and_after_pointer) ... ok
+2026-11-13T01:49:45.4890723Z test_first_generation_crash_recovers (test_goal_store.StoreTests.test_first_generation_crash_recovers) ... ok
+2026-11-13T01:49:45.4934407Z test_initial_migration_and_idempotency (test_goal_store.StoreTests.test_initial_migration_and_idempotency) ... ok
+2026-11-13T01:49:45.4937070Z test_invalid_lock_timeout_rejected (test_goal_store.StoreTests.test_invalid_lock_timeout_rejected) ... ok
+2026-11-13T01:49:45.4944301Z test_invalid_names_and_torn_pointer (test_goal_store.StoreTests.test_invalid_names_and_torn_pointer) ... ok
+2026-11-13T01:49:45.4948180Z test_lock_symlink_is_not_followed (test_goal_store.StoreTests.test_lock_symlink_is_not_followed) ... ok
+2026-11-13T01:49:45.6430299Z test_lock_timeout_does_not_publish (test_goal_store.StoreTests.test_lock_timeout_does_not_publish) ... ok
+2026-11-13T01:49:45.7408621Z test_lock_timeout_preserves_existing_head_and_generations (test_goal_store.StoreTests.test_lock_timeout_preserves_existing_head_and_generations) ... ok
+2026-11-13T01:49:45.7448330Z test_missing_committed_predecessor_is_not_an_empty_history (test_goal_store.StoreTests.test_missing_committed_predecessor_is_not_an_empty_history) ... ok
+2026-11-13T01:49:45.7450123Z test_missing_nofollow_fails_closed (test_goal_store.StoreTests.test_missing_nofollow_fails_closed) ... ok
+2026-11-13T01:49:45.7474967Z test_nested_paths_are_preserved_and_unsafe_names_rejected (test_goal_store.StoreTests.test_nested_paths_are_preserved_and_unsafe_names_rejected) ... ok
+2026-11-13T01:49:45.7477461Z test_open_and_read_never_create_store_files (test_goal_store.StoreTests.test_open_and_read_never_create_store_files) ... ok
+2026-11-13T01:49:45.7510153Z test_recover_preserves_unknown_and_corrupt_entries (test_goal_store.StoreTests.test_recover_preserves_unknown_and_corrupt_entries) ... ok
+2026-11-13T01:49:45.8104723Z test_simultaneous_writers_compare_and_swap (test_goal_store.StoreTests.test_simultaneous_writers_compare_and_swap) ... ok
+2026-11-13T01:49:46.6728718Z test_bridge_ack_ready_structured_completion_and_independent_adoption (test_host.Host.test_bridge_ack_ready_structured_completion_and_independent_adoption) ... ok
+2026-11-13T01:49:47.2504594Z test_cancellation_token_kills_only_owned_command_and_needs_host_confirmation (test_host.Host.test_cancellation_token_kills_only_owned_command_and_needs_host_confirmation) ... ok
+2026-11-13T01:49:47.7838378Z test_changed_launcher_cannot_bind_a_worker (test_host.Host.test_changed_launcher_cannot_bind_a_worker) ... ok
+2026-11-13T01:49:48.7632883Z test_claude_launcher_binds_and_runs_original_owned_ready (test_host.Host.test_claude_launcher_binds_and_runs_original_owned_ready) ... ok
+2026-11-13T01:49:50.4562404Z test_expired_budget_denies_hooks_and_no_wave_dispatch (test_host.Host.test_expired_budget_denies_hooks_and_no_wave_dispatch) ... ok
+2026-11-13T01:49:51.3257751Z test_first_explicit_prompt_is_captured_before_initialization_and_reentry (test_host.Host.test_first_explicit_prompt_is_captured_before_initialization_and_reentry) ... ok
+2026-11-13T01:49:52.3360712Z test_first_worker_tool_binds_ticket_and_codex_keeps_normal_permissions (test_host.Host.test_first_worker_tool_binds_ticket_and_codex_keeps_normal_permissions) ... ok
+2026-11-13T01:49:53.0052119Z test_interrupt_only_requests_and_structured_errors_keep_missing_output (test_host.Host.test_interrupt_only_requests_and_structured_errors_keep_missing_output) ... ok
+2026-11-13T01:49:53.5450716Z test_missing_launcher_cannot_bind_a_worker (test_host.Host.test_missing_launcher_cannot_bind_a_worker) ... ok
+2026-11-13T01:49:54.5345241Z test_native_claude_rewrite_does_not_auto_approve_permissions (test_host.Host.test_native_claude_rewrite_does_not_auto_approve_permissions) ... ok
+2026-11-13T01:49:55.6759250Z test_native_hooks_correlate_only_nonce_call_and_native_agent_id (test_host.Host.test_native_hooks_correlate_only_nonce_call_and_native_agent_id) ... ok
+2026-11-13T01:49:56.6838427Z test_non_goal_noop_and_explicit_prompt_entry_cache (test_host.Host.test_non_goal_noop_and_explicit_prompt_entry_cache) ... ok
+2026-11-13T01:49:57.1570665Z test_nonce_capacity_and_scope_rejection_preserve_failed_attempt (test_host.Host.test_nonce_capacity_and_scope_rejection_preserve_failed_attempt) ... ok
+2026-11-13T01:49:59.0874324Z test_other_worker_can_be_cancelled_while_validator_is_running (test_host.Host.test_other_worker_can_be_cancelled_while_validator_is_running) ... ok
+2026-11-13T01:49:59.8764172Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-q5w2km1u/1.out", "response": {}, "tool": "Write"}
+2026-11-13T01:49:59.9456928Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "./scratch/../1.out", "response": {}, "tool": "Write"}
+2026-11-13T01:50:00.0163090Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-q5w2km1u/2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+2026-11-13T01:50:00.0875169Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+2026-11-13T01:50:00.1574706Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out.extra", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+2026-11-13T01:50:00.2281902Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+2026-11-13T01:50:00.2968932Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": ".goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Write"}
+2026-11-13T01:50:00.3667766Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+2026-11-13T01:50:00.4371809Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-q5w2km1u-outside.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+2026-11-13T01:50:00.5073055Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+2026-11-13T01:50:00.5767741Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": null, "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write requires file_path"}}, "tool": "Write"}
+2026-11-13T01:50:00.6461448Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+2026-11-13T01:50:00.7158353Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-q5w2km1u/1.out", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:00.7860012Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "./scratch/../1.out", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:00.8568702Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-q5w2km1u/2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Edit"}
+2026-11-13T01:50:00.9272728Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:00.9976444Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out.extra", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Edit"}
+2026-11-13T01:50:01.0683851Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:01.1395202Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": ".goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Edit"}
+2026-11-13T01:50:01.2101804Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:01.2801517Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-q5w2km1u-outside.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Edit"}
+2026-11-13T01:50:01.3508223Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:01.4207600Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": null, "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write requires file_path"}}, "tool": "Edit"}
+2026-11-13T01:50:01.4901800Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:01.4938195Z test_registered_write_edit_stay_in_owned_paths_and_can_retry (test_host.Host.test_registered_write_edit_stay_in_owned_paths_and_can_retry) ... ok
+2026-11-13T01:50:02.0601748Z test_short_write_lock_contention_waits_and_records_each_ready_once (test_host.Host.test_short_write_lock_contention_waits_and_records_each_ready_once) ... ok
+2026-11-13T01:50:02.8442908Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-quec0krt/1.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+2026-11-13T01:50:02.9152961Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-quec0krt/1.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Edit"}
+2026-11-13T01:50:02.9867220Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-quec0krt/1.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+2026-11-13T01:50:03.0570639Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+2026-11-13T01:50:03.1277501Z STRUCTURED_WRITE_HOOK {"agent": null, "file_path": "/tmp/goal-write-outside-m_sdcekt/parent.py", "response": {}, "tool": "Write"}
+2026-11-13T01:50:03.1989364Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:03.2704393Z STRUCTURED_WRITE_HOOK {"agent": null, "file_path": "/tmp/goal-write-outside-m_sdcekt/parent.py", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:03.2738337Z test_structured_leaf_symlink_escape_and_parent_permissions (test_host.Host.test_structured_leaf_symlink_escape_and_parent_permissions) ... ok
+2026-11-13T01:50:04.0679298Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-txt5pz5a/owned/nested/new.py", "response": {}, "tool": "Write"}
+2026-11-13T01:50:04.1385680Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../owned/new.py", "response": {}, "tool": "Write"}
+2026-11-13T01:50:04.2081618Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+2026-11-13T01:50:04.2772812Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/.goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Write"}
+2026-11-13T01:50:04.3475833Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-txt5pz5a/owned/nested/new.py", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:04.4186039Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../owned/new.py", "response": {}, "tool": "Edit"}
+2026-11-13T01:50:04.4900693Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Edit"}
+2026-11-13T01:50:04.5604965Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/.goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Edit"}
+2026-11-13T01:50:04.6317738Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-txt5pz5a/owned/escape/new.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+2026-11-13T01:50:04.7027286Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-txt5pz5a/owned/escape/new.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Edit"}
+2026-11-13T01:50:04.7735853Z STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-txt5pz5a/owned/escape/../new.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+2026-11-13T01:50:04.7770898Z test_structured_write_subtree_checks_symlinks_and_control_paths (test_host.Host.test_structured_write_subtree_checks_symlinks_and_control_paths) ... ok
+2026-11-13T01:50:05.3691043Z test_symlink_launcher_cannot_bind_a_worker (test_host.Host.test_symlink_launcher_cannot_bind_a_worker) ... ok
+2026-11-13T01:50:05.8073157Z test_symlinked_state_and_cancel_target_are_refused (test_host.Host.test_symlinked_state_and_cancel_target_are_refused) ... ok
+2026-11-13T01:50:07.1364387Z test_actual_loop_resume_preserves_origin_and_run (test_host_budget.HostBudget.test_actual_loop_resume_preserves_origin_and_run) ... ok
+2026-11-13T01:50:07.5697276Z test_clock_regression_and_uncommitted_views_fail_without_writes (test_host_budget.HostBudget.test_clock_regression_and_uncommitted_views_fail_without_writes) ... ok
+2026-11-13T01:50:08.0484347Z test_earlier_observed_entry_is_preserved_when_adopted_later (test_host_budget.HostBudget.test_earlier_observed_entry_is_preserved_when_adopted_later) ... ok
+2026-11-13T01:50:08.9148812Z test_host_faults_use_same_pointer_commit_and_exact_recovery (test_host_budget.HostBudget.test_host_faults_use_same_pointer_commit_and_exact_recovery) ... ok
+2026-11-13T01:50:09.3468622Z test_host_observation_requires_exclusive_ledger_ownership (test_host_budget.HostBudget.test_host_observation_requires_exclusive_ledger_ownership) ... ok
+2026-11-13T01:50:09.7847117Z test_invalid_receipts_and_budgets_do_not_write (test_host_budget.HostBudget.test_invalid_receipts_and_budgets_do_not_write) ... ok
+2026-11-13T01:50:13.3756605Z test_late_real_gate_go_is_not_timely (test_host_budget.HostBudget.test_late_real_gate_go_is_not_timely) ... ok
+2026-11-13T01:50:14.3454272Z test_real_planning_delay_and_gate_elapsed_survive_owner_restart (test_host_budget.HostBudget.test_real_planning_delay_and_gate_elapsed_survive_owner_restart) ... ok
+2026-11-13T01:50:14.8050661Z test_reboot_keeps_origin_and_rejects_nonadvancing_wall_clock (test_host_budget.HostBudget.test_reboot_keeps_origin_and_rejects_nonadvancing_wall_clock) ... ok
+2026-11-13T01:50:15.2649223Z test_reentry_and_larger_allowance_never_extend_either_clock (test_host_budget.HostBudget.test_reentry_and_larger_allowance_never_extend_either_clock) ... ok
+2026-11-13T01:50:15.7226407Z test_script_entry_remains_accurate_and_v1_api_still_works (test_host_budget.HostBudget.test_script_entry_remains_accurate_and_v1_api_still_works) ... ok
+2026-11-13T01:50:16.0789752Z test_cancel_stops_owned_descendants_and_preserves_other_worker (test_host_cancel.HostCancellation.test_cancel_stops_owned_descendants_and_preserves_other_worker) ... ok
+2026-11-13T01:50:16.1300579Z test_cancelled_ticket_never_releases_a_new_command (test_host_cancel.HostCancellation.test_cancelled_ticket_never_releases_a_new_command) ... ok
+2026-11-13T01:50:16.7616050Z test_host_deadline_caps_longer_command_allowance (test_host_cancel.HostCancellation.test_host_deadline_caps_longer_command_allowance) ... ok
+2026-11-13T01:50:17.5681429Z test_fixed_worker_check_uses_project_cwd_without_granting_adoption (test_host_command.HostCommand.test_fixed_worker_check_uses_project_cwd_without_granting_adoption) ... ok
+2026-11-13T01:50:18.1388353Z test_pre_cancel_never_releases_command (test_host_command.HostCommand.test_pre_cancel_never_releases_command) ... ok
+2026-11-13T01:50:19.0235421Z test_ticket_cancel_stops_descendants_and_keeps_sibling_and_parent_trace (test_host_command.HostCommand.test_ticket_cancel_stops_descendants_and_keeps_sibling_and_parent_trace) ... ok
+2026-11-13T01:50:21.1355354Z test_wrapper_rechecks_shortened_budget_instead_of_ticket_original_deadline (test_host_command.HostCommand.test_wrapper_rechecks_shortened_budget_instead_of_ticket_original_deadline) ... ok
+2026-11-13T01:50:23.8206704Z test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch (test_incumbent.Incumbent.test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch) ... ok
+2026-11-13T01:50:26.0518047Z test_failed_gate_or_unsafe_scope_cannot_be_saved_as_incumbent (test_incumbent.Incumbent.test_failed_gate_or_unsafe_scope_cannot_be_saved_as_incumbent) ... ok
+2026-11-13T01:50:30.0365399Z test_interrupted_restore_blocks_gate_and_recovery_preserves_conflicts (test_incumbent.Incumbent.test_interrupted_restore_blocks_gate_and_recovery_preserves_conflicts) ... ok
+2026-11-13T01:50:33.5207529Z test_owned_user_edit_refuses_all_writes_unowned_edit_survives (test_incumbent.Incumbent.test_owned_user_edit_refuses_all_writes_unowned_edit_survives) ... ok
+2026-11-13T01:50:37.7467983Z test_restored_bytes_and_permissions_reproduce_original_go (test_incumbent.Incumbent.test_restored_bytes_and_permissions_reproduce_original_go) ... ok
+2026-11-13T01:50:50.2892491Z test_checkpoint_refuses_missing_uncalibrated_and_unverifiable_horizon (test_incumbent.IntermediateCheckpoint.test_checkpoint_refuses_missing_uncalibrated_and_unverifiable_horizon) ... ok
+2026-11-13T01:51:04.2747916Z test_checkpoint_reruns_floor_and_honors_inherited_deadline (test_incumbent.IntermediateCheckpoint.test_checkpoint_reruns_floor_and_honors_inherited_deadline) ... ok
+2026-11-13T01:51:14.6016418Z test_failed_horizon_cannot_advance_an_otherwise_feasible_score (test_incumbent.IntermediateCheckpoint.test_failed_horizon_cannot_advance_an_otherwise_feasible_score) ... ok
+2026-11-13T01:51:24.6237148Z test_intermediate_restore_requalifies_without_claiming_completion (test_incumbent.IntermediateCheckpoint.test_intermediate_restore_requalifies_without_claiming_completion) ... ok
+2026-11-13T01:51:36.0776863Z test_qualification_and_bind_recover_on_both_sides_of_commit (test_incumbent.IntermediateCheckpoint.test_qualification_and_bind_recover_on_both_sides_of_commit) ... ok
+2026-11-13T01:51:42.0840650Z test_bind_qualifier_cannot_publish_historical_raw_mutation (test_incumbent.QualifiedWatermark.test_bind_qualifier_cannot_publish_historical_raw_mutation) ... ok
+2026-11-13T01:51:47.6635055Z test_bind_qualifier_cannot_publish_log_mutation (test_incumbent.QualifiedWatermark.test_bind_qualifier_cannot_publish_log_mutation) ... ok
+2026-11-13T01:51:53.2973144Z test_bind_qualifier_cannot_publish_state_mutation_in_its_own_scope (test_incumbent.QualifiedWatermark.test_bind_qualifier_cannot_publish_state_mutation_in_its_own_scope) ... ok
+2026-11-13T01:51:58.9890831Z test_bind_qualifier_cannot_publish_verdict_mutation_in_its_own_scope (test_incumbent.QualifiedWatermark.test_bind_qualifier_cannot_publish_verdict_mutation_in_its_own_scope) ... ok
+2026-11-13T01:52:07.5185897Z test_feasible_lower_score_does_not_replace_qualified_best (test_incumbent.QualifiedWatermark.test_feasible_lower_score_does_not_replace_qualified_best) ... ok
+2026-11-13T01:52:15.1306871Z test_improving_objective_with_declining_judge_still_fails (test_incumbent.QualifiedWatermark.test_improving_objective_with_declining_judge_still_fails) ... ok
+2026-11-13T01:52:26.9092068Z test_infeasible_maximum_cannot_poison_restored_incumbent (test_incumbent.QualifiedWatermark.test_infeasible_maximum_cannot_poison_restored_incumbent) ... ok
+2026-11-13T01:52:38.5939960Z test_infeasible_minimum_cannot_poison_restored_incumbent (test_incumbent.QualifiedWatermark.test_infeasible_minimum_cannot_poison_restored_incumbent) ... ok
+2026-11-13T01:52:46.1784677Z test_lower_minimize_score_with_declining_judge_still_fails (test_incumbent.QualifiedWatermark.test_lower_minimize_score_with_declining_judge_still_fails) ... ok
+2026-11-13T01:52:56.6279756Z test_same_score_qualified_judge_is_used_for_next_comparison (test_incumbent.QualifiedWatermark.test_same_score_qualified_judge_is_used_for_next_comparison) ... ok
+2026-11-13T01:53:06.4582378Z test_temporary_contract_tamper_cannot_erase_prior_qualification (test_incumbent.QualifiedWatermark.test_temporary_contract_tamper_cannot_erase_prior_qualification) ... ok
+2026-11-13T01:53:13.7939020Z test_unfrozen_prose_cannot_reset_a_qualified_watermark (test_incumbent.QualifiedWatermark.test_unfrozen_prose_cannot_reset_a_qualified_watermark) ... ok
+2026-11-13T01:53:14.3959495Z test_changed_adopted_parent_cannot_authorize_child (test_learning_flow.LearningFlow.test_changed_adopted_parent_cannot_authorize_child) ... ok
+2026-11-13T01:53:15.4608611Z test_changed_interface_between_validation_and_adoption_is_rejected (test_learning_flow.LearningFlow.test_changed_interface_between_validation_and_adoption_is_rejected) ... ok
+2026-11-13T01:53:16.2422313Z test_context_cannot_relabel_a_borrowed_reader_as_writer (test_learning_flow.LearningFlow.test_context_cannot_relabel_a_borrowed_reader_as_writer) ... ok
+2026-11-13T01:53:18.9144310Z test_context_does_not_send_an_unbooked_or_claimed_wave_back_to_work (test_learning_flow.LearningFlow.test_context_does_not_send_an_unbooked_or_claimed_wave_back_to_work) ... ok
+2026-11-13T01:53:19.8519607Z test_context_rejects_stale_artifact_and_corrupt_ledger (test_learning_flow.LearningFlow.test_context_rejects_stale_artifact_and_corrupt_ledger) ... ok
+2026-11-13T01:53:21.5039965Z test_context_stamp_consumes_revision_under_original_writer_lock (test_learning_flow.LearningFlow.test_context_stamp_consumes_revision_under_original_writer_lock) ... ok
+2026-11-13T01:53:22.6796597Z test_expired_context_offers_no_dispatch_and_receipt_does_not_invent_go (test_learning_flow.LearningFlow.test_expired_context_offers_no_dispatch_and_receipt_does_not_invent_go) ... ok
+2026-11-13T01:53:24.5740735Z test_first_real_hook_entry_has_a_usable_map_before_contract_exists (test_learning_flow.LearningFlow.test_first_real_hook_entry_has_a_usable_map_before_contract_exists) ... ok
+2026-11-13T01:53:25.2999708Z test_holdout_rejection_preserves_the_consumed_routing_version (test_learning_flow.LearningFlow.test_holdout_rejection_preserves_the_consumed_routing_version) ... ok
+2026-11-13T01:53:25.7676323Z test_installed_entry_cannot_launch_harness (test_learning_flow.LearningFlow.test_installed_entry_cannot_launch_harness) ... ok
+2026-11-13T01:53:26.2614499Z test_prepare_is_stable_until_the_actual_budget_changes (test_learning_flow.LearningFlow.test_prepare_is_stable_until_the_actual_budget_changes) ... ok
+2026-11-13T01:53:27.0239377Z test_qualified_policy_changes_dispatch_and_mismatch_retains_baseline (test_learning_flow.LearningFlow.test_qualified_policy_changes_dispatch_and_mismatch_retains_baseline) ... ok
+2026-11-13T01:53:27.7540689Z test_related_inputs_interfaces_and_outputs_invalidate_reuse (test_learning_flow.LearningFlow.test_related_inputs_interfaces_and_outputs_invalidate_reuse) ... ok
+2026-11-13T01:53:28.6207149Z test_repair_dispatches_only_failed_unit_and_preserves_good_bytes (test_learning_flow.LearningFlow.test_repair_dispatches_only_failed_unit_and_preserves_good_bytes) ... ok
+2026-11-13T01:53:29.5524555Z test_task_rename_cannot_reset_retry_cap (test_learning_flow.LearningFlow.test_task_rename_cannot_reset_retry_cap) ... ok
+2026-11-13T01:53:30.1457647Z test_unique_prompt_enter_preserves_earliest_origin_and_rejects_ambiguity (test_learning_flow.LearningFlow.test_unique_prompt_enter_preserves_earliest_origin_and_rejects_ambiguity) ... ok
+2026-11-13T01:53:30.5958015Z test_v2_rejects_wait_without_a_consumed_artifact (test_learning_flow.LearningFlow.test_v2_rejects_wait_without_a_consumed_artifact) ... ok
+2026-11-13T01:53:31.2601293Z test_withdrawal_and_pending_transition_block_stale_dispatch (test_learning_flow.LearningFlow.test_withdrawal_and_pending_transition_block_stale_dispatch) ... ok
+2026-11-13T01:53:33.5818874Z test_background_check_is_cancelled_and_cannot_keep_access_or_store_lock (test_ledger_access.LedgerAccess.test_background_check_is_cancelled_and_cannot_keep_access_or_store_lock) ... ok
+2026-11-13T01:53:34.7578917Z test_check_cannot_reenter_controller_writer (test_ledger_access.LedgerAccess.test_check_cannot_reenter_controller_writer) ... ok
+2026-11-13T01:53:35.3670688Z test_exclusive_owner_excludes_every_controller_and_reader (test_ledger_access.LedgerAccess.test_exclusive_owner_excludes_every_controller_and_reader) ... ok
+2026-11-13T01:53:36.6607654Z test_external_cache_gate_serializes_readers (test_ledger_access.LedgerAccess.test_external_cache_gate_serializes_readers) ... ok
+2026-11-13T01:53:37.1852767Z test_init_and_stamp_preflight_preserve_ledger_and_decimal_budgets (test_ledger_access.LedgerAccess.test_init_and_stamp_preflight_preserve_ledger_and_decimal_budgets) ... ok
+2026-11-13T01:53:38.5608574Z test_killed_controller_releases_borrowed_raw_gate_locks (test_ledger_access.LedgerAccess.test_killed_controller_releases_borrowed_raw_gate_locks) ... ok
+2026-11-13T01:53:39.6224601Z test_killed_gate_does_not_leave_foreground_shell_holding_lock (test_ledger_access.LedgerAccess.test_killed_gate_does_not_leave_foreground_shell_holding_lock) ... ok
+2026-11-13T01:53:40.9319000Z test_live_verification_holds_shared_lock_for_entire_check (test_ledger_access.LedgerAccess.test_live_verification_holds_shared_lock_for_entire_check) ... ok
+2026-11-13T01:53:41.2958426Z test_shared_reader_excludes_writer_without_creating_files (test_ledger_access.LedgerAccess.test_shared_reader_excludes_writer_without_creating_files) ... ok
+2026-11-13T01:53:41.5632138Z test_stale_inherited_descriptor_is_refused (test_ledger_access.LedgerAccess.test_stale_inherited_descriptor_is_refused) ... ok
+2026-11-13T01:53:41.9324532Z MEDIUM_GRADER_OBSERVATION {"fixture": "control", "returncode": 0, "ok": true, "checks": 28, "failed": [], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+2026-11-13T01:53:41.9326900Z test_correct_control_is_accepted (test_medium_grader.MediumGrader.test_correct_control_is_accepted) ... ok
+2026-11-13T01:53:42.3102616Z MEDIUM_GRADER_OBSERVATION {"fixture": "missing-input", "returncode": 1, "ok": false, "checks": 28, "failed": ["cli-missing-input"], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+2026-11-13T01:53:42.6781840Z MEDIUM_GRADER_OBSERVATION {"fixture": "physical-line", "returncode": 1, "ok": false, "checks": 28, "failed": ["strict-physical-line-13"], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+2026-11-13T01:53:43.0500437Z MEDIUM_GRADER_OBSERVATION {"fixture": "integer-amount", "returncode": 1, "ok": false, "checks": 28, "failed": ["parser-original-integer"], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+2026-11-13T01:53:43.4238490Z MEDIUM_GRADER_OBSERVATION {"fixture": "skip-fields", "returncode": 1, "ok": false, "checks": 28, "failed": ["skip-bad-complete-groups"], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+2026-11-13T01:53:43.8491572Z MEDIUM_GRADER_OBSERVATION {"fixture": "literal-utf8", "returncode": 1, "ok": false, "checks": 28, "failed": ["cli-literal-utf8"], "error": null, "grader_sha256": "cb4b97f2db0450f2f21eda5bd9d8e8478931d5e7d3394915666130712c22730d"}
+2026-11-13T01:53:43.8498213Z test_five_single_defect_mutants_are_rejected (test_medium_grader.MediumGrader.test_five_single_defect_mutants_are_rejected) ... ok
+2026-11-13T01:53:50.8899702Z test_all_writers_recover_at_each_side_of_pointer_and_lost_ack (test_mutation_commit.MutationCommit.test_all_writers_recover_at_each_side_of_pointer_and_lost_ack) ... ok
+2026-11-13T01:53:51.4833703Z test_bind_batch_is_all_or_nothing_and_input_is_part_of_identity (test_mutation_commit.MutationCommit.test_bind_batch_is_all_or_nothing_and_input_is_part_of_identity) ... ok
+2026-11-13T01:53:51.7535104Z test_stamp_missing_approval_placeholder_is_preflight_only (test_mutation_commit.MutationCommit.test_stamp_missing_approval_placeholder_is_preflight_only) ... ok
+2026-11-13T01:53:51.7544198Z test_already_exited_unreaped_owner_never_starts_command (test_owner_watch.OwnerWatch.test_already_exited_unreaped_owner_never_starts_command) ... ok
+2026-11-13T01:53:51.7602582Z test_failed_child_event_registration_never_releases_command (test_owner_watch.OwnerWatch.test_failed_child_event_registration_never_releases_command) ... ok
+2026-11-13T01:53:51.7758348Z test_inherited_sigchld_ignore_cannot_auto_reap_supervised_child (test_owner_watch.OwnerWatch.test_inherited_sigchld_ignore_cannot_auto_reap_supervised_child) ... ok
+2026-11-13T01:53:51.7918060Z test_large_budget_does_not_overflow_process_event_wait (test_owner_watch.OwnerWatch.test_large_budget_does_not_overflow_process_event_wait) ... ok
+2026-11-13T01:53:51.8259914Z test_normal_command_status_and_exec_pid_are_preserved (test_owner_watch.OwnerWatch.test_normal_command_status_and_exec_pid_are_preserved) ... ok
+2026-11-13T01:53:51.8691362Z test_owner_zombie_exit_kills_child_before_owner_is_reaped (test_owner_watch.OwnerWatch.test_owner_zombie_exit_kills_child_before_owner_is_reaped) ... ok
+2026-11-13T01:53:51.8693611Z test_ready_fd_must_be_a_pipe_before_starting_command (test_owner_watch.OwnerWatch.test_ready_fd_must_be_a_pipe_before_starting_command) ... ok
+2026-11-13T01:53:51.8918689Z test_supervisor_termination_cleans_its_child (test_owner_watch.OwnerWatch.test_supervisor_termination_cleans_its_child) ... ok
+2026-11-13T01:53:51.8923716Z test_unavailable_exit_events_never_start_command (test_owner_watch.OwnerWatch.test_unavailable_exit_events_never_start_command) ... ok
+2026-11-13T01:53:51.9688443Z OWNER_GUARD_OBSERVATION {"command_ready": false, "elapsed": 0.07582490400000097, "infinite_requested": false, "late_write": false, "mode": "normal", "result": 7, "stderr": "", "stdout": "{\"nofile\": [65536, 65536]}\n"}
+2026-11-13T01:53:52.9239914Z OWNER_GUARD_OBSERVATION {"command_ready": true, "elapsed": 0.30457656400005817, "infinite_requested": false, "late_write": false, "mode": "timeout", "result": 124, "stderr": "", "stdout": "{\"nofile\": [65536, 65536]}\n"}
+2026-11-13T01:53:53.6791302Z OWNER_GUARD_OBSERVATION {"command_ready": true, "elapsed": 0.10462294399997063, "infinite_requested": false, "late_write": false, "mode": "cancel", "result": 130, "stderr": "", "stdout": "{\"nofile\": [65536, 65536]}\n"}
+2026-11-13T01:53:53.6792671Z test_finite_limit_normal_timeout_and_cancel (test_owner_watch_guard.GroupGuard.test_finite_limit_normal_timeout_and_cancel) ... ok
+2026-11-13T01:53:53.8126492Z OWNER_GUARD_FDS {"guard_alive": true, "guard_wait": [0, 0], "high_fd": 2000, "infinite_requested": false, "lock_released_while_parent_alive": true, "nofile": [65536, 65536], "nofile_before_fd_setup": [65536, 65536], "parent_alive": true, "stderr": "", "stdout": "", "stdout_eof_while_parent_alive": true}
+2026-11-13T01:53:53.8128042Z test_guard_drops_stdout_and_high_lock_descriptor (test_owner_watch_guard.GroupGuard.test_guard_drops_stdout_and_high_lock_descriptor) ... ok
+2026-11-13T01:53:53.8129214Z test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors (test_owner_watch_guard.GroupGuard.test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors) ... skipped 'actual hard RLIMIT_NOFILE prevents inheriting infinity'
+2026-11-13T01:53:53.8130414Z test_infinite_limit_normal_timeout_and_cancel (test_owner_watch_guard.GroupGuard.test_infinite_limit_normal_timeout_and_cancel) ... skipped 'actual hard RLIMIT_NOFILE prevents inheriting infinity'
+2026-11-13T01:53:53.8308680Z OWNER_GUARD_UNAVAILABLE {"command_executed": false, "result": 127, "stderr": "OWNER_WATCH: ERROR command-start: open-descriptor-inventory-unavailable\n", "stdout": ""}
+2026-11-13T01:53:53.8310014Z test_unavailable_descriptor_inventories_never_execute_user_command (test_owner_watch_guard.GroupGuard.test_unavailable_descriptor_inventories_never_execute_user_command) ... ok
+2026-11-13T01:53:56.8511743Z test_checkpoint_bundle_transition_recovers_from_archives_without_project_reexecution (test_policy_transition.PolicyTransition.test_checkpoint_bundle_transition_recovers_from_archives_without_project_reexecution) ... ok
+2026-11-13T01:53:57.6182860Z test_evaluating_crash_can_be_quarantined_in_same_state_without_claiming_withdrawal (test_policy_transition.PolicyTransition.test_evaluating_crash_can_be_quarantined_in_same_state_without_claiming_withdrawal) ... ok
+2026-11-13T01:53:57.9671650Z test_execution_and_recovery_obey_same_directory_writer_lock (test_policy_transition.PolicyTransition.test_execution_and_recovery_obey_same_directory_writer_lock) ... ok
+2026-11-13T01:53:59.2044173Z test_execution_keeps_reader_lock_through_owned_process_cleanup (test_policy_transition.PolicyTransition.test_execution_keeps_reader_lock_through_owned_process_cleanup) ... ok
+2026-11-13T01:53:59.5767575Z test_final_report_write_failure_leaves_committed_switch_pending (test_policy_transition.PolicyTransition.test_final_report_write_failure_leaves_committed_switch_pending) ... ok
+2026-11-13T01:53:59.9090542Z test_first_promotion_recovers_without_a_previous_pointer (test_policy_transition.PolicyTransition.test_first_promotion_recovers_without_a_previous_pointer) ... ok
+2026-11-13T01:54:00.1469515Z test_guard_creation_failure_never_dispatches_a_trial (test_policy_transition.PolicyTransition.test_guard_creation_failure_never_dispatches_a_trial) ... ok
+2026-11-13T01:54:00.5777116Z test_intent_creation_failure_after_regression_retains_evaluation_guard (test_policy_transition.PolicyTransition.test_intent_creation_failure_after_regression_retains_evaluation_guard) ... ok
+2026-11-13T01:54:00.8148196Z test_normal_budget_exhaustion_retains_enabled_policy_and_clears_guard (test_policy_transition.PolicyTransition.test_normal_budget_exhaustion_retains_enabled_policy_and_clears_guard) ... ok
+2026-11-13T01:54:01.1715307Z test_pointer_write_failure_blocks_old_policy_until_real_recovery (test_policy_transition.PolicyTransition.test_pointer_write_failure_blocks_old_policy_until_real_recovery) ... ok
+2026-11-13T01:54:03.1891960Z test_process_crashes_before_after_switch_report_and_ack_recover_without_replay (test_policy_transition.PolicyTransition.test_process_crashes_before_after_switch_report_and_ack_recover_without_replay) ... ok
+2026-11-13T01:54:04.0208348Z test_quarantine_itself_recovers_on_both_sides_of_pointer_switch (test_policy_transition.PolicyTransition.test_quarantine_itself_recovers_on_both_sides_of_pointer_switch) ... ok
+2026-11-13T01:54:06.4746066Z test_recovery_detects_checksum_pointer_report_material_and_archive_edits (test_policy_transition.PolicyTransition.test_recovery_detects_checksum_pointer_report_material_and_archive_edits) ... ok
+2026-11-13T01:54:09.0034283Z test_budget_commit_failure_sides_and_exact_recovery (test_runner_lifecycle.Lifecycle.test_budget_commit_failure_sides_and_exact_recovery) ... ok
+2026-11-13T01:54:12.3848207Z test_competing_runners_dispatch_exactly_one_worker (test_runner_lifecycle.Lifecycle.test_competing_runners_dispatch_exactly_one_worker) ... ok
+2026-11-13T01:54:15.7202814Z test_frozen_wall_clock_cannot_renew_monotonic_budget (test_runner_lifecycle.Lifecycle.test_frozen_wall_clock_cannot_renew_monotonic_budget) ... ok
+2026-11-13T01:54:18.1618799Z test_late_product_go_is_not_counted_as_timely_success (test_runner_lifecycle.Lifecycle.test_late_product_go_is_not_counted_as_timely_success) ... ok
+2026-11-13T01:54:21.5830341Z test_outer_executor_cancellation_cleans_nested_check_group (test_runner_lifecycle.Lifecycle.test_outer_executor_cancellation_cleans_nested_check_group) ... ok
+2026-11-13T01:54:24.8221624Z test_runner_death_before_reaping_stops_group_and_releases_ownership (test_runner_lifecycle.Lifecycle.test_runner_death_before_reaping_stops_group_and_releases_ownership) ... ok
+2026-11-13T01:54:26.6135609Z test_runner_views_cannot_extend_budget_outside_commit (test_runner_lifecycle.Lifecycle.test_runner_views_cannot_extend_budget_outside_commit) ... ok
+2026-11-13T01:54:29.9380763Z test_standalone_gate_ignores_unbounded_timeout_tool (test_runner_lifecycle.Lifecycle.test_standalone_gate_ignores_unbounded_timeout_tool) ... ok
+2026-11-13T01:54:33.0344931Z test_standalone_gate_zombie_cannot_leave_check_running (test_runner_lifecycle.Lifecycle.test_standalone_gate_zombie_cannot_leave_check_running) ... ok
+2026-11-13T01:54:33.3009603Z test_damaged_cost_evidence_does_not_turn_into_zero_or_a_go (test_runtime_trace.RuntimeTrace.test_damaged_cost_evidence_does_not_turn_into_zero_or_a_go) ... ok
+2026-11-13T01:54:33.4993108Z test_handled_supervisor_setup_failure_finishes_cost_without_dispatch (test_runtime_trace.RuntimeTrace.test_handled_supervisor_setup_failure_finishes_cost_without_dispatch) ... ok
+2026-11-13T01:54:34.7267637Z test_measurement_conditions_and_nested_wall_time_are_observed (test_runtime_trace.RuntimeTrace.test_measurement_conditions_and_nested_wall_time_are_observed) ... ok
+2026-11-13T01:54:35.1316627Z test_timed_out_executor_is_retained_with_nonzero_cost (test_runtime_trace.RuntimeTrace.test_timed_out_executor_is_retained_with_nonzero_cost) ... ok
+2026-11-13T01:54:35.4007044Z test_unfinished_span_is_unknown_not_zero (test_runtime_trace.RuntimeTrace.test_unfinished_span_is_unknown_not_zero) ... ok
+2026-11-13T01:54:51.9192439Z RESOURCE_PRESSURE_OBSERVATION [{'shared': True, 'result': 1, 'elapsed': 7.072361987000022, 'stdout': '  ok   - pressure producer joined\n== results: pass=1 fail=0 ==\nGATE: BLOCKED reason=time-budget-exhausted\n  FAIL - same green settlement (want rc=0 got rc=3)\n== results: pass=0 fail=1 ==\n== total: pass=1 fail=1 shards=2 ==\n', 'stderr': ''}, {'shared': False, 'result': 0, 'elapsed': 9.445356098000047, 'stdout': 'run_tests: isolated finite-settlement cluster=2\n  ok   - pressure producer joined\n== results: pass=1 fail=0 ==\nGATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-656d1c99b9c6fe7011a5057f8d9571f612229705a84279e7615eb5d4a8e84bc7 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n  ok   - same green settlement (rc=0)\n== results: pass=1 fail=0 ==\n== total: pass=2 fail=0 shards=2 ==\n', 'stderr': ''}]
+2026-11-13T01:54:51.9196609Z test_same_gate_and_assertion_under_shared_and_isolated_pressure (test_scenario_resources.ScenarioResources.test_same_gate_and_assertion_under_shared_and_isolated_pressure) ... ok
+2026-11-13T01:54:51.9223669Z test_actual_three_round_case_is_one_artifact_and_two_claims (test_strategy_events.StrategyEvents.test_actual_three_round_case_is_one_artifact_and_two_claims) ... ok
+2026-11-13T01:55:00.0993183Z test_real_controller_same_artifact_claims_do_not_create_strategy_benefit (test_strategy_events.StrategyEvents.test_real_controller_same_artifact_claims_do_not_create_strategy_benefit) ... ok
+2026-11-13T01:55:00.1055457Z test_restoration_and_missing_identity_do_not_earn_fresh_gain (test_strategy_events.StrategyEvents.test_restoration_and_missing_identity_do_not_earn_fresh_gain) ... ok
+2026-11-13T01:55:00.1082853Z test_same_artifact_score_changes_are_information_not_strategy_gain (test_strategy_events.StrategyEvents.test_same_artifact_score_changes_are_information_not_strategy_gain) ... ok
+2026-11-13T01:55:02.9046922Z test_open_caller_pipe_does_not_block_fixed_prompt_executor (test_unattended_stdin.ExecutorInput.test_open_caller_pipe_does_not_block_fixed_prompt_executor) ... ok
+2026-11-13T01:55:13.9351043Z test_all_managed_views_refuse_even_harmless_uncommitted_changes (test_view_authority.ViewAuthority.test_all_managed_views_refuse_even_harmless_uncommitted_changes) ... ok
+2026-11-13T01:55:16.4823810Z test_ambient_mode_without_inherited_descriptor_cannot_bypass_view_check (test_view_authority.ViewAuthority.test_ambient_mode_without_inherited_descriptor_cannot_bypass_view_check) ... ok
+2026-11-13T01:55:20.0451593Z test_generation_checksum_is_verified_by_all_readers (test_view_authority.ViewAuthority.test_generation_checksum_is_verified_by_all_readers) ... ok
+2026-11-13T01:55:22.2106786Z test_invalid_init_identity_creates_no_goal_directory (test_view_authority.ViewAuthority.test_invalid_init_identity_creates_no_goal_directory) ... ok
+2026-11-13T01:55:24.4741861Z test_migration_refuses_duplicate_or_truncated_legacy_iteration_rows (test_view_authority.ViewAuthority.test_migration_refuses_duplicate_or_truncated_legacy_iteration_rows) ... ok
+2026-11-13T01:55:27.7523689Z test_migration_refuses_legacy_history_view_disagreement (test_view_authority.ViewAuthority.test_migration_refuses_legacy_history_view_disagreement) ... ok
+2026-11-13T01:55:31.4346915Z test_missing_or_truncated_pointer_never_falls_back_to_legacy (test_view_authority.ViewAuthority.test_missing_or_truncated_pointer_never_falls_back_to_legacy) ... ok
+2026-11-13T01:55:34.6586361Z test_no_pending_recovery_restores_exact_latest_committed_version (test_view_authority.ViewAuthority.test_no_pending_recovery_restores_exact_latest_committed_version) ... ok
+2026-11-13T01:55:36.9523310Z test_resetting_approval_marker_cannot_reapprove_a_weaker_contract (test_view_authority.ViewAuthority.test_resetting_approval_marker_cannot_reapprove_a_weaker_contract) ... ok
+2026-11-13T01:55:39.3277707Z test_unknown_legacy_command_kind_is_not_silently_migrated (test_view_authority.ViewAuthority.test_unknown_legacy_command_kind_is_not_silently_migrated) ... ok
+2026-11-13T01:55:42.5661563Z test_unversioned_legacy_requires_explicit_read_only_migration (test_view_authority.ViewAuthority.test_unversioned_legacy_requires_explicit_read_only_migration) ... ok
+2026-11-13T01:55:42.6327123Z test_cleanup_handles_shell_special_temporary_directory_path (test_worktree_scope.WorktreeScope.test_cleanup_handles_shell_special_temporary_directory_path) ... ok
+2026-11-13T01:55:42.8379583Z test_dirty_parent_files_do_not_bind_subproject (test_worktree_scope.WorktreeScope.test_dirty_parent_files_do_not_bind_subproject) ... ok
+2026-11-13T01:55:43.9277084Z test_gate_verify_rejects_check_mutating_gitlink_content (test_worktree_scope.WorktreeScope.test_gate_verify_rejects_check_mutating_gitlink_content) ... ok
+2026-11-13T01:55:44.1748307Z test_gitlink_binds_checked_out_commit_and_parent_index_object (test_worktree_scope.WorktreeScope.test_gitlink_binds_checked_out_commit_and_parent_index_object) ... ok
+2026-11-13T01:55:47.2262990Z test_gitlink_edit_invalidates_prior_judged_evidence (test_worktree_scope.WorktreeScope.test_gitlink_edit_invalidates_prior_judged_evidence) ... ok
+2026-11-13T01:55:47.6400618Z test_gitlink_ignored_files_require_explicit_watch (test_worktree_scope.WorktreeScope.test_gitlink_ignored_files_require_explicit_watch) ... ok
+2026-11-13T01:55:49.0778233Z test_gitlink_nesting_limit_fails_closed (test_worktree_scope.WorktreeScope.test_gitlink_nesting_limit_fails_closed) ... ok
+2026-11-13T01:55:49.1793883Z test_gitlink_tracked_path_cannot_follow_symlink_parent (test_worktree_scope.WorktreeScope.test_gitlink_tracked_path_cannot_follow_symlink_parent) ... ok
+2026-11-13T01:55:49.4259681Z test_gitlink_tracked_symlink_hashes_target_without_following_it (test_worktree_scope.WorktreeScope.test_gitlink_tracked_symlink_hashes_target_without_following_it) ... ok
+2026-11-13T01:55:49.8294456Z test_gitlink_tracked_untracked_and_deleted_bytes_are_bound (test_worktree_scope.WorktreeScope.test_gitlink_tracked_untracked_and_deleted_bytes_are_bound) ... ok
+2026-11-13T01:55:50.0329663Z test_initialized_submodule_gitfile_binds_child_bytes (test_worktree_scope.WorktreeScope.test_initialized_submodule_gitfile_binds_child_bytes) ... ok
+2026-11-13T01:55:50.3304929Z test_linked_worktree_uses_the_selected_worktree_bytes (test_worktree_scope.WorktreeScope.test_linked_worktree_uses_the_selected_worktree_bytes) ... ok
+2026-11-13T01:55:50.7106350Z test_nested_gitlinks_bind_content_and_commit_with_awkward_names (test_worktree_scope.WorktreeScope.test_nested_gitlinks_bind_content_and_commit_with_awkward_names) ... ok
+2026-11-13T01:55:50.7980966Z test_shell_fallback_refuses_gitlink_instead_of_partial_digest (test_worktree_scope.WorktreeScope.test_shell_fallback_refuses_gitlink_instead_of_partial_digest) ... ok
+2026-11-13T01:55:51.5118689Z test_unmaterialized_replaced_or_cyclic_gitlink_fails_closed (test_worktree_scope.WorktreeScope.test_unmaterialized_replaced_or_cyclic_gitlink_fails_closed) ... ok
+2026-11-13T01:55:51.6031773Z test_unreadable_gitlink_content_fails_closed (test_worktree_scope.WorktreeScope.test_unreadable_gitlink_content_fails_closed) ... ok
+2026-11-13T01:55:54.7166022Z test_unreadable_top_level_directory_cannot_preserve_a_go (test_worktree_scope.WorktreeScope.test_unreadable_top_level_directory_cannot_preserve_a_go) ... ok
+2026-11-13T01:55:54.9105360Z test_unreadable_untracked_gitlink_directory_fails_closed (test_worktree_scope.WorktreeScope.test_unreadable_untracked_gitlink_directory_fails_closed) ... ok
+2026-11-13T01:55:55.0794209Z test_untracked_nested_repository_is_not_an_empty_directory (test_worktree_scope.WorktreeScope.test_untracked_nested_repository_is_not_an_empty_directory) ... ok
+2026-11-13T01:55:55.0794890Z 
+2026-11-13T01:55:55.0795021Z ======================================================================
+2026-11-13T01:55:55.0796038Z FAIL: test_killed_close_blocks_readers_and_recovers_without_replaying_checks (test_controller_writers.ControllerWriters.test_killed_close_blocks_readers_and_recovers_without_replaying_checks)
+2026-11-13T01:55:55.0797114Z ----------------------------------------------------------------------
+2026-11-13T01:55:55.0797545Z Traceback (most recent call last):
+2026-11-13T01:55:55.0798368Z   File "/home/runner/work/goal-loop/goal-loop/tests/test_controller_writers.py", line 45, in test_killed_close_blocks_readers_and_recovers_without_replaying_checks
+2026-11-13T01:55:55.0798976Z     self.assertNotEqual(result.returncode, 0)
+2026-11-13T01:55:55.0799215Z     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+2026-11-13T01:55:55.0799426Z AssertionError: 0 == 0
+2026-11-13T01:55:55.0799539Z 
+2026-11-13T01:55:55.0799659Z ----------------------------------------------------------------------
+2026-11-13T01:55:55.0799933Z Ran 279 tests in 607.990s
+2026-11-13T01:55:55.0800057Z 
+2026-11-13T01:55:55.0814657Z FAILED (failures=1, skipped=2)
+2026-11-13T01:55:55.1250052Z ##[error]Process completed with exit code 1.
+2026-11-13T01:55:55.1361667Z Post job cleanup.
+2026-11-13T01:55:55.2087258Z [command]/usr/bin/git version
+2026-11-13T01:55:55.2123336Z git version 2.56.0
+2026-11-13T01:55:55.2152538Z Temporarily overriding HOME='/home/runner/work/_temp/f085364d-337d-45c8-970a-9f2c44fe20b9' before making global git config changes
+2026-11-13T01:55:55.2153467Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-13T01:55:55.2156702Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/goal-loop/goal-loop
+2026-11-13T01:55:55.2194282Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-13T01:55:55.2225795Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-13T01:55:55.2476421Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-13T01:55:55.2502064Z http.https://github.com/.extraheader
+2026-11-13T01:55:55.2511531Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-13T01:55:55.2542387Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-13T01:55:55.2788915Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-13T01:55:55.2825756Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-13T01:55:55.3248122Z Cleaning up orphan processes
+2026-11-13T01:55:55.3551300Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
