@@ -1,0 +1,54 @@
+Looking in links: /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/attrs-25.4.0-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 1))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/ephemeral_port_reserve-1.1.4-py2.py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 2))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/exceptiongroup-1.3.0-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 3))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/freezegun-1.5.2-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 4))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/hypothesis-6.135.26-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 5))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/idna-3.20-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 6))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/iniconfig-2.3.1-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 7))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/markupsafe-3.0.3-cp312-cp312-macosx_11_0_arm64.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 8))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/mypy-1.17.1-cp312-cp312-macosx_11_0_arm64.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 9))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/mypy_extensions-1.1.0-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 10))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/outcome-1.3.0.post0-py2.py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 11))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/packaging-26.3-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 12))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/pathspec-0.12.1-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 13))
+Requirement already satisfied: pip==26.0 in /private/tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/runtime/lib/python3.12/site-packages (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 14)) (26.0)
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/pluggy-1.7.0-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 15))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/pygments-2.21.0-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 16))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/pytest-8.4.2-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 17))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/pytest_mock-3.14.1-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 18))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/python_dateutil-4.0.0-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 19))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/sniffio-1.3.1-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 20))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/sortedcontainers-2.4.0-py2.py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 21))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/tornado-6.5.2-cp39-abi3-macosx_10_9_universal2.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 22))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/trio-0.30.0-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 23))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/typeguard-4.4.4-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 24))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/typing_extensions-4.14.1-py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 25))
+Processing /tmp/goal-protocol-efficiency-xpw3677q/holdout-private/wheels/tzdata-2026.6-py2.py3-none-any.whl (from -r /tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/requirements.lock (line 26))
+Installing collected packages: sortedcontainers, tzdata, typing_extensions, tornado, sniffio, Pygments, pluggy, pathspec, packaging, mypy_extensions, MarkupSafe, iniconfig, idna, ephemeral-port-reserve, attrs, typeguard, python-dateutil, pytest, outcome, mypy, hypothesis, exceptiongroup, trio, pytest-mock, freezegun
+
+Successfully installed MarkupSafe-3.0.3 Pygments-2.21.0 attrs-25.4.0 ephemeral-port-reserve-1.1.4 exceptiongroup-1.3.0 freezegun-1.5.2 hypothesis-6.135.26 idna-3.20 iniconfig-2.3.1 mypy-1.17.1 mypy_extensions-1.1.0 outcome-1.3.0.post0 packaging-26.3 pathspec-0.12.1 pluggy-1.7.0 pytest-8.4.2 pytest-mock-3.14.1 python-dateutil-4.0.0 sniffio-1.3.1 sortedcontainers-2.4.0 tornado-6.5.2 trio-0.30.0 typeguard-4.4.4 typing_extensions-4.14.1 tzdata-2026.6
+{"case_id": "hc03", "project": "/private/tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/position/work", "started_at_utc": "2026-11-13T10:34:59Z", "validator_sha256": "20510354a3142ab45f588c7dbd0d88d317de5114f049aa99f336f5ffff5899b6", "command": ["/private/tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/runtime/bin/python", "-m", "pytest", "-c", "/dev/null", "--rootdir", "/tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/business-replay/project", "--basetemp", "/tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/business-replay/pytest-tmp", "-q", "--disable-warnings", "-p", "pytest_mock", "tests/test_options.py", "tests/test_arguments.py", "tests/test_types.py", "tests/test_basic.py", "test_holdout_acceptance.py"], "returncode": 1, "timed_out": false, "elapsed_seconds": 0.7965460419654846}
+{
+  "kind": "posthoc independent business replay only; no model calls and no original timing/eligibility changes",
+  "position": 7,
+  "case": "hc03",
+  "command": [
+    "/tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/runtime/bin/python",
+    "-B",
+    "/tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/study/holdout-private/grade.py",
+    "--case",
+    "hc03",
+    "--project",
+    "/tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/position/work",
+    "--log-dir",
+    "/tmp/goal-protocol-efficiency-xpw3677q/portable-final-filtered-007/business-replay"
+  ],
+  "returncode": 1,
+  "elapsed_seconds": 5.981575124897063,
+  "original_qualified": false,
+  "original_elapsed_seconds": 668.7767900419421,
+  "protocol_receipts": "Original native events/audit/Gate are archived. Their historical host deadlines are not reset or requalified by this replay.",
+  "extraction": "Historical curator proof/evidence scratch remains in the archive; it is not extracted or rerun. Frozen operational grader/validator/business files are extracted.",
+  "dependencies": "Exact recorded wheel hashes, freshly installed isolated runtime; current OS/host timing is not the original timing."
+}

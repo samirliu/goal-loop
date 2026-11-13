@@ -1,0 +1,12 @@
+[
+  {
+    "position": 14,
+    "archive": "position-014.tar.gz",
+    "sha256": "6ff923c053143481b622207210100cadcab36464421dbcd4156ba2c6360692c1",
+    "original_report_sha256": "3a3209c4487a7105344896ccf822129c119162dc30489b380208a933dd66e62c",
+    "qualified_original": false,
+    "original_nonredacted_artifact_metadata_verified_before_export": true,
+    "redacted_original_metadata_paths_unknown": [],
+    "excluded_caches": "Caches and generated pytest scratch are preserved at original local paths, omitted from committed archives. Original receipts, code, trusted fixtures and logs remain included."
+  }
+]

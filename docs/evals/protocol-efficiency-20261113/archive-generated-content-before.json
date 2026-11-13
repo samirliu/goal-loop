@@ -1,0 +1,146 @@
+[
+  {
+    "archive": "inputs.tar.gz",
+    "bytes": 69502291,
+    "generated_members": {
+      "tmp": 59,
+      "hypothesis": 764,
+      "pytest-tmp": 5927
+    },
+    "generated_bytes": {
+      "tmp": 0,
+      "hypothesis": 855180,
+      "pytest-tmp": 86577142
+    }
+  },
+  {
+    "archive": "position-001.tar.gz",
+    "bytes": 1563042,
+    "generated_members": {
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "tmp": 0
+    }
+  },
+  {
+    "archive": "position-002.tar.gz",
+    "bytes": 1600261,
+    "generated_members": {
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "tmp": 0
+    }
+  },
+  {
+    "archive": "position-003.tar.gz",
+    "bytes": 1600267,
+    "generated_members": {
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "tmp": 0
+    }
+  },
+  {
+    "archive": "position-004.tar.gz",
+    "bytes": 2651612,
+    "generated_members": {
+      "hypothesis": 26,
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "hypothesis": 27771,
+      "tmp": 0
+    }
+  },
+  {
+    "archive": "position-005.tar.gz",
+    "bytes": 2648771,
+    "generated_members": {
+      "hypothesis": 26,
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "hypothesis": 27771,
+      "tmp": 0
+    }
+  },
+  {
+    "archive": "position-006.tar.gz",
+    "bytes": 2610960,
+    "generated_members": {
+      "hypothesis": 26,
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "hypothesis": 27771,
+      "tmp": 0
+    }
+  },
+  {
+    "archive": "position-007.tar.gz",
+    "bytes": 2281340,
+    "generated_members": {
+      "pytest-tmp": 11,
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "pytest-tmp": 0,
+      "tmp": 0
+    }
+  },
+  {
+    "archive": "position-008.tar.gz",
+    "bytes": 2247466,
+    "generated_members": {
+      "pytest-tmp": 11,
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "pytest-tmp": 0,
+      "tmp": 0
+    }
+  },
+  {
+    "archive": "position-009.tar.gz",
+    "bytes": 2287141,
+    "generated_members": {
+      "pytest-tmp": 11,
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "pytest-tmp": 0,
+      "tmp": 0
+    }
+  },
+  {
+    "archive": "position-010.tar.gz",
+    "bytes": 3744390,
+    "generated_members": {
+      "hypothesis": 25,
+      "pytest-tmp": 159,
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "hypothesis": 28146,
+      "pytest-tmp": 8649037,
+      "tmp": 0
+    }
+  },
+  {
+    "archive": "position-011.tar.gz",
+    "bytes": 3741582,
+    "generated_members": {
+      "hypothesis": 25,
+      "pytest-tmp": 159,
+      "tmp": 1
+    },
+    "generated_bytes": {
+      "hypothesis": 28146,
+      "pytest-tmp": 8649037,
+      "tmp": 0
+    }
+  }
+]

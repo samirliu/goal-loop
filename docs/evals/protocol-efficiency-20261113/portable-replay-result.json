@@ -1,0 +1,23 @@
+{
+  "kind": "posthoc independent business replay only; no model calls and no original timing/eligibility changes",
+  "position": 1,
+  "case": "hc01",
+  "command": [
+    "/tmp/goal-protocol-efficiency-xpw3677q/portable-replay-001-r2/study/holdout-private/runtime/bin/python",
+    "-B",
+    "/tmp/goal-protocol-efficiency-xpw3677q/portable-replay-001-r2/study/holdout-private/grade.py",
+    "--case",
+    "hc01",
+    "--project",
+    "/tmp/goal-protocol-efficiency-xpw3677q/portable-replay-001-r2/position/work",
+    "--log-dir",
+    "/tmp/goal-protocol-efficiency-xpw3677q/portable-replay-001-r2/business-replay"
+  ],
+  "returncode": 0,
+  "elapsed_seconds": 10.13779329112731,
+  "original_qualified": true,
+  "original_elapsed_seconds": 609.3929214170203,
+  "protocol_receipts": "Original native events/audit/Gate are archived. Their historical host deadlines are not reset or requalified by this replay.",
+  "extraction": "Historical curator proof/evidence scratch remains in the archive; it is not extracted or rerun. Frozen operational grader/validator/business files are extracted.",
+  "dependencies": "Exact recorded wheel hashes, freshly installed isolated runtime; current OS/host timing is not the original timing."
+}

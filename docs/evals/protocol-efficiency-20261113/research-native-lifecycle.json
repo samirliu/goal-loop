@@ -1,0 +1,137 @@
+{
+  "kind": "selected native research identity/settings/lifecycle only; no reasoning or opaque bodies",
+  "records": [
+    {
+      "session_id": "01a1d3bb-46fb-71d0-b246-9aad6c069c80",
+      "agent_path": "/root/complex_holdout_curator",
+      "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+      "source_timestamp": "2026-11-13T07:07:08.454Z",
+      "lifecycle": [
+        {
+          "type": "event_msg",
+          "timestamp": "2026-11-13T07:07:08.493Z",
+          "payload": {
+            "type": "task_started",
+            "turn_id": "01a1d3bb-4728-73d1-a5e7-390ebdf00028",
+            "root_turn_id": "01a1d3b6-5101-7151-9b57-c8771d8c346c",
+            "started_at": 1794553628
+          }
+        },
+        {
+          "type": "turn_context",
+          "timestamp": "2026-11-13T07:07:24.712Z",
+          "payload": {
+            "turn_id": "01a1d3bb-4728-73d1-a5e7-390ebdf00028",
+            "model": "gpt-6.1-sol",
+            "effort": "max",
+            "approval_policy": "never",
+            "sandbox_policy": {
+              "type": "danger-full-access"
+            },
+            "permission_profile": {
+              "type": "disabled"
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-11-13T07:32:04.804Z",
+          "payload": {
+            "type": "task_complete",
+            "turn_id": "01a1d3bb-4728-73d1-a5e7-390ebdf00028",
+            "root_turn_id": "01a1d3b6-5101-7151-9b57-c8771d8c346c",
+            "started_at": 1794553628,
+            "completed_at": 1794555124,
+            "duration_ms": 1496346
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-11-13T07:32:21.205Z",
+          "payload": {
+            "type": "task_started",
+            "turn_id": "01a1d3d2-5c49-7882-aa89-86d76fcdb3da",
+            "root_turn_id": "01a1d3b6-5101-7151-9b57-c8771d8c346c",
+            "started_at": 1794555141
+          }
+        },
+        {
+          "type": "turn_context",
+          "timestamp": "2026-11-13T07:32:21.227Z",
+          "payload": {
+            "turn_id": "01a1d3d2-5c49-7882-aa89-86d76fcdb3da",
+            "model": "gpt-6.1-sol",
+            "effort": "max",
+            "approval_policy": "never",
+            "sandbox_policy": {
+              "type": "danger-full-access"
+            },
+            "permission_profile": {
+              "type": "disabled"
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-11-13T07:34:57.970Z",
+          "payload": {
+            "type": "task_complete",
+            "turn_id": "01a1d3d2-5c49-7882-aa89-86d76fcdb3da",
+            "root_turn_id": "01a1d3b6-5101-7151-9b57-c8771d8c346c",
+            "started_at": 1794555141,
+            "completed_at": 1794555297,
+            "duration_ms": 156767
+          }
+        }
+      ]
+    },
+    {
+      "session_id": "01a1d3ba-9a69-7332-86c9-5b8a7464b9d2",
+      "agent_path": "/root/bounded_eval_capture",
+      "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+      "source_timestamp": "2026-11-13T07:06:24.279Z",
+      "lifecycle": [
+        {
+          "type": "event_msg",
+          "timestamp": "2026-11-13T07:06:24.316Z",
+          "payload": {
+            "type": "task_started",
+            "turn_id": "01a1d3ba-9a9a-7a92-90ed-e6b92fe7c216",
+            "root_turn_id": "01a1d3b6-5101-7151-9b57-c8771d8c346c",
+            "started_at": 1794553584
+          }
+        },
+        {
+          "type": "turn_context",
+          "timestamp": "2026-11-13T07:06:40.674Z",
+          "payload": {
+            "turn_id": "01a1d3ba-9a9a-7a92-90ed-e6b92fe7c216",
+            "model": "gpt-6.1-sol",
+            "effort": "max",
+            "approval_policy": "never",
+            "sandbox_policy": {
+              "type": "danger-full-access"
+            },
+            "permission_profile": {
+              "type": "disabled"
+            }
+          }
+        },
+        {
+          "type": "event_msg",
+          "timestamp": "2026-11-13T07:27:24.526Z",
+          "payload": {
+            "type": "task_complete",
+            "turn_id": "01a1d3ba-9a9a-7a92-90ed-e6b92fe7c216",
+            "root_turn_id": "01a1d3b6-5101-7151-9b57-c8771d8c346c",
+            "started_at": 1794553584,
+            "completed_at": 1794554844,
+            "duration_ms": 1260243
+          }
+        }
+      ]
+    }
+  ],
+  "tokens": null,
+  "fees": null
+}

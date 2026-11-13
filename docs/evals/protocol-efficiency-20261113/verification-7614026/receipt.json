@@ -1,0 +1,81 @@
+{
+  "commit": "76140262bab69f6e31c032cb1c2dd760a1bd3a3a",
+  "run": 43385957103,
+  "conclusion": "success",
+  "jobs": {
+    "macos": {
+      "raw_log_sha256": "715e5e98734eeb44e176b57d329f6b30efef7cd17c1dc433b9045bd4617fbd4c",
+      "compressed_log_sha256": "6b45d7a2c5f7c919652627eb4e9757aa4c4d22807aebed09d6eec6ee00e8fcbf",
+      "python_totals": [
+        {
+          "tests": 341,
+          "seconds": 1030.296
+        }
+      ],
+      "skipped": 0,
+      "skip_policy": "No skips.",
+      "embedded_fixture_totals": [
+        {
+          "pass": 603,
+          "fail": 0,
+          "shards": 10
+        },
+        {
+          "pass": 1,
+          "fail": 1,
+          "shards": 2
+        },
+        {
+          "pass": 2,
+          "fail": 0,
+          "shards": 2
+        }
+      ],
+      "main_scenario_totals": [
+        {
+          "pass": 603,
+          "fail": 0,
+          "shards": 10
+        }
+      ],
+      "embedded_fixture_note": "Negative shard-runner tests deliberately emit nested fail summaries; actual CI step and full job conclusions are success."
+    },
+    "ubuntu": {
+      "raw_log_sha256": "238c7f4a6babc03daa9e7719c3d8d358b326ca2d00dcc56066c68f69a98814f8",
+      "compressed_log_sha256": "b7b249f6671608d8ab1588ad0d9f96e7e48a351d3c9d41cec33dd24b49122c08",
+      "python_totals": [
+        {
+          "tests": 341,
+          "seconds": 838.091
+        }
+      ],
+      "skipped": 2,
+      "skip_policy": "Only the two pre-existing Linux RLIMIT fixtures; no new skips.",
+      "embedded_fixture_totals": [
+        {
+          "pass": 603,
+          "fail": 0,
+          "shards": 10
+        },
+        {
+          "pass": 1,
+          "fail": 1,
+          "shards": 2
+        },
+        {
+          "pass": 2,
+          "fail": 0,
+          "shards": 2
+        }
+      ],
+      "main_scenario_totals": [
+        {
+          "pass": 603,
+          "fail": 0,
+          "shards": 10
+        }
+      ],
+      "embedded_fixture_note": "Negative shard-runner tests deliberately emit nested fail summaries; actual CI step and full job conclusions are success."
+    }
+  }
+}

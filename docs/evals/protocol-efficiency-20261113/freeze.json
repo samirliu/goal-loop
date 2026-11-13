@@ -1,0 +1,31 @@
+{
+  "evaluation_positions_started": 0,
+  "frozen_utc": "2026-11-13T07:36:24.818602+00:00",
+  "manifests": {
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/001/manifest.json": "702c7aa0106ad10647762514580f293d4e668ccb08e90bfb64d203a9dd78ea4c",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/002/manifest.json": "3d5baca42e89fffc60e4bfdcd92bf811a119757aecdeace125e3ce9204d3c26e",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/003/manifest.json": "ebc880b77068bdde096849bdd55acabef41ad4b27211cd57e6ef7c38427457d4",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/004/manifest.json": "3a3661d4f668a1a78df2b10c1d720fe32fe3d77b5f8ce166e7333f789c72ca18",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/005/manifest.json": "b9c7856db32b453dab45a141bed6d4b90eeaf3c421e6648a9b5e59fdcfc001e2",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/006/manifest.json": "66ae37a0656db3d29876130cbf7af99ad01d1b8432d593608c9ce8ccff0274ea",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/007/manifest.json": "629f5edc8b7a85168d70d958334df9b8856d80d695680910d1a74af57d2e81bb",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/008/manifest.json": "900c17d1ea57bbba16710c015148db56a3e5c9495bf71c71dc13a575297d474b",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/009/manifest.json": "e15dc69e9ac08772789e3a2f7fd031e1728365d9a30033718a833ebcda238a89",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/010/manifest.json": "cbefb27ee9495eede558ac49e2c24fe9462ac5972a3f6874f0ebb87df93cc169",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/011/manifest.json": "85810af984f35f50c873553f8b6e6384e2fd9fd73e1a434942a795b256a2f36d",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/012/manifest.json": "736218d44b42e2edb42b75554ab552c46043437285f9a38c51bc67672ddb94b0",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/013/manifest.json": "2b0fa6447e261c6e8a8828ee73dec8642928a29a9dbc9988311bbe50590c3cbd",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/014/manifest.json": "b902f2f3921cbe962a03fdc40a5a4fc4a6c2c9075a164091f82468ce1bfd5b10",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/015/manifest.json": "2c1f7f7f556cd0065caf3c88a6fbd68f5f5c0d32245e6a5c09957cf8b7004112",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/016/manifest.json": "ddb2212ff7d5dc67b9e5f7a9401db1ec8a238910f3dd999d72400f634ec19e51",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/017/manifest.json": "82890ad588b7e001c2f8432c9011f132af9d18208d2f08c636311049e953fad0",
+    "/tmp/goal-protocol-efficiency-xpw3677q/positions/018/manifest.json": "36306418261e8aaa4695dee62553969e3f8cbaabf8e0f572d11b38a10112a8d8"
+  },
+  "protocol_sha256": "3f594c65b68848ebbe3388ce5872b1f3fbbdd1ad75829d8ea47b7b1126c16ae8",
+  "real_model_calls_for_calibration": 0,
+  "source_files": {
+    "/Users/m/repo/goal-loop/devtools/native_eval_capture.py": "3cd9de995eacdd977909548fb5023bf39e3d27547e9e397c6b0dea917ae4e6ec",
+    "/Users/m/repo/goal-loop/docs/evals/protocol-efficiency-20261113/prepare_study.py": "b81ff3ff881c4cab115b831234e535dd13d0d51677306fb5a42a552887b20f84"
+  },
+  "version": 1
+}

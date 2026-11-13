@@ -1,0 +1,106 @@
+{
+  "kind": "final archive/source/report integrity and high-confidence credential-pattern scan; no model calls",
+  "archives": 19,
+  "members_scanned": 27328,
+  "original_reports_byte_identical": [
+    {
+      "position": 1,
+      "sha256": "3ebc17ea51f0182feb57e37bc86fb600aec4c42ab69cadd056cf6acac36f6788",
+      "qualified": true
+    },
+    {
+      "position": 2,
+      "sha256": "ccf1256c7f508415a6d398da3000177763e26a50696b51c985bdb4b5d9c84918",
+      "qualified": true
+    },
+    {
+      "position": 3,
+      "sha256": "d0958a4e9f3d0f2a8135e126eecc01369e805cf614a578b4ec92a8d663f9362e",
+      "qualified": true
+    },
+    {
+      "position": 4,
+      "sha256": "3e030d0d2bf4399c9e9007c720e2c8ab56aa7dc94096e22b4f6cc9df4da22d59",
+      "qualified": true
+    },
+    {
+      "position": 5,
+      "sha256": "b35fbec92eae2d0a0ce75be11132d690cf1fd429ff24b20d53e4d00447992ade",
+      "qualified": true
+    },
+    {
+      "position": 6,
+      "sha256": "16c469a02472e9878b220b52563d1e5d4d10fe91a81381f6a1d811773de95b23",
+      "qualified": true
+    },
+    {
+      "position": 7,
+      "sha256": "9699ca1d1f19bbcb1809d291fb299a475d240df8f470ca3e9d33810b76180504",
+      "qualified": false
+    },
+    {
+      "position": 8,
+      "sha256": "d5f2496ca379c9b232a8ee8dfe638178cbc1cb9880f903cb2175a1f8de2bb51c",
+      "qualified": false
+    },
+    {
+      "position": 9,
+      "sha256": "d6ac90baad426bb3dc285c065876c4cfc9e07c5115fd1197d8b16b1bf3e99b72",
+      "qualified": false
+    },
+    {
+      "position": 10,
+      "sha256": "7afe2d225e18f7fe0bd890b7f541c63397df8faace6a5c9c5968c69da7c0e57e",
+      "qualified": false
+    },
+    {
+      "position": 11,
+      "sha256": "1acc308cdc9feafd6e96ef81295d0ef79d647fb453b105604701ba5812b746e6",
+      "qualified": false
+    },
+    {
+      "position": 12,
+      "sha256": "6192a12c39a8b7edbe2f8cb07199d00bfb0b9464426a3b3796311686b760f9aa",
+      "qualified": false
+    },
+    {
+      "position": 13,
+      "sha256": "7710f9aa5b6e6f47fa7dce62333257b5af30074f2314edccd0100f15e2141e52",
+      "qualified": false
+    },
+    {
+      "position": 14,
+      "sha256": "3a3209c4487a7105344896ccf822129c119162dc30489b380208a933dd66e62c",
+      "qualified": false
+    },
+    {
+      "position": 15,
+      "sha256": "58454f4f0472dbaf4516cb6dd7d38cf8118bcb93b9fd106498879c8993044c78",
+      "qualified": false
+    },
+    {
+      "position": 16,
+      "sha256": "cd55e614bee3a741a2ff98dc9488839c3c133e6b3e3a8a251a8bad42a1acc52f",
+      "qualified": true
+    },
+    {
+      "position": 17,
+      "sha256": "81865b7a0f80c3ad71e030f34434f8ca9a830c9a48762ebd92a35d25f9935fe5",
+      "qualified": true
+    },
+    {
+      "position": 18,
+      "sha256": "61340b0d2aa8f6ee35f885b431a3e8eb081a0b107209f9f731c6c631f7a1fe7b",
+      "qualified": true
+    }
+  ],
+  "frozen_protocol_manifest_collector_verified": true,
+  "credential_patterns": [
+    "github_token",
+    "openai_project_key",
+    "aws_access_id",
+    "private_key"
+  ],
+  "credential_findings": [],
+  "limitations": "Pattern matching cannot prove absence of every secret. Public upstream synthetic password fixtures retained. Original full native reasoning/account logs are excluded."
+}

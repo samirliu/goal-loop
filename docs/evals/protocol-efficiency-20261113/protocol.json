@@ -1,0 +1,175 @@
+{
+  "actual_model": "gpt-6.1-sol",
+  "adoption": {
+    "any_of": [
+      "C qualified >= A qualified+2 AND C qualified >= B qualified+2, no quality regression",
+      "C qualified >= max(A,B) AND C cost/qualified <= 0.8*min(A cost/qualified,B cost/qualified)"
+    ],
+    "default": "Baseline remains default throughout; candidate is opt-in. No promotion or general stability claim without all gates.",
+    "family_benefit": "C family qualified >=both and either exceeds both or has lower cost/qualified than better reference",
+    "family_guard": "benefit in >=2 families; every other family C cost/qualified <=1.10*better reference and no lower qualification",
+    "quality": "same frozen grader, including genuine regressions, negative behaviors and compatibility requirements"
+  },
+  "baseline_commit": "cc26e0b4d8e847d7bc64fd4ce3f09159ab5724cb",
+  "candidate_commit": "76140262bab69f6e31c032cb1c2dd760a1bd3a3a",
+  "causal_scope": "A/C compares product workflows; B/C compares candidate+explicit opt-in, not code bytes alone.",
+  "corpus_sha256": "94be825e5cfb561a97110021837bf4c508513143197bc66756ac3dea0cbe1907",
+  "costs": [
+    "position elapsed",
+    "root evaluation worker span",
+    "internal worker-seconds",
+    "research/tooling/development/holdout/follow-up costs separately",
+    "tokens/fees/service compute unknown where unexposed; never zero"
+  ],
+  "default_serial": true,
+  "effort": "max",
+  "execution_seconds": 780,
+  "fork_turns": "none",
+  "frozen_utc": "2026-11-13T07:36:23.238155+00:00",
+  "groups": {
+    "A": "bare native host; normal tools and at most two native workers; no goal-loop duties",
+    "B": "frozen baseline goal-loop; standard SKILL and manual close template",
+    "C": "frozen candidate goal-loop plus explicit opt-in measured close and receipt"
+  },
+  "limitations": [
+    "one pair per task/group; six public historical tasks, no general statistical stability",
+    "pretraining familiarity cannot be excluded",
+    "local native logs trusted but unsigned; opaque tool bodies remain unknown",
+    "snapshot hashes cannot detect transient restored edits",
+    "parent interruption/service stop latency remains separately observed/unknown"
+  ],
+  "main_cost": "sum(actual elapsed seconds of ALL positions, including failures)/qualified deliveries; zero qualified => undefined",
+  "max_internal_workers": 2,
+  "max_positions": 18,
+  "order": [
+    {
+      "case": "hc01",
+      "family": "cross_module_behavior_repair",
+      "group": "A",
+      "position": 1
+    },
+    {
+      "case": "hc01",
+      "family": "cross_module_behavior_repair",
+      "group": "B",
+      "position": 2
+    },
+    {
+      "case": "hc01",
+      "family": "cross_module_behavior_repair",
+      "group": "C",
+      "position": 3
+    },
+    {
+      "case": "hc02",
+      "family": "cross_module_behavior_repair",
+      "group": "B",
+      "position": 4
+    },
+    {
+      "case": "hc02",
+      "family": "cross_module_behavior_repair",
+      "group": "C",
+      "position": 5
+    },
+    {
+      "case": "hc02",
+      "family": "cross_module_behavior_repair",
+      "group": "A",
+      "position": 6
+    },
+    {
+      "case": "hc03",
+      "family": "interface_compatibility_migration",
+      "group": "C",
+      "position": 7
+    },
+    {
+      "case": "hc03",
+      "family": "interface_compatibility_migration",
+      "group": "A",
+      "position": 8
+    },
+    {
+      "case": "hc03",
+      "family": "interface_compatibility_migration",
+      "group": "B",
+      "position": 9
+    },
+    {
+      "case": "hc04",
+      "family": "interface_compatibility_migration",
+      "group": "C",
+      "position": 10
+    },
+    {
+      "case": "hc04",
+      "family": "interface_compatibility_migration",
+      "group": "B",
+      "position": 11
+    },
+    {
+      "case": "hc04",
+      "family": "interface_compatibility_migration",
+      "group": "A",
+      "position": 12
+    },
+    {
+      "case": "hc05",
+      "family": "integration_failure_recovery",
+      "group": "B",
+      "position": 13
+    },
+    {
+      "case": "hc05",
+      "family": "integration_failure_recovery",
+      "group": "A",
+      "position": 14
+    },
+    {
+      "case": "hc05",
+      "family": "integration_failure_recovery",
+      "group": "C",
+      "position": 15
+    },
+    {
+      "case": "hc06",
+      "family": "integration_failure_recovery",
+      "group": "A",
+      "position": 16
+    },
+    {
+      "case": "hc06",
+      "family": "integration_failure_recovery",
+      "group": "C",
+      "position": 17
+    },
+    {
+      "case": "hc06",
+      "family": "integration_failure_recovery",
+      "group": "B",
+      "position": 18
+    }
+  ],
+  "permissions": {
+    "approval_policy": "never",
+    "sandbox_policy": "danger-full-access"
+  },
+  "qualification": [
+    "same frozen independent behavior/upstream tests pass",
+    "one normal nonempty native final and actual completed host task/descendants by execution deadline",
+    "all preparation, tool/worker work and independent checks/report within original outer deadline",
+    "unchanged frozen source/grader/immutable inputs; same actual model/effort/permissions",
+    "goal-loop groups additionally pass original audit and emit original Gate GO"
+  ],
+  "seconds": 900,
+  "source_freeze": "candidate-production-manifest.json",
+  "stopping": [
+    "no reruns, replacement cases/seeds, deadline extensions or posthoc eligibility rescue",
+    "interrupt still-active native work at execution deadline and collect actual terminal; late remains failed",
+    "stop real calls after position18; retain all startup/tool/timeout/cancel/no-final/late failures"
+  ],
+  "tool_capability": "Same native host and tool catalog; no secondary host/client/service/queue.",
+  "verification_reserve_seconds": 120,
+  "version": 1
+}

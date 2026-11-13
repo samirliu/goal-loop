@@ -1,0 +1,208 @@
+{
+  "kind": "cost ledger; overlapping clocks and token definitions are not added as invoice cost",
+  "recorded_utc": "2026-11-13T10:36:40.807654+00:00",
+  "research_and_holdout_preparation": [
+    {
+      "role": "/root/complex_holdout_curator",
+      "native_worker_seconds": 1653.113,
+      "turn_spans_seconds": [
+        1496.346,
+        156.767
+      ],
+      "tokens": {
+        "input_tokens": 9057214,
+        "cached_input_tokens": 8923776,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 67238,
+        "reasoning_output_tokens": 26254,
+        "total_tokens": 9124452
+      },
+      "fees": null
+    },
+    {
+      "role": "/root/bounded_eval_capture",
+      "native_worker_seconds": 1260.243,
+      "turn_spans_seconds": [
+        1260.243
+      ],
+      "tokens": {
+        "input_tokens": 2458569,
+        "cached_input_tokens": 2400768,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 53540,
+        "reasoning_output_tokens": 27255,
+        "total_tokens": 2512109
+      },
+      "fees": null
+    }
+  ],
+  "root_observed": {
+    "source": "root-native-usage-observed.json",
+    "tokens": {
+      "input_tokens": 67136733,
+      "cached_input_tokens": 66864768,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 298968,
+      "reasoning_output_tokens": 216496,
+      "total_tokens": 67435701
+    },
+    "phase_totals": {
+      "research_tooling_development_before_freeze": {
+        "input_tokens": 8475175,
+        "cached_input_tokens": 8334592,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 43733,
+        "reasoning_output_tokens": 26742,
+        "total_tokens": 8518908
+      },
+      "freeze_to_first_position": {
+        "input_tokens": 426780,
+        "cached_input_tokens": 423936,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4569,
+        "reasoning_output_tokens": 1126,
+        "total_tokens": 431349
+      },
+      "holdout_execution_orchestration": {
+        "input_tokens": 56135836,
+        "cached_input_tokens": 56048896,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 239165,
+        "reasoning_output_tokens": 182401,
+        "total_tokens": 56375001
+      },
+      "post_position_evidence_and_ci": {
+        "input_tokens": 2098942,
+        "cached_input_tokens": 2057344,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 11501,
+        "reasoning_output_tokens": 6227,
+        "total_tokens": 2110443
+      }
+    },
+    "final_tail_unknown": true
+  },
+  "tooling_modification": {
+    "worker": "/root/bounded_eval_capture",
+    "native_worker_seconds": 1260.243,
+    "included_above": true,
+    "root_review_and_integration_seconds": null,
+    "fees": null
+  },
+  "core_product_development": {
+    "separate_root_wall_seconds": null,
+    "separate_root_tokens": null,
+    "root_pre_freeze_combined_usage": {
+      "input_tokens": 8475175,
+      "cached_input_tokens": 8334592,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 43733,
+      "reasoning_output_tokens": 26742,
+      "total_tokens": 8518908
+    },
+    "new_measured_close_test_seconds": 47.637,
+    "existing_context_regression_seconds": 122.052,
+    "test_clocks_overlap_development_window": true,
+    "fees": null
+  },
+  "holdout_validation": {
+    "real_positions": 18,
+    "all_attempt_seconds": 9241.73496599961,
+    "campaign_first_entry_to_last_report_seconds": 10246.794441223145,
+    "between_position_orchestration_seconds": 1005.0594752235338,
+    "groups": {
+      "A": {
+        "positions": 6,
+        "qualified": 3,
+        "total_seconds": 2924.188915040344,
+        "root_worker_seconds": 2686.9240000247955,
+        "internal_worker_seconds_terminal_observed": 0,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 4408064,
+          "input_tokens": 4642243,
+          "output_tokens": 90670,
+          "reasoning_output_tokens": 46931,
+          "total_tokens": 4732913
+        },
+        "fees": null,
+        "human_business_interventions": 0
+      },
+      "B": {
+        "positions": 6,
+        "qualified": 3,
+        "total_seconds": 3172.4104680423625,
+        "root_worker_seconds": 2999.6749999523163,
+        "internal_worker_seconds_terminal_observed": 0,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 8630912,
+          "input_tokens": 8988488,
+          "output_tokens": 113121,
+          "reasoning_output_tokens": 51691,
+          "total_tokens": 9101609
+        },
+        "fees": null,
+        "human_business_interventions": 0
+      },
+      "C": {
+        "positions": 6,
+        "qualified": 3,
+        "total_seconds": 3145.1355829169042,
+        "root_worker_seconds": 2892.184999704361,
+        "internal_worker_seconds_terminal_observed": 0,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 5968384,
+          "input_tokens": 6329713,
+          "output_tokens": 109308,
+          "reasoning_output_tokens": 50089,
+          "total_tokens": 6439021
+        },
+        "fees": null,
+        "human_business_interventions": 0
+      }
+    },
+    "parent_orchestration_tokens": {
+      "input_tokens": 56135836,
+      "cached_input_tokens": 56048896,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 239165,
+      "reasoning_output_tokens": 182401,
+      "total_tokens": 56375001
+    },
+    "independent_grader_and_checks": "Included in each original position elapsed; preparatory corpus checks are research above. Do not count twice."
+  },
+  "followup": {
+    "real_model_positions_after_18": 0,
+    "offline_replays": [
+      {
+        "position": 1,
+        "seconds": 9.32124691689387,
+        "returncode": 0
+      },
+      {
+        "position": 7,
+        "seconds": 6.09793341695331,
+        "returncode": 1
+      }
+    ],
+    "root_observed_tokens": {
+      "input_tokens": 2098942,
+      "cached_input_tokens": 2057344,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 11501,
+      "reasoning_output_tokens": 6227,
+      "total_tokens": 2110443
+    },
+    "ongoing_ci_and_final_tail_seconds": null,
+    "fees": null
+  },
+  "human_business_interventions": 0,
+  "user_goal_instruction_and_review_seconds": null,
+  "pricing_and_service_compute": null,
+  "goal_meter": "goal-meter-before-final-positions.json is a separate native goal accounting unit; not added to SDK token counts",
+  "break_even_tasks": null,
+  "break_even_status": "未建立：没有达到门槛的可信净节省，不能据局部调用减少计算回本。",
+  "overlap_policy": "Root research, tooling review, development, tests and child workers overlap. Child native worker-seconds and parent orchestration usage are reported separately. No grand total sums overlapping wall clocks. Numeric input totals include cached input; reasoning may already be part of output. Fees, service compute and unknowns are not zero."
+}

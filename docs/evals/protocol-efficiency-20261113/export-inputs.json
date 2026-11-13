@@ -1,0 +1,7 @@
+[
+  {
+    "archive": "inputs.tar.gz",
+    "sha256": "8d4077c9134fa64660b272dd656955ea7fd274f55c1d8d0690943150e0904556",
+    "scope": "Frozen business/product/grader inputs and ALL curator validation history; excludes installed runtimes, wheels and caches. Dependencies have separate pinned identity/hash manifest."
+  }
+]

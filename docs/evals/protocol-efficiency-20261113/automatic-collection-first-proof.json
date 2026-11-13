@@ -1,0 +1,13 @@
+{
+  "kind": "first real automatic collection proof; original timing, no new model call",
+  "position": 1,
+  "native_terminal_epoch": 1794556036.86,
+  "independent_started_epoch": 1794556038.406343,
+  "terminal_to_independent_start_seconds": 1.5463430881500244,
+  "independent_finished_epoch": 1794556040.8930078,
+  "original_deadline_epoch": 1794556333.4512808,
+  "report_finished_epoch": 1794556042.844395,
+  "qualified_original": true,
+  "root_observation_epoch": 1794556156.5566201,
+  "collector_source_sha256": "3cd9de995eacdd977909548fb5023bf39e3d27547e9e397c6b0dea917ae4e6ec"
+}

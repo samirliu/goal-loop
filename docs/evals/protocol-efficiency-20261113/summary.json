@@ -1,0 +1,1331 @@
+{
+  "adoption": {
+    "adopt": false,
+    "better_reference_seconds_per_qualified": 974.7296383467814,
+    "break_even_reason": "requires credible repeatable positive net savings and complete cost valuation; not established by this small single-pair study alone",
+    "break_even_tasks": null,
+    "cost_win": false,
+    "count_win": false,
+    "decision": "retain baseline; net efficiency goal not achieved",
+    "family_details": {
+      "cross_module_behavior_repair": {
+        "benefit": true,
+        "better_reference_seconds_per_qualified": 533.6445487079909,
+        "other_family_cost_guard": true
+      },
+      "integration_failure_recovery": {
+        "benefit": false,
+        "better_reference_seconds_per_qualified": 699.3014489582274,
+        "other_family_cost_guard": false
+      },
+      "interface_compatibility_migration": {
+        "benefit": false,
+        "better_reference_seconds_per_qualified": null,
+        "other_family_cost_guard": false
+      }
+    },
+    "family_gate": false,
+    "net_goal_achieved": false
+  },
+  "complete": true,
+  "cost_unknowns": "Numeric native token counters are reported where exposed and complete; missing usage, fees and service compute remain unknown. Cached input is included in input, reasoning may be an output subset; counters and worker-seconds are not invoice cost.",
+  "families": {
+    "cross_module_behavior_repair": {
+      "A": {
+        "attempts_seconds": [
+          609.3929214170203,
+          500.89164041611366
+        ],
+        "fees": null,
+        "finished": 2,
+        "human_business_interventions": 0,
+        "internal_worker_seconds_terminal_observed": 0,
+        "median_attempt_seconds": 555.142280916567,
+        "positions": 2,
+        "qualified": 2,
+        "root_worker_positions_unknown": 0,
+        "root_worker_seconds": 995.5799996852875,
+        "root_worker_seconds_lower_bound": 995.5799996852875,
+        "root_worker_seconds_observed": 995.5799996852875,
+        "seconds_per_qualified": 555.142280916567,
+        "service_compute": null,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 1582592,
+          "input_tokens": 1655273,
+          "output_tokens": 34677,
+          "reasoning_output_tokens": 18971,
+          "total_tokens": 1689950
+        },
+        "tokens": 1689950,
+        "tokens_observed_lower_bound": 1689950,
+        "total_seconds": 1110.284561833134
+      },
+      "B": {
+        "attempts_seconds": [
+          664.2525228329469,
+          403.03657458303496
+        ],
+        "fees": null,
+        "finished": 2,
+        "human_business_interventions": 0,
+        "internal_worker_seconds_terminal_observed": 0,
+        "median_attempt_seconds": 533.6445487079909,
+        "positions": 2,
+        "qualified": 2,
+        "root_worker_positions_unknown": 0,
+        "root_worker_seconds": 998.0730001926422,
+        "root_worker_seconds_lower_bound": 998.0730001926422,
+        "root_worker_seconds_observed": 998.0730001926422,
+        "seconds_per_qualified": 533.6445487079909,
+        "service_compute": null,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 2752384,
+          "input_tokens": 2865929,
+          "output_tokens": 35882,
+          "reasoning_output_tokens": 15931,
+          "total_tokens": 2901811
+        },
+        "tokens": 2901811,
+        "tokens_observed_lower_bound": 2901811,
+        "total_seconds": 1067.2890974159818
+      },
+      "C": {
+        "attempts_seconds": [
+          653.8819839579519,
+          334.8607817920856
+        ],
+        "fees": null,
+        "finished": 2,
+        "human_business_interventions": 0,
+        "internal_worker_seconds_terminal_observed": 0,
+        "median_attempt_seconds": 494.37138287501875,
+        "positions": 2,
+        "qualified": 2,
+        "root_worker_positions_unknown": 0,
+        "root_worker_seconds": 936.2169997692108,
+        "root_worker_seconds_lower_bound": 936.2169997692108,
+        "root_worker_seconds_observed": 936.2169997692108,
+        "seconds_per_qualified": 494.37138287501875,
+        "service_compute": null,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 1921536,
+          "input_tokens": 2053373,
+          "output_tokens": 39211,
+          "reasoning_output_tokens": 18071,
+          "total_tokens": 2092584
+        },
+        "tokens": 2092584,
+        "tokens_observed_lower_bound": 2092584,
+        "total_seconds": 988.7427657500375
+      }
+    },
+    "integration_failure_recovery": {
+      "A": {
+        "attempts_seconds": [
+          435.77873375010677,
+          263.52271520812064
+        ],
+        "fees": null,
+        "finished": 2,
+        "human_business_interventions": 0,
+        "internal_worker_seconds_terminal_observed": 0,
+        "median_attempt_seconds": 349.6507244791137,
+        "positions": 2,
+        "qualified": 1,
+        "root_worker_positions_unknown": 0,
+        "root_worker_seconds": 659.5850002765656,
+        "root_worker_seconds_lower_bound": 659.5850002765656,
+        "root_worker_seconds_observed": 659.5850002765656,
+        "seconds_per_qualified": 699.3014489582274,
+        "service_compute": null,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 1085824,
+          "input_tokens": 1150471,
+          "output_tokens": 19761,
+          "reasoning_output_tokens": 10283,
+          "total_tokens": 1170232
+        },
+        "tokens": 1170232,
+        "tokens_observed_lower_bound": 1170232,
+        "total_seconds": 699.3014489582274
+      },
+      "B": {
+        "attempts_seconds": [
+          515.6351030000951,
+          400.52290554204956
+        ],
+        "fees": null,
+        "finished": 2,
+        "human_business_interventions": 0,
+        "internal_worker_seconds_terminal_observed": 0,
+        "median_attempt_seconds": 458.07900427107234,
+        "positions": 2,
+        "qualified": 1,
+        "root_worker_positions_unknown": 0,
+        "root_worker_seconds": 869.0179998874664,
+        "root_worker_seconds_lower_bound": 869.0179998874664,
+        "root_worker_seconds_observed": 869.0179998874664,
+        "seconds_per_qualified": 916.1580085421447,
+        "service_compute": null,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 2503552,
+          "input_tokens": 2614075,
+          "output_tokens": 34233,
+          "reasoning_output_tokens": 16625,
+          "total_tokens": 2648308
+        },
+        "tokens": 2648308,
+        "tokens_observed_lower_bound": 2648308,
+        "total_seconds": 916.1580085421447
+      },
+      "C": {
+        "attempts_seconds": [
+          580.4515451248735,
+          430.8416935419664
+        ],
+        "fees": null,
+        "finished": 2,
+        "human_business_interventions": 0,
+        "internal_worker_seconds_terminal_observed": 0,
+        "median_attempt_seconds": 505.64661933341995,
+        "positions": 2,
+        "qualified": 1,
+        "root_worker_positions_unknown": 0,
+        "root_worker_seconds": 965.7200000286102,
+        "root_worker_seconds_lower_bound": 965.7200000286102,
+        "root_worker_seconds_observed": 965.7200000286102,
+        "seconds_per_qualified": 1011.2932386668399,
+        "service_compute": null,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 1738112,
+          "input_tokens": 1838116,
+          "output_tokens": 34837,
+          "reasoning_output_tokens": 17828,
+          "total_tokens": 1872953
+        },
+        "tokens": 1872953,
+        "tokens_observed_lower_bound": 1872953,
+        "total_seconds": 1011.2932386668399
+      }
+    },
+    "interface_compatibility_migration": {
+      "A": {
+        "attempts_seconds": [
+          621.5455352910794,
+          493.05736895790324
+        ],
+        "fees": null,
+        "finished": 2,
+        "human_business_interventions": 0,
+        "internal_worker_seconds_terminal_observed": 0,
+        "median_attempt_seconds": 557.3014521244913,
+        "positions": 2,
+        "qualified": 0,
+        "root_worker_positions_unknown": 0,
+        "root_worker_seconds": 1031.7590000629425,
+        "root_worker_seconds_lower_bound": 1031.7590000629425,
+        "root_worker_seconds_observed": 1031.7590000629425,
+        "seconds_per_qualified": null,
+        "service_compute": null,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 1739648,
+          "input_tokens": 1836499,
+          "output_tokens": 36232,
+          "reasoning_output_tokens": 17677,
+          "total_tokens": 1872731
+        },
+        "tokens": 1872731,
+        "tokens_observed_lower_bound": 1872731,
+        "total_seconds": 1114.6029042489827
+      },
+      "B": {
+        "attempts_seconds": [
+          588.8453769590706,
+          600.1179851251654
+        ],
+        "fees": null,
+        "finished": 2,
+        "human_business_interventions": 0,
+        "internal_worker_seconds_terminal_observed": 0,
+        "median_attempt_seconds": 594.481681042118,
+        "positions": 2,
+        "qualified": 0,
+        "root_worker_positions_unknown": 0,
+        "root_worker_seconds": 1132.5839998722076,
+        "root_worker_seconds_lower_bound": 1132.5839998722076,
+        "root_worker_seconds_observed": 1132.5839998722076,
+        "seconds_per_qualified": null,
+        "service_compute": null,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 3374976,
+          "input_tokens": 3508484,
+          "output_tokens": 43006,
+          "reasoning_output_tokens": 19135,
+          "total_tokens": 3551490
+        },
+        "tokens": 3551490,
+        "tokens_observed_lower_bound": 3551490,
+        "total_seconds": 1188.963362084236
+      },
+      "C": {
+        "attempts_seconds": [
+          668.7767900419421,
+          476.3227884580847
+        ],
+        "fees": null,
+        "finished": 2,
+        "human_business_interventions": 0,
+        "internal_worker_seconds_terminal_observed": 0,
+        "median_attempt_seconds": 572.5497892500134,
+        "positions": 2,
+        "qualified": 0,
+        "root_worker_positions_unknown": 0,
+        "root_worker_seconds": 990.2479999065399,
+        "root_worker_seconds_lower_bound": 990.2479999065399,
+        "root_worker_seconds_observed": 990.2479999065399,
+        "seconds_per_qualified": null,
+        "service_compute": null,
+        "token_detail": {
+          "cache_write_input_tokens": 0,
+          "cached_input_tokens": 2308736,
+          "input_tokens": 2438224,
+          "output_tokens": 35260,
+          "reasoning_output_tokens": 14190,
+          "total_tokens": 2473484
+        },
+        "tokens": 2473484,
+        "tokens_observed_lower_bound": 2473484,
+        "total_seconds": 1145.0995785000268
+      }
+    }
+  },
+  "finished": 18,
+  "groups": {
+    "A": {
+      "attempts_seconds": [
+        609.3929214170203,
+        500.89164041611366,
+        621.5455352910794,
+        493.05736895790324,
+        435.77873375010677,
+        263.52271520812064
+      ],
+      "fees": null,
+      "finished": 6,
+      "human_business_interventions": 0,
+      "internal_worker_seconds_terminal_observed": 0,
+      "median_attempt_seconds": 496.97450468700845,
+      "positions": 6,
+      "qualified": 3,
+      "root_worker_positions_unknown": 0,
+      "root_worker_seconds": 2686.9240000247955,
+      "root_worker_seconds_lower_bound": 2686.9240000247955,
+      "root_worker_seconds_observed": 2686.9240000247955,
+      "seconds_per_qualified": 974.7296383467814,
+      "service_compute": null,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 4408064,
+        "input_tokens": 4642243,
+        "output_tokens": 90670,
+        "reasoning_output_tokens": 46931,
+        "total_tokens": 4732913
+      },
+      "tokens": 4732913,
+      "tokens_observed_lower_bound": 4732913,
+      "total_seconds": 2924.188915040344
+    },
+    "B": {
+      "attempts_seconds": [
+        664.2525228329469,
+        403.03657458303496,
+        588.8453769590706,
+        600.1179851251654,
+        515.6351030000951,
+        400.52290554204956
+      ],
+      "fees": null,
+      "finished": 6,
+      "human_business_interventions": 0,
+      "internal_worker_seconds_terminal_observed": 0,
+      "median_attempt_seconds": 552.2402399795828,
+      "positions": 6,
+      "qualified": 3,
+      "root_worker_positions_unknown": 0,
+      "root_worker_seconds": 2999.6749999523163,
+      "root_worker_seconds_lower_bound": 2999.6749999523163,
+      "root_worker_seconds_observed": 2999.6749999523163,
+      "seconds_per_qualified": 1057.470156014121,
+      "service_compute": null,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 8630912,
+        "input_tokens": 8988488,
+        "output_tokens": 113121,
+        "reasoning_output_tokens": 51691,
+        "total_tokens": 9101609
+      },
+      "tokens": 9101609,
+      "tokens_observed_lower_bound": 9101609,
+      "total_seconds": 3172.4104680423625
+    },
+    "C": {
+      "attempts_seconds": [
+        653.8819839579519,
+        334.8607817920856,
+        668.7767900419421,
+        476.3227884580847,
+        580.4515451248735,
+        430.8416935419664
+      ],
+      "fees": null,
+      "finished": 6,
+      "human_business_interventions": 0,
+      "internal_worker_seconds_terminal_observed": 0,
+      "median_attempt_seconds": 528.3871667914791,
+      "positions": 6,
+      "qualified": 3,
+      "root_worker_positions_unknown": 0,
+      "root_worker_seconds": 2892.184999704361,
+      "root_worker_seconds_lower_bound": 2892.184999704361,
+      "root_worker_seconds_observed": 2892.184999704361,
+      "seconds_per_qualified": 1048.378527638968,
+      "service_compute": null,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 5968384,
+        "input_tokens": 6329713,
+        "output_tokens": 109308,
+        "reasoning_output_tokens": 50089,
+        "total_tokens": 6439021
+      },
+      "tokens": 6439021,
+      "tokens_observed_lower_bound": 6439021,
+      "total_seconds": 3145.1355829169042
+    }
+  },
+  "limits": [
+    "one pair per task/group; six public historical tasks, no general statistical stability",
+    "pretraining familiarity cannot be excluded",
+    "local native logs trusted but unsigned; opaque tool bodies remain unknown",
+    "snapshot hashes cannot detect transient restored edits",
+    "parent interruption/service stop latency remains separately observed/unknown"
+  ],
+  "max_positions": 18,
+  "positions": [
+    {
+      "case": "hc01",
+      "checks": {
+        "independent": {
+          "elapsed_seconds": 2.4857928750570863,
+          "result": 0
+        }
+      },
+      "collector_qualified": true,
+      "elapsed_seconds": 609.3929214170203,
+      "family": "cross_module_behavior_repair",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented awaitable policies and callbacks, async strategy exports, mixed short-circuit composition, and async decorator dispatch.\n\nPublic check passes; all 146 tests pass. Full mypy still reports 7 existing core/Tornado typing errors.",
+          "timestamp": "2026-11-13T07:47:16.741Z",
+          "turn_id": "01a1d3d7-0c9d-7250-ae7f-3065a234334f"
+        }
+      ],
+      "finished": true,
+      "group": "A",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 19,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 1,
+      "qualified": true,
+      "reasons": [],
+      "root_worker_seconds": 588.3479998111725,
+      "root_worker_seconds_lower_bound": 588.3479998111725,
+      "session_id": "01a1d3d7-0c62-7112-9df7-03f53449b782",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 953088,
+        "input_tokens": 993799,
+        "output_tokens": 23192,
+        "reasoning_output_tokens": 13314,
+        "total_tokens": 1016991
+      },
+      "tokens": 1016991,
+      "tokens_observed_lower_bound": 1016991
+    },
+    {
+      "case": "hc01",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": 0.13696133415214717,
+          "result": 0
+        },
+        "gate": {
+          "elapsed_seconds": 3.576516625005752,
+          "result": 0
+        },
+        "independent": {
+          "elapsed_seconds": 2.420094500062987,
+          "result": 0
+        }
+      },
+      "collector_qualified": true,
+      "elapsed_seconds": 664.2525228329469,
+      "family": "cross_module_behavior_repair",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented awaitable policies and callbacks, async strategy imports, mixed short-circuit composition, and async callable/partial decorator dispatch.\n\nPublic check passed; **155 tests passed**, including 42 new cases. Audit clean; **Gate GO**, 2/2 checks. Mypy retains the same seven pre-existing errors.\n\nDelivered in one serial iteration; no optimization score claimed. Evidence: [contract](/tmp/goal-protocol-efficiency-xpw3677q/positions/002/work/.goal/goal.md), [review](/tmp/goal-protocol-efficiency-xpw3677q/positions/002/work/.goal/evidence/implementation-review.md), [loop log](/tmp/goal-protocol-efficiency-xpw3677q/positions/002/work/.goal/loop-log.md).",
+          "timestamp": "2026-11-13T07:58:32.400Z",
+          "turn_id": "01a1d3e0-8d12-71b1-a8da-6c0b0d3b3b03"
+        }
+      ],
+      "finished": true,
+      "group": "B",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 29,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 2,
+      "qualified": true,
+      "reasons": [],
+      "root_worker_seconds": 641.2640001773834,
+      "root_worker_seconds_lower_bound": 641.2640001773834,
+      "session_id": "01a1d3e0-8ccd-70d3-9e81-db0e77f77a65",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 1683072,
+        "input_tokens": 1737910,
+        "output_tokens": 24897,
+        "reasoning_output_tokens": 12119,
+        "total_tokens": 1762807
+      },
+      "tokens": 1762807,
+      "tokens_observed_lower_bound": 1762807
+    },
+    {
+      "case": "hc01",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": 0.14101291680708528,
+          "result": 0
+        },
+        "gate": {
+          "elapsed_seconds": 0.9177604170981795,
+          "result": 0
+        },
+        "independent": {
+          "elapsed_seconds": 2.4389069580938667,
+          "result": 0
+        }
+      },
+      "collector_qualified": true,
+      "elapsed_seconds": 653.8819839579519,
+      "family": "cross_module_behavior_repair",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented awaitable policies and callbacks, async retry strategies, ordered mixed composition, and async callable/partial decorator dispatch.\n\nValidation: **139 tests passed**, public check passed, audit clean, and fresh **Gate GO** confirmed completion.\n\nMypy retains six errors in existing base/Tornado code; none in the new strategy module or tests.\n\nEvidence: [contract](/tmp/goal-protocol-efficiency-xpw3677q/positions/003/work/.goal/goal.md), [iteration log](/tmp/goal-protocol-efficiency-xpw3677q/positions/003/work/.goal/loop-log.md), [review](/tmp/goal-protocol-efficiency-xpw3677q/positions/003/work/.goal/evidence/review.md). One iteration; optimization strategy and score are not applicable.",
+          "timestamp": "2026-11-13T08:09:43.964Z",
+          "turn_id": "01a1d3ea-f61e-7cb1-93c8-f7945078a4d4"
+        }
+      ],
+      "finished": true,
+      "group": "C",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 19,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 3,
+      "qualified": true,
+      "reasons": [],
+      "root_worker_seconds": 630.7939999103546,
+      "root_worker_seconds_lower_bound": 630.7939999103546,
+      "session_id": "01a1d3ea-f5df-7d73-9cb0-de93affb2423",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 1085824,
+        "input_tokens": 1133719,
+        "output_tokens": 26613,
+        "reasoning_output_tokens": 13880,
+        "total_tokens": 1160332
+      },
+      "tokens": 1160332,
+      "tokens_observed_lower_bound": 1160332
+    },
+    {
+      "case": "hc02",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": 0.13991112518124282,
+          "result": 0
+        },
+        "gate": {
+          "elapsed_seconds": 0.9267060419078916,
+          "result": 0
+        },
+        "independent": {
+          "elapsed_seconds": 6.817264333833009,
+          "result": 0
+        }
+      },
+      "collector_qualified": true,
+      "elapsed_seconds": 403.03657458303496,
+      "family": "cross_module_behavior_repair",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Fixed union selection to honor serialized discriminator names, including empty keys and explicit overrides, while preserving unique-key fallback and ambiguity errors.\n\nValidation: public check passed; 231 tests passed. Review found no remaining issues. Audit clean; Gate GO at iteration 1.\n\nRuff was unavailable. Evidence: [review](/tmp/goal-protocol-efficiency-xpw3677q/positions/004/work/.goal/evidence/review.md), [log](/tmp/goal-protocol-efficiency-xpw3677q/positions/004/work/.goal/loop-log.md), [contract](/tmp/goal-protocol-efficiency-xpw3677q/positions/004/work/.goal/goal.md).",
+          "timestamp": "2026-11-13T08:16:59.696Z",
+          "turn_id": "01a1d3f5-c9f1-7b53-9907-8375374be9b6"
+        }
+      ],
+      "finished": true,
+      "group": "B",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 20,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 4,
+      "qualified": true,
+      "reasons": [],
+      "root_worker_seconds": 356.8090000152588,
+      "root_worker_seconds_lower_bound": 356.8090000152588,
+      "session_id": "01a1d3f5-c9af-75c2-8fa8-1fb5762781a7",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 1069312,
+        "input_tokens": 1128019,
+        "output_tokens": 10985,
+        "reasoning_output_tokens": 3812,
+        "total_tokens": 1139004
+      },
+      "tokens": 1139004,
+      "tokens_observed_lower_bound": 1139004
+    },
+    {
+      "case": "hc02",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": 0.13680237508378923,
+          "result": 0
+        },
+        "gate": {
+          "elapsed_seconds": 0.9190222080796957,
+          "result": 0
+        },
+        "independent": {
+          "elapsed_seconds": 7.215709125157446,
+          "result": 0
+        }
+      },
+      "collector_qualified": true,
+      "elapsed_seconds": 334.8607817920856,
+      "family": "cross_module_behavior_repair",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented wire-name literal discrimination, including empty keys, explicit overrides, and per-member renames. Added regression coverage while preserving ambiguity and invalid-input errors.\n\nValidation: public check passed; 669 tests passed, 15 xfailed. Audit clean; Gate GO, iteration 1. Ruff was unavailable.\n\nEvidence: [review](/tmp/goal-protocol-efficiency-xpw3677q/positions/005/work/.goal/evidence/rename-review.md), [loop log](/tmp/goal-protocol-efficiency-xpw3677q/positions/005/work/.goal/loop-log.md), [contract](/tmp/goal-protocol-efficiency-xpw3677q/positions/005/work/.goal/goal.md).",
+          "timestamp": "2026-11-13T08:22:46.686Z",
+          "turn_id": "01a1d3fb-dd7c-7780-9ae9-1adc38538765"
+        }
+      ],
+      "finished": true,
+      "group": "C",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 17,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 5,
+      "qualified": true,
+      "reasons": [],
+      "root_worker_seconds": 305.4229998588562,
+      "root_worker_seconds_lower_bound": 305.4229998588562,
+      "session_id": "01a1d3fb-dd38-7c50-a6ba-e76340812913",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 835712,
+        "input_tokens": 919654,
+        "output_tokens": 12598,
+        "reasoning_output_tokens": 4191,
+        "total_tokens": 932252
+      },
+      "tokens": 932252,
+      "tokens_observed_lower_bound": 932252
+    },
+    {
+      "case": "hc02",
+      "checks": {
+        "independent": {
+          "elapsed_seconds": 7.049826290924102,
+          "result": 0
+        }
+      },
+      "collector_qualified": true,
+      "elapsed_seconds": 500.89164041611366,
+      "family": "cross_module_behavior_repair",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented union selection using configured wire discriminator names, including empty keys, per-member renames, and explicit overrides. Added regression coverage.\n\nPublic check passed; available suite: **950 passed, 15 xfailed**.\n\nFive test modules required missing optional dependencies. Ruff was unavailable.",
+          "timestamp": "2026-11-13T08:32:00.405Z",
+          "turn_id": "01a1d402-c304-7122-9ef3-eafbd74adb27"
+        }
+      ],
+      "finished": true,
+      "group": "A",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 14,
+      "normal_final": true,
+      "opaque_tool_receipts": 1,
+      "peak_internal_workers": 0,
+      "position": 6,
+      "qualified": true,
+      "reasons": [],
+      "root_worker_seconds": 407.231999874115,
+      "root_worker_seconds_lower_bound": 407.231999874115,
+      "session_id": "01a1d402-c2ce-7fc1-a338-5d05f025fd41",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 629504,
+        "input_tokens": 661474,
+        "output_tokens": 11485,
+        "reasoning_output_tokens": 5657,
+        "total_tokens": 672959
+      },
+      "tokens": 672959,
+      "tokens_observed_lower_bound": 672959
+    },
+    {
+      "case": "hc03",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "gate": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "independent": {
+          "elapsed_seconds": 1.0502151669934392,
+          "result": 1
+        }
+      },
+      "collector_qualified": false,
+      "elapsed_seconds": 668.7767900419421,
+      "family": "interface_compatibility_migration",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented flag default/activation reconciliation and environment token conversion, with 229 regression cases.\n\n- Tests: 967 passed, 22 skipped, 1 expected failure.\n- Public check passed; mypy passed for 25 files.\n- Audit clean; Gate returned GO for iteration 1.\n\nCoverage remains limited by the existing skips and expected failure. [Review evidence](/tmp/goal-protocol-efficiency-xpw3677q/positions/007/work/.goal/evidence/review.md).",
+          "timestamp": "2026-11-13T08:45:44.388Z",
+          "turn_id": "01a1d40c-fb9e-72d2-8629-a022f4e4ff71"
+        }
+      ],
+      "finished": true,
+      "group": "C",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 18,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 7,
+      "qualified": false,
+      "reasons": [
+        "acceptance check failed or result unknown: independent"
+      ],
+      "root_worker_seconds": 561.3429999351501,
+      "root_worker_seconds_lower_bound": 561.3429999351501,
+      "session_id": "01a1d40c-fb6c-7150-b738-42c8d6462ee9",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 1093120,
+        "input_tokens": 1150255,
+        "output_tokens": 19620,
+        "reasoning_output_tokens": 8374,
+        "total_tokens": 1169875
+      },
+      "tokens": 1169875,
+      "tokens_observed_lower_bound": 1169875
+    },
+    {
+      "case": "hc03",
+      "checks": {
+        "independent": {
+          "elapsed_seconds": 0.9141675841528922,
+          "result": 1
+        }
+      },
+      "collector_qualified": false,
+      "elapsed_seconds": 621.5455352910794,
+      "family": "interface_compatibility_migration",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented flag/default reconciliation and environment conversion, with regression tests for types, explicit `False`/`None`, defaults, and precedence.\n\nValidation: 975 passed, 22 skipped, 1 expected failure. Public check passed. Skipped tests remain unverified.",
+          "timestamp": "2026-11-13T08:56:42.237Z",
+          "turn_id": "01a1d416-86a0-7512-9a83-a5d06d02b8ef"
+        }
+      ],
+      "finished": true,
+      "group": "A",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 19,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 8,
+      "qualified": false,
+      "reasons": [
+        "acceptance check failed or result unknown: independent"
+      ],
+      "root_worker_seconds": 594.2170000076294,
+      "root_worker_seconds_lower_bound": 594.2170000076294,
+      "session_id": "01a1d416-865c-72f3-a5db-81f2a08a79a6",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 965120,
+        "input_tokens": 1004760,
+        "output_tokens": 18702,
+        "reasoning_output_tokens": 10414,
+        "total_tokens": 1023462
+      },
+      "tokens": 1023462,
+      "tokens_observed_lower_bound": 1023462
+    },
+    {
+      "case": "hc03",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "gate": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "independent": {
+          "elapsed_seconds": 1.0444605418015271,
+          "result": 1
+        }
+      },
+      "collector_qualified": false,
+      "elapsed_seconds": 588.8453769590706,
+      "family": "interface_compatibility_migration",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented flag/default reconciliation, environment token handling, exact string activation, and strict boolean errors.\n\nVerification: public check passed; **957 tests passed, 22 skipped, 1 xfailed**. Final audit clean; **Gate GO**, iteration 1. Ruff unavailable.\n\nEvidence: [contract](.goal/goal.md), [review](.goal/evidence/review.md), [loop log](.goal/loop-log.md).",
+          "timestamp": "2026-11-13T09:08:11.676Z",
+          "turn_id": "01a1d421-618e-7bd3-b0eb-01b498158d53"
+        }
+      ],
+      "finished": true,
+      "group": "B",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 23,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 9,
+      "qualified": false,
+      "reasons": [
+        "acceptance check failed or result unknown: independent"
+      ],
+      "root_worker_seconds": 571.8989999294281,
+      "root_worker_seconds_lower_bound": 571.8989999294281,
+      "session_id": "01a1d421-615d-7113-a38d-365ec3fa9362",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 1554944,
+        "input_tokens": 1618796,
+        "output_tokens": 24245,
+        "reasoning_output_tokens": 12994,
+        "total_tokens": 1643041
+      },
+      "tokens": 1643041,
+      "tokens_observed_lower_bound": 1643041
+    },
+    {
+      "case": "hc04",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "gate": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "independent": {
+          "elapsed_seconds": 5.726485792081803,
+          "result": 1
+        }
+      },
+      "collector_qualified": false,
+      "elapsed_seconds": 476.3227884580847,
+      "family": "interface_compatibility_migration",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented modern keyword-only inheritance, the `force_kw_only` compatibility switch, updated field stubs, and regression tests.\n\nPublic check passed. Full suite: **1,426 passed, 8 skipped, 1 xfailed**. Skips cover unavailable cloudpickle/pyright and version/platform cases.\n\nAudit clean; **Gate GO**, iteration 1, with no unresolved checks. Evidence: [contract](/tmp/goal-protocol-efficiency-xpw3677q/positions/010/work/.goal/goal.md), [log](/tmp/goal-protocol-efficiency-xpw3677q/positions/010/work/.goal/loop-log.md), [review](/tmp/goal-protocol-efficiency-xpw3677q/positions/010/work/.goal/proposals/close-iteration.json). Strategy scoring was not applicable.",
+          "timestamp": "2026-11-13T09:17:46.660Z",
+          "turn_id": "01a1d42c-5637-70d1-8c96-f195e1650f9c"
+        }
+      ],
+      "finished": true,
+      "group": "C",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 18,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 10,
+      "qualified": false,
+      "reasons": [
+        "acceptance check failed or result unknown: independent"
+      ],
+      "root_worker_seconds": 428.90499997138977,
+      "root_worker_seconds_lower_bound": 428.90499997138977,
+      "session_id": "01a1d42c-55ff-70d2-9d3d-c0c7d5b6c86b",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 1215616,
+        "input_tokens": 1287969,
+        "output_tokens": 15640,
+        "reasoning_output_tokens": 5816,
+        "total_tokens": 1303609
+      },
+      "tokens": 1303609,
+      "tokens_observed_lower_bound": 1303609
+    },
+    {
+      "case": "hc04",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "gate": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "independent": {
+          "elapsed_seconds": 5.01632241695188,
+          "result": 1
+        }
+      },
+      "collector_qualified": false,
+      "elapsed_seconds": 600.1179851251654,
+      "family": "interface_compatibility_migration",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented keyword-only inheritance migration, compatibility switches, and updated stubs while preserving legacy defaults.\n\nPublic check passed. Regression suite: **1,448 passed, 8 skipped, 1 expected failure**. Skips reflect unavailable dependencies or other runtimes.\n\nWorkflow booked; audit clean; **Gate GO**.\n\n[Review](/tmp/goal-protocol-efficiency-xpw3677q/positions/011/work/.goal/evidence/review.md) · [Tests](/tmp/goal-protocol-efficiency-xpw3677q/positions/011/work/.goal/evidence/regression-tests.txt) · [Log](/tmp/goal-protocol-efficiency-xpw3677q/positions/011/work/.goal/loop-log.md)",
+          "timestamp": "2026-11-13T09:29:07.593Z",
+          "turn_id": "01a1d434-b8e7-7881-af66-14f0fc431172"
+        }
+      ],
+      "finished": true,
+      "group": "B",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 27,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 11,
+      "qualified": false,
+      "reasons": [
+        "acceptance check failed or result unknown: independent"
+      ],
+      "root_worker_seconds": 560.6849999427795,
+      "root_worker_seconds_lower_bound": 560.6849999427795,
+      "session_id": "01a1d434-b8ac-7b42-86eb-d34057c32685",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 1820032,
+        "input_tokens": 1889688,
+        "output_tokens": 18761,
+        "reasoning_output_tokens": 6141,
+        "total_tokens": 1908449
+      },
+      "tokens": 1908449,
+      "tokens_observed_lower_bound": 1908449
+    },
+    {
+      "case": "hc04",
+      "checks": {
+        "independent": {
+          "elapsed_seconds": 4.989451125031337,
+          "result": 1
+        }
+      },
+      "collector_qualified": false,
+      "elapsed_seconds": 493.05736895790324,
+      "family": "interface_compatibility_migration",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented modern keyword-only inheritance, configurable `force_kw_only` compatibility, and field stubs accepting `None`. Added 154 regression cases.\n\nValidation: public check passed; full suite **1,504 passed, 8 skipped, 1 expected failure**; mypy check passed. Skips cover unavailable optional dependencies and Python/platform requirements.",
+          "timestamp": "2026-11-13T09:38:31.980Z",
+          "turn_id": "01a1d43f-3577-7fd1-a8f4-1c9f103e503c"
+        }
+      ],
+      "finished": true,
+      "group": "A",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 14,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 12,
+      "qualified": false,
+      "reasons": [
+        "acceptance check failed or result unknown: independent"
+      ],
+      "root_worker_seconds": 437.5420000553131,
+      "root_worker_seconds_lower_bound": 437.5420000553131,
+      "session_id": "01a1d43f-3539-7b62-80e2-a896d5727233",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 774528,
+        "input_tokens": 831739,
+        "output_tokens": 17530,
+        "reasoning_output_tokens": 7263,
+        "total_tokens": 849269
+      },
+      "tokens": 849269,
+      "tokens_observed_lower_bound": 849269
+    },
+    {
+      "case": "hc05",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "gate": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "independent": {
+          "elapsed_seconds": 0.8459276249632239,
+          "result": 1
+        }
+      },
+      "collector_qualified": false,
+      "elapsed_seconds": 515.6351030000951,
+      "family": "integration_failure_recovery",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Fixed multipart buffering to preserve payload bytes and trailing newlines across split delimiters, including closing-boundary epilogues.\n\nValidation: public check passed; 384 tests passed with one existing resource warning. Final audit clean; Gate GO, iteration 1. Ruff was unavailable.\n\nEvidence: [contract](/tmp/goal-protocol-efficiency-xpw3677q/positions/013/work/.goal/goal.md), [loop log](/tmp/goal-protocol-efficiency-xpw3677q/positions/013/work/.goal/loop-log.md), [review](/tmp/goal-protocol-efficiency-xpw3677q/positions/013/work/.goal/evidence/multipart-review.md).",
+          "timestamp": "2026-11-13T09:48:28.568Z",
+          "turn_id": "01a1d447-6a37-7490-824a-c59ef5c10343"
+        }
+      ],
+      "finished": true,
+      "group": "B",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 21,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 13,
+      "qualified": false,
+      "reasons": [
+        "acceptance check failed or result unknown: independent"
+      ],
+      "root_worker_seconds": 496.24699997901917,
+      "root_worker_seconds_lower_bound": 496.24699997901917,
+      "session_id": "01a1d447-69f0-7401-9794-4e37600e1d45",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 1338368,
+        "input_tokens": 1398685,
+        "output_tokens": 18020,
+        "reasoning_output_tokens": 8216,
+        "total_tokens": 1416705
+      },
+      "tokens": 1416705,
+      "tokens_observed_lower_bound": 1416705
+    },
+    {
+      "case": "hc05",
+      "checks": {
+        "independent": {
+          "elapsed_seconds": 0.6541767921298742,
+          "result": 1
+        }
+      },
+      "collector_qualified": false,
+      "elapsed_seconds": 435.77873375010677,
+      "family": "integration_failure_recovery",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Fixed multipart buffering to preserve payload bytes and trailing newlines across split delimiters. Added decoder, form-parser, and request-level regression tests.\n\nPublic check passed. Broader checks: **996 passed, 3 skipped**. Server tests were excluded; debug tests require unavailable `pytest-timeout`. One pre-existing temporary-file warning remains.",
+          "timestamp": "2026-11-13T09:56:37.425Z",
+          "turn_id": "01a1d450-1cce-70e1-8b64-ec377e27743f"
+        }
+      ],
+      "finished": true,
+      "group": "A",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 15,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 14,
+      "qualified": false,
+      "reasons": [
+        "acceptance check failed or result unknown: independent"
+      ],
+      "root_worker_seconds": 414.92900013923645,
+      "root_worker_seconds_lower_bound": 414.92900013923645,
+      "session_id": "01a1d450-1c94-7612-b4f3-260df54e91a1",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 696704,
+        "input_tokens": 729645,
+        "output_tokens": 13768,
+        "reasoning_output_tokens": 7927,
+        "total_tokens": 743413
+      },
+      "tokens": 743413,
+      "tokens_observed_lower_bound": 743413
+    },
+    {
+      "case": "hc05",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "gate": {
+          "elapsed_seconds": null,
+          "result": null
+        },
+        "independent": {
+          "elapsed_seconds": 0.6478901661466807,
+          "result": 1
+        }
+      },
+      "collector_qualified": false,
+      "elapsed_seconds": 580.4515451248735,
+      "family": "integration_failure_recovery",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented multipart buffering fixes and regression coverage for split delimiters, trailing newlines, boundary lookalikes, and epilogues.\n\nValidation: public check passed, 322 selected tests passed, and 380 chunking checks passed. One existing unclosed-file warning remains.\n\nAudit clean; Gate **GO**, iteration 1, `completion_verified=true`. No scored objective.\n\nEvidence: [log](/tmp/goal-protocol-efficiency-xpw3677q/positions/015/work/.goal/loop-log.md), [contract](/tmp/goal-protocol-efficiency-xpw3677q/positions/015/work/.goal/goal.md), [review](/tmp/goal-protocol-efficiency-xpw3677q/positions/015/work/.goal/proposals/close-iteration.json).",
+          "timestamp": "2026-11-13T10:06:53.681Z",
+          "turn_id": "01a1d457-45dd-78f2-b745-af6a57d9239d"
+        }
+      ],
+      "finished": true,
+      "group": "C",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 17,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 15,
+      "qualified": false,
+      "reasons": [
+        "acceptance check failed or result unknown: independent"
+      ],
+      "root_worker_seconds": 561.9980001449585,
+      "root_worker_seconds_lower_bound": 561.9980001449585,
+      "session_id": "01a1d457-45a2-7ae1-be8f-cad825bbe168",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 1000448,
+        "input_tokens": 1056294,
+        "output_tokens": 22294,
+        "reasoning_output_tokens": 11828,
+        "total_tokens": 1078588
+      },
+      "tokens": 1078588,
+      "tokens_observed_lower_bound": 1078588
+    },
+    {
+      "case": "hc06",
+      "checks": {
+        "independent": {
+          "elapsed_seconds": 0.7200882500037551,
+          "result": 0
+        }
+      },
+      "collector_qualified": true,
+      "elapsed_seconds": 263.52271520812064,
+      "family": "integration_failure_recovery",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented stale-ID skipping for explicit update/remove batches, returning only affected IDs and preserving complete writes and cache refreshes. Added 36 regression cases.\n\nValidation: public check passed; full suite **241 passed, 1 skipped** (optional PyYAML unavailable).\n\nArbitrary callback exceptions retain existing behavior without rollback.",
+          "timestamp": "2026-11-13T10:12:03.606Z",
+          "turn_id": "01a1d460-d91b-7c93-92df-c5dc4a0e97f4"
+        }
+      ],
+      "finished": true,
+      "group": "A",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 10,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 16,
+      "qualified": true,
+      "reasons": [],
+      "root_worker_seconds": 244.6560001373291,
+      "root_worker_seconds_lower_bound": 244.6560001373291,
+      "session_id": "01a1d460-d8df-7810-b7ac-2c57a1837f8d",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 389120,
+        "input_tokens": 420826,
+        "output_tokens": 5993,
+        "reasoning_output_tokens": 2356,
+        "total_tokens": 426819
+      },
+      "tokens": 426819,
+      "tokens_observed_lower_bound": 426819
+    },
+    {
+      "case": "hc06",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": 0.14039795892313123,
+          "result": 0
+        },
+        "gate": {
+          "elapsed_seconds": 1.870953334029764,
+          "result": 0
+        },
+        "independent": {
+          "elapsed_seconds": 0.7286827089264989,
+          "result": 0
+        }
+      },
+      "collector_qualified": true,
+      "elapsed_seconds": 430.8416935419664,
+      "family": "integration_failure_recovery",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented stale-ID skipping for explicit-ID updates and removals, returning only affected IDs. Added regression coverage for iterables, caches, persistence, middleware, and upserts.\n\nPublic check passed. Full suite: **247 passed, 1 skipped**. Audit clean; **Gate: GO**.\n\nCallback exceptions still propagate; rollback remains outside scope.\n\nEvidence: [contract](/tmp/goal-protocol-efficiency-xpw3677q/positions/017/work/.goal/goal.md), [review](/tmp/goal-protocol-efficiency-xpw3677q/positions/017/work/.goal/evidence/stale-id-review.md), [loop log](/tmp/goal-protocol-efficiency-xpw3677q/positions/017/work/.goal/loop-log.md).",
+          "timestamp": "2026-11-13T10:20:12.150Z",
+          "turn_id": "01a1d465-e693-76d0-97a4-c8ed45322f9f"
+        }
+      ],
+      "finished": true,
+      "group": "C",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 15,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 17,
+      "qualified": true,
+      "reasons": [],
+      "root_worker_seconds": 403.72199988365173,
+      "root_worker_seconds_lower_bound": 403.72199988365173,
+      "session_id": "01a1d465-e65d-7ac3-bb44-da150da0c29f",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 737664,
+        "input_tokens": 781822,
+        "output_tokens": 12543,
+        "reasoning_output_tokens": 6000,
+        "total_tokens": 794365
+      },
+      "tokens": 794365,
+      "tokens_observed_lower_bound": 794365
+    },
+    {
+      "case": "hc06",
+      "checks": {
+        "audit": {
+          "elapsed_seconds": 0.13327720807865262,
+          "result": 0
+        },
+        "gate": {
+          "elapsed_seconds": 0.8455654999706894,
+          "result": 0
+        },
+        "independent": {
+          "elapsed_seconds": 0.7263640000019222,
+          "result": 0
+        }
+      },
+      "collector_qualified": true,
+      "elapsed_seconds": 400.52290554204956,
+      "family": "integration_failure_recovery",
+      "fees": null,
+      "finals": [
+        {
+          "text": "Implemented stale-ID skipping for explicit-ID updates and removals, returning only affected IDs. Added 94 regression cases covering iterators, caches, persistence, middleware, and upsert.\n\nValidation: public check passed; full suite **299 passed, 1 skipped**. Fresh audit was clean; **GATE: GO**, iteration 1. Optional pycodestyle was unavailable.\n\nSTRATEGY-PICK: none; score trajectory: none (functional task).\n\nEvidence: [contract](/tmp/goal-protocol-efficiency-xpw3677q/positions/018/work/.goal/goal.md), [loop log](/tmp/goal-protocol-efficiency-xpw3677q/positions/018/work/.goal/loop-log.md), [review](/tmp/goal-protocol-efficiency-xpw3677q/positions/018/work/.goal/evidence/review.md).",
+          "timestamp": "2026-11-13T10:27:54.545Z",
+          "turn_id": "01a1d46d-6654-7382-bb00-15d6d1c6b6c6"
+        }
+      ],
+      "finished": true,
+      "group": "B",
+      "internal_worker_seconds": 0,
+      "native_tool_calls": 20,
+      "normal_final": true,
+      "opaque_tool_receipts": 0,
+      "peak_internal_workers": 0,
+      "position": 18,
+      "qualified": true,
+      "reasons": [],
+      "root_worker_seconds": 372.77099990844727,
+      "root_worker_seconds_lower_bound": 372.77099990844727,
+      "session_id": "01a1d46d-660a-73d2-b1e6-fe17ae3a2369",
+      "settings_ok": true,
+      "token_detail": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 1165184,
+        "input_tokens": 1215390,
+        "output_tokens": 16213,
+        "reasoning_output_tokens": 8409,
+        "total_tokens": 1231603
+      },
+      "tokens": 1231603,
+      "tokens_observed_lower_bound": 1231603
+    }
+  ]
+}

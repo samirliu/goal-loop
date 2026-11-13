@@ -1,0 +1,11 @@
+[
+  {
+    "position": 6,
+    "archive": "position-006.tar.gz",
+    "sha256": "1dbe4f6832610cc6004e8aa56c45a94e247ee4f6058678b21b2eedf748157366",
+    "original_report_sha256": "16c469a02472e9878b220b52563d1e5d4d10fe91a81381f6a1d811773de95b23",
+    "qualified_original": true,
+    "original_artifacts_verified_before_export": true,
+    "excluded_caches": "Preserved at original local path and by original fingerprints; omitted from committed archives. Business grader ignores these caches too."
+  }
+]

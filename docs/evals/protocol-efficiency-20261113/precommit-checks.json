@@ -1,0 +1,9 @@
+{
+  "staged_diff_check_returncode": 2,
+  "staged_diff_check_output": "docs/evals/protocol-efficiency-20261113/candidate.patch:8: trailing whitespace.\n+ \ndocs/evals/protocol-efficiency-20261113/candidate.patch:12: trailing whitespace.\n+ \ndocs/evals/protocol-efficiency-20261113/candidate.patch:75: trailing whitespace.\n+ \ndocs/evals/protocol-efficiency-20261113/candidate.patch:76: trailing whitespace.\n+ \ndocs/evals/protocol-efficiency-20261113/candidate.patch:94: trailing whitespace.\n+ \ndocs/evals/protocol-efficiency-20261113/candidate.patch:114: trailing whitespace.\n+ \ndocs/evals/protocol-efficiency-20261113/candidate.patch:215: trailing whitespace.\n+ \n",
+  "interpretation": "Only candidate.patch unified-diff empty context lines carry their required leading context space. The patch is retained byte-for-byte as evidence; no source whitespace errors.",
+  "excluding_patch_returncode": 0,
+  "excluding_patch_output": "",
+  "docs_consistency": "bash tests/docs_consistency.sh passed locally",
+  "production_source_diff_from_frozen_commit": ""
+}

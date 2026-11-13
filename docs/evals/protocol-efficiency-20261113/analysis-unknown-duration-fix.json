@@ -1,0 +1,10 @@
+{
+  "utc": "2026-11-13T08:31:52.010454+00:00",
+  "reason": "Keep missing native root terminal worker duration unknown, with observed active lower bound, instead of an empty completed-span sum of zero. Main elapsed/qualification/adoption criteria unchanged.",
+  "before_sha256": "5b7e913bbce3b24cdda54750ae44feb3a6719a93d13e49fa272c78daba87a00b",
+  "after_sha256": "269af3e2f6681eada9823da5089754c84e17e6b488e86527c2ac39700393f6ab",
+  "finished_positions_checked_unchanged": 5,
+  "all_existing_summary_fields_unchanged": true,
+  "unknown_active_fixture_passed": true,
+  "real_model_calls": 0
+}

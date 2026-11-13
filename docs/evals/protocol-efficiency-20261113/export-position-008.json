@@ -1,0 +1,14 @@
+[
+  {
+    "position": 8,
+    "archive": "position-008.tar.gz",
+    "sha256": "9d12e73220a9c1d53e124ec47f1be0a1c7c63dbad0e934b1a7276ecbc5206b1d",
+    "original_report_sha256": "d5f2496ca379c9b232a8ee8dfe638178cbc1cb9880f903cb2175a1f8de2bb51c",
+    "qualified_original": false,
+    "original_nonredacted_artifact_metadata_verified_before_export": true,
+    "redacted_original_metadata_paths_unknown": [
+      "/tmp/goal-protocol-efficiency-xpw3677q/positions/008/work/entries/tests/entries/typing/entries/typing_password_option.py"
+    ],
+    "excluded_caches": "Preserved at original local path and by original fingerprints; omitted from committed archives. Business grader ignores these caches too."
+  }
+]

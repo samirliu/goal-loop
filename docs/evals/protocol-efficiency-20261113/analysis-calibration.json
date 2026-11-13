@@ -1,0 +1,12 @@
+{
+  "kind": "mechanism/formula checks only; no model effectiveness evidence",
+  "utc": "2026-11-13T07:44:13.719726+00:00",
+  "summarizer_sha256": "5b7e913bbce3b24cdda54750ae44feb3a6719a93d13e49fa272c78daba87a00b",
+  "checks": {
+    "all_failed_cost_retained": true,
+    "zero_qualified_cost_undefined": true,
+    "unknown_worker_cost_not_zero": true,
+    "missing_actual_settings_rejects_qualification": true
+  },
+  "real_model_calls": 0
+}

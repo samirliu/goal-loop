@@ -1,0 +1,141 @@
+{
+  "archives": [
+    {
+      "file": "archives/inputs.tar.gz",
+      "bytes": 65135382,
+      "sha256": "42da194e132e5b347f97d652e716cff8ab85f1f9682695913204f3e0a624869f",
+      "members": 20322,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-001.tar.gz",
+      "bytes": 1563000,
+      "sha256": "9fb0c5ee75c06bf0608a85e662f665bb089a9491d004174c568d823d5b92700b",
+      "members": 186,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-002.tar.gz",
+      "bytes": 1600217,
+      "sha256": "ef62f51aab3b41a0164b5dcd954c44cf8e382ca1bf4e61bacba8bb339f31c740",
+      "members": 240,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-003.tar.gz",
+      "bytes": 1600234,
+      "sha256": "090047012baaaa04d79d095c43b40078d806ef2c210d0c4b5204e6cbc329bd1b",
+      "members": 233,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-004.tar.gz",
+      "bytes": 2625149,
+      "sha256": "63b8cf78241442a9b059e7f5d6b407f6cdd5663eb18be88b2858cd56092181ad",
+      "members": 460,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-005.tar.gz",
+      "bytes": 2622879,
+      "sha256": "cee92952cfcccd424593f7005627a4d6cab774e9524f7082c881f20ac22f2f89",
+      "members": 458,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-006.tar.gz",
+      "bytes": 2584893,
+      "sha256": "bbde5f499beea7a3e588d2fc9d6da0b9424d7ab9ab47206924feaee087430d1f",
+      "members": 412,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-007.tar.gz",
+      "bytes": 2280735,
+      "sha256": "f659b81ee5db729ca1e2d5ee0f1c5ab544f1d22e9fa89a5cdaa92d03d9bc9517",
+      "members": 394,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-008.tar.gz",
+      "bytes": 2246873,
+      "sha256": "85752fa5a99afd45ad44832f47ae139acbf0c7bac66107effda4b39e422fa1f3",
+      "members": 355,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-009.tar.gz",
+      "bytes": 2286531,
+      "sha256": "f5f8f45ce073eba1261dcc8d1fe77bb906f9eb7ee1c2b122f1453c84a8b66ab3",
+      "members": 397,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-010.tar.gz",
+      "bytes": 3375310,
+      "sha256": "5545479755b043bc957887f5f63ae9e2b5701ab009d6596bfb0b3943e4b67e3a",
+      "members": 349,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-011.tar.gz",
+      "bytes": 3372340,
+      "sha256": "d3bdfd43d6a1cb9961f419d4dab300455af211be7da426256a6c681177ae160c",
+      "members": 354,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-012.tar.gz",
+      "bytes": 3334140,
+      "sha256": "fcae114d4cf7ac2558e112da9fcc5242a70a445e4ce19720623fe64417007d88",
+      "members": 311,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-013.tar.gz",
+      "bytes": 3335239,
+      "sha256": "c219833ecf350ff15216359bc8ced8a075e5fca9fb905f4dcd7b9ca8bd2154eb",
+      "members": 759,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-014.tar.gz",
+      "bytes": 3294857,
+      "sha256": "30805c2f532c1dde82aa2ce4b306a9f00427641bfa25f066eabab9eb1135a658",
+      "members": 718,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-015.tar.gz",
+      "bytes": 3336296,
+      "sha256": "2bc3b2e88a937a032aa0dd4783681d5fbf9daee25eae59913a84da77efc3b057",
+      "members": 756,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-016.tar.gz",
+      "bytes": 1737152,
+      "sha256": "82168bddc9429df37e9b1f793aa9dab11506833075969d529d46664afb7b2392",
+      "members": 174,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-017.tar.gz",
+      "bytes": 1774828,
+      "sha256": "5d0f2c4c20c0c796c8ebbe5e3cacb6a8dd8b46349464ba4d52c92deabaf37ca3",
+      "members": 225,
+      "generated_cache_members": 0
+    },
+    {
+      "file": "archives/position-018.tar.gz",
+      "bytes": 1790081,
+      "sha256": "4e6c3d81950c8cd690a042fba6dd24ba8b2134e8596aa6102a8419e04c51ffc5",
+      "members": 225,
+      "generated_cache_members": 0
+    }
+  ],
+  "originals_preserved": "/tmp/goal-protocol-efficiency-xpw3677q/archives-before-generated-filter",
+  "retained_content_verification": "archive-cache-filter-revision.json; retained member type, mode, link, size and file SHA-256 compared before/after",
+  "historical_export_receipts": "export-*.json describe export-time hashes; archive-manifest.json and SHA256SUMS describe final cache-filtered archives",
+  "redacted_original_metadata": "Collector redacted fingerprint values for paths containing password; these original metadata values remain unknown. Export compares unredacted metadata and preserves original reports. See export-redacted-metadata-counterexample.json."
+}

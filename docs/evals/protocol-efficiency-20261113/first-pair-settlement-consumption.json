@@ -1,0 +1,45 @@
+{
+  "kind": "actual submitted ledger inputs after completed native positions; diagnostic only",
+  "recorded_utc": "2026-11-13T08:11:39.124731+00:00",
+  "rows": [
+    {
+      "position": 2,
+      "proposal": {
+        "adversarial": "clear",
+        "adversarial_note": "Reviewed saved source diffs and new async modules; public check exit 0; pytest -W error::RuntimeWarning tests: 155 passed; mypy matches 7 original errors, no added errors; evidence/implementation-review.md.",
+        "checks_fail": 0,
+        "checks_pass": 2,
+        "checks_unverifiable": 0,
+        "exit_signal": "yes",
+        "files": "tenacity,tests",
+        "operation_id": "context-i1-33622b7f11a95b037d6c",
+        "progress": "yes",
+        "task": "T1"
+      },
+      "iteration_log": "## iteration 1\ntask=T1[crew:1]\nfiles_modified=tenacity,tests\nchecks_pass=2\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=yes\nfalse_complete=no\ndigest=v2-e348f9c72e85a4c9f1bce988aec98c9c512b0066d825e173dfbd48fb9b142100\nscore=none\nstrategy_delta=none\nstrategy=none\n",
+      "measured_input": false,
+      "manual_count_fields": [
+        "checks_fail",
+        "checks_pass",
+        "checks_unverifiable"
+      ]
+    },
+    {
+      "position": 3,
+      "proposal": {
+        "adversarial": "clear",
+        "adversarial_note": "Actual second-pass source review and adversarial runtime checks recorded in .goal/evidence/review.md: full pytest 139 passed, public service check exit 0, both mixed operator orders short-circuit, original exception identity and awaitable work results preserved, concurrent suspending policies isolated. Mypy retains six errors on unchanged base/Tornado statements; no new-code type errors.",
+        "checks_source": "verify",
+        "exit_signal": "yes",
+        "files": "tenacity/__init__.py,tenacity/_asyncio.py,tenacity/_utils.py,tenacity/retry.py,tenacity/asyncio/__init__.py,tenacity/asyncio/retry.py,tests/test_async_policies.py",
+        "operation_id": "context-i1-07ad0a4a6c87c4ce5b16",
+        "progress": "yes",
+        "receipt": "yes",
+        "task": "T1"
+      },
+      "iteration_log": "## iteration 1\ntask=T1[crew:1]\nfiles_modified=tenacity/__init__.py,tenacity/_asyncio.py,tenacity/_utils.py,tenacity/retry.py,tenacity/asyncio/__init__.py,tenacity/asyncio/retry.py,tests/test_async_policies.py\nchecks_pass=1\nchecks_fail=0\nchecks_unverifiable=0\nerror_signature=none\nprogress=yes\nexit_signal=yes\nfalse_complete=no\ndigest=v2-58847b08bd858811ca8fa2aa2a0f12f3f4ba74e2dcd095ab96f63a19708d9cdd\nscore=none\nstrategy_delta=none\nstrategy=none\n",
+      "measured_input": true,
+      "manual_count_fields": []
+    }
+  ]
+}

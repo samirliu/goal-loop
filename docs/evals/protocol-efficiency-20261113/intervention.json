@@ -1,0 +1,58 @@
+{
+  "kind": "frozen one-boundary opt-in product candidate; no utility claim",
+  "candidate_commit": "76140262bab69f6e31c032cb1c2dd760a1bd3a3a",
+  "baseline_commit": "cc26e0b4d8e847d7bc64fd4ce3f09159ab5724cb",
+  "hypothesis": "Derive close counts from the verifier already run by the original close and immediately execute the existing fresh receipt, reducing model transcription and separate close/receipt handoffs without automating review.",
+  "prior_cost_evidence": {
+    "source": "../delivery-value-20261113/native-trace.json",
+    "bare_host_tool_calls": [
+      4,
+      5
+    ],
+    "baseline_host_tool_calls": [
+      20,
+      14
+    ],
+    "baseline_protocol_read_calls": [
+      2,
+      3
+    ],
+    "qualification_per_group": "2/2 in prior tiny suite; no complex generalization",
+    "previous_collector_gap": "Position8 normal final326.122s; root collection381.187s after360s deadline; preserved failed."
+  },
+  "negative_before_change": "measured-close-before.log: actual CLI rejected --checks-from-verify, rc4; no measured close path existed",
+  "product_scope": [
+    "goal_ctl.sh opt-in measured counts inside original journal/verify, then original receipt",
+    "goal_context.py optional version-bound measured_template; legacy template unchanged",
+    "SKILL.md optional mode documentation; default manual protocol retained"
+  ],
+  "retained": [
+    "five invariants",
+    "canonical store and exact-intent retry",
+    "source/artifact binding",
+    "shared deadlines",
+    "pending recovery",
+    "original audit/Gate",
+    "actual progress and exit judgment",
+    "actual adversarial review"
+  ],
+  "unsupported": [
+    "objective",
+    "forge",
+    "judged",
+    "external",
+    "non-exit numerical metrics"
+  ],
+  "failure_policy": "Incomplete verifier evidence fails closed with pending; recover original transaction. No inferred clear, worker terminal, or GO.",
+  "qualification_tests": {
+    "new_measured_close": 9,
+    "existing_context_actions": 19,
+    "collector_mechanism": 22,
+    "additional_supervisor": 14,
+    "existing_delivery": 7
+  },
+  "overhead_limit": "Visible calls/bytes and known close steps are diagnostic. Reasoning allocation, exact protocol time and opaque tools are unknown; the prior trace does not prove closing is the largest wall-time component.",
+  "adoption": "Keep candidate opt-in throughout study. Do not promote default or claim net efficiency unless all predeclared utility gates pass.",
+  "evaluation_positions_used": 0,
+  "recorded_utc": "2026-11-13T07:30:32.490419+00:00"
+}

@@ -1,0 +1,96 @@
+{
+  "adapter_revision": 1,
+  "case_readiness": [
+    {
+      "family": "cross_module_behavior_repair",
+      "id": "hc01",
+      "ready": true,
+      "source_sha256": "0514fa8f61ebeb1a32f59490bea470f0c81d9b3811b56359e5b2974d8bdf005e",
+      "validator_sha256": "ee58dcc459b07006535243f4b5951c62047c27389af9a463a8e07f025648d9c3"
+    },
+    {
+      "family": "cross_module_behavior_repair",
+      "id": "hc02",
+      "ready": true,
+      "source_sha256": "8fc286253399fcecf7e45fe5a6e0eba33cff7ec3817e2545e0d8137e235d1283",
+      "validator_sha256": "728cfa89dedffd8ff475c2db174ab585a65509df77a1c9f9e236d172b4b0b55c"
+    },
+    {
+      "family": "interface_compatibility_migration",
+      "id": "hc03",
+      "ready": true,
+      "source_sha256": "f7e31e59332fda330c7cfb139dd36981501dcf95f80f343ff325184dbd98a909",
+      "validator_sha256": "20510354a3142ab45f588c7dbd0d88d317de5114f049aa99f336f5ffff5899b6"
+    },
+    {
+      "family": "interface_compatibility_migration",
+      "id": "hc04",
+      "ready": true,
+      "source_sha256": "1c1b556d32c1d76c7303e6b1bf911d817e299b76b5301806677036d1110a643a",
+      "validator_sha256": "e364fb103152d522dd761d28f94972051e4a59318a7c30a45e77072cf6305688"
+    },
+    {
+      "family": "integration_failure_recovery",
+      "id": "hc05",
+      "ready": true,
+      "source_sha256": "615324b94e3fc48859aeee56f04f9f218d2f6ec5fdb3f6b42b39dee3b2200e25",
+      "validator_sha256": "3ad09e0086ce6384fabcf23fc60a68bda75f6348cbf0048a0f75d74069e9ffce"
+    },
+    {
+      "family": "integration_failure_recovery",
+      "id": "hc06",
+      "ready": true,
+      "source_sha256": "5c0667af64932c880ac768c0c3436bf27fffe187ed4fa977fa4c91c5f7ebd579",
+      "validator_sha256": "009a27257ba5d22dfa731d8e3d4f0bdeade1d1dc6bf53fa146c7ec4cc4090c5e"
+    }
+  ],
+  "corpus_sha256": "94be825e5cfb561a97110021837bf4c508513143197bc66756ac3dea0cbe1907",
+  "dependency_readiness": {
+    "offline_rebuild_verified": true,
+    "ready": true,
+    "runtime_identity_sha256": "a4eb495f8b7d855d93862518e10d482f875f328bda7ff1bd59b31bdac1550295",
+    "wheel_count": 26
+  },
+  "family_counts": {
+    "cross_module_behavior_repair": 2,
+    "integration_failure_recovery": 2,
+    "interface_compatibility_migration": 2
+  },
+  "grader_sha256": "fd05b5e0dec78a27d8d3d64210250b5208d91b2df6a1a563371f77a775cbca27",
+  "ids": [
+    "hc01",
+    "hc02",
+    "hc03",
+    "hc04",
+    "hc05",
+    "hc06"
+  ],
+  "proof_counts": {
+    "final_golden_passes": 6,
+    "final_original_rejections": 6,
+    "independent_negative_behavior_suites_passed": 6,
+    "protocol_state_counterexample_failed_before_fix": 1,
+    "protocol_state_fixed_source_passed_after_fix": 1,
+    "public_fixed_passes": 6,
+    "public_original_rejections": 6,
+    "retained_grader_attempt_returncode_nonzero": 48,
+    "retained_grader_attempt_returncode_zero": 41,
+    "retained_grader_attempts": 89
+  },
+  "ready": true,
+  "timing_cost": {
+    "adapter_revision_elapsed_seconds": 105.437217,
+    "adapter_revision_ended_at_utc": "2026-11-13T07:34:24.437217+00:00",
+    "coding_workers_run": 0,
+    "complete_evaluation_positions_consumed": 0,
+    "cost_status": "unknown: agent billing/token counters and CLI/API prices are not exposed",
+    "cost_usd": null,
+    "elapsed_wall_seconds": 1317.043236,
+    "ended_at_utc": "2026-11-13T07:31:05.043236+00:00",
+    "final_golden_acceptance_max_seconds": 7.439611250068992,
+    "final_golden_acceptance_total_seconds": 17.34405229310505,
+    "started_at_utc": "2026-11-13T07:09:08+00:00",
+    "token_usage": null,
+    "total_preparation_and_adapter_seconds": 1422.480453
+  }
+}

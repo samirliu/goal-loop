@@ -1,0 +1,10 @@
+{
+  "kind": "Numeric native token availability correction only; wall/adoption/qualification unchanged",
+  "utc": "2026-11-13T08:41:15.277248+00:00",
+  "before_sha256": "269af3e2f6681eada9823da5089754c84e17e6b488e86527c2ac39700393f6ab",
+  "after_sha256": "64a6935c532131d574a4c6b5f0052d2c92fa650098182ab2f968f0be326e0691",
+  "completed_positions_unchanged": 6,
+  "all_non_token_existing_fields_unchanged": true,
+  "fees": null,
+  "real_model_calls": 0
+}

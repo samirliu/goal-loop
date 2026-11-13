@@ -1,0 +1,128 @@
+{
+  "private_corpus_sha256": "94be825e5cfb561a97110021837bf4c508513143197bc66756ac3dea0cbe1907",
+  "product_frozen_before_task_details": true,
+  "tasks": [
+    {
+      "id": "hc01",
+      "family": "cross_module_behavior_repair",
+      "repository": "jd/tenacity",
+      "bad_commit": "cb15300d9b4358d9bdb6cfd33d433368700b3abe",
+      "golden_commit": "21137e79ea6d59907b3b8d236c275c5190a612fe",
+      "allowed_output_prefixes": [
+        "tenacity/",
+        "tests/"
+      ],
+      "public_check": {
+        "command_template": "\"{python}\" verify_public.py",
+        "cwd_template": "{project}",
+        "file": "verify_public.py",
+        "sha256": "75cb7a52bf8f3fe21da12b8f048e141d33b6ef3ad58a7aee4ad67def2f82f894"
+      },
+      "upstream_url": "https://github.com/jd/tenacity/pull/451",
+      "source_sha256": "0514fa8f61ebeb1a32f59490bea470f0c81d9b3811b56359e5b2974d8bdf005e",
+      "upstream_evidence_manifest_sha256": "48fa189ffa457288cc7ca83af293f5ee1b387bbc45e6c11cd434f8b0910fea65"
+    },
+    {
+      "id": "hc02",
+      "family": "cross_module_behavior_repair",
+      "repository": "python-attrs/cattrs",
+      "bad_commit": "0a1d658438f1cd0d2a409edf867c0f1d3ef40398",
+      "golden_commit": "b3fb197563bd784adcbe7a385bf7d414a9c82829",
+      "allowed_output_prefixes": [
+        "src/cattrs/",
+        "src/cattr/",
+        "tests/"
+      ],
+      "public_check": {
+        "command_template": "\"{python}\" verify_public.py",
+        "cwd_template": "{project}",
+        "file": "verify_public.py",
+        "sha256": "a5b8bf30e0654766025d762cb6bf3ec53e6bc260aa847ad0464e3c47e48d4d72"
+      },
+      "upstream_url": "https://github.com/python-attrs/cattrs/pull/778",
+      "source_sha256": "8fc286253399fcecf7e45fe5a6e0eba33cff7ec3817e2545e0d8137e235d1283",
+      "upstream_evidence_manifest_sha256": "00f23be485147425f2080980c5c88b15549e751798e2d0aac76f11615f755f0e"
+    },
+    {
+      "id": "hc03",
+      "family": "interface_compatibility_migration",
+      "repository": "pallets/click",
+      "bad_commit": "5c1239b0116b66492cdd0848144ab3c78a04495a",
+      "golden_commit": "565f36d5bc4a15d304337b749e113fb4477b1843",
+      "allowed_output_prefixes": [
+        "src/click/",
+        "tests/"
+      ],
+      "public_check": {
+        "command_template": "\"{python}\" verify_public.py",
+        "cwd_template": "{project}",
+        "file": "verify_public.py",
+        "sha256": "c2ebdb58c09482590da9be997d141f8d5bc20ac263fdbd3bae18942f205c0dfd"
+      },
+      "upstream_url": "https://github.com/pallets/click/pull/2956",
+      "source_sha256": "f7e31e59332fda330c7cfb139dd36981501dcf95f80f343ff325184dbd98a909",
+      "upstream_evidence_manifest_sha256": "fa648d37bb778b6e183f5899260c9dab332aae6cc19d9505bac1c59a30579c48"
+    },
+    {
+      "id": "hc04",
+      "family": "interface_compatibility_migration",
+      "repository": "python-attrs/attrs",
+      "bad_commit": "af349876f4fb5df2b71a3f4878239b775bc89230",
+      "golden_commit": "6e3786c599279f24e91b0d57ef448f7a85d7a69f",
+      "allowed_output_prefixes": [
+        "src/attr/",
+        "src/attrs/",
+        "tests/"
+      ],
+      "public_check": {
+        "command_template": "\"{python}\" verify_public.py",
+        "cwd_template": "{project}",
+        "file": "verify_public.py",
+        "sha256": "5ad5752192dc4238a5b897db0e6b4e0a00aec7410e4cb2905b611809d6169837"
+      },
+      "upstream_url": "https://github.com/python-attrs/attrs/pull/1457",
+      "source_sha256": "1c1b556d32c1d76c7303e6b1bf911d817e299b76b5301806677036d1110a643a",
+      "upstream_evidence_manifest_sha256": "aaaebaed7dc530ec2d3cc2a9f08cdf8009ca98825e66dbbc583b14fe2dd5fff8"
+    },
+    {
+      "id": "hc05",
+      "family": "integration_failure_recovery",
+      "repository": "pallets/werkzeug",
+      "bad_commit": "b48878cf16dfca3c89ac58aca47ab1ecfcb71354",
+      "golden_commit": "06f33b24182ad4e03ec35eb55b3daf358d12b11e",
+      "allowed_output_prefixes": [
+        "src/werkzeug/",
+        "tests/"
+      ],
+      "public_check": {
+        "command_template": "\"{python}\" verify_public.py",
+        "cwd_template": "{project}",
+        "file": "verify_public.py",
+        "sha256": "4cbc8482bdb6780aab3a514fd272bc0b159ee60c7d377e9b90b0725d7913e623"
+      },
+      "upstream_url": "https://github.com/pallets/werkzeug/pull/3081",
+      "source_sha256": "615324b94e3fc48859aeee56f04f9f218d2f6ec5fdb3f6b42b39dee3b2200e25",
+      "upstream_evidence_manifest_sha256": "da9665d0a7489c6b555fd44e41293d25f95e96edf968c4bc5b1b7dffeb12ecd0"
+    },
+    {
+      "id": "hc06",
+      "family": "integration_failure_recovery",
+      "repository": "msiemens/tinydb",
+      "bad_commit": "8a2dc204c265c07ce8506a3599a28e720b6dcdd7",
+      "golden_commit": "76d21d26c682e1ca6ca25bd8e81edf9f609ac52f",
+      "allowed_output_prefixes": [
+        "tinydb/",
+        "tests/"
+      ],
+      "public_check": {
+        "command_template": "\"{python}\" verify_public.py",
+        "cwd_template": "{project}",
+        "file": "verify_public.py",
+        "sha256": "636c110da110c13f493b92374d740a160949413ccba25087ecccb6815e4c95b3"
+      },
+      "upstream_url": "https://github.com/msiemens/tinydb/pull/616",
+      "source_sha256": "5c0667af64932c880ac768c0c3436bf27fffe187ed4fa977fa4c91c5f7ebd579",
+      "upstream_evidence_manifest_sha256": "6daf7d6e85895287189086c2f51e214bd71da5183d59151f97fe55850fcb6e4e"
+    }
+  ]
+}

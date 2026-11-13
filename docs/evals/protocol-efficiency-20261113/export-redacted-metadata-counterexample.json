@@ -1,0 +1,16 @@
+{
+  "diff": [
+    {
+      "path": "/entries/tests/entries/typing/entries/typing_password_option.py",
+      "expected_type": "str",
+      "actual_type": "dict",
+      "report_redacted": true
+    }
+  ],
+  "sanitized_fingerprints_equal": true,
+  "kind": "Evidence-export counterexample: native secret-key sanitizer redacts metadata for legitimate typing_password_option.py, not actual source drift",
+  "failed_export_returncode": 1,
+  "utc": "2026-11-13T08:50:51.512816+00:00",
+  "qualification_or_timing_changed": false,
+  "original_report_kept": true
+}

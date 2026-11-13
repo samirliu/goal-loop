@@ -1,0 +1,27 @@
+test_bad_product_is_measured_failed_not_auto_passed (test_measured_close.MeasuredClose.test_bad_product_is_measured_failed_not_auto_passed) ... ok
+test_expired_close_cannot_gain_a_fresh_receipt_budget (test_measured_close.MeasuredClose.test_expired_close_cannot_gain_a_fresh_receipt_budget) ... FAIL
+test_explicit_counts_cannot_be_mixed_with_measured_mode (test_measured_close.MeasuredClose.test_explicit_counts_cannot_be_mixed_with_measured_mode) ... ok
+test_interruption_recovers_and_reuses_original_measured_arguments (test_measured_close.MeasuredClose.test_interruption_recovers_and_reuses_original_measured_arguments) ... ok
+test_one_call_derives_counts_books_and_runs_original_fresh_acceptance (test_measured_close.MeasuredClose.test_one_call_derives_counts_books_and_runs_original_fresh_acceptance) ... ok
+test_partial_pass_from_mutating_check_is_never_committed (test_measured_close.MeasuredClose.test_partial_pass_from_mutating_check_is_never_committed) ... ok
+test_replay_preserves_original_intent_and_gets_fresh_gate (test_measured_close.MeasuredClose.test_replay_preserves_original_intent_and_gets_fresh_gate) ... ok
+test_successful_checks_never_supply_missing_adversarial_clear (test_measured_close.MeasuredClose.test_successful_checks_never_supply_missing_adversarial_clear) ... ok
+test_version_bound_map_consumes_measured_request (test_measured_close.MeasuredClose.test_version_bound_map_consumes_measured_request) ... ok
+
+======================================================================
+FAIL: test_expired_close_cannot_gain_a_fresh_receipt_budget (test_measured_close.MeasuredClose.test_expired_close_cannot_gain_a_fresh_receipt_budget)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_measured_close.py", line 130, in test_expired_close_cannot_gain_a_fresh_receipt_budget
+    self.assertFalse(self.receipt(stale)['completion_verified'])
+                     ~~~~~~~~~~~~^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_measured_close.py", line 34, in receipt
+    self.assertEqual(len(rows),1,result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 1 : CTL: ERROR recovery-required (run recover before further ledger operations)
+
+
+----------------------------------------------------------------------
+Ran 9 tests in 47.382s
+
+FAILED (failures=1)

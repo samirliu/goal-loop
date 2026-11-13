@@ -1,0 +1,15 @@
+{
+  "kind": "Native goal meter snapshot; separate from per-thread SDK usage, not invoice cost",
+  "goal": {
+    "threadId": "01a1d348-5480-7601-ace5-8b01be0530a0",
+    "objective": "pasted text file: /Users/m/.codex/attachments/d3596d6b-902a-469c-ad38-f222c055ccaa/pasted-text-1.txt. Read this file before continuing.",
+    "status": "active",
+    "tokensUsed": 1981378,
+    "timeUsedSeconds": 11697,
+    "createdAt": 1794553303,
+    "updatedAt": 1794565000
+  },
+  "remainingTokens": null,
+  "completionBudgetReport": null,
+  "meter_updated_utc": "2026-11-13T10:16:40Z"
+}

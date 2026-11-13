@@ -1,0 +1,14 @@
+{
+  "workspace": "/tmp/goal-protocol-efficiency-xpw3677q",
+  "recorded_monotonic": 1739125.702395875,
+  "recorded_epoch": 1794553551.020716,
+  "recorded_utc": "2026-11-13T07:05:51.020718+00:00",
+  "initial_head": "cc26e0b4d8e847d7bc64fd4ce3f09159ab5724cb",
+  "model_call_positions_used": 0,
+  "model_call_positions_maximum": 18,
+  "position_seconds": 900,
+  "verification_reserve_seconds": 120,
+  "earlier_inspection_seconds": null,
+  "tokens": null,
+  "money": null
+}

@@ -1,0 +1,40 @@
+{
+  "kind": "posthoc diagnostics only; no qualification or criteria change",
+  "rows": [
+    {
+      "position": 1,
+      "group": "A",
+      "qualified": true,
+      "elapsed_seconds": 609.3929214170203,
+      "native_tool_calls": 19,
+      "opaque_tool_receipts": 0,
+      "first_observed_tool_timestamp": "2026-11-13T07:39:30.026Z",
+      "first_tool_since_entry_seconds": 136.57471919059753,
+      "independent_seconds": 2.4857928750570863
+    },
+    {
+      "position": 2,
+      "group": "B",
+      "qualified": true,
+      "elapsed_seconds": 664.2525228329469,
+      "native_tool_calls": 29,
+      "opaque_tool_receipts": 0,
+      "first_observed_tool_timestamp": "2026-11-13T07:49:37.304Z",
+      "first_tool_since_entry_seconds": 119.07942175865173,
+      "independent_seconds": 2.420094500062987
+    },
+    {
+      "position": 3,
+      "group": "C",
+      "qualified": true,
+      "elapsed_seconds": 653.8819839579519,
+      "native_tool_calls": 19,
+      "opaque_tool_receipts": 0,
+      "first_observed_tool_timestamp": "2026-11-13T08:01:11.288Z",
+      "first_tool_since_entry_seconds": 133.3492181301117,
+      "independent_seconds": 2.4389069580938667
+    }
+  ],
+  "tokens": null,
+  "fees": null
+}

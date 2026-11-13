@@ -1,0 +1,114 @@
+{
+  "end_basis": "Actual local handoff preparation timestamp; parent must replace/reconcile full native turn end with later host task_complete, currently unknown",
+  "ended_utc": "2026-11-13T07:26:48.819783+00:00",
+  "fees": null,
+  "files": {
+    "devtools/native_eval_capture.py": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "3cd9de995eacdd977909548fb5023bf39e3d27547e9e397c6b0dea917ae4e6ec"
+    },
+    "tests/test_native_eval_capture.py": {
+      "kind": "file",
+      "mode": 420,
+      "sha256": "a4b003713ea35e734ffe305a93f4a413b1e83e686cf636282e942adb9708b80d"
+    }
+  },
+  "first_tool_clock_utc": "2026-11-13T07:08:24Z",
+  "kind": "bounded-collector research/tooling; not a full evaluation position",
+  "local_work_completed_utc": "2026-11-13T07:26:11.989049+00:00",
+  "model_clients_started": 0,
+  "native_evaluation_positions_used": 0,
+  "native_replay": {
+    "bytes_read": 453207,
+    "checks_executed": 0,
+    "final_count": 1,
+    "kind": "real prior position-8 rollout replay; mechanism only; not a new position",
+    "native_complete_rows_read": 88,
+    "native_prefix_sha256": "f5bdc2cc265ddf5df61e09de00fcd4f128db50b8333ed6893e5476f833cd01e1",
+    "native_workers_started": 0,
+    "opaque_tool_receipts": 15,
+    "raw_or_thinking_saved": false,
+    "runtime_session_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+    "sanitized_receipts_sha256": "bda8e64d29d1c6fde91877610ad756f974ba755edec25229313bd5361e57f261",
+    "status": "completed",
+    "terminal": true,
+    "tool_calls": 9,
+    "unique_child_thread_id": "01a1d373-15a8-74d2-bc57-01d20ffd7758"
+  },
+  "native_research_worker": {
+    "agent_path": "/root/bounded_eval_capture",
+    "id": "01a1d3ba-9a69-7332-86c9-5b8a7464b9d2",
+    "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+    "timestamp": "2026-11-13T07:06:24.279Z"
+  },
+  "native_task_completed_utc": null,
+  "native_task_started_utc": "2026-11-13T07:06:24.316Z",
+  "observed_wall_seconds_since_first_tool_clock": 1067.989049,
+  "observed_wall_seconds_since_native_task_started": 1224.503783,
+  "readiness": "Implementation frozen for parent handoff; no further edits planned",
+  "record_updated_utc": "2026-11-13T07:12:26.625302+00:00",
+  "service_compute_seconds": null,
+  "start_basis": "Actual native host task_started timestamp; initial model/tool overhead is included",
+  "started_utc": "2026-11-13T07:06:24.316Z",
+  "tests": [
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_native_eval_capture.py",
+        "-v"
+      ],
+      "elapsed_seconds": 5.2907637499738485,
+      "ended_utc": "2026-11-13T07:26:11.901525+00:00",
+      "log": "/tmp/goal-protocol-efficiency-xpw3677q/collector-tests.log",
+      "returncode": 0,
+      "started_utc": "2026-11-13T07:26:06.610648+00:00"
+    },
+    {
+      "basis": "Executed in prior tool batch; exact UTC endpoints not separately captured",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_owner_watch*.py",
+        "-v"
+      ],
+      "reported_runner_seconds": 4.162,
+      "returncode": 0,
+      "tests": 14,
+      "utc_start_end": null
+    },
+    {
+      "basis": "Executed in prior tool batch; exact UTC endpoints not separately captured",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_delivery_evaluation.py",
+        "-v"
+      ],
+      "reported_runner_seconds": 0.56,
+      "returncode": 0,
+      "tests": 7,
+      "utc_start_end": null
+    }
+  ],
+  "tokens": null
+}

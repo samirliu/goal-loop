@@ -1,0 +1,16 @@
+test_one_call_derives_counts_books_and_runs_original_fresh_acceptance (test_measured_close.MeasuredClose.test_one_call_derives_counts_books_and_runs_original_fresh_acceptance) ... FAIL
+
+======================================================================
+FAIL: test_one_call_derives_counts_books_and_runs_original_fresh_acceptance (test_measured_close.MeasuredClose.test_one_call_derives_counts_books_and_runs_original_fresh_acceptance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_measured_close.py", line 38, in test_one_call_derives_counts_books_and_runs_original_fresh_acceptance
+    self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4 != 0 : CTL: ERROR unknown-flag:--checks-from-verify
+
+
+----------------------------------------------------------------------
+Ran 1 test in 2.094s
+
+FAILED (failures=1)

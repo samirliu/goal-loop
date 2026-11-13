@@ -1,0 +1,215 @@
+{
+  "recorded_utc": "2026-11-13T10:30:13.035665+00:00",
+  "production_files_verified": 53,
+  "production_drift": [],
+  "frozen_protocol_and_all_manifest_hashes_verified": true,
+  "unique_native_ids": 18,
+  "cli_versions": [
+    "0.167.2"
+  ],
+  "all_normal_finals_and_terminals_within_original_execution_deadlines": true,
+  "all_original_reports_within_original_outer_deadlines": true,
+  "bare_goal_state_absent": true,
+  "real_positions_used": 18,
+  "real_positions_closed": true,
+  "rows": [
+    {
+      "position": 1,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d3d7-0c62-7112-9df7-03f53449b782"
+      ],
+      "qualified": true,
+      "elapsed_seconds": 609.3929214170203,
+      "normal_final": true,
+      "original_report_sha256": "3ebc17ea51f0182feb57e37bc86fb600aec4c42ab69cadd056cf6acac36f6788"
+    },
+    {
+      "position": 2,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d3e0-8ccd-70d3-9e81-db0e77f77a65"
+      ],
+      "qualified": true,
+      "elapsed_seconds": 664.2525228329469,
+      "normal_final": true,
+      "original_report_sha256": "ccf1256c7f508415a6d398da3000177763e26a50696b51c985bdb4b5d9c84918"
+    },
+    {
+      "position": 3,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d3ea-f5df-7d73-9cb0-de93affb2423"
+      ],
+      "qualified": true,
+      "elapsed_seconds": 653.8819839579519,
+      "normal_final": true,
+      "original_report_sha256": "d0958a4e9f3d0f2a8135e126eecc01369e805cf614a578b4ec92a8d663f9362e"
+    },
+    {
+      "position": 4,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d3f5-c9af-75c2-8fa8-1fb5762781a7"
+      ],
+      "qualified": true,
+      "elapsed_seconds": 403.03657458303496,
+      "normal_final": true,
+      "original_report_sha256": "3e030d0d2bf4399c9e9007c720e2c8ab56aa7dc94096e22b4f6cc9df4da22d59"
+    },
+    {
+      "position": 5,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d3fb-dd38-7c50-a6ba-e76340812913"
+      ],
+      "qualified": true,
+      "elapsed_seconds": 334.8607817920856,
+      "normal_final": true,
+      "original_report_sha256": "b35fbec92eae2d0a0ce75be11132d690cf1fd429ff24b20d53e4d00447992ade"
+    },
+    {
+      "position": 6,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d402-c2ce-7fc1-a338-5d05f025fd41"
+      ],
+      "qualified": true,
+      "elapsed_seconds": 500.89164041611366,
+      "normal_final": true,
+      "original_report_sha256": "16c469a02472e9878b220b52563d1e5d4d10fe91a81381f6a1d811773de95b23"
+    },
+    {
+      "position": 7,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d40c-fb6c-7150-b738-42c8d6462ee9"
+      ],
+      "qualified": false,
+      "elapsed_seconds": 668.7767900419421,
+      "normal_final": true,
+      "original_report_sha256": "9699ca1d1f19bbcb1809d291fb299a475d240df8f470ca3e9d33810b76180504"
+    },
+    {
+      "position": 8,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d416-865c-72f3-a5db-81f2a08a79a6"
+      ],
+      "qualified": false,
+      "elapsed_seconds": 621.5455352910794,
+      "normal_final": true,
+      "original_report_sha256": "d5f2496ca379c9b232a8ee8dfe638178cbc1cb9880f903cb2175a1f8de2bb51c"
+    },
+    {
+      "position": 9,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d421-615d-7113-a38d-365ec3fa9362"
+      ],
+      "qualified": false,
+      "elapsed_seconds": 588.8453769590706,
+      "normal_final": true,
+      "original_report_sha256": "d6ac90baad426bb3dc285c065876c4cfc9e07c5115fd1197d8b16b1bf3e99b72"
+    },
+    {
+      "position": 10,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d42c-55ff-70d2-9d3d-c0c7d5b6c86b"
+      ],
+      "qualified": false,
+      "elapsed_seconds": 476.3227884580847,
+      "normal_final": true,
+      "original_report_sha256": "7afe2d225e18f7fe0bd890b7f541c63397df8faace6a5c9c5968c69da7c0e57e"
+    },
+    {
+      "position": 11,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d434-b8ac-7b42-86eb-d34057c32685"
+      ],
+      "qualified": false,
+      "elapsed_seconds": 600.1179851251654,
+      "normal_final": true,
+      "original_report_sha256": "1acc308cdc9feafd6e96ef81295d0ef79d647fb453b105604701ba5812b746e6"
+    },
+    {
+      "position": 12,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d43f-3539-7b62-80e2-a896d5727233"
+      ],
+      "qualified": false,
+      "elapsed_seconds": 493.05736895790324,
+      "normal_final": true,
+      "original_report_sha256": "6192a12c39a8b7edbe2f8cb07199d00bfb0b9464426a3b3796311686b760f9aa"
+    },
+    {
+      "position": 13,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d447-69f0-7401-9794-4e37600e1d45"
+      ],
+      "qualified": false,
+      "elapsed_seconds": 515.6351030000951,
+      "normal_final": true,
+      "original_report_sha256": "7710f9aa5b6e6f47fa7dce62333257b5af30074f2314edccd0100f15e2141e52"
+    },
+    {
+      "position": 14,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d450-1c94-7612-b4f3-260df54e91a1"
+      ],
+      "qualified": false,
+      "elapsed_seconds": 435.77873375010677,
+      "normal_final": true,
+      "original_report_sha256": "3a3209c4487a7105344896ccf822129c119162dc30489b380208a933dd66e62c"
+    },
+    {
+      "position": 15,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d457-45a2-7ae1-be8f-cad825bbe168"
+      ],
+      "qualified": false,
+      "elapsed_seconds": 580.4515451248735,
+      "normal_final": true,
+      "original_report_sha256": "58454f4f0472dbaf4516cb6dd7d38cf8118bcb93b9fd106498879c8993044c78"
+    },
+    {
+      "position": 16,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d460-d8df-7810-b7ac-2c57a1837f8d"
+      ],
+      "qualified": true,
+      "elapsed_seconds": 263.52271520812064,
+      "normal_final": true,
+      "original_report_sha256": "cd55e614bee3a741a2ff98dc9488839c3c133e6b3e3a8a251a8bad42a1acc52f"
+    },
+    {
+      "position": 17,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d465-e65d-7ac3-bb44-da150da0c29f"
+      ],
+      "qualified": true,
+      "elapsed_seconds": 430.8416935419664,
+      "normal_final": true,
+      "original_report_sha256": "81865b7a0f80c3ad71e030f34434f8ca9a830c9a48762ebd92a35d25f9935fe5"
+    },
+    {
+      "position": 18,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d46d-660a-73d2-b1e6-fe17ae3a2369"
+      ],
+      "qualified": true,
+      "elapsed_seconds": 400.52290554204956,
+      "normal_final": true,
+      "original_report_sha256": "61340b0d2aa8f6ee35f885b431a3e8eb081a0b107209f9f731c6c631f7a1fe7b"
+    }
+  ]
+}

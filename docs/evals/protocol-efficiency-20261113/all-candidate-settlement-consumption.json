@@ -1,0 +1,125 @@
+{
+  "kind": "actual submitted proposals; no causal time attribution or automatic review claim",
+  "rows": [
+    {
+      "position": 3,
+      "case": "hc01",
+      "qualified": true,
+      "proposal": {
+        "adversarial": "clear",
+        "adversarial_note": "Actual second-pass source review and adversarial runtime checks recorded in .goal/evidence/review.md: full pytest 139 passed, public service check exit 0, both mixed operator orders short-circuit, original exception identity and awaitable work results preserved, concurrent suspending policies isolated. Mypy retains six errors on unchanged base/Tornado statements; no new-code type errors.",
+        "checks_source": "verify",
+        "exit_signal": "yes",
+        "files": "tenacity/__init__.py,tenacity/_asyncio.py,tenacity/_utils.py,tenacity/retry.py,tenacity/asyncio/__init__.py,tenacity/asyncio/retry.py,tests/test_async_policies.py",
+        "operation_id": "context-i1-07ad0a4a6c87c4ce5b16",
+        "progress": "yes",
+        "receipt": "yes",
+        "task": "T1"
+      },
+      "manual_count_fields": [],
+      "derived_counts_requested": true,
+      "receipt_requested": true,
+      "judgment_and_review_fields_present": true
+    },
+    {
+      "position": 5,
+      "case": "hc02",
+      "qualified": true,
+      "proposal": {
+        "adversarial": "clear",
+        "adversarial_note": "Actual second-pass source diff and added-test review found no issues; public check exit 0; selected regression suites 551 passed and 15 xfailed, generic/error suites 118 passed; current AST/whitespace checks passed. Evidence: .goal/evidence/rename-review.md. Ruff unavailable in the prepared runtime.",
+        "checks_source": "verify",
+        "exit_signal": "yes",
+        "files": "src/cattrs/disambiguators.py tests/test_disambiguators.py",
+        "operation_id": "context-i1-1c60f3da0adc94732b8c",
+        "progress": "yes",
+        "receipt": "yes",
+        "task": "T1"
+      },
+      "manual_count_fields": [],
+      "derived_counts_requested": true,
+      "receipt_requested": true,
+      "judgment_and_review_fields_present": true
+    },
+    {
+      "position": 7,
+      "case": "hc03",
+      "qualified": false,
+      "proposal": {
+        "adversarial": "clear",
+        "adversarial_note": "Read repaired construction/default/env/boolean conversion and regression tests; pytest: 967 passed, 22 skipped, 1 xfailed; public check passed; mypy: no issues in 25 source files. See .goal/evidence/review.md.",
+        "checks_source": "verify",
+        "exit_signal": "yes",
+        "files": "src/click/core.py,src/click/types.py,tests/test_options.py,tests/test_arguments.py,tests/test_flag_configuration.py",
+        "operation_id": "context-i1-fad129ae6d1c110cab59",
+        "progress": "yes",
+        "receipt": "yes",
+        "task": "T1"
+      },
+      "manual_count_fields": [],
+      "derived_counts_requested": true,
+      "receipt_requested": true,
+      "judgment_and_review_fields_present": true
+    },
+    {
+      "position": 10,
+      "case": "hc04",
+      "qualified": false,
+      "proposal": {
+        "adversarial": "clear",
+        "adversarial_note": "Actual second-pass review read field resolution, decorator forwarding, both public stubs, constructor/match_args generation and MRO collection. Review found forced inherited settings were lost at the next modern level; fixed effective kw_only propagation without changing selected field definitions/order and added linear/diamond regressions. Final regression command: PYTHONPATH=src /tmp/goal-protocol-efficiency-xpw3677q/runtime-public/bin/python -B -m pytest -q -p no:cacheprovider; actual exit 0, 1426 passed, 8 skipped, 1 xfailed in 4.83s. Skips cover unavailable cloudpickle/pyright and other Python/platform variants. The untouched verify_public.py also exits 0 and prints public check passed. Runtime/source review confirms force defaults False modern/True legacy, field stubs accept None, positional order errors remain, aliases/defaults/factories/frozen/generated attrs init are covered. No unresolved functional finding.",
+        "checks_source": "verify",
+        "exit_signal": "yes",
+        "files": "src/attr/_make.py,src/attr/_next_gen.py,src/attr/__init__.pyi,src/attrs/__init__.pyi,tests/test_kw_only.py",
+        "operation_id": "context-i1-763e1d7948021337a821",
+        "progress": "yes",
+        "receipt": "yes",
+        "task": "T1"
+      },
+      "manual_count_fields": [],
+      "derived_counts_requested": true,
+      "receipt_requested": true,
+      "judgment_and_review_fields_present": true
+    },
+    {
+      "position": 15,
+      "case": "hc05",
+      "qualified": false,
+      "proposal": {
+        "adversarial": "clear",
+        "adversarial_note": "Reviewed complete multipart.py diff against pre-edit source: newest line-break handling keeps CRLF intact, complete boundary consumption is independent of payload CR, ambiguous closing suffixes wait for input, false closing markers remain data, and invalid long lookalikes are released without buffering file contents. PYTHONPATH=src prepared python -B -m pytest -p no:cacheprovider tests/sansio tests/test_formparser.py tests/test_wrappers.py tests/test_test.py tests/test_wsgi.py -q: 322 passed, one existing test_end_of_file unclosed temporary-file warning. Public verify_public.py passed. Final AST, line-length and whitespace checks passed. PYTHONPATH=src prepared python -B /tmp/efficiency015-review.py: 380 adversarial checks passed across boundaries, trailing CR/LF variants, 1-128 byte parser reads and random decoder chunks, including invalid closing-marker lookalikes, repeated NeedData and exact epilogues. No unresolved correctness finding; optional ruff unavailable in prepared environment.",
+        "checks_source": "verify",
+        "exit_signal": "yes",
+        "files": "src/werkzeug/sansio/multipart.py tests/sansio/test_multipart.py tests/test_formparser.py",
+        "operation_id": "context-i1-fe38360076768d3c2e55",
+        "progress": "yes",
+        "receipt": "yes",
+        "task": "T1"
+      },
+      "manual_count_fields": [],
+      "derived_counts_requested": true,
+      "receipt_requested": true,
+      "judgment_and_review_fields_present": true
+    },
+    {
+      "position": 17,
+      "case": "hc06",
+      "qualified": true,
+      "proposal": {
+        "adversarial": "clear",
+        "adversarial_note": "Reviewed update/remove explicit-ID branches and _update_table write/cache path; callback KeyError propagation, missing-only no-ops, one-shot iterables, reopened JSON and CachingMiddleware persistence, unaffected tables, and Document-ID upsert are covered. Prepared-runtime verify_public.py passed; full pytest: 247 passed, 1 skipped. Actual review recorded in .goal/evidence/stale-id-review.md.",
+        "checks_source": "verify",
+        "exit_signal": "yes",
+        "files": "tinydb/table.py,tests/test_stale_ids.py",
+        "operation_id": "context-i1-f7f6e89eb2ae1fc67be8",
+        "progress": "yes",
+        "receipt": "yes",
+        "task": "T1"
+      },
+      "manual_count_fields": [],
+      "derived_counts_requested": true,
+      "receipt_requested": true,
+      "judgment_and_review_fields_present": true
+    }
+  ]
+}

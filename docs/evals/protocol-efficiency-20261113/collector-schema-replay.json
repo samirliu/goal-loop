@@ -1,0 +1,17 @@
+{
+  "bytes_read": 453207,
+  "checks_executed": 0,
+  "final_count": 1,
+  "kind": "real prior position-8 rollout replay; mechanism only; not a new position",
+  "native_complete_rows_read": 88,
+  "native_prefix_sha256": "f5bdc2cc265ddf5df61e09de00fcd4f128db50b8333ed6893e5476f833cd01e1",
+  "native_workers_started": 0,
+  "opaque_tool_receipts": 15,
+  "raw_or_thinking_saved": false,
+  "runtime_session_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+  "sanitized_receipts_sha256": "bda8e64d29d1c6fde91877610ad756f974ba755edec25229313bd5361e57f261",
+  "status": "completed",
+  "terminal": true,
+  "tool_calls": 9,
+  "unique_child_thread_id": "01a1d373-15a8-74d2-bc57-01d20ffd7758"
+}

@@ -1,0 +1,51 @@
+{
+  "started": "2026-11-13T07:33:07.911747+00:00",
+  "finished": "2026-11-13T07:33:08.404319+00:00",
+  "elapsed": 0.49264283291995525,
+  "results": [
+    {
+      "case": "hc01",
+      "elapsed": 0.058454083977267146,
+      "result": 0,
+      "stdout": "{\"case_id\": \"hc01\", \"project\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc01\", \"task_file\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc01/TASK.md\", \"environment\": {\"TASK_PYTHON\": \"/tmp/goal-protocol-efficiency-xpw3677q/runtime-public/bin/python\"}}\n",
+      "stderr": ""
+    },
+    {
+      "case": "hc02",
+      "elapsed": 0.09118187497369945,
+      "result": 0,
+      "stdout": "{\"case_id\": \"hc02\", \"project\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc02\", \"task_file\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc02/TASK.md\", \"environment\": {\"TASK_PYTHON\": \"/tmp/goal-protocol-efficiency-xpw3677q/runtime-public/bin/python\"}}\n",
+      "stderr": ""
+    },
+    {
+      "case": "hc03",
+      "elapsed": 0.08157104183919728,
+      "result": 0,
+      "stdout": "{\"case_id\": \"hc03\", \"project\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc03\", \"task_file\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc03/TASK.md\", \"environment\": {\"TASK_PYTHON\": \"/tmp/goal-protocol-efficiency-xpw3677q/runtime-public/bin/python\"}}\n",
+      "stderr": ""
+    },
+    {
+      "case": "hc04",
+      "elapsed": 0.07314408314414322,
+      "result": 0,
+      "stdout": "{\"case_id\": \"hc04\", \"project\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc04\", \"task_file\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc04/TASK.md\", \"environment\": {\"TASK_PYTHON\": \"/tmp/goal-protocol-efficiency-xpw3677q/runtime-public/bin/python\"}}\n",
+      "stderr": ""
+    },
+    {
+      "case": "hc05",
+      "elapsed": 0.1335992910899222,
+      "result": 0,
+      "stdout": "{\"case_id\": \"hc05\", \"project\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc05\", \"task_file\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc05/TASK.md\", \"environment\": {\"TASK_PYTHON\": \"/tmp/goal-protocol-efficiency-xpw3677q/runtime-public/bin/python\"}}\n",
+      "stderr": ""
+    },
+    {
+      "case": "hc06",
+      "elapsed": 0.054318916983902454,
+      "result": 0,
+      "stdout": "{\"case_id\": \"hc06\", \"project\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc06\", \"task_file\": \"/private/tmp/goal-protocol-efficiency-xpw3677q/initial/hc06/TASK.md\", \"environment\": {\"TASK_PYTHON\": \"/tmp/goal-protocol-efficiency-xpw3677q/runtime-public/bin/python\"}}\n",
+      "stderr": ""
+    }
+  ],
+  "kind": "global corpus staging preparation; not per-position fresh workspace preparation",
+  "evaluation_positions_consumed": 0
+}

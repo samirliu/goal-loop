@@ -1,0 +1,199 @@
+{
+  "kind": "Read-only source/settings/fresh native identity audit before final position finishes",
+  "production_files_verified": 53,
+  "production_drift": [],
+  "unique_native_ids": 17,
+  "cli_versions": [
+    "0.167.2"
+  ],
+  "rows": [
+    {
+      "position": 1,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d3d7-0c62-7112-9df7-03f53449b782"
+      ],
+      "qualified": true,
+      "normal_final": true,
+      "elapsed_seconds": 609.3929214170203,
+      "bare_goal_state_present": false
+    },
+    {
+      "position": 2,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d3e0-8ccd-70d3-9e81-db0e77f77a65"
+      ],
+      "qualified": true,
+      "normal_final": true,
+      "elapsed_seconds": 664.2525228329469,
+      "bare_goal_state_present": null
+    },
+    {
+      "position": 3,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d3ea-f5df-7d73-9cb0-de93affb2423"
+      ],
+      "qualified": true,
+      "normal_final": true,
+      "elapsed_seconds": 653.8819839579519,
+      "bare_goal_state_present": null
+    },
+    {
+      "position": 4,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d3f5-c9af-75c2-8fa8-1fb5762781a7"
+      ],
+      "qualified": true,
+      "normal_final": true,
+      "elapsed_seconds": 403.03657458303496,
+      "bare_goal_state_present": null
+    },
+    {
+      "position": 5,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d3fb-dd38-7c50-a6ba-e76340812913"
+      ],
+      "qualified": true,
+      "normal_final": true,
+      "elapsed_seconds": 334.8607817920856,
+      "bare_goal_state_present": null
+    },
+    {
+      "position": 6,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d402-c2ce-7fc1-a338-5d05f025fd41"
+      ],
+      "qualified": true,
+      "normal_final": true,
+      "elapsed_seconds": 500.89164041611366,
+      "bare_goal_state_present": false
+    },
+    {
+      "position": 7,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d40c-fb6c-7150-b738-42c8d6462ee9"
+      ],
+      "qualified": false,
+      "normal_final": true,
+      "elapsed_seconds": 668.7767900419421,
+      "bare_goal_state_present": null
+    },
+    {
+      "position": 8,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d416-865c-72f3-a5db-81f2a08a79a6"
+      ],
+      "qualified": false,
+      "normal_final": true,
+      "elapsed_seconds": 621.5455352910794,
+      "bare_goal_state_present": false
+    },
+    {
+      "position": 9,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d421-615d-7113-a38d-365ec3fa9362"
+      ],
+      "qualified": false,
+      "normal_final": true,
+      "elapsed_seconds": 588.8453769590706,
+      "bare_goal_state_present": null
+    },
+    {
+      "position": 10,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d42c-55ff-70d2-9d3d-c0c7d5b6c86b"
+      ],
+      "qualified": false,
+      "normal_final": true,
+      "elapsed_seconds": 476.3227884580847,
+      "bare_goal_state_present": null
+    },
+    {
+      "position": 11,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d434-b8ac-7b42-86eb-d34057c32685"
+      ],
+      "qualified": false,
+      "normal_final": true,
+      "elapsed_seconds": 600.1179851251654,
+      "bare_goal_state_present": null
+    },
+    {
+      "position": 12,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d43f-3539-7b62-80e2-a896d5727233"
+      ],
+      "qualified": false,
+      "normal_final": true,
+      "elapsed_seconds": 493.05736895790324,
+      "bare_goal_state_present": false
+    },
+    {
+      "position": 13,
+      "group": "B",
+      "actual_native_ids": [
+        "01a1d447-69f0-7401-9794-4e37600e1d45"
+      ],
+      "qualified": false,
+      "normal_final": true,
+      "elapsed_seconds": 515.6351030000951,
+      "bare_goal_state_present": null
+    },
+    {
+      "position": 14,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d450-1c94-7612-b4f3-260df54e91a1"
+      ],
+      "qualified": false,
+      "normal_final": true,
+      "elapsed_seconds": 435.77873375010677,
+      "bare_goal_state_present": false
+    },
+    {
+      "position": 15,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d457-45a2-7ae1-be8f-cad825bbe168"
+      ],
+      "qualified": false,
+      "normal_final": true,
+      "elapsed_seconds": 580.4515451248735,
+      "bare_goal_state_present": null
+    },
+    {
+      "position": 16,
+      "group": "A",
+      "actual_native_ids": [
+        "01a1d460-d8df-7810-b7ac-2c57a1837f8d"
+      ],
+      "qualified": true,
+      "normal_final": true,
+      "elapsed_seconds": 263.52271520812064,
+      "bare_goal_state_present": false
+    },
+    {
+      "position": 17,
+      "group": "C",
+      "actual_native_ids": [
+        "01a1d465-e65d-7ac3-bb44-da150da0c29f"
+      ],
+      "qualified": true,
+      "normal_final": true,
+      "elapsed_seconds": 430.8416935419664,
+      "bare_goal_state_present": null
+    }
+  ],
+  "no_model_calls": true
+}
