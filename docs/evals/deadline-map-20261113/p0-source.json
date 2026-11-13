@@ -1,0 +1,21 @@
+{
+  "original_head": "014b7d5c46f2dfd1f25cf8f11fa7c5e63a557aba",
+  "files": {
+    "scripts/goal_parse.sh": "89549e59831652fbdf2647985c7d200472039bbb18cc658c066a6e2a008e500f",
+    "scripts/goal_gate.sh": "4ba8c3e47945cf34c15e1f84170fe73e53a95b33c406a2736ccf2d9c1612885e",
+    "scripts/goal_runner.py": "19d7857fe9e1249071dac1ec105050b6d56b1d778aeb2613e2867ff1f10b7d01",
+    "scripts/goal_store.py": "13d4250e70d406d030eace9d7c2b12c6fc0a0dd4cff11fcd536671ae4d0ee8f3",
+    "tests/test_gate_entry_budget.py": "4a75b31a4a0edd0c59111a48ac328b7d93cd966b6aa38876b10950d17a3cabb8",
+    "tests/test_parse.sh": "50d36dcb9e3d5287289a6c0889e1c0d1bb0ddd4822215eb07ea81cee84219344"
+  },
+  "original_files": {
+    "scripts/goal_parse.sh": "368fdcbb5838c8a8d64570f409b1ea713ec3ce24938825a8dc5f9f2ed1a85bdb",
+    "scripts/goal_gate.sh": "4ba8c3e47945cf34c15e1f84170fe73e53a95b33c406a2736ccf2d9c1612885e",
+    "scripts/goal_runner.py": "19d7857fe9e1249071dac1ec105050b6d56b1d778aeb2613e2867ff1f10b7d01",
+    "scripts/goal_store.py": "13d4250e70d406d030eace9d7c2b12c6fc0a0dd4cff11fcd536671ae4d0ee8f3",
+    "tests/test_gate_entry_budget.py": "a97616363ad4b89ffbbc4c79fa53c372048215e3dc2aeccc40ed2315f5f4a2b7",
+    "tests/test_parse.sh": "0832ed9ee3a6754f0109217003ab538a3b16d756a6a66e8c7d543261ad339349"
+  },
+  "scope": "P0 source identity; modified parser only in production; test instrumentation separate",
+  "python": "Python 3.14.8"
+}

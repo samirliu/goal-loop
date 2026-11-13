@@ -1,0 +1,10 @@
+  ok   - 28 expired green claim -> GO (rc=0)
+  ok   - 28 NOTE fuse
+  ok   - 28 still GO
+  ok   - 76 expired wallclock green claim -> GO (rc=0)
+  ok   - 76 NOTE fuse
+  ok   - 76 still GO
+  ok   - 77 expired+fail -> BLOCKED rc3 (rc=3)
+  ok   - 77 BLOCKED fuse
+== results: pass=8 fail=0 ==
+== total: pass=8 fail=0 shards=1 ==

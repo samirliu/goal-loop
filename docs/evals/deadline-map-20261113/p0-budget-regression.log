@@ -1,0 +1,8 @@
+test_ambient_supervision_marker_cannot_skip_the_bound (test_gate_budget.GateBudget.test_ambient_supervision_marker_cannot_skip_the_bound) ... ok
+test_expired_standalone_batch_does_not_give_every_ac_new_time (test_gate_budget.GateBudget.test_expired_standalone_batch_does_not_give_every_ac_new_time) ... ok
+test_hash_preparation_is_inside_the_same_bound (test_gate_budget.GateBudget.test_hash_preparation_is_inside_the_same_bound) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 14.014s
+
+OK

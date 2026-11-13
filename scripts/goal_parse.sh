@@ -266,9 +266,16 @@ gp_is_natural(){ printf '%s' "$1" | grep -qE '^[0-9]+$'; }
 
 # ---- state.rec -------------------------------------------------------------
 gp_state_get(){                                          # $1 project $2 key -> value or ""
-  local f="$1/.goal/state.rec"
+  local f="$1/.goal/state.rec" line value=""
   [ -f "$f" ] || { echo ""; return; }
-  grep -E "^$2=" "$f" | gp_r | tail -1 | cut -d= -f2-
+  # Read current bytes on every call. A gate asks for dozens of keys; four
+  # processes per lookup used most of the finite settlement under contention.
+  # Builtins preserve last-row wins, CR scrubbing and an unterminated last row
+  # without caching a ledger snapshot across a check or controller mutation.
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in "$2="*) value=${line#*=}; value=${value//$'\r'/} ;; esac
+  done < "$f"
+  printf '%s\n' "$value"
 }
 
 # ---- goal.md contract grammar (references/gate.md section 1) --------------

@@ -1,0 +1,617 @@
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	﻿2026-11-13T00:51:58.6331200Z ##[group]Run bash tests/run_tests.sh
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:51:58.6331500Z [36;1mbash tests/run_tests.sh[0m
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:51:58.6359970Z shell: /bin/bash -e {0}
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:51:58.6360160Z ##[endgroup]
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8182430Z   ok   - 01 help exits 0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8184100Z   ok   - 01 help mentions --verify
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8184580Z   ok   - 09 contract-tampered -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8184970Z   ok   - 17a forge close w/o --dry -> rc4 (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8185530Z   ok   - 17a refusal leaves no orphan loop-log block
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8187210Z   ok   - 24 exit=1 negative GO -> rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8187530Z   ok   - 24 --verify PASS on rc match
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8188690Z   ok   - 31a cache hit replays metric 42
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8191150Z   ok   - 31b command ran once for unchanged input
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8192230Z   ok   - 31c stdout archived under .goal/evidence
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8244650Z   ok   - 31d rerun after input change
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8247280Z   ok   - 47 status echoes crew wave marker
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8249190Z   ok   - 47b teams marker refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8250540Z   ok   - 47b names bad-task
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8255780Z   ok   - 61 mismatch noted
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8256730Z   ok   - 61 measured score recorded
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8257250Z   ok   - 61 best_score from measurement
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8257900Z   ok   - 72 minimize agree -> GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8258350Z   ok   - 72 no DIVERGENCE
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8259020Z   ok   - 83 catch1 auto-counted
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8264120Z   ok   - 83 catch2 auto-counted
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8264510Z   ok   - 83 third claim frozen -> rc3 (rc=3)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8265300Z   ok   - 83 state holds count
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8265810Z   ok   - 90 manual flag noted not double-counted
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8266710Z   ok   - 90 fc counted exactly 1
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8267260Z   ok   - 98a pruned dir change invisible
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8268010Z   ok   - 98b real source change still detected
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8268850Z   ok   - 98c digest deterministic
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8398990Z   ok   - 99a .goalignore prunes named dir
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8399440Z   ok   - 99b GOAL_PRUNE override deterministic
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8399930Z   ok   - 99c GOAL_PRUNE drops src from watch
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8400280Z   ok   - 108a claim with illegal task id -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8400680Z   ok   - 108a names bad-task
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8401010Z   ok   - 108a hint routes the fix
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8401310Z   ok   - 108b bare legacy id still claims (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8401670Z   ok   - 108b legacy NOTE emitted
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8401980Z   ok   - 115c NEXT routes fix-AC
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8402310Z   ok   - 115c NEXT sentence present
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8402560Z   ok   - 117c rc75 -> deferred rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8402930Z   ok   - 117c deferred routing
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8403180Z   ok   - 117c wait hint
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8403520Z   ok   - 120a legacy rows parse, claim GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8403910Z   ok   - 120b status survives mixed-field ledger
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8404350Z   ok   - 123c invented suffix fails A1/A3 (rc=1)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8404780Z   ok   - 123c rejected at schema/vocab gate
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8405060Z   ok   - 126c exploit-only pick
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8405520Z   ok   - 127a status rc0 without goal.md (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8405760Z   ok   - 127a STEP says fill contract
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8406100Z   ok   - 127a parse silent on missing goal.md
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8406320Z   ok   - 127a no goal_parse.sh traceback
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8406530Z   ok   - 130c finding refuses claim (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8406740Z   ok   - 130c reason adversarial-finding
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8407050Z   ok   - 130c clear receipt GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8407430Z   ok   - 133c audit fails on ticked-but-unbooked (rc=1)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8407910Z   ok   - 133c A9 named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8408200Z   ok   - 133f audit clean after close (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8408530Z   ok   - 135b unbacked suffix refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8413460Z   ok   - 135b names unbacked-task-suffix
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8413680Z   ok   - 137a check-only preserves gate rc (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8413990Z   ok   - 137a check-only preserves foreign lock
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8414590Z   ok   - 137b live owner refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8414970Z   ok   - 137b refusal preserves foreign lock
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8415270Z   ok   - 137c normal exhausted run rc intact (rc=3)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8415710Z   ok   - 137c executor runs at project root
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8416110Z   ok   - 137c owned lock cleaned
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8416440Z   ok   - 149 finding cannot be replaced by note injection (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8416780Z   ok   - 149 gate reports real finding
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8417080Z   ok   - 149 receipt remains one record
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8417460Z   ok   - 153 vanished untracked file refuses digest (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8417790Z   ok   - 159 deadline mutation refuses verification (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8418270Z   ok   - 159 deadline mutation names ledger guard
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8418670Z   ok   - 159 clock mutation refuses verification (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8418920Z   ok   - 159 clock mutation names ledger guard
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8419200Z == results: pass=73 fail=0 ==
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8419500Z   ok   - 02 no-goal-dir -> rc4 (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8419780Z   ok   - 10 metric FAIL -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8420070Z   ok   - 10 reason open-FAIL w/ gate rerun
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8420280Z   ok   - 16 prose->judged GO -> rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8420500Z   ok   - 23a exit flip after stamp -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8420820Z   ok   - 23a reason contract-tampered
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8421130Z   ok   - 23b exit line smuggled -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8421340Z   ok   - 23b reason contract-tampered
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8421740Z   ok   - 36 hook claimed+NO-GO blocks (rc2) (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8422150Z   ok   - 36 block reason carries GOAL_LOOP_GATE prefix
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8422490Z   ok   - 36 gate reason preserved in block message
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8423170Z   ok   - 45 single-run baseline refused rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8423390Z   ok   - 55b probe-ok GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8423770Z   ok   - 65a crew invented recovery rc1 (rc=1)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8424100Z   ok   - 65a rejected at schema gate
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8424520Z   ok   - 65e crew recovery suffix clean (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8424720Z   ok   - 65e clean
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8425020Z   ok   - 73 max_iterations bound
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8425290Z   ok   - 73 check_timeout bound
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8425470Z   ok   - 73 wallclock bound
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8425790Z   ok   - 73 deadline seeded
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8426050Z   ok   - 78 metric regex extracts through ANSI
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8426400Z   ok   - 78b regex miss -> BROKEN named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8426690Z   ok   - 86 verify unknown id -> rc4 (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8427100Z   ok   - 86 unknown id named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8427300Z   ok   - 87 alpha numeric-key -> rc4 (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8427530Z   ok   - 87 offending key named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8427800Z   ok   - 95a regression -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8428010Z   ok   - 95a hint restore-best
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8428200Z   ok   - 95b tampered -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8428620Z   ok   - 95b hint proposal-to-user
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8428970Z   ok   - 102 dead fixture -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8429260Z   ok   - 102 reason calibration-broken
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8429600Z   ok   - 102 hint routes
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8429860Z   ok   - 109a strategy written
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8430040Z   ok   - 109d label trimmed
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8430260Z   ok   - 109g strategy label does not excuse R10 (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8430510Z   ok   - 110f two A windows + one B window
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8430740Z   ok   - 110f window order follows file order
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8430990Z   ok   - 115e garbage row skipped rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8431330Z   ok   - 115e slope still computed
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8432010Z   ok   - 116a horizon-less objective -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8432240Z   ok   - 116a refusal names horizon
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8432560Z   ok   - 116b waived stamps -> rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8432770Z   ok   - 116d waiver strip -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8433040Z   ok   - 116d tamper named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8433220Z   ok   - 121b real FAIL still counted
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8433560Z   ok   - 124c real FAIL counted
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8433800Z   ok   - 124c2 contract-defect not counted
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8434140Z   ok   - 124c2 ratchet stayed 0 on contract defect
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8434360Z   ok   - 134e no soft claim NEXT
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8434640Z   ok   - 134e routes close or degrade
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8434870Z   ok   - 135f open item blocks the claim (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8435090Z   ok   - 135f names open-items
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8435410Z   ok   - 135f routes to close-open-item
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8435750Z   ok   - 142 symlink target changes non-Git digest
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8436680Z   ok   - 142 mode changes non-Git digest
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8437020Z   ok   - 142 newline path remains content-bound
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8437320Z   ok   - 142 option-like path remains content-bound
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8437670Z   ok   - 150 strategy-pipe rejected before mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8438020Z   ok   - 150 signature-newline rejected before mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8438380Z   ok   - 150 files-newline rejected before mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8440660Z   ok   - 150 delta-blank rejected before mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8441100Z   ok   - 150 delta-none rejected before mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8441430Z   ok   - 150 whitespace objective label rejected before measurement
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8441920Z   ok   - 150 multiword objective label rejected before measurement
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8442330Z == results: pass=66 fail=0 ==
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8492270Z   ok   - 03 threshold GO deterministic (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8492800Z   ok   - 03 GO line says mode=threshold
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8493820Z   ok   - 15 budget-fuse -> rc3 (rc=3)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8494210Z   ok   - 15 reason budget-fuse
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8494450Z   ok   - 22 state seeds dry_streak
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8494760Z   ok   - 22 state seeds dry_limit
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8495110Z   ok   - 22 state seeds check_timeout
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8495370Z   ok   - 30 close preserves time_budget
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8495800Z   ok   - 30 close preserves deadline
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8496210Z   ok   - 37 hook unclaimed allows stop (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8496640Z   ok   - 46 status prints iteration line
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8498550Z   ok   - 46 status prints last block
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8500340Z   ok   - 46 status prints next task
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8502430Z   ok   - 58 strategy_delta single line
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8535010Z   ok   - 58 loop-log block intact
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8535730Z   ok   - 60 status best_score
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8536170Z   ok   - 71 minimize divergence -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8536550Z   ok   - 71 DIVERGENCE token
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8536800Z   ok   - 71 dir named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8537120Z   ok   - 84 notes never block -> GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8537360Z   ok   - 84 tautology suspect named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8537700Z   ok   - 88 negative score extracted with sign
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8538050Z   ok   - 88 negative band holds -> GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8538260Z   ok   - 97 A8 warns (stdout)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8538530Z   ok   - 97 no stderr noise for missing scores.rec
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8539030Z   ok   - 101e calib literal inside check -> stamps clean (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8539440Z   ok   - 101e gate must not invent calibration
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8539740Z   ok   - 99d empty project digest rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8540090Z   ok   - 99d empty digest well-formed
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8540360Z   ok   - 107a unstamped => step 1
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8540720Z   ok   - 107b stamped, no work => step 2
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8541480Z   ok   - 107c work unclaimed => step 3
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8541810Z   ok   - 107d claimed => step 4
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8542150Z   ok   - 109f audit clean w/ strategy (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8542400Z   ok   - 109f audit says clean
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8542700Z   ok   - 110c no comparable pair
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8542930Z   ok   - 110i negative slope shown
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8543230Z   ok   - 110i beyond tight band is regression
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8543540Z   ok   - 114a gate still GO with peer-note present (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8543950Z   ok   - 114a tree digest blind to peer-notes
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8544280Z   ok   - 114a rc stable across peer-note
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8544610Z   ok   - 114c gate.md documents peer-notes
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8544880Z   ok   - 114c crew.md documents peer-notes
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8545200Z   ok   - 114c R6 never-WRITE clause intact
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8545460Z   ok   - 114d docs consistency green (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8545790Z   ok   - 114e patterns C3 for section 12
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8546070Z   ok   - 118a drift inside z-band -> GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8546350Z   ok   - 118b drift beyond z-band -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8546610Z   ok   - 118b band source named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8546890Z   ok   - 118c silent sd -> BROKEN
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8547180Z   ok   - 128b deadline not rebased
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8547490Z   ok   - 128b deadline still 1
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8547780Z   ok   - 131b builtin check still GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8548050Z   ok   - 133a pre-reg seeded at stamp
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8548400Z   ok   - 133a has kill lines
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8548620Z   ok   - 133a has strategy slot
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8548910Z   ok   - 133e NEXT forces close-iteration
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8549170Z   ok   - 133e not soft-claim NEXT
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8549480Z   ok   - 134f claim with ghost file refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8549770Z   ok   - 134f names missing-claimed-file
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8550070Z   ok   - 136a entry gain belongs to B
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8550330Z   ok   - 136a entry measured as one delta
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8550980Z   ok   - 136b no unsupported last-label preference
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8551320Z   ok   - 136c missing measurement breaks attribution
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8551640Z   ok   - 136d latest A supersedes historical exploit
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8551980Z   ok   - 136d pick disjoint
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8552970Z   ok   - 136e retry with new evidence clears old prune
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8553420Z   ok   - 136f oscillation is not a dry plateau
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8553710Z   ok   - 136g regression avoids strategy
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8554020Z   ok   - 136h negative minimize entry gain
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8554360Z   ok   - 136i orphan ignored for eval-gap
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8554730Z   ok   - 136j ledger gap cannot earn exploit
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8555100Z   ok   - 136k spread declaration suppresses false confidence
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8555420Z   ok   - 136k missing spread identified
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8555710Z == results: pass=74 fail=0 ==
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8569010Z   ok   - 04 not-claimed -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8569340Z   ok   - 11a check-broken rc127 -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8569650Z   ok   - 11a reason check-broken
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8569890Z   ok   - 17b --dry yes + fail -> rc4 (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8570150Z   ok   - 17b refusal leaves no orphan loop-log block
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8570600Z   ok   - 25 exit=3 vs rc1 -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8570970Z   ok   - 25 reason open-FAIL w/ expect
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8571290Z   ok   - 32 docs consistency (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8571610Z   ok   - 34 hook no-goal allows stop (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8571880Z   ok   - 39 hook rc4 fail-open allows stop (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8572280Z   ok   - 53 maximize GO at score 7 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8572540Z   ok   - 53 GO line carries score
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8572780Z   ok   - 53 best_score stored
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8573030Z   ok   - 54 score-regressed -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8573310Z   ok   - 54 reason score-regressed
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8573880Z   ok   - 69 minimize classified deterministic
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8574090Z   ok   - 69 not judged
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8574260Z   ok   - 69 minimize GO at score 7 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8574460Z   ok   - 69 best_score stored
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8574700Z   ok   - 70 score-regressed (minimize 7>5) -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8574950Z   ok   - 70 reason score-regressed
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8575170Z   ok   - 70 direction named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8575390Z   ok   - 79 noise-band holds -> GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8575630Z   ok   - 80 below band -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8575850Z   ok   - 80 regressed names tol
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8576100Z   ok   - 91 objective-on-judged refused (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8576330Z   ok   - 91 stamp refusal names the AC
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8576780Z   ok   - 92 stamp without placeholder rc4 (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8577210Z   ok   - 92 placeholder refusal named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8577520Z   ok   - 103a status prints NEXT
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8577850Z   ok   - 103a NEXT names the hint
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8578180Z   ok   - 103a NEXT is one actionable sentence
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8578490Z   ok   - 103b clean claim => nothing pending
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8578880Z   ok   - 106a disagreeing same-binding pair -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8579270Z   ok   - 106a reason verdict-conflict
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8579680Z   ok   - 106a hint routes rebind
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8580010Z   ok   - 106b identical double-bind is NOT a conflict (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8587740Z   ok   - 106c conflict cleared by fresh binding on new state (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8588060Z   ok   - 113a promote after 3 waves
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8588280Z   ok   - 113b normalized ids count as one domain
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8588520Z   ok   - 113c interleaved stays silent
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8588730Z   ok   - 113d run of two stays silent
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8588930Z   ok   - 113e promote wording is consider
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8589130Z   ok   - 113f unstalled promote silent
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8589360Z   ok   - 117g floor FAIL beats DEFERRED (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8589950Z   ok   - 117g in-tree FAIL surfaced not masked
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8590180Z   ok   - 123b re-run suffix clean (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8590390Z   ok   - 123b clean said
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8590550Z   ok   - 126a rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8590810Z   ok   - 126a STRATEGY-PICK prefer=B avoid=A
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8591100Z   ok   - 126d NEXT carries pick
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8591310Z   ok   - 126d NEXT hint intact
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8591510Z   ok   - 130b stale receipt refuses claim (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8591740Z   ok   - 130b still adversarial-missing
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8591940Z   ok   - 132b empty raw still NO-GO (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8592150Z   ok   - 132b raw-evidence-missing
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8592350Z   ok   - 134a false-tick fails audit (rc=1)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8592540Z   ok   - 134a A10 named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8592710Z   ok   - 134a names missing path
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8592900Z   ok   - 135c bad class refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8593100Z   ok   - 135c names bad-fault-class
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8593310Z   ok   - 135c illegal pair refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8593520Z   ok   - 135c names bad-fault-outcome
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8593730Z   ok   - 141 progress rejected without mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8593970Z   ok   - 141 exit-signal rejected without mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8594220Z   ok   - 141 false-complete rejected without mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8594460Z   ok   - 141 dry rejected without mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8594680Z   ok   - 141 checks-pass rejected without mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8594920Z   ok   - 141 checks-fail rejected without mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8595180Z   ok   - 141 checks-unverifiable rejected without mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8595450Z   ok   - 141 invalid task rejected before measurement
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8595680Z   ok   - 146 watched directory content
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8595870Z   ok   - 146 watched empty directory
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8596410Z   ok   - 146 changing watched scope refuses claim (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8596680Z   ok   - 146 scope change is contract tampering
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8596930Z   ok   - 152 empty hash sensor refuses identity (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8597190Z   ok   - 152 constant hash sensor refuses identity (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8597460Z   ok   - 158 isolated Python digest succeeds (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8597710Z   ok   - 158 ambient Python startup hook not executed
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8597930Z == results: pass=79 fail=0 ==
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8633050Z   ok   - 05 stale -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8633350Z   ok   - 05 reason verdicts-stale
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8633570Z   ok   - 13 forge not-dry -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8633820Z   ok   - 13 reason not-dry
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8634030Z   ok   - 14 forge GO -> rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8634230Z   ok   - 14 GO line says mode=forge
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8634470Z   ok   - 29 future deadline GO -> rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8634750Z   ok   - 33 shellcheck clean
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8634970Z   ok   - 40 stamp without baseline refused rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8635210Z   ok   - 40 goal.md left unstamped
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8635410Z   ok   - 41 stamp with baseline ok (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8635650Z   ok   - 41 forge GO with baseline satisfied (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8635880Z   ok   - 59 bad-score refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8636080Z   ok   - 63 clean ledger rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8636300Z   ok   - 63 clean said
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8636550Z   ok   - 65 bad vocab+score+delta rc1 (rc=1)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8636750Z   ok   - 65 vocab
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8636900Z   ok   - 65 score-format
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8637070Z   ok   - 65 missing strategy_delta
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8637260Z   ok   - 74 not-covered -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8637450Z   ok   - 74 reason not-covered
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8637630Z   ok   - 74 hint bind-seat
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8637790Z   ok   - 75 status shows T1
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8637960Z   ok   - 75 status shows T2
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8639400Z   ok   - 75 status counts 2 open
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8639590Z   ok   - 75 status drops ticked T1
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8639770Z   ok   - 75 ticked item hidden
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8639960Z   ok   - 84b artifact with spaces -> GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8640210Z   ok   - 89 ledger-mutating check never ends GO (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8640450Z   ok   - 89b verify self-rewrite caught (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8640670Z   ok   - 89b ledger mutation named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8640880Z   ok   - 100a calib declared, no grades -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8641110Z   ok   - 100a reason calibration-missing
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8641310Z   ok   - 100a hint routes the controller
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8641510Z   ok   - 100b lenient seat -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8641700Z   ok   - 100b names the bad fixture
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8641930Z   ok   - 100c calibrated claim -> GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8642150Z   ok   - 100e unbound grade -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8642360Z   ok   - 100e reason good side
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8642550Z   ok   - 100d stale grades voided -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8642780Z   ok   - 100d stale calibration flagged
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8643000Z   ok   - 109c folded to one line
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8643260Z   ok   - 109c no block shred
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8643480Z   ok   - 109c gate still GO with folded label (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8643720Z   ok   - 110b unmeasured window
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8643910Z   ok   - 110b numeric window still slopes
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8644120Z   ok   - 110g flat prune
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8644330Z   ok   - 111a healthy loop prints no efficiency block
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8644560Z   ok   - 115a status rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8644750Z   ok   - 115a iteration line intact
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8644950Z   ok   - 115a last block intact
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8645130Z   ok   - 115a work-plan NEXT intact
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8645350Z   ok   - 116c judged+calib horizon stamps (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8645790Z   ok   - 117d window cache: one query per window
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8646020Z   ok   - 117e expired window re-queries
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8646230Z   ok   - 124b missing expected refused (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8646450Z   ok   - 124b names expected
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8646640Z   ok   - 126e NEXT carries pick
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8646820Z   ok   - 126e NEXT hint intact
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8647010Z   ok   - 129a no evidence at n=1
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8647190Z   ok   - 129a efficiency unmeasured
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8647410Z   ok   - 132a claim without raw dump is NO-GO (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8647650Z   ok   - 132a reason raw-evidence-missing
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8647850Z   ok   - 132a GO with raw dump (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8648050Z   ok   - 132c close auto-writes raw
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8648250Z   ok   - 132c GO after auto raw + adv (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8648460Z   ok   - 135a fault close ok (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8648650Z   ok   - 135a names the fault
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8648840Z   ok   - 135a ledger carries the derived suffix
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8649080Z   ok   - 135a fault row written
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8649250Z   ok   - 135a audit clean (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8649450Z   ok   - 139 invalid receipt rejected (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8649660Z   ok   - 139 reason names bad receipt
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8649870Z   ok   - 139 refusal leaves all state unchanged
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8650160Z   ok   - 144 explicitly watched Git-ignored artifact bound
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8650500Z   ok   - 144 explicitly watched pruned artifact bound
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8650770Z   ok   - 144 watched ignored artifact may claim GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8651040Z   ok   - 144 ignored artifact change revokes GO (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8651280Z   ok   - 144 ignored change names stale digest
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8651520Z   ok   - 154 tracked deletion is digestible (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8651750Z   ok   - 154 tracked deletion changes identity
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8651980Z   ok   - 157 Git accelerator matches fallback
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8652240Z   ok   - 157 Git backends detect ignored artifact change
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8652650Z == results: pass=83 fail=0 ==
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8710550Z   ok   - 06 judged open-FAIL -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8710860Z   ok   - 11b non-numeric metric -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8711100Z   ok   - 11b reason check-broken
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8711300Z   ok   - 18 missing dry_streak -> rc4 (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8711530Z   ok   - 26 carry-forward GO -> rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8711820Z   ok   - 27 stale re-bind -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8712030Z   ok   - 27 reason not-covered
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8712220Z   ok   - 42 cmd mismatch rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8712410Z   ok   - 42 reason baseline-cmd-mismatch
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8712630Z   ok   - 55 probe-failed -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8712830Z   ok   - 55 reason check-broken probe
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8713070Z   ok   - 62 unmeasurable records ok rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8713370Z   ok   - 62 warns unmeasurable
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8713560Z   ok   - 62 score=none recorded
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8713800Z   FAIL - 76 expired wallclock green claim -> GO (want rc=0 got rc=3)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8714060Z   ok   - 76 NOTE fuse
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8714220Z   FAIL - 76 still GO
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8714410Z   ok   - 81 unbound PASS -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8714620Z   ok   - 81 verdict-unbound named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8714810Z   ok   - 82 bound artifact GO -> rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8715040Z   ok   - 82b stale artifact hash -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8715250Z   ok   - 82b mismatch named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8715440Z   ok   - 94 two same error_signature -> rc3 (rc=3)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8715660Z   ok   - 94 grind detector named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8715870Z   ok   - 94b none signatures never trip (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8716200Z   ok   - 101a calib on non-judged AC -> stamp refused (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8716490Z   ok   - 101a reason named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8717180Z   ok   - 101b missing bad fixture -> stamp refused (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8717430Z   ok   - 101b names the fixture
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8717630Z   ok   - 101c one-sided calib -> stamp refused (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8717850Z   ok   - 101c needs both
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8718050Z   ok   - 101d one ruler both ends -> stamp refused (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8718290Z   ok   - 101d names the single-ruler problem
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8718500Z   ok   - 110d negative slope format
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8718700Z   ok   - 110d negative maximize is pruned
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8718920Z   ok   - 111b forge stall fires
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8719110Z   ok   - 115b step line intact
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8719280Z   ok   - 115f golden STEP present
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8719500Z   ok   - 115f golden NEXT present
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8719740Z   ok   - 115f no v2.8 lines on legacy ledger
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8720020Z   ok   - 117f window-without-external -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8720260Z   ok   - 117f refusal names window/external
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8720470Z   ok   - 121a deferred claim -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8720690Z   ok   - 121a waits, not counted
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8720870Z   ok   - 121a ratchet stayed at 0
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8721080Z   ok   - 125e provider-fatal suffix accepted (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8721300Z   ok   - 125e audit clean
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8721480Z   ok   - 126f pick present while stalled
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8721730Z   ok   - 126f2 gate GO untouched by pick work (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8721960Z   ok   - 126f2 gate silent on pick
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8722190Z   ok   - 131a check-script mutation refuses claim (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8722430Z   ok   - 131a reason check-script-tampered
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8722640Z   ok   - 134b range files= refused (rc=1)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8722840Z   ok   - 134b A10 or unverifiable
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8723070Z   ok   - 135d unbacked suffix fails audit (rc=1)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8723330Z   ok   - 135d names A11
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8723590Z   ok   - 138 documented fast lane reaches GO on first claim (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8724130Z   ok   - 138 actual gate output
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8724390Z   ok   - 138 no false complete from missing receipt
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8724650Z   ok   - 145 unsafe path rejected: ../outside
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8724880Z   ok   - 145 unsafe path rejected: /tmp/outside
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8725120Z   ok   - 145 unsafe path rejected: .goal/state.rec
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8725370Z   ok   - 145 unsafe path rejected: build/../outside
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8725600Z   ok   - 145 symlink parent rejected (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8725860Z   ok   - 145 watch decoy inside command ignored (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8726120Z   ok   - 148 legacy claim requires rebind (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8726340Z   ok   - 148 identifies legacy identity
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8726570Z   ok   - 148 legacy seat still refuses new claim (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8726800Z   ok   - 148 stale seat names migration
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8727030Z   ok   - 148 migration does not count as false completion
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8727290Z   ok   - 148 fresh judged evidence resumes GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8727670Z   ok   - 148 successful rebind preserves ratchet
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8727950Z   ok   - 155 accelerator and fallback identities match
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8728210Z   ok   - 155 both backends detect watched mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8728440Z == results: pass=72 fail=2 ==
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8774470Z   ok   - 07 evidence-missing -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8774760Z   ok   - 12 --verify mutated-tree -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8775100Z   ok   - 12 reason check-mutated-tree
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8775350Z   ok   - 19 dry_streak=2 after two dry rounds
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8775620Z   FAIL - 28 expired green claim -> GO (want rc=0 got rc=3)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8775860Z   ok   - 28 NOTE fuse
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8776010Z   FAIL - 28 still GO
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8776220Z   ok   - 38 hook rc3 state allows stop (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8776510Z   ok   - 44 baseline-check not-forge ok (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8777150Z   ok   - 44 threshold GO without baseline (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8777420Z   ok   - 56 progress=no without strategy_delta refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8777690Z   ok   - 56 error names strategy-delta
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8777900Z   ok   - 56 strategy_delta recorded
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8778120Z   ok   - 65c removed teams fallback token rc1 (rc=1)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8778350Z   ok   - 65c names fallback-vocabulary
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8778570Z   ok   - 66 divergence refuses claim rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8778800Z   ok   - 66 names DIVERGENCE
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8779000Z   ok   - 67 no DIVERGENCE on same-direction
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8779240Z   ok   - 67 no DIVERGENCE token
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8779480Z   ok   - 68 A8 warn does not block rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8779740Z   ok   - 68 A8 warns judge-score-unrecorded
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8779990Z   ok   - 96a claim at dry=limit (3>=3) GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8780210Z   ok   - 96a forge GO line
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8780400Z   ok   - 96a dry_streak reached limit
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8780710Z   ok   - 96b premature forge claim (dry 2<3) rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8781000Z   ok   - 96b not-dry named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8781180Z   ok   - 96b counted by ratchet
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8781380Z   ok   - 105a bare T1 normalizes to crew:1
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8781610Z   ok   - 105b free-form task -> write refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8781830Z   ok   - 105b names the task schema
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8782040Z   ok   - 105c junk task kept out of ledger
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8782250Z   ok   - 109b default strategy none
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8782450Z   ok   - 109e legacy block status rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8782660Z   ok   - 109e attribution-unused fires
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8782860Z   ok   - 110h tol-band flat prune
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8783050Z   ok   - 112a eval-gap fires
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8783230Z   ok   - 112a names goal-critic
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8783410Z   ok   - 112b two points stay silent
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8783620Z   ok   - 112c unstalled stays silent
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8784280Z   ok   - 112d no objective stays silent
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8784600Z   ok   - 112e tol-band flat fires
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8785040Z   ok   - 117a external PASS -> GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8791220Z   ok   - 117b external FAIL -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8791450Z   ok   - 117b external fail named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8791650Z   ok   - 123a recovery suffix clean (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8791890Z   ok   - 123a clean said
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8792130Z   ok   - 124a multi-line AC stamp refused (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8792370Z   ok   - 124a refusal names single-line
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8792610Z   ok   - 124a left unstamped
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8792820Z   ok   - 126g threshold without objective prints no pick
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8793050Z   ok   - 129c bare T accepted (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8793240Z   ok   - 129c ledger has crew:1
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8793420Z   ok   - 129c teams marker refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8793640Z   ok   - 129c names bad-task
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8793950Z   ok   - 133d audit fails on zero-bookkeeping under clock (rc=1)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8794240Z   ok   - 133d A9 clock named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8794420Z   ok   - 134c clean when files exist (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8794610Z   ok   - 134c no A10
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8794760Z   ok   - 135g claim goes through (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8794950Z   ok   - 135g gate GO
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8795110Z   ok   - 143 judged Git candidate GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8795360Z   ok   - 143 changed dirty file refuses prior verdict (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8795610Z   ok   - 143 refusal identifies staleness
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8795860Z   ok   - 147 newly created watched artifact changes digest
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8796110Z   ok   - 151 malformed watch refused at stamp (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8796340Z   ok   - 151 malformed watch named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8796550Z   ok   - 151 multiple watch fields accepted (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8796780Z   ok   - 151 second watched path is bound
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8797310Z   ok   - 151 sort failure refuses digest (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8797570Z   ok   - 151 sha256sum failure refuses digest (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8797880Z   ok   - 160 a numeric line from a failed command cannot deliver GO (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8798170Z   ok   - 160 nonzero metric exit is broken
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8798410Z   ok   - 160 malformed objective reading is refused (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8798660Z   ok   - 160 malformed decimal is broken
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8798920Z   ok   - 160 per-check timeout refuses partial numeric output (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8799190Z   ok   - 160 timed out measurement is broken
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8799490Z   ok   - 160 signed decimal and explicit expected nonzero still pass (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8799810Z   ok   - 160 signed decimal is recorded in score grammar
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8800080Z   ok   - 160 broken sensor stderr does not set a water mark
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8800320Z == results: pass=77 fail=2 ==
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8836300Z   ok   - 08 unverifiable-excessive -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8836760Z   ok   - 20 --verify OK -> rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8837010Z   ok   - 20 --verify skips judged
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8837260Z   ok   - 20 --verify reruns deterministic
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8837490Z   ok   - 21 --verify AC-1 only -> rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8837700Z   ok   - 21 filtered run omitted AC-2
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8837920Z   ok   - 35 hook claimed+GO allows stop (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8838160Z   ok   - 43 abs stamp ok without baseline (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8838430Z   ok   - 43 abs forge GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8838680Z   ok   - 57 tampered objective -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8838900Z   ok   - 57 reason contract-tampered
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8839120Z   ok   - 65d provider-fatal suffix clean (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8839350Z   ok   - 65d clean
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8839560Z   ok   - 70b minimize GO at improved score 3 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8839860Z   ok   - 77 expired+fail -> BLOCKED rc3 (rc=3)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8840500Z   ok   - 77 BLOCKED fuse
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8840680Z   ok   - 85 duplicate AC id -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8840880Z   ok   - 85 duplicate named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8841120Z   ok   - 93a no-progress alone refused (R10) (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8841420Z   ok   - 93b no-progress+delta -> HALF_OPEN
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8841700Z   ok   - 93c HALF_OPEN claim w/o strategy -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8841950Z   ok   - 93c R10 duty named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8842160Z   ok   - 93d progress reset + claim GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8842370Z   ok   - 93d breaker back CLOSED
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8842550Z   ok   - 93e streak 3>2 -> OPEN
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8842730Z   ok   - 93f claim at OPEN -> rc3 (rc=3)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8842930Z   ok   - 93f breaker-open named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8843110Z   ok   - 104a init seeds contract (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8843320Z   ok   - 104a goal.md seeded from template
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8843520Z   ok   - 104a re-init -> rc2 (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8843740Z   ok   - 104a re-init points at R3
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8843970Z   ok   - 104b unclaimed -> iterations-exhausted (rc=3)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8844240Z   ok   - 104b loops without API (dry-run plan line)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8844470Z   ok   - 104b fuse reason
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8844710Z   ok   - 104c claim verified -> DELIVERED (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8844980Z   ok   - 104c delivery line
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8845180Z   ok   - 104d continue without contract -> rc4 (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8845420Z   ok   - 110a rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8845620Z   ok   - 110a missing point stays unmeasured
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8845850Z   ok   - 110e minimize direction exploit
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8846050Z   ok   - 111c orphan row rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8846270Z   ok   - 111c no pair from orphan rows
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8846480Z   ok   - 115d empty-score status rc0 (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8846690Z   ok   - 115d score-data none
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8847070Z   ok   - 115g advisory order deterministic
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8847300Z   ok   - 115g promote present too
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8847530Z   ok   - 119a objective unlabeled wave refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8847780Z   ok   - 119a names the strategy duty
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8848010Z   ok   - 119b scores.rec carries the strategy column
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8848240Z   ok   - 126b prune-only pick
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8848430Z   ok   - 126h gradient documents STRATEGY-PICK
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8848660Z   ok   - 126h crew briefs cite STRATEGY-PICK
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8848910Z   ok   - 130a claim without adversarial is NO-GO (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8849170Z   ok   - 130a reason adversarial-missing
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8849420Z   ok   - 130a GO with bound adversarial receipt (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8849640Z   ok   - 130a GO line
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8849840Z   ok   - 133b first close without --score refused (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8850070Z   ok   - 133b names missing-score
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8850280Z   ok   - 133b first close with --score ok (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8850530Z   ok   - 134d open item missing files allowed (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8850820Z   ok   - 135e unbooked fault fails audit (rc=1)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8851170Z   ok   - 135e names A11
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8851400Z   ok   - 140 dirty tracked bytes change digest
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8851700Z   ok   - 140 untracked nested bytes change digest
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8852000Z   ok   - 140 symlink target changes digest
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8852240Z   ok   - 140 executable mode changes digest
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8852480Z   ok   - 140 verify refuses dirty-file mutation (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8852720Z   ok   - 140 names mutation
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8852940Z   ok   - 140 Git candidate claims GO (rc=0)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8853220Z   ok   - 140 dirty edit stales prior claim (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8853460Z   ok   - 140 stale claim named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8853720Z   ok   - 156 tracked entry under symlink parent refuses digest (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8854050Z   ok   - 156 shell fallback refuses symlink parent (rc=4)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8854580Z   ok   - 161 inflated dry count without recorded rounds refuses GO (rc=2)
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8854880Z   ok   - 161 missing executed coverage named
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8855100Z == results: pass=75 fail=0 ==
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8875090Z == total: pass=599 fail=4 shards=8 ==
+lint (macos-latest)	Scenario test suite (gate semantics, no API needed)	2026-11-13T00:57:35.8960390Z ##[error]Process completed with exit code 1.

@@ -63,7 +63,11 @@ class GateEntryBudget(unittest.TestCase):
             ' finally: os.close(fd)\n'
             'spec=importlib.util.spec_from_file_location("actual_entry_module",sys.argv[1])\n'
             'actual=importlib.util.module_from_spec(spec);spec.loader.exec_module(actual)\n'
-            'if sys.argv[2] == "access-exec":\n'
+            'if Path(sys.argv[1]).name == "goal_tree_digest.py":\n'
+            ' began=time.monotonic(); value=actual.fingerprint(*(actual.items(arg) for arg in sys.argv[2:6]))\n'
+            ' record(os.environ["GATE_ENTRY_PHASE_LOG"],dict(phase="fingerprint",start=began,end=time.monotonic()))\n'
+            ' print(value)\n'
+            'elif sys.argv[2] == "access-exec":\n'
             ' store=actual; real=store.verify_views\n'
             ' def slow(state):\n'
             '  marker=Path(os.environ["GATE_ENTRY_READ_MARKER"])\n'
@@ -74,6 +78,16 @@ class GateEntryBudget(unittest.TestCase):
             '  marker.write_text(json.dumps({"started":began,"finished":time.monotonic(),"real_views_verified":True}))\n'
             '  return value\n'
             ' if "GATE_ENTRY_READ_DELAY" in os.environ: store.verify_views=slow\n'
+            ' verify=store.verify_views; flock=store.fcntl.flock\n'
+            ' def measured_view(state):\n'
+            '  began=time.monotonic(); value=verify(state)\n'
+            '  record(os.environ["GATE_ENTRY_PHASE_LOG"],dict(phase="ledger-verification",start=began,end=time.monotonic()))\n'
+            '  return value\n'
+            ' def measured_lock(*args):\n'
+            '  began=time.monotonic(); value=flock(*args)\n'
+            '  record(os.environ["GATE_ENTRY_PHASE_LOG"],dict(phase="lock",start=began,end=time.monotonic()))\n'
+            '  return value\n'
+            ' store.verify_views=measured_view; store.fcntl.flock=measured_lock\n'
             ' record(os.environ["GATE_ENTRY_ACCESS_LOG"],{"entered":time.monotonic(),'
             '"inherited":os.environ.get("GOAL_ACCESS_FD") is not None})\n'
             ' store._access_exec(sys.argv[3:])\n'
@@ -91,13 +105,15 @@ class GateEntryBudget(unittest.TestCase):
         shim.write_text('#!/bin/bash\nif [ "${1:-}" = -I ]; then\n case "${2:-}:${3:-}" in\n '+
             shlex.quote(str(ROOT/'scripts/goal_store.py')+':access-exec')+
             ') if [ "${5:-}" = gate ]; then exec '+wrapped+'; fi ;;\n '+
-            shlex.quote(str(ROOT/'scripts/goal_runner.py')+':gate-limit')+') exec '+wrapped+' ;;\n esac\nfi\nexec '+
+            shlex.quote(str(ROOT/'scripts/goal_runner.py')+':gate-limit')+') exec '+wrapped+' ;;\n '+
+            shlex.quote(str(ROOT/'scripts/goal_tree_digest.py'))+':*) exec '+wrapped+' ;;\n esac\nfi\nexec '+
             shlex.quote(sys.executable)+' "$@"\n')
         shim.chmod(0o755)
         path = [p for p in env['PATH'].split(os.pathsep) if p != str(bindir)]
         return dict(env, PATH=os.pathsep.join([str(bindir), *path]),
                     GATE_ENTRY_ACCESS_LOG=str(self.state/'evidence/access-entry.jsonl'),
-                    GATE_ENTRY_LIMIT_LOG=str(self.state/'evidence/gate-limits.jsonl'))
+                    GATE_ENTRY_LIMIT_LOG=str(self.state/'evidence/gate-limits.jsonl'),
+                    GATE_ENTRY_PHASE_LOG=str(self.state/'evidence/entry-phases.jsonl'))
 
     def contexts(self):
         path = self.state/'evidence/context'
@@ -115,13 +131,20 @@ class GateEntryBudget(unittest.TestCase):
         completed = self.state/'evidence/completed'
         access_log = self.state/'evidence/access-entry.jsonl'
         access = [json.loads(line) for line in access_log.read_text().splitlines()] if access_log.exists() else []
+        phase_log = self.state/'evidence/entry-phases.jsonl'
+        phases = [json.loads(line) for line in phase_log.read_text().splitlines()] if phase_log.exists() else []
         fresh = [row['entered'] for row in access if not row['inherited']]
         finished = time.monotonic()
+        spans = []
+        for path in (self.state/'evidence/runtime').glob('*.json'):
+            span = json.loads(path.read_bytes())['payload']
+            if span.get('start_monotonic', 0) >= started:
+                spans.append({k: span.get(k) for k in ('kind', 'label', 'start_monotonic', 'elapsed', 'result', 'state')})
         value = dict(case=self.id(), started_monotonic=started, elapsed=finished-started, returncode=result.returncode,
                      fresh_access_entries=fresh, access_elapsed=finished-fresh[0] if len(fresh) == 1 else None,
                      contexts=self.contexts(), limits=self.gate_limits(),
                      completed=completed.read_text().splitlines() if completed.exists() else [],
-                     stdout=result.stdout, stderr=result.stderr, **extra)
+                     stdout=result.stdout, stderr=result.stderr, phases=phases, spans=spans, **extra)
         print('GATE_ENTRY_OBSERVATION '+json.dumps(value, sort_keys=True), file=sys.stderr, flush=True)
         return value
 
@@ -230,6 +253,35 @@ class GateEntryBudget(unittest.TestCase):
         self.assertTrue(marker.exists(),observed)
         self.assertEqual(result.returncode,2,observed)
         self.assertLess(observed['elapsed'],4.2,observed)
+
+    def test_expired_green_claim_with_state_reader_process_latency(self):
+        """28/76 with repeatable process-start pressure, not random CPU load."""
+        self.contract(checks=1, duration=0)
+        (self.project/'answer').write_text('landed')
+        self.call(CTL, 'close-iteration', '--operation-id', 'green-latency', '--task', 'T1',
+                  '--files', 'answer', '--checks-pass', '1', '--checks-fail', '0',
+                  '--checks-unverifiable', '0', '--exit-signal', 'yes', '--no-gate',
+                  '--adversarial', 'clear', '--adversarial-note', 'fixture command and landed answer reviewed', expected=0)
+        bindir = self.state/'lookup-bin'; bindir.mkdir()
+        grep = subprocess.check_output(['which', 'grep'], text=True).strip()
+        shim = bindir/'grep'
+        shim.write_text('#!/bin/bash\n'
+                        'if [ "${1:-}" = -E ]; then\n'
+                        ' case "${2:-}" in ^*=) printf "%s\\n" "$2" >> "$LOOKUP_LOG"; sleep .12 ;; esac\n'
+                        'fi\nexec '+shlex.quote(grep)+' "$@"\n')
+        shim.chmod(0o755)
+        marker = self.state/'evidence/lookups'
+        env = dict(os.environ, PATH=str(bindir)+os.pathsep+os.environ['PATH'], LOOKUP_LOG=str(marker))
+        env = self.observe_gate_limits(env)
+        for name in ('context', 'completed'):
+            (self.state/'evidence'/name).unlink(missing_ok=True)
+        started = time.monotonic()
+        result = self.call(GATE, '--check', env=env)
+        observed = self.observation(result, started, delayed_lookups=marker.read_text().splitlines() if marker.exists() else [])
+        self.assertEqual(result.returncode, 0, observed)
+        self.assertIn('GATE: GO ', result.stdout, observed)
+        self.assertIn('time-budget-exhausted', result.stdout, observed)
+        self.assertLess(observed['elapsed'], 4.2, observed)
 
 
 if __name__ == '__main__':

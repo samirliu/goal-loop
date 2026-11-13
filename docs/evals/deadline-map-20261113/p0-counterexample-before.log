@@ -1,0 +1,18 @@
+test_expired_green_claim_with_state_reader_process_latency (test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_state_reader_process_latency)
+28/76 with repeatable process-start pressure, not random CPU load. ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_state_reader_process_latency", "completed": ["0"], "contexts": [["1718697.026056208", "1718699.986408113"]], "delayed_lookups": ["^check_timeout=", "^iteration=", "^breaker=", "^false_completes=", "^replans=", "^no_progress_streak=", "^max_iterations=", "^no_progress_limit=", "^iteration=", "^breaker=", "^false_completes=", "^no_progress_streak=", "^max_iterations=", "^no_progress_limit="], "elapsed": 3.0261444998905063, "fresh_access_entries": [], "limits": [], "returncode": 3, "started_monotonic": 1718697.722702708, "stderr": "GATE: BLOCKED reason=time-budget-exhausted\n", "stdout": ""}
+FAIL
+
+======================================================================
+FAIL: test_expired_green_claim_with_state_reader_process_latency (test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_state_reader_process_latency)
+28/76 with repeatable process-start pressure, not random CPU load.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_gate_entry_budget.py", line 255, in test_expired_green_claim_with_state_reader_process_latency
+    self.assertEqual(result.returncode, 0, observed)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 3 != 0 : {'case': 'test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_state_reader_process_latency', 'started_monotonic': 1718697.722702708, 'elapsed': 3.0261444998905063, 'returncode': 3, 'fresh_access_entries': [], 'access_elapsed': None, 'contexts': [['1718697.026056208', '1718699.986408113']], 'limits': [], 'completed': ['0'], 'stdout': '', 'stderr': 'GATE: BLOCKED reason=time-budget-exhausted\n', 'delayed_lookups': ['^check_timeout=', '^iteration=', '^breaker=', '^false_completes=', '^replans=', '^no_progress_streak=', '^max_iterations=', '^no_progress_limit=', '^iteration=', '^breaker=', '^false_completes=', '^no_progress_streak=', '^max_iterations=', '^no_progress_limit=']}
+
+----------------------------------------------------------------------
+Ran 1 test in 5.791s
+
+FAILED (failures=1)

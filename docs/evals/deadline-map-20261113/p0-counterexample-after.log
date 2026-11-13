@@ -1,0 +1,8 @@
+test_expired_green_claim_with_state_reader_process_latency (test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_state_reader_process_latency)
+28/76 with repeatable process-start pressure, not random CPU load. ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_state_reader_process_latency", "completed": ["0", "0"], "contexts": [["1718728.769842875", "1718731.730437392"], ["1718729.535997125", "1718732.497078771"]], "delayed_lookups": ["^exit_signal=", "^task=", "^digest="], "elapsed": 1.5814614999108016, "fresh_access_entries": [], "limits": [], "returncode": 0, "started_monotonic": 1718729.490352333, "stderr": "", "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-9a9cedba1bd0208136b7d46707b80dee7bccab22e8d9fc999529a99b200ea998 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n"}
+ok
+
+----------------------------------------------------------------------
+Ran 1 test in 4.418s
+
+OK
