@@ -1,0 +1,210 @@
+{
+  "attempt": 1,
+  "conclusion": "cancelled",
+  "databaseId": 43438021005,
+  "headSha": "974d6ac83db8208badb3a73ead33b4659b4b6357",
+  "jobs": [
+    {
+      "completedAt": "2026-11-13T14:09:48Z",
+      "conclusion": "cancelled",
+      "databaseId": 131928050069,
+      "name": "lint (macos-latest)",
+      "startedAt": "2026-11-13T13:56:10Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-13T13:56:12Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-13T13:56:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:56:17Z",
+          "conclusion": "success",
+          "name": "Check out repository",
+          "number": 2,
+          "startedAt": "2026-11-13T13:56:12Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:56:31Z",
+          "conclusion": "success",
+          "name": "Install shellcheck and gawk (macOS)",
+          "number": 3,
+          "startedAt": "2026-11-13T13:56:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:56:36Z",
+          "conclusion": "success",
+          "name": "Shellcheck the shipped scripts",
+          "number": 4,
+          "startedAt": "2026-11-13T13:56:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:56:36Z",
+          "conclusion": "success",
+          "name": "Bash syntax check (bash -n)",
+          "number": 5,
+          "startedAt": "2026-11-13T13:56:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:56:37Z",
+          "conclusion": "success",
+          "name": "Docs consistency (invariants, packs, legacy R index)",
+          "number": 6,
+          "startedAt": "2026-11-13T13:56:36Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T14:03:13Z",
+          "conclusion": "success",
+          "name": "Scenario test suite (gate semantics, no API needed)",
+          "number": 7,
+          "startedAt": "2026-11-13T13:56:37Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T14:03:15Z",
+          "conclusion": "success",
+          "name": "Companion contract-forge lint fixtures",
+          "number": 8,
+          "startedAt": "2026-11-13T14:03:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T14:09:43Z",
+          "conclusion": "cancelled",
+          "name": "Budget, ledger access, commit and recovery tests",
+          "number": 9,
+          "startedAt": "2026-11-13T14:03:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T14:09:44Z",
+          "conclusion": "success",
+          "name": "Post Check out repository",
+          "number": 18,
+          "startedAt": "2026-11-13T14:09:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T14:09:46Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-11-13T14:09:44Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/samirliu/goal-loop/actions/runs/43438021005/job/131928050069"
+    },
+    {
+      "completedAt": "2026-11-13T14:09:37Z",
+      "conclusion": "cancelled",
+      "databaseId": 131928050482,
+      "name": "lint (ubuntu-latest)",
+      "startedAt": "2026-11-13T13:56:09Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-11-13T13:56:11Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-11-13T13:56:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:56:18Z",
+          "conclusion": "success",
+          "name": "Check out repository",
+          "number": 2,
+          "startedAt": "2026-11-13T13:56:11Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:56:18Z",
+          "conclusion": "skipped",
+          "name": "Install shellcheck and gawk (macOS)",
+          "number": 3,
+          "startedAt": "2026-11-13T13:56:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:56:20Z",
+          "conclusion": "success",
+          "name": "Shellcheck the shipped scripts",
+          "number": 4,
+          "startedAt": "2026-11-13T13:56:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:56:20Z",
+          "conclusion": "success",
+          "name": "Bash syntax check (bash -n)",
+          "number": 5,
+          "startedAt": "2026-11-13T13:56:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:56:21Z",
+          "conclusion": "success",
+          "name": "Docs consistency (invariants, packs, legacy R index)",
+          "number": 6,
+          "startedAt": "2026-11-13T13:56:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:58:53Z",
+          "conclusion": "success",
+          "name": "Scenario test suite (gate semantics, no API needed)",
+          "number": 7,
+          "startedAt": "2026-11-13T13:56:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T13:58:54Z",
+          "conclusion": "success",
+          "name": "Companion contract-forge lint fixtures",
+          "number": 8,
+          "startedAt": "2026-11-13T13:58:53Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T14:09:34Z",
+          "conclusion": "cancelled",
+          "name": "Budget, ledger access, commit and recovery tests",
+          "number": 9,
+          "startedAt": "2026-11-13T13:58:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T14:09:34Z",
+          "conclusion": "success",
+          "name": "Post Check out repository",
+          "number": 18,
+          "startedAt": "2026-11-13T14:09:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-11-13T14:09:34Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-11-13T14:09:34Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/samirliu/goal-loop/actions/runs/43438021005/job/131928050482"
+    }
+  ],
+  "startedAt": "2026-11-13T13:56:05Z",
+  "status": "completed",
+  "updatedAt": "2026-11-13T14:09:48Z",
+  "url": "https://github.com/samirliu/goal-loop/actions/runs/43438021005"
+}

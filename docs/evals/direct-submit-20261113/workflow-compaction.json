@@ -1,0 +1,35 @@
+{
+  "kind": "Documentation/work obligation change; size is diagnostic, not delivery efficacy",
+  "sizes": {
+    "baseline": {
+      "lines": 124,
+      "characters": 6435,
+      "bytes": 10552
+    },
+    "pre-compaction": {
+      "lines": 127,
+      "characters": 6610,
+      "bytes": 10843
+    },
+    "candidate": {
+      "lines": 69,
+      "characters": 3759,
+      "bytes": 6872
+    }
+  },
+  "removed_model_obligations": [
+    "manual proposal write and refresh",
+    "copying derived identity/count controls",
+    "duplicate final checks after submit",
+    "ordinary-task strategy forms",
+    "protocol-field dump in business final"
+  ],
+  "retained": [
+    "five invariants",
+    "real review and explicit judgment",
+    "true host identity and earliest budget",
+    "all original gate, audit, recovery and calibration rules",
+    "original assertions and timeouts"
+  ],
+  "new_real_model_positions": 0
+}

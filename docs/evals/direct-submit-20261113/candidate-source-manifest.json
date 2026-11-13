@@ -1,11 +1,11 @@
 {
-  "recorded_utc": "2026-11-13T13:51:31.228555+00:00",
+  "recorded_utc": "2026-11-13T14:10:55.906169+00:00",
   "baseline_commit": "00e68c2e04d8356d2d6af38759829a3147d17f77",
   "branch": "perf/direct-submit-20261113",
   "files": {
     "SKILL.md": {
-      "sha256": "5d0629fce710f8672d14cba3caefbee93d792bcf9b2fa1bf1b3c5bdd55e4a281",
-      "bytes": 10843
+      "sha256": "d6319b1b878291d462d3748650c889d509375c63cbccc616341b52ab69025fde",
+      "bytes": 6872
     },
     "agents/goal-adjudicator.md": {
       "sha256": "f7ede0b8f73573a4e6c416d1282fda5d8340226611b2c68c0603ba2b803d73f3",
@@ -222,5 +222,6 @@
   },
   "new_real_model_positions": 0,
   "source_status": "Frozen candidate for CI; no new real complex-task evaluation yet",
-  "original_gate_audit_store_runner_unchanged": true
+  "original_gate_audit_store_runner_unchanged": true,
+  "workflow_refinement": "Remove duplicated manual obligations already implemented by direct submission; load advanced capabilities only when used. No original test, gate, budget or recovery change."
 }

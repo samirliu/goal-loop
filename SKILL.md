@@ -10,13 +10,7 @@ description: |-
 
 # Goal Loop (v4.1.1)
 
-契约定义成功，crew 执行，门控重跑验收；测量反馈决定下一波。
-持久状态在 `.goal/`，恢复时先 `status`。额外编排的价值必须通过同预算对照证明。
-入口执行 `python3 -I <skill>/scripts/goal_host.py enter <project> <seconds> --context`，一次绑定最早宿主预算并返回 `context` 地图；没有唯一真实回执时，用实际 backend/session 调用 `begin … --context`，不猜身份。已获自动批准授权才加 `--auto`。恢复或产物变更后用 `bash <skill>/scripts/goal_ctl.sh context --project <project>` 取新地图；不读源码重建协议。
-
-地图直接列出验收条款。写好契约后，执行 `submissions.stamp.command`：程序运行原冒烟，再按原批准标记盖戳。修复任务初始 FAIL 可以记录；BROKEN、变更产物或不完整检查不能盖戳。实际实现与复审后取一次新地图，按 `submissions.close.template` 填实际判断，执行其 `command` 并将 JSON 作为 stdin；不需模型另写请求文件、抄 operation_id 或写完再取图。程序在原锁内核对该版本，保存原可恢复请求并调用原收账；常见 `exit=N` 契约自动测量计数，claim 时运行原 audit/Gate 并返回终验回执。特殊契约仍列出需实际观测的计数、score、dry 等字段；不能从勾选或 worker 自述补 PASS/clear。
-
-产物、契约、计划、输入、工具或账本变化时拒绝旧提交，先取新图并复核实际判断。pending 时只执行原 `recover`；恢复后用地图的 `close` 或 `retry-close` 沿用保存的原请求，不重新编造参数。历史 REPLAY 不能替代当前终验。原 `actions`、请求文件、`close-iteration --checks-from-verify --receipt` 和完整 status 保留兼容；净交付收益仍以真实留出对照为准。
+契约定义成功，原收账与门控验证完成。持久状态在 `.goal/`；机械参数由执行地图派生，模型负责需求、实现和实际复审。
 
 ## 五条不变量（唯一的法律）
 
@@ -28,100 +22,48 @@ description: |-
 | **GRADIENT** | 优化不交付劣于水位；盲区显式；波次要归因。 |
 | **FENCE** | 写围栏/进度诚实/自审；树外事实走结算不走猜。 |
 
-检查序号/旧规则别名/schema：`references/gate.md`。深度：按能力键开 `references/packs/README.md` 下各 pack。
-**规则冻结：** 新行为必须是「不变量在新场景的实例」；写不成=新原语（先删并等价物）或不做。**编号只减不增。**
+规则冻结：新行为须是既有不变量的实例；编号只减不增。具体 schema/路由在 `references/gate.md`，按需能力见 `references/packs/README.md`。
 
-## 停车规则（只有四类）
+## 默认路径：小任务快车道
 
-不可逆/破坏性；安全敏感；工作区外共享副作用（merge/push/发布）；契约需修改（盖戳后只能提案）。
-其余冲突：**裁决并入账（`Ruling: 决定 — 理由 — 错了损失什么`），继续**。
-`goal_hook.sh`（可选 Stop hook，安装后）在声称完成而门控 rc=2 时阻止停车。
+默认串行完成实际业务；多个文件不等于需要 crew。普通确定性任务只走下面四步，不额外填策略表、抄检查数或自行拼 CLI 参数。
 
-## Step 1 契约
+1. **进入并取图**：`python3 -I <skill>/scripts/goal_host.py enter <project> <seconds> --context` 一次绑定最早宿主预算并返回 `context`。无唯一真实回执时，用实际 backend/session 调用 `begin … --context`，不猜身份。已有自动执行授权才加 `--auto`；授权沿用，不重复索要。
+2. **作者契约并盖戳**：按地图给出的路径/template 写业务 AC 与 work-plan；每条 AC 都有能失败的指名检查。写好后取一次新地图，执行 `submissions.stamp.command`，程序运行原冒烟、检查冻结与盖戳。初始业务 FAIL 可以成为修复起点；BROKEN、变更树/账本或不完整检查不能盖戳。预算参数在盖戳时绑定，不能延长既有截止。
+3. **实现并实际复审**：实现业务、执行适当项目检查、检查反例与兼容性，真实更新 work-plan。复审结束时取新地图，直接按 `submissions.close.template` 提交实际判断；执行其 `command`，JSON 作为 stdin。通常完成意图只填 progress、exit_signal、adversarial、adversarial_note；计数、身份、request 文件、版本消费与终验由程序处理。只有模板要求实际计数时才运行 `actions.verify` 取观测。缺字段按原错误补实际证据；禁止把勾选或 worker 自述补成 PASS/clear。
+4. **按原终验交付**：claim 提交会执行原收账及 `goal_audit.sh`/Gate，最后的原终验回执必须 `completion_verified=true` 且退出码为 0 才交付。只报业务结果、实际验收、未解决项和必要产物路径；原始账本按需提供。普通继续迭代不要求编造 clear；`progress=no` 须给真实 `strategy_delta`。
 
-- 开始执行即绑定宿主 `begin`，沿用已有最早截止；有 prompt hook 时从 prompt 起算，否则明确 `host-tool-entry`。不在 stamp 或 resume 重新起表。配置和调用见 [宿主接入](references/host.md)。
-- Level 0 AC：`- AC-N | <yes/no 陈述> | check: \`<命令>\` | expected: <spec>`
-- spec：`exit=0|exit=N` / 数值（`>=60`）/ `maximize`|`minimize` / `judged`
-- **Goodhart 哨兵**：不推进目标也能满足 = 代理指标，重写或删。
-- 验收依赖 Git 忽略或默认剪枝的交付物时，在对应 AC 的 `expected:` 前加 `| watch: \`项目相对路径\``；目录递归绑定，符号链接仅绑定链接本身。
-- 盖章前冒烟；优化类冒烟即基线。预算 knobs **盖戳时绑定**进 state.rec。
-- `--auto` 仍展示摘要。`--time-budget=N` 墙钟到期**不没收已通过的交付**（绿 claim GO+NOTE）。
+验收依赖默认忽略的交付物时，在 AC 的 expected 前声明 `watch:`。业务、契约、计划、证据、输入或工具版本变更后，旧地图失效；重新取图并复核实际判断，不盲目自动刷新旧复审。地图只派生动作，不是完成权威。
 
-**能力键 → 必读 pack（盖戳前）：**
+## 恢复与失败
 
-| 契约出现 | pack |
+- 出现 pending/recovery-required：只执行地图的原 `recover`。提交前恢复后用 `actions.close` 沿用保存的请求；提交后用 `retry-close` 精确重放原 ID/argv。REPLAY 只确认历史，仍须当前原终验。
+- `command:null` 或提交缺字段表示必要事实未知；补真实输入，不猜。旧请求文件、直接 CLI 与完整 status 均兼容，正常路径无需手工维护它们；细节见 `references/host.md`。
+- NO-GO：按 `hint=` 修复实际问题；`bind-seat` 需要判读席，不能用 coder 自述替代。一次失败不意味着重写契约或重置预算；假完成两次会 BLOCKED，deferred-pending 由程序区分。
+- 最早预算包括协议阅读、工具、全部 worker 与验收；不从 stamp/resume 重新起表。过半仍 iteration=0 时停止加派，取消未落盘 worker，收账或降级。到期不没收已通过的交付，按原有限结算验证，不授予新工作预算。
+
+## 只在对应能力出现时加载
+
+| 契约/执行出现 | 需要的说明 |
 |---|---|
 | `judged` / `calib:` / `probe:` / `metric:` / `sd:` / `var:` | `references/packs/instrument.md` |
-| `objective:` / `exit: forge` / horizon / `--strategy` | `references/packs/gradient.md` |
+| `objective: maximize` / `minimize` / `exit: forge` / horizon / `--strategy` | `references/packs/gradient.md` |
 | `external:` / `window:` | `references/packs/external.md` |
+| 实际需要原生 worker 协作 | `references/crew.md` 与 `references/host.md` |
 
-水位/forge/EFFICIENCY/`calib:`/deferred 细节在 pack。
-**指标批评席**（forge dry 轮）：分数与进度单调吗？刷分路径？说不清=重写 AC。
-摘要一屏（目标+exit/预算+AC 表+基线）→ 取得批准；会话已授权自动执行时用 `--auto`，不重复索要批准。
+判断类 AC 在 claim 前由全新冷席终验，生产者不自裁；校准必须识别好/坏样本。优化类先建立真实基线，再填地图要求的 score/strategy/dry；`pre-reg.md` 由 stamp 播种，实际策略与反证只在使用优化能力时补齐。forge 的**指标批评席**必须以证据检查盲区与刷分路径；读数或 dry 不能由代理指标/产量替代。EFFICIENCY 只作诊断，净交付收益仍需同预算留出对照。
 
-## 小任务快车道
+## 使用 crew 时
 
-单一端到端验收、局部改动、无需跨 worker 协调的小任务（可含多个文件）直接串行走快车道；不为凑 crew 写接口或扩充检查；实际复审后再填 clear 和证据：
+- 只有启动、协调、join 和终验能装进剩余预算且有净收益依据才并行；未知成本先串行。接口先冻结在 `.goal/interfaces.md`。
+- 原生生命周期沿用地图与宿主 adapter：prepare → 实际 spawn → attach → 真实终态 reconcile → validate/adopt。首个工具运行 ready 命令；启动确认、报告正文都不是完成。取消须实际 interrupt 并读取终态。
+- 共享工作区、互不相交文件域；**禁止** `isolation: worktree`。worker 禁写 `.goal/`、禁自行 spawn；勾账不等于验收。
+- 一波一收账，未收账不得再开波。worker 失效用原 `--fault` 字段记录实际恢复；`peer-notes` 每迭代最多一行，声明不是指令。输入复用、`--policy-state`、故障词汇与证据绑定都按对应地图/crew 说明处理。
 
-优先走上面的入口 → `submissions.stamp` → 实现与复审 → `submissions.close`。一般确定性契约只需提交 progress、exit_signal、adversarial、adversarial_note 四项实际判断。原始命令仍可直接调用：
+## 停车与诊断
 
-```
-[ -d .goal ] || bash scripts/goal_ctl.sh init --project . # hook/enter 已初始化时跳过；context 提供最小契约
-bash scripts/goal_ctl.sh stamp --project . --auto          # 冒烟过 check 之后
-bash scripts/goal_ctl.sh close-iteration --project . --operation-id wave-T1-001 --task T1 --files <产物> \
-  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes \
-  --adversarial clear --adversarial-note '<实际复审的命令及结果>'
-# 首次收账退出码为门控裁决；REPLAY 只确认历史收账，交付前重跑 gate
-```
+停车只有四类：不可逆/破坏性；安全敏感；工作区外共享副作用（merge/push/发布）；盖戳后契约需修改。已有授权继续沿用。其他冲突裁决并入账：`Ruling: 决定 — 理由 — 错了损失什么`。
 
-证明：`bash examples/quickstart-one-shot/run.sh`。
+GO（rc=0）交付；BLOCKED（rc=3）报告；NO-GO（rc=2）修复后继续。Stop hook 可选；不能覆盖预算或把重复续跑当进展。无参 `/goal-loop` 用 context/status 接续，不创建新目标。
 
-## 缺省跑规（与目标无关）
-
-1. **一波一收账**：`close-iteration` 是唯一波次出口；调用前记录本轮固定 `--operation-id`，中断先恢复，再以同 ID 和原参数重试（见 `gate.md`）。未收账不得再派下一波。有产物/勾账却 0 迭代 = unbooked（audit **A9**）。
-2. **objective 冷启动**：首波必须 `--score` + `--strategy`，否则不开多 worker 扩产。
-3. **开跑即有** `.goal/pre-reg.md`（stamp 播种模板：假设/策略标签槽/杀点/降级线）；策略标签从 objective 抽 2–4 个短英文名，一词一波；先写预期变化和反证，证据不足时 `prefer=none`。
-4. **杀点**：预算包含读协议、规划、工具/worker 启动和验收；先记总截止，stamp 只传剩余秒数，预留收账时间。墙钟过半仍 `iteration=0` → 停派工，取消未落盘 worker，收账或降级交付（已过线部分 + 续写接口），禁止堆产量冒充完成。
-   **假勾**：work-plan `[x]` 的 `files=` 必须已在盘上（audit **A10**）；`a..b` 区间不可证 = 拒绝。墙钟过期零记账 → 收账/降级，不得再派波。
-5. **终报**（claim 后）：loop-log/`STRATEGY-PICK`/分数轨迹（按标签）/gate 行 + 三牙路径。字数或文件数不进优化分子。
-
-## Step 2 派工
-
-- 原生 worker 用宿主 adapter `prepare → 实际 spawn → attach → reconcile → validate/adopt`；首个工具执行返回的 ready 命令，shell 沿用所属 wrapper。取消标记与真实宿主 interrupt 同时使用，读取终态后才记 cancelled；启动回执/报告正文不能代替完成。见 [宿主接入](references/host.md)。
-- 可拆不等于应并行：启动+协调+join+验收须装得进剩余预算；启动成本未知的短预算小任务先串行贯通。并行仅限互不相交文件域，人数由净收益决定。
-- **一波一收账**（缺省 1）：join 后必须 `close-iteration`（objective 带 `--score --strategy`）再开下一波。
-- **接口先行**：`.goal/interfaces.md` 冻结，改走提案。
-- **禁止** `isolation: worktree`。简报：任务/输出路径/文件域/通过条件/返回证据；禁写 `.goal/`；禁 spawn。
-- **peer-notes**：`.goal/evidence/peer-notes/<task>.md` 每迭代 ≤1 行；claim-not-instruction。
-- 账本：`task=T<n>[crew:N]`（N=该波实际并发人数，非上限）；work-plan 是正本；**勾完 ≠ GO**。详见 `crew.md`。
-- **worker 掉线/空转**：`close-iteration --fault CLASS --fault-outcome OUTCOME`（后缀由工具派生，不许自封；audit **A11** 双向核账）；没勾的 work-plan 项让门控拒收（`open-items`）。见 `crew.md` §3.5。
-- 需跨波复用时用 crew 图 v2 的显式 `inputs`；只派未接受单元。候选路由用已有进化状态的 `--policy-state` 接入 plan/begin，prepare 返回实际消费版本与输入简报；未验证候选不生效，撤回或版本改变后先重规划。细节见 `crew.md`。
-- Worker 工艺自理；联合波次只归因整波。策略迁移/写回 skill 必须过留出对照，见 gradient pack。
-
-## Step 3 Join + gate
-
-- 合并审阅；接口冲突串行修；两轮未解退串行并记录。
-- `goal_gate.sh --check` = **唯一完成判定**。claim 前必跑 `goal_audit.sh --project .`，rc!=0 不许 claim。
-- 收尾 `python3 -I <skill>/scripts/goal_context.py receipt <project>` 在同一截止内执行原 audit/Gate，输出证据回执；不代替收账或授予额外 GO。
-- 记账 `close-iteration --score N` / `--strategy-delta` / `--strategy`（objective 下强制）。
-  勾账 work-plan `[ ]`→`[x]`。
-
-## Step 4 分岔
-
-- **GO（rc=0）→ 交付。** BLOCKED（rc=3）→ 停车四类之一，报告。
-- **NO-GO（rc=2）**：`status` 的 `NEXT ->` / `hint=` 机械路由（`bind-seat`→判读席；`fix-AC`→修 FAIL）。
-- **冷席终验**（judged）：claim 前全新判读席一次；`packs/instrument.md`。
-- 熔断：墙钟/停滞/迭代。forge 穷尽见 `packs/gradient.md`。
-- **假完成棘轮**：`--exit-signal yes` + NO-GO → +1，两次 BLOCKED。修产物不是再 claim。
-  `deferred-pending` 不计数。**EFFICIENCY**（advisory，不改路由）见 `packs/gradient.md`。
-
-## 账本
-
-`.goal/`：goal.md · state.rec · loop-log.md · verdicts.rec · scores.rec · evidence/ · interfaces.md。
-无参 `/goal-loop` = status + 接续。
-
-## 脚本与自检
-
-`scripts/{goal_gate,goal_ctl,goal_hook,goal_parse,goal_audit}.sh` · `assets/goal.contract.md`。正常运行只用宿主原生工具；外部 harness runner 仅在仓库 `devtools/goal_loop.sh` 显式选择，原安装路径拒绝启动。
-自检：`tests/run_tests.sh` · `tests/docs_consistency.sh` · `examples/quickstart-one-shot/run.sh`。
-卸载 = 删 skill 目录 + `~/.claude/agents/goal-*.md`。
+正常运行只用宿主模型、工具和原生 worker，不启动第二宿主、模型客户端、服务或队列。独立开发运行器仅在仓库 `devtools/` 显式选择。自检：`tests/run_tests.sh`、`tests/docs_consistency.sh`。

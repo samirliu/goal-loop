@@ -1,0 +1,8 @@
+{
+  "run": 43438021005,
+  "head": "974d6ac83db8208badb3a73ead33b4659b4b6357",
+  "returncode": 0,
+  "stdout": "\u2713 Request to cancel workflow 43438021005 submitted.\n",
+  "stderr": "",
+  "reason": "Default SKILL still duplicated manual work already handled by direct submission. Final workflow instructions changed, so full validation will run on the new final commit. No failed assertions skipped; obsolete run and cost retained."
+}
