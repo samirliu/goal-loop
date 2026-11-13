@@ -1,0 +1,21 @@
+{
+  "kind": "Current development and local mechanism costs; no new efficacy model calls",
+  "user_request_utc": null,
+  "root_native_usage_reported": null,
+  "root_usage_events": 0,
+  "counter_issues": [],
+  "root_native_source": "/Users/m/.codex/sessions/2026/11/13/rollout-2026-11-13T13-01-35-01a1d348-5480-7601-ace5-8b01be0530a0.jsonl",
+  "root_native_bytes_observed": 17032532,
+  "root_native_prefix_sha256": "c620847bf391b7c9aa60e255b711de65f417de12ffbac8d90957da4102adf85e",
+  "root_usage_observed_through": null,
+  "development_elapsed_since_first_record_seconds": 1813.1470789909363,
+  "earlier_development_wall_unknown": true,
+  "model_usage_final_tail_unknown": true,
+  "new_efficacy_model_positions": 0,
+  "local_mechanism_trials": 6,
+  "local_mechanism_all_attempt_seconds": 35.926165499025956,
+  "fees": null,
+  "service_compute": null,
+  "break_even_tasks": null,
+  "limitations": "Root coding-model requests are costs, distinct from efficacy positions. Numeric host counters include cached input; reasoning may be part of output. No invoice conversion or complete final tail. Local test/development clocks overlap, no fictitious grand elapsed sum."
+}

@@ -1,0 +1,30 @@
+{
+  "kind": "Current development and local mechanism costs; no new efficacy model calls",
+  "user_request_utc": "2026-11-13T13:13:08.661Z",
+  "root_native_usage_reported": {
+    "input_tokens": 6948823,
+    "cached_input_tokens": 6889856,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 65045,
+    "reasoning_output_tokens": 43007,
+    "total_tokens": 7013868
+  },
+  "root_usage_events": 26,
+  "counter_issues": [],
+  "root_native_source": "/Users/m/.codex/sessions/2026/11/13/rollout-2026-11-13T13-01-35-01a1d348-5480-7601-ace5-8b01be0530a0.jsonl",
+  "root_native_bytes_observed": 17135600,
+  "root_native_prefix_sha256": "a148bed56a14fa4340ab983a144693f5b3e90a4f57eccf2f6bcac6710406d452",
+  "root_usage_observed_through": "2026-11-13T13:53:53.145Z",
+  "development_elapsed_since_first_record_seconds": 1813.1470789909363,
+  "earlier_development_wall_unknown": true,
+  "model_usage_final_tail_unknown": true,
+  "new_efficacy_model_positions": 0,
+  "local_mechanism_trials": 6,
+  "local_mechanism_all_attempt_seconds": 35.926165499025956,
+  "fees": null,
+  "service_compute": null,
+  "break_even_tasks": null,
+  "limitations": "Root coding-model requests are costs, distinct from efficacy positions. Numeric host counters include cached input; reasoning may be part of output. No invoice conversion or complete final tail. Local test/development clocks overlap, no fictitious grand elapsed sum.",
+  "user_request_to_snapshot_seconds": 2479.040691,
+  "usage_marker_correction": "Current native user messages are response_item/message/input_text, not older event_msg/user_message. Original unknown snapshot retained. No costs treated as zero."
+}

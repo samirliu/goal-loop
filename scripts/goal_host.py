@@ -701,9 +701,13 @@ def main():
     p = commands.add_parser('begin')
     p.add_argument('project'); p.add_argument('backend'); p.add_argument('session'); p.add_argument('seconds', type=float)
     p.add_argument('--origin', type=Path)
+    p.add_argument('--context', action='store_true', help='return the current action map with the bound host entry')
+    p.add_argument('--auto', action='store_true', help='context: only with existing automatic approval authorization')
     p = commands.add_parser('enter')
     p.add_argument('project'); p.add_argument('seconds', type=float)
     p.add_argument('--backend'); p.add_argument('--session')
+    p.add_argument('--context', action='store_true', help='return the current action map with the bound host entry')
+    p.add_argument('--auto', action='store_true', help='context: only with existing automatic approval authorization')
     p = commands.add_parser('prepare')
     p.add_argument('project'); p.add_argument('wave'); p.add_argument('task'); p.add_argument('--session'); p.add_argument('--call-id')
     for name in ('attach', 'ready', 'cancel', 'validate', 'adopt'):
@@ -714,6 +718,8 @@ def main():
     p = commands.add_parser('hook')
     p.add_argument('--backend', choices=('claude', 'codex'), required=True); p.add_argument('--project')
     args = parser.parse_args()
+    if getattr(args, 'auto', False) and not args.context:
+        parser.error('--auto requires --context')
     if args.command == 'hook':
         payload = json.load(sys.stdin)
         try:
@@ -736,6 +742,13 @@ def main():
         result = reconcile(args.project, json.loads(args.receipt.read_bytes()), args.session, args.backend)
     else:
         result = globals()[args.command](args.project, args.ticket)
+    if getattr(args, 'context', False):
+        context = module('goal_context')
+        try:
+            view = context.show(args.project, args.auto)
+        except context.store.StoreError as exc:
+            raise ValueError(str(exc)) from exc
+        result = dict(host=result, context=view)
     print(json.dumps(result, sort_keys=True, allow_nan=False))
 
 

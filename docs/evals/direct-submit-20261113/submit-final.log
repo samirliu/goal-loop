@@ -1,0 +1,17 @@
+.....F...............
+======================================================================
+FAIL: test_numeric_contract_keeps_explicit_observed_counts (__main__.ContextEntry.test_numeric_contract_keeps_explicit_observed_counts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_submit.py", line 246, in test_numeric_contract_keeps_explicit_observed_counts
+    self.assertEqual(stamped.returncode, 0, stamped.stdout+stamped.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : GATE: VERIFY AC-1|PASS|exit=0
+GATE: VERIFY-OK checked=1
+CTL: ERROR stamp-refused: AC-1 expected: token is empty after parse (single-line AC required)
+
+
+----------------------------------------------------------------------
+Ran 21 tests in 62.825s
+
+FAILED (failures=1)

@@ -12,10 +12,11 @@ description: |-
 
 契约定义成功，crew 执行，门控重跑验收；测量反馈决定下一波。
 持久状态在 `.goal/`，恢复时先 `status`。额外编排的价值必须通过同预算对照证明。
-入口优先执行 `python3 -I <skill>/scripts/goal_host.py enter <project> <seconds>`：从唯一真实 prompt 回执识别宿主，不猜 session；无回执时用宿主实际身份调用 begin。接着 `bash <skill>/scripts/goal_ctl.sh context --project <project>` 取得当前地图与带版本的准确命令；已获自动批准授权时加 `--auto`。过期后重新派生，不读源码重建协议。恢复也用 context；`status` 保留完整诊断。可选 `--brief` 仅隐藏内部绑定哈希和重复字段；真实小样本未建立完整交付提速，不默认采用。
-地图的 `command:null` 表示必要输入缺失。按返回的路径/template 补实际检查计数、退出判断和复审证据，再刷新地图执行 `close`；不能从勾选或 worker 自述补 PASS/clear。待恢复时只执行 `recover`，之后沿用原 ID/参数；`retry-close` 是历史重放，终验用新地图的 `receipt`。
+入口执行 `python3 -I <skill>/scripts/goal_host.py enter <project> <seconds> --context`，一次绑定最早宿主预算并返回 `context` 地图；没有唯一真实回执时，用实际 backend/session 调用 `begin … --context`，不猜身份。已获自动批准授权才加 `--auto`。恢复或产物变更后用 `bash <skill>/scripts/goal_ctl.sh context --project <project>` 取新地图；不读源码重建协议。
 
-可选机械收尾：契约全部为 `exit=N` 且无 objective、forge、judged、external 时，可显式选择地图的 `close_input.measured_template`，填写实际进展、退出判断和复审证据后写入相同 request 路径，刷新地图执行 `close`。它使用原收账中的原验证器派生计数，并在提交或精确重放后执行原 audit/Gate 终验；不需另跑 verify 抄计数或再请求 receipt。直接入口为 `close-iteration --checks-from-verify --receipt`，不得混入手填计数。验证不完整则保留 pending，按原恢复协议处理。此模式保持可选，净交付收益须另行对照证明。
+地图直接列出验收条款。写好契约后，执行 `submissions.stamp.command`：程序运行原冒烟，再按原批准标记盖戳。修复任务初始 FAIL 可以记录；BROKEN、变更产物或不完整检查不能盖戳。实际实现与复审后取一次新地图，按 `submissions.close.template` 填实际判断，执行其 `command` 并将 JSON 作为 stdin；不需模型另写请求文件、抄 operation_id 或写完再取图。程序在原锁内核对该版本，保存原可恢复请求并调用原收账；常见 `exit=N` 契约自动测量计数，claim 时运行原 audit/Gate 并返回终验回执。特殊契约仍列出需实际观测的计数、score、dry 等字段；不能从勾选或 worker 自述补 PASS/clear。
+
+产物、契约、计划、输入、工具或账本变化时拒绝旧提交，先取新图并复核实际判断。pending 时只执行原 `recover`；恢复后用地图的 `close` 或 `retry-close` 沿用保存的原请求，不重新编造参数。历史 REPLAY 不能替代当前终验。原 `actions`、请求文件、`close-iteration --checks-from-verify --receipt` 和完整 status 保留兼容；净交付收益仍以真实留出对照为准。
 
 ## 五条不变量（唯一的法律）
 
@@ -61,6 +62,8 @@ description: |-
 ## 小任务快车道
 
 单一端到端验收、局部改动、无需跨 worker 协调的小任务（可含多个文件）直接串行走快车道；不为凑 crew 写接口或扩充检查；实际复审后再填 clear 和证据：
+
+优先走上面的入口 → `submissions.stamp` → 实现与复审 → `submissions.close`。一般确定性契约只需提交 progress、exit_signal、adversarial、adversarial_note 四项实际判断。原始命令仍可直接调用：
 
 ```
 [ -d .goal ] || bash scripts/goal_ctl.sh init --project . # hook/enter 已初始化时跳过；context 提供最小契约

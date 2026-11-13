@@ -11,6 +11,7 @@
 它只从本项目唯一真实 prompt 回执（或唯一活跃会话）取 backend/session，调用原 begin；
 有歧义时拒绝并要求传真实身份，绝不猜 session。无 hook 的显式 bridge 仍用下面的 begin。
 随后 `bash ${GOAL_SKILL}/scripts/goal_ctl.sh context --project PROJECT` 输出当前状态和准确命令。
+入口加 `--context` 会在同一调用中返回 `host` 与 `context`，省去单独取图。显式 `begin` 也支持；只有原来已授权自动批准时再加 `--auto`，默认保持手动批准标记。重复入口仍收紧原预算，不能续期。
 可选 `--brief` 只隐藏内部绑定哈希和重复的收账字段；完整绑定仍在原锁内重新计算，动作与 revision 相同。它只作诊断选项；真实小样本未建立完整交付提速，默认保留完整地图。
 只有会话已授权自动批准时才加 `--auto`；默认不添加自动批准标记。授权选项也是版本绑定的一部分。
 首次 hook 只建立账本、尚无 goal.md 时，context 返回最小契约模板和写入路径；不替用户写入或批准，也不要求重新 init 或阅读实现源码。填好并冒烟后重新取 context，才提供带当前版本的 stamp 命令。
@@ -18,6 +19,12 @@
 它只是派生地图，不是新账本或完成权威。完整 status 和原始错误仍可读取。
 
 地图覆盖未初始化、契约/冒烟、实施/派工、未收账、恢复及终验。每个 action 给出参数、证据来源、准确 `command` 和底层 `executes`；必要输入未知时 `command` 为 null。把 `close_input.template` 写到返回的 `.goal/proposals/close-iteration.json`，依据实际 verify 输出和复审补齐 null，然后重新取地图。work-plan 只提供任务/文件域，不能提供检查计数或批准。图任务另用 `execution_input` 补实际 mode 和原生 launch/terminal 回执路径；plan/begin/prepare/attach/reconcile/validate/adopt/finish 仍调用原入口，不启动宿主客户端。
+
+新请求优先使用 `submissions`：契约写好后执行 `submissions.stamp.command`，一次完成原 smoke 与 stamp。初始业务 FAIL 是修复工作的有效起点；只有完整、未变更树或账本且没有 BROKEN 的观测才能继续盖戳，原批准语义不变。
+
+完成实际工作与复审后取新地图，将 `submissions.close.template` 填为真实 JSON，并直接作为其 `command` 的 stdin。程序在原排他锁内先核对地图版本，再推导固定 operation_id、单任务文件域、符合条件的检查数与 claim 终验，校验字段并原子保存标准 proposal，随后同 PID 交给原 controller。模型无需先写 proposal 再取一次新地图。业务判断、复审、特殊契约观测仍由调用者提供；缺失不会从 PASS 猜出 clear。
+
+旧地图的 contract/artifact/plan/evidence/input/crew/policy/budget/implementation 绑定全部保留，scripts/ 中全部 Python、Bash、awk 文件的版本也参与绑定。输入只允许覆盖实际判断字段，不能替换程序派生的 operation_id、checks_source 或 receipt。提交被打断后，仍用原 pending/recover；提交前恢复沿用保存的 proposal，提交后重放沿用原 journal argv，当前终验仍由原 audit/Gate 执行。
 
 输入文件只是调用参数，不是新账本。动作绑定它们的字节、相关回执、产物、策略及工具版本；消费前在原锁下重核，过期或变化后拒绝。context 直接持有读锁，所以 pending 期间也能只读展示 recover。新的原事务 journal 与提交回执保留精确 argv；恢复后 `retry-close` 沿用原请求，只返回历史结果。地图读取有界；到期只提供结算路径，调用各原入口既有的有限验收窗口，不额外改写整次收账预算，更短继承截止仍优先。
 

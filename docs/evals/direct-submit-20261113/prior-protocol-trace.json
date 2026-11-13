@@ -1,0 +1,140 @@
+{
+  "kind": "Prior native tool-input diagnosis only; no business answers copied",
+  "records": [
+    {
+      "old_position": 2,
+      "raw_events_sha256": "b0daceeb185a0d01fa885437bec09dafad80f72d258bb49d78d48458ca171ade",
+      "selected_tool_inputs": [
+        {
+          "timestamp": "2026-11-13T07:50:03.676Z",
+          "input_sha256": "2f28dbec041a76e7ce26d8f7fd8b97b0ff142ba7cf863f5e189eee4edeebc739",
+          "input_characters": 591,
+          "diagnostic_tags": [
+            "host"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T07:50:12.816Z",
+          "input_sha256": "264907ab38106d7d274b7fc443c1ae4ffd4940bc98280c5a2d5b5819ca1381ba",
+          "input_characters": 684,
+          "diagnostic_tags": [
+            "context-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T07:50:49.033Z",
+          "input_sha256": "1807c56cecac0069572d91cc5b2427e814ce6134b760d68c74630188da818ad3",
+          "input_characters": 819,
+          "diagnostic_tags": [
+            "context-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T07:50:58.804Z",
+          "input_sha256": "5bb33e86fa3ea2d8b46445ef4c303fefd0990a3eb4adf800839b4f0ca7c94867",
+          "input_characters": 444,
+          "diagnostic_tags": [
+            "consume-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T07:54:57.423Z",
+          "input_sha256": "79dd8e1b0873730961d3f6b743c3a940d75c18b5f713f61d8919436590d09b99",
+          "input_characters": 1501,
+          "diagnostic_tags": [
+            "context-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T07:57:06.643Z",
+          "input_sha256": "ded9ccd3f01b7a2e5b651dca1dc38462ecef6e838285be46d5b262821c9b6976",
+          "input_characters": 1388,
+          "diagnostic_tags": [
+            "context-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T07:57:50.861Z",
+          "input_sha256": "9ad0f158cd0fdc16a2c360e6ae603f265943157e303bd38e181d9b3adb55994b",
+          "input_characters": 2825,
+          "diagnostic_tags": [
+            "context-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T07:57:58.222Z",
+          "input_sha256": "addf1b99ee13a13143b237e429ef4f22c9fc586116c8c7d1d4b1c4e6b2fb7991",
+          "input_characters": 717,
+          "diagnostic_tags": [
+            "context-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T07:58:16.628Z",
+          "input_sha256": "429de2fe6312cd5a2645512cb12ff8d38f74c46e5b6b0a746f2a89c7ef1420d1",
+          "input_characters": 798,
+          "diagnostic_tags": [
+            "context-map"
+          ]
+        }
+      ]
+    },
+    {
+      "old_position": 3,
+      "raw_events_sha256": "0b7eed1d68b738237d7d3ebb78a56f0a2d7dcaa69892f9d34330c961d80443a1",
+      "selected_tool_inputs": [
+        {
+          "timestamp": "2026-11-13T08:01:32.327Z",
+          "input_sha256": "4650e2087dd372186aba7d5c6e8293897545bf018690620408828d5878f25bff",
+          "input_characters": 939,
+          "diagnostic_tags": [
+            "host",
+            "context-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T08:01:52.520Z",
+          "input_sha256": "2a2d57e679ca4998d94e1a6a3abf11e64f4b2f26edc2ced73fcc15a96d886678",
+          "input_characters": 1517,
+          "diagnostic_tags": [
+            "context-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T08:02:31.444Z",
+          "input_sha256": "87a729e5eec0ffecd6082d3ff5a2ea2c4e4a9cdd1288aeac45a4b79666075741",
+          "input_characters": 415,
+          "diagnostic_tags": [
+            "consume-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T08:07:29.548Z",
+          "input_sha256": "fdffe7db1c40cd4c61f37e2a99e5c2f0e0f6e2da9ea003f89ae1a8d315f83c7e",
+          "input_characters": 4218,
+          "diagnostic_tags": [
+            "context-map"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T08:08:47.737Z",
+          "input_sha256": "4b20093f18d2ced303f569dc1775a18ee5dd3344fc52abf59dcd8b6d67a40069",
+          "input_characters": 3524,
+          "diagnostic_tags": [
+            "context-map",
+            "proposal-authoring"
+          ]
+        },
+        {
+          "timestamp": "2026-11-13T08:09:00.532Z",
+          "input_sha256": "3dae10ee1648fd00bd9ed75c8bc4a54bd0391d8f30337a852ad1dac91f5be2f1",
+          "input_characters": 440,
+          "diagnostic_tags": [
+            "consume-map"
+          ]
+        }
+      ]
+    }
+  ],
+  "limits": "Keyword tags describe visible tool inputs, may include mixed business work and do not establish model reasoning time or exact subprocess counts. Old tasks are development traces, never new holdouts."
+}

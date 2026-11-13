@@ -8,6 +8,8 @@
 
 入口/恢复可用 `goal_host.py enter` 识别唯一真实宿主回执，再用 `goal_ctl.sh context` 获取带版本的执行地图。crew 图 v2 绑定实际输入并复用未失效单元；`--policy-state` 让既有合格策略实际限制派工，撤回后拒绝旧版本。原 Gate、账本和预算保持完成依据。见[端到端小示例](examples/learning-edge/README.md)与[本轮实现记录](docs/deepening-execution.md)；示例受控晋升不代表真实 agent 效用已获证明。
 
+减少机械往返的新路径：`goal_host.py enter … --context` 在绑定宿主与预算后直接返回地图；`submissions.stamp` 运行原冒烟与盖戳，`submissions.close` 直接接收实际判断。通常的确定性契约只填进展、退出意图、复审结论和复审证据四项，程序推导操作身份、检查数并执行原终验；不用先写 proposal 再刷新地图。原调用方式保持兼容，版本过期仍拒绝提交。机制测量和收益边界见[直接提交评估](docs/evals/direct-submit-20261113/README.md)。
+
 ```
 objective → contract (AC-1..N, each with a NAMED failable check) → user approval stamp
   → loop: crew wave (parallel workers, width fits the work) → join → gate re-runs deterministic checks

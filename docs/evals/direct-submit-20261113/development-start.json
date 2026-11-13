@@ -1,0 +1,12 @@
+{
+  "baseline_commit": "00e68c2e04d8356d2d6af38759829a3147d17f77",
+  "started_utc": "2026-11-13T13:21:18.170566+00:00",
+  "started_monotonic": 1761652.929321291,
+  "workspace": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-direct-submit-c72jb5op",
+  "prior_study": "../protocol-efficiency-20261113",
+  "prior_real_positions_used": 18,
+  "new_real_evaluations_started": 0,
+  "new_real_evaluation_allowance": "awaiting explicit user budget answer; implementation and local regressions continue",
+  "candidate_scope": "Version-bound direct intent submission, combined host entry/context, smoke and original stamp, original measured close and receipt",
+  "preserved": "Canonical ledger, original Gate/audit, request recovery, explicit approval and review, original deadlines"
+}
