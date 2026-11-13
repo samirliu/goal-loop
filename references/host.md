@@ -18,7 +18,7 @@
 
 地图覆盖未初始化、契约/冒烟、实施/派工、未收账、恢复及终验。每个 action 给出参数、证据来源、准确 `command` 和底层 `executes`；必要输入未知时 `command` 为 null。把 `close_input.template` 写到返回的 `.goal/proposals/close-iteration.json`，依据实际 verify 输出和复审补齐 null，然后重新取地图。work-plan 只提供任务/文件域，不能提供检查计数或批准。图任务另用 `execution_input` 补实际 mode 和原生 launch/terminal 回执路径；plan/begin/prepare/attach/reconcile/validate/adopt/finish 仍调用原入口，不启动宿主客户端。
 
-输入文件只是调用参数，不是新账本。动作绑定它们的字节、相关回执、产物、策略及工具版本；消费前在原锁下重核，过期或变化后拒绝。context 直接持有读锁，所以 pending 期间也能只读展示 recover。新的原事务 journal 与提交回执保留精确 argv；恢复后 `retry-close` 沿用原请求，只返回历史结果。到期只提供结算路径，参数准备和原检查共享原有限窗口，更短继承截止优先。
+输入文件只是调用参数，不是新账本。动作绑定它们的字节、相关回执、产物、策略及工具版本；消费前在原锁下重核，过期或变化后拒绝。context 直接持有读锁，所以 pending 期间也能只读展示 recover。新的原事务 journal 与提交回执保留精确 argv；恢复后 `retry-close` 沿用原请求，只返回历史结果。地图读取有界；到期只提供结算路径，调用各原入口既有的有限验收窗口，不额外改写整次收账预算，更短继承截止仍优先。
 
 `python3 -I ${GOAL_SKILL}/scripts/goal_context.py receipt PROJECT` 在同一截止执行原 audit/Gate，
 返回原输出、策略消费版本、单元复用来源与未解决项。只有两者实际通过才有 completion_verified=true。

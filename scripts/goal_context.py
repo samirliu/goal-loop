@@ -413,7 +413,7 @@ def compile_view(root, state, fd, auto=False):
                  budget_scope=runner['scope'] if runner else 'contract-only',
                  remaining_seconds=None if cap is None else max(0, cap-time.monotonic()),
                  expired=expired, accepted=[s for s in plan.splitlines() if s.startswith('- [x]')],
-                 settlement_deadline=settlement_cap,
+                 read_deadline=settlement_cap,
                  pending=[s for s in plan.splitlines() if s.startswith('- [ ]')],
                  accepted_units=[u for u in units.values() if u['accepted']],
                  repair_units=[u for u in units.values() if not u['accepted']], policies=policies,
@@ -473,10 +473,9 @@ def run(project, revision, action, auto=False):
         env = dict(os.environ, GOAL_ACCESS_FD=str(fd), GOAL_ACCESS_OWNER_PID=str(os.getpid()),
                    GOAL_ACCESS_EXEC_PID=str(os.getpid()), GOAL_ACCESS_MODE='write' if action in ('stamp', 'close', 'retry-close', 'receipt', 'recover') else
                    'exclusive-read' if action in ('gate', 'verify') else 'read')
-        if value.get('expired') and action != 'status':
-            # Revision preparation and the original settlement consume one
-            # existing envelope; this never grants time for another work wave.
-            env['GOAL_RUNNER_MONOTONIC_END'] = str(value['settlement_deadline'])
+        # Preserve any actual inherited deadline. The map's bounded read is
+        # not a new aggregate close budget: the original controller owns its
+        # existing raw-verification and acceptance envelopes independently.
         os.execvpe(commands[action][0], commands[action], env)
 
 

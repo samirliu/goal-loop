@@ -220,7 +220,19 @@ class ContextActions(unittest.TestCase):
         view = self.view()
         self.assertTrue(view['expired'])
         self.assertFalse({'plan', 'begin-wave', 'prepare-T1', 'stamp'} & set(view['actions']))
-        self.execute(view, 'close')
+        # Charge deterministic map preparation without slowing the original
+        # controller's later batches. Mapping must preserve their envelopes,
+        # rather than inventing a stricter aggregate close deadline.
+        bindir = self.state/'map-probe'; bindir.mkdir()
+        marker = self.state/'evidence/map-digest-delayed'
+        shim = bindir/'python3'
+        shim.write_text('#!/bin/bash\ncase "${2:-}" in */goal_tree_digest.py)\n'
+                        ' if [ ! -e "$MAP_DELAY_MARKER" ]; then touch "$MAP_DELAY_MARKER"; sleep 1; fi ;;\nesac\n'
+                        'exec '+shlex.quote(sys.executable)+' "$@"\n')
+        shim.chmod(0o755)
+        env = dict(os.environ, PATH=str(bindir)+os.pathsep+os.environ['PATH'], MAP_DELAY_MARKER=str(marker))
+        self.execute(view, 'close', env=env)
+        self.assertTrue(marker.exists(), 'controlled map preparation never ran')
         self.assertEqual(json.loads((self.state/'runner.json').read_text())['deadline'], deadline)
         receipt = json.loads(self.execute(self.view(), 'receipt').stdout)
         self.assertTrue(receipt['completion_verified'])

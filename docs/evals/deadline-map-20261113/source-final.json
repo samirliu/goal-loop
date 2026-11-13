@@ -10,7 +10,7 @@
       "mode": "0o644"
     },
     "scripts/goal_context.py": {
-      "sha256": "afc55b7bfdbbaf320ae53c4ef88368fd8b1a317e312b11b4a9aa3f33971d19b7",
+      "sha256": "d8aeea8c3289694700f03f9c32481caad8dc70e70df0333f463676e412e8c0dd",
       "mode": "0o644"
     },
     "scripts/goal_crew.py": {
@@ -110,7 +110,7 @@
       "mode": "0o644"
     },
     "tests/test_context_actions.py": {
-      "sha256": "024c1207315b730a839d44d8c4a76f52fefb53d8d6c273489a84b7d6333fc8b7",
+      "sha256": "63270fd837f485dc26b5114241f57a8ee0ad4fd2caaecdb1f1a9c32118d63c69",
       "mode": "0o644"
     },
     "tests/test_controller_writers.py": {
