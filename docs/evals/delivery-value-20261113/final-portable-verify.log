@@ -1,0 +1,92 @@
+{
+  "verified": true,
+  "scope": "two final-source validation tasks; no efficiency or learning utility inference",
+  "rows": [
+    {
+      "case": "development-small",
+      "phase": "final-validation",
+      "position": 7,
+      "variant": "final-default",
+      "qualified": true,
+      "normal_final": true,
+      "checks_passed": true,
+      "tool_calls": 21,
+      "protocol_lookup_calls": 4,
+      "failures": 0,
+      "seconds": 299.36268654093146,
+      "status": "completed",
+      "posthoc": {
+        "independent": {
+          "result": 0,
+          "stdout": "{\"ok\": true, \"checks\": [{\"name\": \"finite-union-0\", \"pass_\": true}, {\"name\": \"finite-union-1\", \"pass_\": true}, {\"name\": \"finite-union-2\", \"pass_\": true}, {\"name\": \"finite-union-3\", \"pass_\": true}, {\"name\": \"finite-union-4\", \"pass_\": true}, {\"name\": \"finite-union-5\", \"pass_\": true}, {\"name\": \"finite-union-6\", \"pass_\": true}, {\"name\": \"finite-union-7\", \"pass_\": true}, {\"name\": \"finite-union-8\", \"pass_\": true}, {\"name\": \"finite-union-9\", \"pass_\": true}, {\"name\": \"finite-union-10\", \"pass_\": true}, {\"name\": \"finite-union-11\", \"pass_\": true}, {\"name\": \"finite-union-12\", \"pass_\": true}, {\"name\": \"finite-union-13\", \"pass_\": true}, {\"name\": \"finite-union-14\", \"pass_\": true}, {\"name\": \"finite-union-15\", \"pass_\": true}, {\"name\": \"finite-union-16\", \"pass_\": true}, {\"name\": \"finite-union-17\", \"pass_\": true}, {\"name\": \"finite-union-18\", \"pass_\": true}, {\"name\": \"finite-union-19\", \"pass_\": true}, {\"name\": \"finite-union-20\", \"pass_\": true}, {\"name\": \"finite-union-21\", \"pass_\": true}, {\"name\": \"finite-union-22\", \"pass_\": true}, {\"name\": \"finite-union-23\", \"pass_\": true}, {\"name\": \"finite-union-24\", \"pass_\": true}, {\"name\": \"finite-union-25\", \"pass_\": true}, {\"name\": \"finite-union-26\", \"pass_\": true}, {\"name\": \"finite-union-27\", \"pass_\": true}, {\"name\": \"finite-union-28\", \"pass_\": true}, {\"name\": \"finite-union-29\", \"pass_\": true}, {\"name\": \"finite-union-30\", \"pass_\": true}, {\"name\": \"finite-union-31\", \"pass_\": true}, {\"name\": \"finite-union-32\", \"pass_\": true}, {\"name\": \"finite-union-33\", \"pass_\": true}, {\"name\": \"finite-union-34\", \"pass_\": true}, {\"name\": \"finite-union-35\", \"pass_\": true}, {\"name\": \"invalid-0\", \"pass_\": true}, {\"name\": \"invalid-1\", \"pass_\": true}, {\"name\": \"invalid-2\", \"pass_\": true}, {\"name\": \"invalid-3\", \"pass_\": true}, {\"name\": \"invalid-4\", \"pass_\": true}, {\"name\": \"large-bounds\", \"pass_\": true}], \"error\": null, \"elapsed\": 0.001596124842762947}\n",
+          "stderr": ""
+        },
+        "audit": {
+          "result": 0,
+          "stdout": "AUDIT: clean (controller ledger hygiene OK)\n",
+          "stderr": ""
+        },
+        "gate": {
+          "result": 0,
+          "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-5eb74cd637a5b9ad1dd476b301cfd356eae26445dd63b07517072cbf12b1b66b iter=1 ac=2 pass=2 unverified=0 mode=threshold\n",
+          "stderr": ""
+        }
+      },
+      "human_interventions": 0,
+      "tokens": null,
+      "money": null,
+      "server_compute": null
+    },
+    {
+      "case": "holdout-medium",
+      "phase": "final-validation",
+      "position": 8,
+      "variant": "final-default",
+      "qualified": false,
+      "normal_final": true,
+      "checks_passed": false,
+      "tool_calls": 9,
+      "protocol_lookup_calls": 6,
+      "failures": 1,
+      "seconds": 381.1866467909422,
+      "status": "completed",
+      "posthoc": {
+        "independent": {
+          "result": 0,
+          "stdout": "{\"ok\": true, \"checks\": [{\"name\": \"parser-0\", \"pass_\": true}, {\"name\": \"parser-1\", \"pass_\": true}, {\"name\": \"parser-2\", \"pass_\": true}, {\"name\": \"parser-3\", \"pass_\": true}, {\"name\": \"parser-4\", \"pass_\": true}, {\"name\": \"parser-5\", \"pass_\": true}, {\"name\": \"parser-6\", \"pass_\": true}, {\"name\": \"parser-7\", \"pass_\": true}, {\"name\": \"invalid-0\", \"pass_\": true}, {\"name\": \"invalid-1\", \"pass_\": true}, {\"name\": \"invalid-2\", \"pass_\": true}, {\"name\": \"invalid-3\", \"pass_\": true}, {\"name\": \"invalid-4\", \"pass_\": true}, {\"name\": \"invalid-5\", \"pass_\": true}, {\"name\": \"invalid-6\", \"pass_\": true}, {\"name\": \"aggregation\", \"pass_\": true}, {\"name\": \"empty-aggregation\", \"pass_\": true}, {\"name\": \"cli-groups\", \"pass_\": true}, {\"name\": \"strict-atomic-line\", \"pass_\": true}, {\"name\": \"skip-bad\", \"pass_\": true}, {\"name\": \"empty-cli\", \"pass_\": true}, {\"name\": \"cli-missing-input\", \"pass_\": true}, {\"name\": \"strict-physical-line-13\", \"pass_\": true}, {\"name\": \"skip-bad-complete-groups\", \"pass_\": true}, {\"name\": \"cli-literal-utf8\", \"pass_\": true}, {\"name\": \"parser-original-integer\", \"pass_\": true}, {\"name\": \"invalid-false-amount\", \"pass_\": true}, {\"name\": \"aggregation-generator-large\", \"pass_\": true}], \"error\": null, \"elapsed\": 0.34033387480303645}\n",
+          "stderr": ""
+        },
+        "audit": {
+          "result": 0,
+          "stdout": "AUDIT: clean (controller ledger hygiene OK)\n",
+          "stderr": ""
+        },
+        "gate": {
+          "result": 0,
+          "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-9a06c3209020cd2bf9b5500f3e71a627a9b4bb660c06bae61cd6cc2ebd3b7f08 iter=1 ac=2 pass=2 unverified=0 mode=threshold\n",
+          "stderr": ""
+        }
+      },
+      "human_interventions": 0,
+      "tokens": null,
+      "money": null,
+      "server_compute": null
+    }
+  ],
+  "totals": {
+    "final-default": {
+      "attempts": 2,
+      "qualified": 1,
+      "normal_finals": 2,
+      "failed": 1,
+      "all_attempt_wall_seconds": 680.5493333318736,
+      "wall_seconds_per_qualified": 680.5493333318736,
+      "protocol_lookup_calls": 10,
+      "tool_calls": 30,
+      "human_interventions": 0,
+      "tokens": null,
+      "money": null,
+      "server_compute": null
+    }
+  }
+}

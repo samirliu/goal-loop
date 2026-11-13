@@ -1,0 +1,21 @@
+test_presentation_reduces_repetition_without_changing_bound_actions (test_context_actions.BriefContextActions.test_presentation_reduces_repetition_without_changing_bound_actions) ... FAIL
+
+======================================================================
+FAIL: test_presentation_reduces_repetition_without_changing_bound_actions (test_context_actions.BriefContextActions.test_presentation_reduces_repetition_without_changing_bound_actions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 252, in test_presentation_reduces_repetition_without_changing_bound_actions
+    self.initialize()
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 40, in initialize
+    first = self.view()
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 248, in view
+    self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 4 != 0 : CTL: ERROR unknown-flag:--brief
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.009s
+
+FAILED (failures=1)

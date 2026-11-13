@@ -1,0 +1,32 @@
+{
+  "final-context-regression.log": {
+    "tests": 19,
+    "seconds": 125.221,
+    "passed": true,
+    "sha256": "c5e1e9cf5e324ac02232da55226b15944c8934023bde180fe516f51ee1a55204"
+  },
+  "final-evaluator-regression.log": {
+    "tests": 7,
+    "seconds": 0.544,
+    "passed": true,
+    "sha256": "9e17b1aad3c498c852b63c709f2a319293e69db6665294e501368642fd15d827"
+  },
+  "learning-regression.log": {
+    "tests": 19,
+    "seconds": 17.184,
+    "passed": true,
+    "sha256": "9979a67b5e540034d2daa3278b996fd4df4414f4e068bb093b3ed61ceac44590"
+  },
+  "policy-regression.log": {
+    "tests": 13,
+    "seconds": 12.801,
+    "passed": true,
+    "sha256": "6700311b655dadb525976bc47ef0014cb1fca777738d1b25362d09204682b1eb"
+  },
+  "budget-regression.log": {
+    "tests": 11,
+    "seconds": 52.566,
+    "passed": true,
+    "sha256": "1edba5f8b77845bc269663a26a84bd7aba16dcc40c71f639d65c1b6a5ef07655"
+  }
+}

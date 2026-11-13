@@ -12,7 +12,7 @@ description: |-
 
 契约定义成功，crew 执行，门控重跑验收；测量反馈决定下一波。
 持久状态在 `.goal/`，恢复时先 `status`。额外编排的价值必须通过同预算对照证明。
-入口优先执行 `python3 -I <skill>/scripts/goal_host.py enter <project> <seconds>`：从唯一真实 prompt 回执识别宿主，不猜 session；无回执时用宿主实际身份调用 begin。接着 `bash <skill>/scripts/goal_ctl.sh context --project <project>` 取得当前地图与带版本的准确命令；已获自动批准授权时加 `--auto`。过期后重新派生，不读源码重建协议。恢复也用 context；`status` 保留完整诊断。
+入口优先执行 `python3 -I <skill>/scripts/goal_host.py enter <project> <seconds>`：从唯一真实 prompt 回执识别宿主，不猜 session；无回执时用宿主实际身份调用 begin。接着 `bash <skill>/scripts/goal_ctl.sh context --project <project>` 取得当前地图与带版本的准确命令；已获自动批准授权时加 `--auto`。过期后重新派生，不读源码重建协议。恢复也用 context；`status` 保留完整诊断。可选 `--brief` 仅隐藏内部绑定哈希和重复字段；真实小样本未建立完整交付提速，不默认采用。
 地图的 `command:null` 表示必要输入缺失。按返回的路径/template 补实际检查计数、退出判断和复审证据，再刷新地图执行 `close`；不能从勾选或 worker 自述补 PASS/clear。待恢复时只执行 `recover`，之后沿用原 ID/参数；`retry-close` 是历史重放，终验用新地图的 `receipt`。
 
 ## 五条不变量（唯一的法律）

@@ -1,0 +1,194 @@
+{
+  "kind": "posthoc diagnostics; no effect on eligibility or original costs",
+  "calibration_passed": true,
+  "definition": "outer host call with an explicit protocol file read/search or goal CLI --help; variable action commands listed for manual review",
+  "rows": [
+    {
+      "position": 7,
+      "variant": "final-default",
+      "case": "development-small",
+      "explicit_protocol_read_calls": 2,
+      "calls": [
+        {
+          "timestamp": "2026-11-13T05:43:57.243Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/validation/sources/final-default/SKILL.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:44:01.742Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:44:09.748Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:44:15.691Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:44:22.471Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/validation/sources/final-default/references/host.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:44:28.556Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:44:33.848Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:44:45.948Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:45:09.170Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:45:12.813Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:45:18.460Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:45:24.920Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:45:34.497Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:45:39.052Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:45:47.071Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:45:53.941Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:46:12.080Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:46:21.468Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:46:32.053Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:46:40.508Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:46:49.443Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        }
+      ],
+      "host_tool_calls": 21,
+      "model_visible_tool_result_bytes": 71507,
+      "first_tool_since_position_entry_seconds": 69.00973105430603,
+      "observed_native_worker_window_seconds": 242.91799998283386,
+      "final_report_since_entry_seconds": 251.03873109817505
+    },
+    {
+      "position": 8,
+      "variant": "final-default",
+      "case": "holdout-medium",
+      "explicit_protocol_read_calls": 2,
+      "calls": [
+        {
+          "timestamp": "2026-11-13T05:50:15.549Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/validation/sources/final-default/SKILL.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:50:48.323Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:50:58.697Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:51:08.848Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:51:45.344Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/validation/sources/final-default/references/gate.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:52:11.879Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:52:22.091Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:52:36.031Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:52:46.955Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        }
+      ],
+      "host_tool_calls": 9,
+      "model_visible_tool_result_bytes": 86798,
+      "first_tool_since_position_entry_seconds": 147.89007711410522,
+      "observed_native_worker_window_seconds": 296.52499985694885,
+      "final_report_since_entry_seconds": 326.1220769882202
+    }
+  ],
+  "tokens": null,
+  "money": null,
+  "server_compute": null
+}

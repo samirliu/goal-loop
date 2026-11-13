@@ -1,0 +1,27 @@
+test_context_without_auto_preserves_unapproved_initial_entry (test_context_actions.BriefContextActions.test_context_without_auto_preserves_unapproved_initial_entry) ... FAIL
+test_context_without_auto_preserves_unapproved_initial_entry (test_context_actions.ContextActions.test_context_without_auto_preserves_unapproved_initial_entry) ... FAIL
+
+======================================================================
+FAIL: test_context_without_auto_preserves_unapproved_initial_entry (test_context_actions.BriefContextActions.test_context_without_auto_preserves_unapproved_initial_entry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 61, in test_context_without_auto_preserves_unapproved_initial_entry
+    self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : /Users/m/repo/goal-loop/scripts/goal_ctl.sh: line 90: context_args[@]: unbound variable
+
+
+======================================================================
+FAIL: test_context_without_auto_preserves_unapproved_initial_entry (test_context_actions.ContextActions.test_context_without_auto_preserves_unapproved_initial_entry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 61, in test_context_without_auto_preserves_unapproved_initial_entry
+    self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : /Users/m/repo/goal-loop/scripts/goal_ctl.sh: line 90: context_args[@]: unbound variable
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.014s
+
+FAILED (failures=2)

@@ -1,0 +1,12 @@
+test_correct_bare_delivery_needs_no_goal_loop_metadata (test_delivery_evaluation.DeliveryEvaluation.test_correct_bare_delivery_needs_no_goal_loop_metadata) ... ok
+test_deadline_model_source_and_missing_positions_are_rejected (test_delivery_evaluation.DeliveryEvaluation.test_deadline_model_source_and_missing_positions_are_rejected) ... ok
+test_false_green_bad_product_and_changed_grader_are_rejected (test_delivery_evaluation.DeliveryEvaluation.test_false_green_bad_product_and_changed_grader_are_rejected) ... ok
+test_filter_does_not_save_thinking_or_credentials (test_delivery_evaluation.DeliveryEvaluation.test_filter_does_not_save_thinking_or_credentials) ... ok
+test_goal_loop_cannot_reuse_bare_acceptance_or_fake_gate (test_delivery_evaluation.DeliveryEvaluation.test_goal_loop_cannot_reuse_bare_acceptance_or_fake_gate) ... ok
+test_no_final_late_final_and_cancel_are_not_deliveries (test_delivery_evaluation.DeliveryEvaluation.test_no_final_late_final_and_cancel_are_not_deliveries) ... ok
+test_reserved_validation_positions_keep_global_identity (test_delivery_evaluation.DeliveryEvaluation.test_reserved_validation_positions_keep_global_identity) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.544s
+
+OK

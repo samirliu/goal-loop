@@ -1,0 +1,26 @@
+{
+  "registered_utc": "2026-11-13T05:22:53.914921+00:00",
+  "global_positions": [
+    7,
+    8
+  ],
+  "maximum_total_positions": 8,
+  "prior_protocol_sha256": "1a1c9e5675d3a010302b380c55ed4b21032daeaa9f7c54b156bcb5a99b9753bd",
+  "reason": "Offline Bash 3/set -u counterexample: optional argument array is empty without --auto/--brief. Preserve original six frozen positions; correct the original unauthorised-approval entry path.",
+  "comparison": "final-source validation only; no replacement of any original failure or timing sample",
+  "tasks": [
+    "same frozen development-small business input",
+    "same frozen holdout-medium business input"
+  ],
+  "seconds": 360,
+  "execution_seconds": 330,
+  "parallelism": 1,
+  "retries": 0,
+  "model": "gpt-6.1-sol",
+  "effort": "max",
+  "source_freeze": "after the original six positions; freeze final recommendation and portable argv before position 7",
+  "recommendation_rule": "If original B loses a qualified delivery or fails its 20% floor on either case, keep the original default recommendation and retain --brief only as an optional diagnostic. Otherwise the recommendation may use --brief. No further performance tuning.",
+  "stop": "Any final validation failure remains a failure; no ninth call; final source after position 7 is immutable.",
+  "tokens": null,
+  "money": null
+}

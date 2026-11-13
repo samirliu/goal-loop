@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent reconstruction of the bounded entry pilot, without model calls."""
+"""Legacy fixed-seed comparison B, both arms goal-loop; never a bare-host A."""
 import argparse
 import hashlib
 import json

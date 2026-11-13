@@ -53,6 +53,16 @@ class ContextActions(unittest.TestCase):
         self.execute(authored, 'verify')
         self.execute(self.view(), 'stamp')
 
+    def test_context_without_auto_preserves_unapproved_initial_entry(self):
+        for flags in ([], ['--brief']):
+            result = subprocess.run(['bash', str(ROOT/'scripts/goal_ctl.sh'), 'context',
+                                     '--project', str(self.project), *flags],
+                                    capture_output=True, text=True, timeout=15)
+            self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+            view = json.loads(result.stdout)
+            self.assertEqual(view['next'], 'initialize-ledger')
+            self.assertNotIn('--auto', view['actions']['init']['command'])
+
     def request(self, *, claim='yes', correct=True):
         (self.project/'answer').write_bytes(b'correct' if correct else b'wrong')
         (self.state/'work-plan.md').write_text('- [x] T1 answer | owner=controller | files=answer\n')
@@ -236,6 +246,29 @@ class ContextActions(unittest.TestCase):
         self.assertEqual(json.loads((self.state/'runner.json').read_text())['deadline'], deadline)
         receipt = json.loads(self.execute(self.view(), 'receipt').stdout)
         self.assertTrue(receipt['completion_verified'])
+
+
+class BriefContextActions(ContextActions):
+    """The smaller presentation must support the same real lifecycle and attacks."""
+
+    def view(self):
+        result = subprocess.run(['bash', str(ROOT/'scripts/goal_ctl.sh'), 'context', '--project',
+                                 str(self.project), '--auto', '--brief'],
+                                capture_output=True, text=True, timeout=15)
+        self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+        return json.loads(result.stdout)
+
+    def test_presentation_reduces_repetition_without_changing_bound_actions(self):
+        self.initialize()
+        brief, _ = self.request()
+        full = ContextActions.view(self)
+        self.assertEqual(brief['revision'], full['revision'])
+        self.assertEqual(brief['actions'], full['actions'])
+        self.assertNotIn('binding', brief)
+        self.assertIn('binding', full)
+        self.assertEqual(brief['close_input']['missing'], full['close_input']['missing'])
+        self.assertEqual(brief['close_input']['template'], full['close_input']['template'])
+        self.assertLess(len(json.dumps(brief)), len(json.dumps(full)))
 
 
 if __name__ == '__main__':

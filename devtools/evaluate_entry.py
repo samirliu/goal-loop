@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Explicit, bounded developer comparison. Never called by the installed skill.
 
+Legacy comparison B: both before and after load goal-loop. Neither is bare host.
 Four predeclared calls, no retries, no installation or permission changes.
 Uses a user-supplied existing CLI. Filtered logs omit model thinking and secrets.
 """

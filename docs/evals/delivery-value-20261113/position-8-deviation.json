@@ -1,0 +1,45 @@
+{
+  "position": 8,
+  "kind": "verification-deadline-expired; late controller collection",
+  "normal_final": true,
+  "final_report_since_entry_seconds": 326.1220769882202,
+  "execution_allowance_seconds": 330,
+  "total_allowance_seconds": 360,
+  "observed_receipt_seconds": 381.1866467909422,
+  "receipt_after_original_deadline_seconds": 21.186646790942177,
+  "in_budget_checks": {
+    "audit": {
+      "reason": "original deadline expired",
+      "result": null
+    },
+    "gate": {
+      "reason": "original deadline expired",
+      "result": null
+    },
+    "independent": {
+      "reason": "original deadline expired",
+      "result": null
+    }
+  },
+  "posthoc_checks": {
+    "audit": {
+      "result": 0,
+      "stderr": "",
+      "stdout": "AUDIT: clean (controller ledger hygiene OK)\n"
+    },
+    "gate": {
+      "result": 0,
+      "stderr": "",
+      "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-9a06c3209020cd2bf9b5500f3e71a627a9b4bb660c06bae61cd6cc2ebd3b7f08 iter=1 ac=2 pass=2 unverified=0 mode=threshold\n"
+    },
+    "independent": {
+      "result": 0,
+      "stderr": "",
+      "stdout": "{\"ok\": true, \"checks\": [{\"name\": \"parser-0\", \"pass_\": true}, {\"name\": \"parser-1\", \"pass_\": true}, {\"name\": \"parser-2\", \"pass_\": true}, {\"name\": \"parser-3\", \"pass_\": true}, {\"name\": \"parser-4\", \"pass_\": true}, {\"name\": \"parser-5\", \"pass_\": true}, {\"name\": \"parser-6\", \"pass_\": true}, {\"name\": \"parser-7\", \"pass_\": true}, {\"name\": \"invalid-0\", \"pass_\": true}, {\"name\": \"invalid-1\", \"pass_\": true}, {\"name\": \"invalid-2\", \"pass_\": true}, {\"name\": \"invalid-3\", \"pass_\": true}, {\"name\": \"invalid-4\", \"pass_\": true}, {\"name\": \"invalid-5\", \"pass_\": true}, {\"name\": \"invalid-6\", \"pass_\": true}, {\"name\": \"aggregation\", \"pass_\": true}, {\"name\": \"empty-aggregation\", \"pass_\": true}, {\"name\": \"cli-groups\", \"pass_\": true}, {\"name\": \"strict-atomic-line\", \"pass_\": true}, {\"name\": \"skip-bad\", \"pass_\": true}, {\"name\": \"empty-cli\", \"pass_\": true}, {\"name\": \"cli-missing-input\", \"pass_\": true}, {\"name\": \"strict-physical-line-13\", \"pass_\": true}, {\"name\": \"skip-bad-complete-groups\", \"pass_\": true}, {\"name\": \"cli-literal-utf8\", \"pass_\": true}, {\"name\": \"parser-original-integer\", \"pass_\": true}, {\"name\": \"invalid-false-amount\", \"pass_\": true}, {\"name\": \"aggregation-generator-large\", \"pass_\": true}], \"error\": null, \"elapsed\": 0.33578424993902445}\n"
+    }
+  },
+  "qualified": false,
+  "disposition": "Retain failure; no ninth position, no replacement, no deadline extension, posthoc cannot rescue qualification.",
+  "cleanup": "Native completed status observed; no unfinished evaluation worker remained. Unobservable service compute remains unknown.",
+  "raw_report_sha256": "bccf8e348be880fcb7ce4842af4ec8ca3cf8df9ecf6c1c80e32c0d3bc0db36c2"
+}

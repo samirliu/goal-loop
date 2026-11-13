@@ -7,6 +7,7 @@
 #   bash goal_ctl.sh stamp --project DIR [--auto] [--time-budget=N]
 #   bash goal_ctl.sh bind  --project DIR            # verdict lines on stdin
 #   bash goal_ctl.sh status --project DIR           # human progress summary
+#   bash goal_ctl.sh context --project DIR [--auto] [--brief]
 #   bash goal_ctl.sh close-iteration --project DIR --task ID --files LIST
 #        --checks-pass N --checks-fail N --checks-unverifiable N
 #        [--progress yes|no] [--exit-signal yes|no] [--error-signature none]
@@ -31,7 +32,7 @@ export LC_ALL=C.UTF-8
 
 here=$(cd "$(dirname "$0")" && pwd)
 _goal_ctl_args=("$@")
-cmd="" project="." auto=0 no_gate=0 max_iterations=12 time_budget=""
+cmd="" project="." auto=0 brief=0 no_gate=0 max_iterations=12 time_budget=""
 task="" files="" cp="" cf="" cu="" progress=yes exit_signal=no errsig=none fcomplete=no dry=""
 score="" judge_score="" strategy_delta="" strategy="" adversarial="" adv_note=""
 fault="" fault_outcome="" fault_note=""
@@ -42,6 +43,7 @@ while [ $# -gt 0 ]; do
     init|stamp|bind|close-iteration|status|context|recover|migrate) cmd="$1" ;;
     --project) [ $# -ge 2 ] || { echo "CTL: ERROR missing-project-arg" >&2; exit 4; }; project="$2"; shift ;;
     --auto) auto=1 ;;
+    --brief) brief=1 ;;
     --time-budget=*) time_budget="${1#*=}" ;;
     --no-gate) no_gate=1 ;;
     --max-iterations=*) max_iterations="${1#*=}" ;;
@@ -78,11 +80,14 @@ if [ "$operation_id_seen" -eq 1 ]; then
 fi
 
 sd="$project/.goal"
+[ "$brief" -eq 0 ] || [ "$cmd" = context ] || { echo 'CTL: ERROR brief-needs-context' >&2; exit 4; }
 if [ "$cmd" = context ]; then
   # The read-only compiler owns its directory lock and can describe recovery
   # while a transaction is pending. Normal controller readers still refuse it.
-  [ "$auto" -ne 1 ] || exec python3 -I "$here/goal_context.py" show "$project" --auto
-  exec python3 -I "$here/goal_context.py" show "$project"
+  context_args=(show "$project")
+  [ "$auto" -ne 1 ] || context_args+=(--auto)
+  [ "$brief" -ne 1 ] || context_args+=(--brief)
+  exec python3 -I "$here/goal_context.py" "${context_args[@]}"
 fi
 if [ "$cmd" = init ]; then
   gp_init_max="$max_iterations"

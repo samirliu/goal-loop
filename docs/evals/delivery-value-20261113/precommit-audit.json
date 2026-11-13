@@ -1,0 +1,46 @@
+{
+  "at": "2026-11-13T06:09:40.570730+00:00",
+  "final_source_matches_frozen_tests_and_native_validation": {
+    "SKILL.md": true,
+    "references/host.md": true,
+    "scripts/goal_context.py": true,
+    "scripts/goal_ctl.sh": true,
+    "devtools/evaluate_entry.py": true,
+    "devtools/verify_entry.py": true,
+    "devtools/evaluate_delivery.py": true,
+    "devtools/verify_delivery.py": true,
+    "tests/test_context_actions.py": true,
+    "tests/test_delivery_evaluation.py": true
+  },
+  "unchanged_protected_sources": {
+    "scripts/goal_gate.sh": true,
+    "scripts/goal_audit.sh": true,
+    "scripts/goal_store.py": true,
+    "scripts/goal_runner.py": true,
+    "scripts/goal_bounded.py": true,
+    "scripts/goal_host.py": true,
+    "scripts/goal_crew.py": true,
+    "scripts/goal_evolve.py": true,
+    "scripts/goal_parse.sh": true,
+    ".github/workflows/ci.yml": true,
+    "tests/test_gate_budget.py": true,
+    "tests/test_host_budget.py": true,
+    "tests/test_policy_transition.py": true
+  },
+  "portable": {
+    "native-portable-verified.json": {
+      "verified": true,
+      "qualified": 6,
+      "normal": 6
+    },
+    "final-portable-verified.json": {
+      "verified": true,
+      "qualified": 1,
+      "normal": 2
+    }
+  },
+  "real_positions": 8,
+  "additional_model_calls_allowed": 0,
+  "decision": "retain baseline default; brief diagnostic optional; no learned policy",
+  "known_failed_position": 8
+}

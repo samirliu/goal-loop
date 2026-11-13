@@ -447,6 +447,17 @@ def show(project, auto=False):
         return value
 
 
+def brief_view(value):
+    """Presentation only: run always recompiles the complete binding under lock."""
+    result = {k: v for k, v in value.items() if k != 'binding'}
+    if 'close_input' in result:
+        # Missing fields already carry their evidence source. Keep the exact
+        # submitted values visible, including after an interrupted request.
+        result['close_input'] = {k: v for k, v in result['close_input'].items()
+                                 if k != 'sources'}
+    return result
+
+
 def run(project, revision, action, auto=False):
     # The lock is retained across exec, so a cooperating ledger writer cannot
     # change the validated revision before the existing command consumes it.
@@ -503,10 +514,15 @@ def main():
     parser.add_argument('revision', nargs='?')
     parser.add_argument('operation', nargs='?')
     parser.add_argument('--auto', action='store_true', help='only with existing authorization for automatic contract approval')
+    parser.add_argument('--brief', action='store_true', help='show: omit internal binding hashes and repeated close fields')
     args = parser.parse_args()
+    if args.brief and args.action != 'show':
+        parser.error('--brief is only valid for show')
     if args.action == 'run':
         run(args.project, args.revision, args.operation, args.auto)
     result = show(args.project, args.auto) if args.action == 'show' else receipt(args.project)
+    if args.brief:
+        result = brief_view(result)
     print(json.dumps(result, ensure_ascii=False, sort_keys=True))
     return 0 if args.action == 'show' or result['completion_verified'] else 2
 

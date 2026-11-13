@@ -1,0 +1,190 @@
+{
+  "verified": true,
+  "positions": [
+    {
+      "position": 1,
+      "cohort": "native",
+      "session": "01a1d352-6c49-7613-83f4-a9f1c3e37f27",
+      "launch_timestamp": "2026-11-13T05:12:36.666Z",
+      "frozen_prompt_sha256": "e4bcf08b28a961c65e61aa6e8838101ae9fea49b04c1e28a99fd02de51a43093",
+      "fork_turns": "none",
+      "native_prompt_at_rest_encrypted": true,
+      "transport_plaintext_equality_verified": null,
+      "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+      "settings": {
+        "model": "gpt-6.1-sol",
+        "effort": "max",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      },
+      "tool_catalog_sha256": "03da5eb04d2849d9fadeb4b0e3e10719f9155b78d61be6f481ba052d464c6515",
+      "thinking_saved": false,
+      "explicit_grader_access": false,
+      "business_artifacts_match_original_collection": true
+    },
+    {
+      "position": 2,
+      "cohort": "native",
+      "session": "01a1d355-4c36-7312-88ed-be947313218c",
+      "launch_timestamp": "2026-11-13T05:15:45.070Z",
+      "frozen_prompt_sha256": "b55eddc22071a94826d45f5b7496586e97997418c931c96f41c831d7f789f697",
+      "fork_turns": "none",
+      "native_prompt_at_rest_encrypted": true,
+      "transport_plaintext_equality_verified": null,
+      "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+      "settings": {
+        "model": "gpt-6.1-sol",
+        "effort": "max",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      },
+      "tool_catalog_sha256": "03da5eb04d2849d9fadeb4b0e3e10719f9155b78d61be6f481ba052d464c6515",
+      "thinking_saved": false,
+      "explicit_grader_access": false,
+      "business_artifacts_match_original_collection": true
+    },
+    {
+      "position": 3,
+      "cohort": "native",
+      "session": "01a1d358-bac6-7c13-bd11-1c56f9074d9b",
+      "launch_timestamp": "2026-11-13T05:19:29.983Z",
+      "frozen_prompt_sha256": "c1a6f48fc195aa5cc33ac70c32a8ff223634d5c2557303e2cf04511a687ad672",
+      "fork_turns": "none",
+      "native_prompt_at_rest_encrypted": true,
+      "transport_plaintext_equality_verified": null,
+      "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+      "settings": {
+        "model": "gpt-6.1-sol",
+        "effort": "max",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      },
+      "tool_catalog_sha256": "03da5eb04d2849d9fadeb4b0e3e10719f9155b78d61be6f481ba052d464c6515",
+      "thinking_saved": false,
+      "explicit_grader_access": false,
+      "business_artifacts_match_original_collection": true
+    },
+    {
+      "position": 4,
+      "cohort": "native",
+      "session": "01a1d35d-b62e-7d01-b537-5dc8ed99a180",
+      "launch_timestamp": "2026-11-13T05:24:56.476Z",
+      "frozen_prompt_sha256": "62dfc864da1a0f144d3df25e3b608a8e4d673d3a818dc0dfeae2b9c0eb28f141",
+      "fork_turns": "none",
+      "native_prompt_at_rest_encrypted": true,
+      "transport_plaintext_equality_verified": null,
+      "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+      "settings": {
+        "model": "gpt-6.1-sol",
+        "effort": "max",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      },
+      "tool_catalog_sha256": "03da5eb04d2849d9fadeb4b0e3e10719f9155b78d61be6f481ba052d464c6515",
+      "thinking_saved": false,
+      "explicit_grader_access": false,
+      "business_artifacts_match_original_collection": true
+    },
+    {
+      "position": 5,
+      "cohort": "native",
+      "session": "01a1d362-63e3-73b3-a1d0-1694ae4232b8",
+      "launch_timestamp": "2026-11-13T05:30:03.098Z",
+      "frozen_prompt_sha256": "674d9fe53ad67e8c575ed04ac0ec9df560a1ade8170490f9f224ac4882a9f14e",
+      "fork_turns": "none",
+      "native_prompt_at_rest_encrypted": true,
+      "transport_plaintext_equality_verified": null,
+      "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+      "settings": {
+        "model": "gpt-6.1-sol",
+        "effort": "max",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      },
+      "tool_catalog_sha256": "03da5eb04d2849d9fadeb4b0e3e10719f9155b78d61be6f481ba052d464c6515",
+      "thinking_saved": false,
+      "explicit_grader_access": false,
+      "business_artifacts_match_original_collection": true
+    },
+    {
+      "position": 6,
+      "cohort": "native",
+      "session": "01a1d366-fd81-7d21-ba7a-8840b8cb5d3b",
+      "launch_timestamp": "2026-11-13T05:35:04.567Z",
+      "frozen_prompt_sha256": "3a4333c241b0c5414e60efbab013ba7948239f9183c625a133c63dcc5ce95fe4",
+      "fork_turns": "none",
+      "native_prompt_at_rest_encrypted": true,
+      "transport_plaintext_equality_verified": null,
+      "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+      "settings": {
+        "model": "gpt-6.1-sol",
+        "effort": "max",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      },
+      "tool_catalog_sha256": "03da5eb04d2849d9fadeb4b0e3e10719f9155b78d61be6f481ba052d464c6515",
+      "thinking_saved": false,
+      "explicit_grader_access": false,
+      "business_artifacts_match_original_collection": true
+    },
+    {
+      "position": 7,
+      "cohort": "validation",
+      "session": "01a1d36e-3027-7f22-b2d5-296a36258484",
+      "launch_timestamp": "2026-11-13T05:42:56.284Z",
+      "frozen_prompt_sha256": "e3234c0662d819e1e8b2b47c3523053c2b6ab4960d0568ad1c6b1ca1c361fa20",
+      "fork_turns": "none",
+      "native_prompt_at_rest_encrypted": true,
+      "transport_plaintext_equality_verified": null,
+      "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+      "settings": {
+        "model": "gpt-6.1-sol",
+        "effort": "max",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      },
+      "tool_catalog_sha256": "03da5eb04d2849d9fadeb4b0e3e10719f9155b78d61be6f481ba052d464c6515",
+      "thinking_saved": false,
+      "explicit_grader_access": false,
+      "business_artifacts_match_original_collection": true
+    },
+    {
+      "position": 8,
+      "cohort": "validation",
+      "session": "01a1d373-15a8-74d2-bc57-01d20ffd7758",
+      "launch_timestamp": "2026-11-13T05:48:17.180Z",
+      "frozen_prompt_sha256": "72b4acf8669d1847f2982ca3749bf147f73db0250f7a93f70e5679c1201f7d99",
+      "fork_turns": "none",
+      "native_prompt_at_rest_encrypted": true,
+      "transport_plaintext_equality_verified": null,
+      "parent_thread_id": "01a1d348-5480-7601-ace5-8b01be0530a0",
+      "settings": {
+        "model": "gpt-6.1-sol",
+        "effort": "max",
+        "approval_policy": "never",
+        "sandbox_policy": {
+          "type": "danger-full-access"
+        }
+      },
+      "tool_catalog_sha256": "03da5eb04d2849d9fadeb4b0e3e10719f9155b78d61be6f481ba052d464c6515",
+      "thinking_saved": false,
+      "explicit_grader_access": false,
+      "business_artifacts_match_original_collection": true
+    }
+  ],
+  "scope": "host-exposed native identities, artifacts and explicit grader access; encrypted native prompt bodies cannot independently establish plaintext transport equality; no unavailable service-compute claim"
+}

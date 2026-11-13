@@ -1,0 +1,426 @@
+{
+  "kind": "posthoc diagnostics; no effect on eligibility or original costs",
+  "calibration_passed": true,
+  "definition": "outer host call with an explicit protocol file read/search or goal CLI --help; variable action commands listed for manual review",
+  "rows": [
+    {
+      "position": 1,
+      "variant": "bare",
+      "case": "development-small",
+      "explicit_protocol_read_calls": 0,
+      "calls": [
+        {
+          "timestamp": "2026-11-13T05:14:35.485Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:14:42.156Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:14:57.770Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:15:13.023Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        }
+      ],
+      "host_tool_calls": 4,
+      "model_visible_tool_result_bytes": 2349,
+      "first_tool_since_position_entry_seconds": 124.68657994270325,
+      "observed_native_worker_window_seconds": 162.18600010871887,
+      "final_report_since_entry_seconds": 168.12758016586304
+    },
+    {
+      "position": 2,
+      "variant": "current",
+      "case": "development-small",
+      "explicit_protocol_read_calls": 2,
+      "calls": [
+        {
+          "timestamp": "2026-11-13T05:16:02.060Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/native/sources/current/SKILL.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:16:06.897Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:16:12.984Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/native/sources/current/references/host.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:16:17.926Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:16:26.066Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:16:31.365Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:16:59.657Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:17:05.338Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:17:17.096Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:17:22.506Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:17:40.540Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:17:51.884Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:17:56.884Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 1
+        },
+        {
+          "timestamp": "2026-11-13T05:18:07.498Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:18:21.339Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:18:28.651Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:18:34.338Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 1
+        },
+        {
+          "timestamp": "2026-11-13T05:18:42.354Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:18:46.345Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 1
+        },
+        {
+          "timestamp": "2026-11-13T05:19:01.205Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        }
+      ],
+      "host_tool_calls": 20,
+      "model_visible_tool_result_bytes": 76663,
+      "first_tool_since_position_entry_seconds": 24.88825488090515,
+      "observed_native_worker_window_seconds": 203.5640001296997,
+      "final_report_since_entry_seconds": 211.534255027771
+    },
+    {
+      "position": 3,
+      "variant": "candidate",
+      "case": "development-small",
+      "explicit_protocol_read_calls": 2,
+      "calls": [
+        {
+          "timestamp": "2026-11-13T05:21:30.438Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/native/sources/candidate/SKILL.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:21:40.035Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:21:50.338Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:21:58.067Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:22:04.551Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/native/sources/candidate/references/host.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:22:34.587Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:23:06.770Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:23:18.103Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:23:26.778Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:23:43.648Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:23:50.103Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:23:59.167Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:24:11.994Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        }
+      ],
+      "host_tool_calls": 13,
+      "model_visible_tool_result_bytes": 63246,
+      "first_tool_since_position_entry_seconds": 129.92650604248047,
+      "observed_native_worker_window_seconds": 291.79299998283386,
+      "final_report_since_entry_seconds": 301.33650612831116
+    },
+    {
+      "position": 4,
+      "variant": "candidate",
+      "case": "holdout-medium",
+      "explicit_protocol_read_calls": 2,
+      "calls": [
+        {
+          "timestamp": "2026-11-13T05:26:55.479Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/native/sources/candidate/SKILL.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:27:05.383Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/native/sources/candidate/references/host.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:27:16.785Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:28:08.282Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:28:22.395Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:28:45.114Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 1
+        },
+        {
+          "timestamp": "2026-11-13T05:29:04.370Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 1
+        },
+        {
+          "timestamp": "2026-11-13T05:29:19.068Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        }
+      ],
+      "host_tool_calls": 8,
+      "model_visible_tool_result_bytes": 55758,
+      "first_tool_since_position_entry_seconds": 141.14591526985168,
+      "observed_native_worker_window_seconds": 273.8919999599457,
+      "final_report_since_entry_seconds": 296.1069152355194
+    },
+    {
+      "position": 5,
+      "variant": "current",
+      "case": "holdout-medium",
+      "explicit_protocol_read_calls": 3,
+      "calls": [
+        {
+          "timestamp": "2026-11-13T05:30:22.664Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/native/sources/current/SKILL.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:30:29.978Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:30:38.889Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/native/sources/current/references/host.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:30:48.220Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:31:04.142Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:32:07.423Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:32:18.593Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:32:26.677Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:32:43.694Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:33:01.989Z",
+          "explicit_protocol_sources": [
+            "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/native/sources/current/references/gate.md"
+          ],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:33:21.517Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:33:29.853Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 1
+        },
+        {
+          "timestamp": "2026-11-13T05:33:42.741Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 1
+        },
+        {
+          "timestamp": "2026-11-13T05:33:58.921Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        }
+      ],
+      "host_tool_calls": 14,
+      "model_visible_tool_result_bytes": 101474,
+      "first_tool_since_position_entry_seconds": 29.109149932861328,
+      "observed_native_worker_window_seconds": 249.76400017738342,
+      "final_report_since_entry_seconds": 259.37514996528625
+    },
+    {
+      "position": 6,
+      "variant": "bare",
+      "case": "holdout-medium",
+      "explicit_protocol_read_calls": 0,
+      "calls": [
+        {
+          "timestamp": "2026-11-13T05:36:48.657Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:36:54.535Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:37:43.998Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:38:04.743Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        },
+        {
+          "timestamp": "2026-11-13T05:38:31.087Z",
+          "explicit_protocol_sources": [],
+          "variable_commands": 0
+        }
+      ],
+      "host_tool_calls": 5,
+      "model_visible_tool_result_bytes": 3973,
+      "first_tool_since_position_entry_seconds": 110.85754299163818,
+      "observed_native_worker_window_seconds": 212.60000014305115,
+      "final_report_since_entry_seconds": 219.43354296684265
+    }
+  ],
+  "tokens": null,
+  "money": null,
+  "server_compute": null
+}

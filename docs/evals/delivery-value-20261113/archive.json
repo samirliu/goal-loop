@@ -1,0 +1,9 @@
+{
+  "path": "native-evidence.tar.xz",
+  "sha256": "531ba52dbc38daddb1d3d02d14132f080c3bdf5e802231f467cf371845d0cae5",
+  "bytes": 201748,
+  "payload_files": 364,
+  "base_commit": "accbe9a52627a08e4e83f558a76be81ba3167a59",
+  "source_restore": "git archive of exact base plus overlays, then byte/mode verification",
+  "cache_and_thinking": "no cache directories, pyc files or reasoning records copied"
+}

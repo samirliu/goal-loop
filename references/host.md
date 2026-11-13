@@ -10,7 +10,8 @@
 正常入口先用 `python3 -I ${GOAL_SKILL}/scripts/goal_host.py enter PROJECT SECONDS`。
 它只从本项目唯一真实 prompt 回执（或唯一活跃会话）取 backend/session，调用原 begin；
 有歧义时拒绝并要求传真实身份，绝不猜 session。无 hook 的显式 bridge 仍用下面的 begin。
-随后 `bash ${GOAL_SKILL}/scripts/goal_ctl.sh context --project PROJECT` 输出简短状态和准确命令。
+随后 `bash ${GOAL_SKILL}/scripts/goal_ctl.sh context --project PROJECT` 输出当前状态和准确命令。
+可选 `--brief` 只隐藏内部绑定哈希和重复的收账字段；完整绑定仍在原锁内重新计算，动作与 revision 相同。它只作诊断选项；真实小样本未建立完整交付提速，默认保留完整地图。
 只有会话已授权自动批准时才加 `--auto`；默认不添加自动批准标记。授权选项也是版本绑定的一部分。
 首次 hook 只建立账本、尚无 goal.md 时，context 返回最小契约模板和写入路径；不替用户写入或批准，也不要求重新 init 或阅读实现源码。填好并冒烟后重新取 context，才提供带当前版本的 stamp 命令。
 每条 action 带账本/产物/工作计划/接口/策略版本；run 消费时在目录锁内重算，过期拒绝后重新派生。

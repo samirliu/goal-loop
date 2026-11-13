@@ -1,0 +1,46 @@
+{
+  "snapshot": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-delivery-value-2_l9zupj/sources/final",
+  "files": {
+    "SKILL.md": {
+      "sha256": "0d9ab0859cd94661f4936727b3eb8e3bd59daa43a4137542b4f74bcc4025a5af",
+      "mode": 420
+    },
+    "references/host.md": {
+      "sha256": "c947506e1c94aca56ca487bb03d58163a10f93bffc5aebb60f990fa9526ee280",
+      "mode": 420
+    },
+    "scripts/goal_context.py": {
+      "sha256": "2f69b41db316cfefa4c5d6a48c2de7203e904f5cc55ca91cab600ca345462817",
+      "mode": 420
+    },
+    "scripts/goal_ctl.sh": {
+      "sha256": "27342116db4992b4b4711f809f905c3bd8f3d75b54e8cd0f9be5b4a4b1fddcc2",
+      "mode": 420
+    },
+    "devtools/evaluate_entry.py": {
+      "sha256": "8d062c66fe251d62acb7595b81144d0314b801cb35e8218cd04c2968c69614e0",
+      "mode": 420
+    },
+    "devtools/verify_entry.py": {
+      "sha256": "89a8aa449f4638d9b4b8259ac26d0f55296c4cb119a3f8c2479fb89502cfbf6d",
+      "mode": 420
+    },
+    "devtools/evaluate_delivery.py": {
+      "sha256": "7a3bdcae047151a31db83c25999ad0baa196ab2f4a51967d4568a750064dc54d",
+      "mode": 420
+    },
+    "devtools/verify_delivery.py": {
+      "sha256": "e98dea4afefbcbbbe299aa4f2614ebb46116fa755aff80057fc7c354e6a5fc77",
+      "mode": 420
+    },
+    "tests/test_context_actions.py": {
+      "sha256": "32f4e7b2ddbbdb1a107ff794952d0e5a0939ffeeec8756a5e6bc95d12734093d",
+      "mode": 420
+    },
+    "tests/test_delivery_evaluation.py": {
+      "sha256": "fe04a64ca60524c5690903797075f292ef3694011a476d3538445086f2067633",
+      "mode": 420
+    }
+  },
+  "scope": "final product, devtools and tests; later evidence documentation is outside this local snapshot"
+}

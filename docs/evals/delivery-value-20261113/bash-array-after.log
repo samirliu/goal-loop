@@ -1,0 +1,7 @@
+test_context_without_auto_preserves_unapproved_initial_entry (test_context_actions.BriefContextActions.test_context_without_auto_preserves_unapproved_initial_entry) ... ok
+test_context_without_auto_preserves_unapproved_initial_entry (test_context_actions.ContextActions.test_context_without_auto_preserves_unapproved_initial_entry) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.257s
+
+OK

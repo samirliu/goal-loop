@@ -1,0 +1,39 @@
+{
+  "candidate_family": "unchanged-phase-map-reuse",
+  "trigger": "Current native position 2 spends multiple calls on versioned maps after the business artifact passes.",
+  "candidate_action": "Reuse an unchanged map for the next action, and avoid reading implementation source to reconstruct the protocol.",
+  "applicability": "Same project, phase and bound revision; no changed output, input, interface, ledger or tool bytes.",
+  "baseline_observation": {
+    "real_position": 2,
+    "events_sha256": "0e7482cf0f06436cb85f9556f354c7d8c6e6f5d65165409541a7f6d1a2fcbb71",
+    "cached_map_consumption_timestamps": [
+      "2026-11-13T05:17:56.884Z",
+      "2026-11-13T05:18:34.338Z",
+      "2026-11-13T05:18:46.345Z"
+    ],
+    "implementation_source_read_timestamps": []
+  },
+  "action_difference": "None in this observed applicable condition: baseline already stores and consumes the map and performs no implementation-source lookup. Changed binding still requires regeneration.",
+  "falsifier": "A fresh applicable baseline trace demonstrably rebuilds an unchanged map or reconstructs protocol from implementation, and a consumed qualified rule changes that action.",
+  "withdrawal": "Any stale-map use after binding change; any holdout qualification loss or unproven net saving.",
+  "disposition": "retain-baseline; reject before program generation or utility slots",
+  "consumed_version": null,
+  "development_trials": 0,
+  "holdout_trials": 0,
+  "followup_trials": 0,
+  "qualified_policy_deliveries": 0,
+  "scope": "one screening only; distinct from rejected two-copy serial family; does not rename or reset that historical family",
+  "statistical_budget": "No new policy state or evaluation created; historical failure/selection archives unchanged.",
+  "observed_screen_script_seconds_lower_bound": 0.001142165856435895,
+  "proposal_model_seconds": null,
+  "tokens": null,
+  "money": null,
+  "positive_future_saving": null,
+  "cost_per_qualified": null,
+  "break_even_tasks": null,
+  "mechanism_regressions": [
+    "learning-regression.log: 19 pass",
+    "policy-regression.log: 13 pass"
+  ],
+  "mechanism_is_utility": false
+}

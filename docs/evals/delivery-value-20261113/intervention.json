@@ -1,0 +1,18 @@
+{
+  "base_commit": "accbe9a52627a08e4e83f558a76be81ba3167a59",
+  "candidate": {
+    "SKILL.md": "d4523b62767600768f84b8dc8cca2f4e0a459d4574d7d26b85e99f40d2e331c9",
+    "references/host.md": "7b53f4916f156b3c7fce1d698d87907b2111a6130de619e759b33d5ae7e1163d",
+    "scripts/goal_context.py": "2f69b41db316cfefa4c5d6a48c2de7203e904f5cc55ca91cab600ca345462817",
+    "scripts/goal_ctl.sh": "088fddddf1d4f7be244fcc2880b4407ad6b7ca57a72d8379764c8cbd560f5b14"
+  },
+  "changed": [
+    "SKILL.md",
+    "references/host.md",
+    "scripts/goal_context.py",
+    "scripts/goal_ctl.sh"
+  ],
+  "driver_sha256": "e2f1c0bed175c4ede35dd2151cde0d6b68e0d78fe9430ea75f872d7e28d09681",
+  "real_calls_before_freeze": 0,
+  "verifier_sha256": "e98dea4afefbcbbbe299aa4f2614ebb46116fa755aff80057fc7c354e6a5fc77"
+}
