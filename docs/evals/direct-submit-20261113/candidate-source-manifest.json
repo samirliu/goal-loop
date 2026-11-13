@@ -4,8 +4,8 @@
   "branch": "perf/direct-submit-20261113",
   "files": {
     "SKILL.md": {
-      "sha256": "d6319b1b878291d462d3748650c889d509375c63cbccc616341b52ab69025fde",
-      "bytes": 6872
+      "sha256": "db9aaac3ad34a785708780d4b2b44cbb8dc1a3fd21feea48170dfb0a19bf0d41",
+      "bytes": 7423
     },
     "agents/goal-adjudicator.md": {
       "sha256": "f7ede0b8f73573a4e6c416d1282fda5d8340226611b2c68c0603ba2b803d73f3",
@@ -223,5 +223,5 @@
   "new_real_model_positions": 0,
   "source_status": "Frozen candidate for CI; no new real complex-task evaluation yet",
   "original_gate_audit_store_runner_unchanged": true,
-  "workflow_refinement": "Remove duplicated manual obligations already implemented by direct submission; load advanced capabilities only when used. No original test, gate, budget or recovery change."
+  "workflow_refinement": "Remove duplicated manual obligations already implemented by direct submission; load advanced capabilities only when used. No original test, gate, budget or recovery change. Restore compatibility claim snippet required by scenario138."
 }

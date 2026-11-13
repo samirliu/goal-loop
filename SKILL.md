@@ -24,7 +24,7 @@ description: |-
 
 规则冻结：新行为须是既有不变量的实例；编号只减不增。具体 schema/路由在 `references/gate.md`，按需能力见 `references/packs/README.md`。
 
-## 默认路径：小任务快车道
+## 小任务快车道：默认串行路径
 
 默认串行完成实际业务；多个文件不等于需要 crew。普通确定性任务只走下面四步，不额外填策略表、抄检查数或自行拼 CLI 参数。
 
@@ -67,3 +67,14 @@ description: |-
 GO（rc=0）交付；BLOCKED（rc=3）报告；NO-GO（rc=2）修复后继续。Stop hook 可选；不能覆盖预算或把重复续跑当进展。无参 `/goal-loop` 用 context/status 接续，不创建新目标。
 
 正常运行只用宿主模型、工具和原生 worker，不启动第二宿主、模型客户端、服务或队列。独立开发运行器仅在仓库 `devtools/` 显式选择。自检：`tests/run_tests.sh`、`tests/docs_consistency.sh`。
+
+## 兼容的直接调用
+
+显式使用旧 CLI 时可按实际检查与复审调用下例；默认地图提交不需要重复填写这些派生字段：
+
+```bash
+bash scripts/goal_ctl.sh close-iteration --project . --operation-id wave-T1-001 --task T1 --files <产物> \
+  --checks-pass 1 --checks-fail 0 --checks-unverifiable 0 --progress yes --exit-signal yes \
+  --adversarial clear --adversarial-note '<实际复审的命令及结果>'
+# clear 和计数必须来自已经执行的复审与检查；历史 REPLAY 后仍需当前终验。
+```

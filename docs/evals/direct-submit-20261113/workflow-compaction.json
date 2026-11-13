@@ -12,9 +12,9 @@
       "bytes": 10843
     },
     "candidate": {
-      "lines": 69,
-      "characters": 3759,
-      "bytes": 6872
+      "lines": 80,
+      "characters": 4132,
+      "bytes": 7423
     }
   },
   "removed_model_obligations": [
@@ -31,5 +31,6 @@
     "all original gate, audit, recovery and calibration rules",
     "original assertions and timeouts"
   ],
-  "new_real_model_positions": 0
+  "new_real_model_positions": 0,
+  "compatibility_example": "Restored after real CI caught documentation contract regression; original assertion kept."
 }
