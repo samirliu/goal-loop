@@ -1,0 +1,20 @@
+CONTROLLED_COST_PRECONDITION {'source_commit': '679f0b4', 'test_sha256': 'f7eb07f22c1cf778affee1645c3ba99b9ec4e9c7bd1a194f2064b7ebd29b089c', 'validator_delay_seconds': 1, 'planner_threshold_changed': False, 'utility_data': False}
+test_decision_flips_with_observed_startup_cost (original_crew_profile.Crew.test_decision_flips_with_observed_startup_cost) ... FAIL
+
+======================================================================
+FAIL: test_decision_flips_with_observed_startup_cost (original_crew_profile.Crew.test_decision_flips_with_observed_startup_cost)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_crew.py", line 107, in test_decision_flips_with_observed_startup_cost
+    self.assertEqual(choice['choice'], expected, choice)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'serial' != 'crew'
+- serial
++ crew
+ : {'choice': 'serial', 'reason': 'startup-coordination-or-dependency-cost', 'condition': '21ef21fa9914331be702b6d35363a30d80a8eed0a69222785d325de3dd5fe910', 'serial_lower': 3.822109331842512, 'crew_upper': 3.60432433267124, 'observations': 6, 'failures': 0, 'pending': 0, 'tokens': None, 'money': None, 'budget_fit': 'yes', 'effective_dependencies': {'T1': [], 'T2': []}, 'single_observations': 0, 'observer_transport': 'python-api', 'serial_basis': 'serial-delegation', 'serial_worker_seconds_lower': 0.51776437391527, 'crew_worker_seconds_upper': 0.5465534159447998, 'uncertainty': 'observed-range; not a confidence interval'}
+
+----------------------------------------------------------------------
+Ran 1 test in 22.739s
+
+FAILED (failures=1)
+Original fixture failure reproduced; correct conservative planner retained serial.

@@ -98,11 +98,11 @@ class Crew(unittest.TestCase):
     def test_decision_flips_with_observed_startup_cost(self):
         for profile, startup, expected in [('low', 0.005, 'crew'), ('high', 0.8, 'serial')]:
             self.write_graph(profile)
-            for i in range(3):
-                self.sample('inline', profile + '-inline-' + str(i))
-                self.sample('crew', profile + '-crew-' + str(i), startup=startup)
-            for name in ('a.out', 'b.out'):
-                (self.project / name).unlink()
+            # Real validators run in planner_profile; timings are controlled
+            # mechanism inputs. A busy runner's .25s sleep did not guarantee
+            # the unchanged >10% cost margin (the CI counterexample was 8.5%).
+            self.planner_profile(serial_elapsed=.8, crew_elapsed=.55+startup,
+                                 crew_duration=.25+startup, startup=startup)
             choice = crew.plan(self.project, self.graph)
             self.assertEqual(choice['choice'], expected, choice)
             self.assertEqual(choice['observations'], 6)
@@ -119,6 +119,44 @@ class Crew(unittest.TestCase):
                 blocked = crew.plan(self.project, self.graph)
                 self.assertEqual(blocked['choice'], 'serial')
                 self.assertEqual(blocked['failures'], 1)
+
+    def planner_profile(self, serial_elapsed, crew_elapsed, crew_duration, startup=.005):
+        """Controlled advice inputs; actual checker/identity validation stays real."""
+        import uuid
+        originals = [self.sample('inline', 'controlled-serial-template', duration=.001),
+                     self.sample('crew', 'controlled-crew-template', duration=.001)]
+        folder = crew.folder(self.project)
+        for path in folder.glob('*.json'):
+            path.unlink()
+        for original in originals:
+            for index in range(3):
+                row = json.loads(json.dumps(original))
+                row['id'] = uuid.uuid4().hex
+                row['trial'] = 'controlled-'+row['id']
+                row['timing_provenance'] = 'controlled-mechanism-only; not empirical utility'
+                elapsed = serial_elapsed if row['mode'] == 'inline' else crew_elapsed
+                row.update(started=original['started']+index, elapsed=elapsed,
+                           finished=original['started']+index+elapsed)
+                duration = .25 if row['mode'] == 'inline' else crew_duration
+                for offset, job in enumerate(row['jobs'].values()):
+                    begin = offset*.27 if row['mode'] == 'inline' else 0
+                    end = begin+duration
+                    job.update(dispatch=begin, started=begin+(.001 if row['mode']=='inline' else startup),
+                               returned=end, first_valid=end+.001, adopted=end+.002)
+                    for check in job['validations']:
+                        check.update(start=end, end=end+.001)
+                row['worker_seconds'] = duration*len(row['jobs'])
+                crew.save(folder/(row['id']+'.json'), row)
+        for name in ('a.out', 'b.out'):
+            (self.project/name).unlink()
+
+    def test_recorded_marginal_gain_does_not_lower_ten_percent_gate(self):
+        self.planner_profile(serial_elapsed=.786307209, crew_elapsed=.719544459, crew_duration=.35)
+        advice = crew.plan(self.project, self.graph)
+        print('CONTROLLED_MARGINAL_COST '+json.dumps(advice), flush=True)
+        self.assertEqual(advice['choice'], 'serial', advice)
+        self.assertLess(advice['serial_lower']-advice['crew_upper'], advice['serial_lower']*.1)
+        self.assertEqual(advice['observations'], 6)
 
     def test_unknown_startup_cannot_become_zero_cost(self):
         for i in range(3):

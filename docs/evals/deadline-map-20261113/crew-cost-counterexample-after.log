@@ -1,0 +1,9 @@
+CONTROLLED_COST_PRECONDITION {'validator_delay_seconds': 1, 'planner_threshold_changed': False, 'utility_data': False}
+test_decision_flips_with_observed_startup_cost (controlled_cost_fixture.Crew.test_decision_flips_with_observed_startup_cost) ... ok
+test_recorded_marginal_gain_does_not_lower_ten_percent_gate (controlled_cost_fixture.Crew.test_recorded_marginal_gain_does_not_lower_ten_percent_gate) ... CONTROLLED_MARGINAL_COST {"choice": "serial", "reason": "startup-coordination-or-dependency-cost", "condition": "21ef21fa9914331be702b6d35363a30d80a8eed0a69222785d325de3dd5fe910", "serial_lower": 0.786307209, "crew_upper": 0.719544459, "observations": 6, "failures": 0, "pending": 0, "tokens": null, "money": null, "budget_fit": "yes", "effective_dependencies": {"T1": [], "T2": []}, "single_observations": 0, "observer_transport": "python-api", "serial_basis": "serial-delegation", "serial_worker_seconds_lower": 0.5, "crew_worker_seconds_upper": 0.7, "uncertainty": "observed-range; not a confidence interval"}
+ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 23.101s
+
+OK

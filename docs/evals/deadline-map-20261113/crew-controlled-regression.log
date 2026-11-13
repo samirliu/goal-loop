@@ -1,0 +1,25 @@
+test_absent_stage_is_unknown_and_explicit_no_operation_is_zero (test_crew.Crew.test_absent_stage_is_unknown_and_explicit_no_operation_is_zero) ... ok
+test_after_adoption_changes_still_fail_even_if_final_checker_is_weak (test_crew.Crew.test_after_adoption_changes_still_fail_even_if_final_checker_is_weak) ... ok
+test_all_cost_history_expires_when_frozen_input_bytes_change (test_crew.Crew.test_all_cost_history_expires_when_frozen_input_bytes_change) ... ok
+test_changed_input_cannot_reuse_frozen_trial (test_crew.Crew.test_changed_input_cannot_reuse_frozen_trial) ... ok
+test_changed_output_cannot_reuse_adoption (test_crew.Crew.test_changed_output_cannot_reuse_adoption) ... ok
+test_cli_records_real_cross_process_lifecycle (test_crew.Crew.test_cli_records_real_cross_process_lifecycle) ... ok
+test_coupled_task_waits_for_adopted_dependency (test_crew.Crew.test_coupled_task_waits_for_adopted_dependency) ... ok
+test_decision_flips_with_observed_startup_cost (test_crew.Crew.test_decision_flips_with_observed_startup_cost) ... ok
+test_different_producer_transports_cannot_be_pooled (test_crew.Crew.test_different_producer_transports_cannot_be_pooled) ... ok
+test_dropped_worker_preserves_adopted_output_and_fault_cost (test_crew.Crew.test_dropped_worker_preserves_adopted_output_and_fault_cost) ... ok
+test_frozen_instrument_cannot_be_swapped (test_crew.Crew.test_frozen_instrument_cannot_be_swapped) ... ok
+test_new_earlier_budget_is_used_before_dispatch_and_undispatched_work_is_booked (test_crew.Crew.test_new_earlier_budget_is_used_before_dispatch_and_undispatched_work_is_booked) ... ok
+test_overlap_adds_serial_precedence_and_invalid_graph_does_not_book (test_crew.Crew.test_overlap_adds_serial_precedence_and_invalid_graph_does_not_book) ... ok
+test_public_cli_reads_api_observations_without_changing_their_transport (test_crew.Crew.test_public_cli_reads_api_observations_without_changing_their_transport) ... ok
+test_recorded_marginal_gain_does_not_lower_ten_percent_gate (test_crew.Crew.test_recorded_marginal_gain_does_not_lower_ten_percent_gate) ... CONTROLLED_MARGINAL_COST {"choice": "serial", "reason": "startup-coordination-or-dependency-cost", "condition": "21ef21fa9914331be702b6d35363a30d80a8eed0a69222785d325de3dd5fe910", "serial_lower": 0.786307209, "crew_upper": 0.719544459, "observations": 6, "failures": 0, "pending": 0, "tokens": null, "money": null, "budget_fit": "yes", "effective_dependencies": {"T1": [], "T2": []}, "single_observations": 0, "observer_transport": "python-api", "serial_basis": "serial-delegation", "serial_worker_seconds_lower": 0.5, "crew_worker_seconds_upper": 0.7, "uncertainty": "observed-range; not a confidence interval"}
+ok
+test_repeated_trial_identity_is_not_independent_replication (test_crew.Crew.test_repeated_trial_identity_is_not_independent_replication) ... ok
+test_single_baseline_cannot_cross_different_frozen_input_bytes (test_crew.Crew.test_single_baseline_cannot_cross_different_frozen_input_bytes) ... ok
+test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width (test_crew.Crew.test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width) ... ok
+test_unknown_startup_cannot_become_zero_cost (test_crew.Crew.test_unknown_startup_cannot_become_zero_cost) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 19.445s
+
+OK

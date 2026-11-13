@@ -118,7 +118,7 @@
       "mode": "0o644"
     },
     "tests/test_crew.py": {
-      "sha256": "f7eb07f22c1cf778affee1645c3ba99b9ec4e9c7bd1a194f2064b7ebd29b089c",
+      "sha256": "da419c003432f01907a04b30aadc6afe8989a4a7b57e699d22f53367076ab04b",
       "mode": "0o644"
     },
     "tests/test_evolution_verifier.py": {
