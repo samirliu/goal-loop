@@ -1,0 +1,32 @@
+[
+  {
+    "mutation": "candidate-identity",
+    "rejected": true,
+    "reason": "candidate policy does not match frozen program"
+  },
+  {
+    "mutation": "missing-withdrawal",
+    "rejected": true,
+    "reason": "missing attempt"
+  },
+  {
+    "mutation": "false-calibration",
+    "rejected": true,
+    "reason": "calibration grader/oracle mismatch"
+  },
+  {
+    "mutation": "forged-budget",
+    "rejected": true,
+    "reason": "budget mismatch"
+  },
+  {
+    "mutation": "stale-selection",
+    "rejected": true,
+    "reason": "current selection mismatch"
+  },
+  {
+    "mutation": "forged-performance-gain",
+    "rejected": true,
+    "reason": "benchmark aggregation mismatch: large-context"
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "source_manifest": "source-manifest.json",
+  "source_files_verified": 94,
+  "source_drift": [],
+  "macos": {
+    "python_full": {
+      "tests": 376,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 884.467,
+      "log": "validation/macos-python.log"
+    },
+    "example_delta": {
+      "tests": 1,
+      "normal_and_optimized": true,
+      "passed": true,
+      "log": "validation/macos-example-delta.log"
+    },
+    "shell_assertions": 603,
+    "parser_assertions": 81,
+    "companion_fixtures": 10,
+    "docs": "CONSISTENT"
+  },
+  "linux": {
+    "python_full": {
+      "tests": 376,
+      "failed": 0,
+      "skipped": 5,
+      "seconds": 507.83,
+      "log": "validation/linux-python.log"
+    },
+    "ordinary_user_worktree_suite": {
+      "tests": 19,
+      "failed": 0,
+      "skipped": 0,
+      "covers_three_permission_skips": true,
+      "log": "validation/linux-worktree-user.log"
+    },
+    "remaining_limitations": [
+      "two infinite-RLIMIT tests cannot inherit infinity on this kernel/container"
+    ],
+    "example_delta": {
+      "tests": 1,
+      "normal_and_optimized": true,
+      "passed": true,
+      "log": "validation/linux-example-delta.log"
+    },
+    "shell_assertions": 603,
+    "parser_assertions": 81,
+    "companion_fixtures": 10,
+    "docs": "CONSISTENT",
+    "shellcheck": "passed"
+  },
+  "complete_goal": false,
+  "goal_status": "active",
+  "reason": "local mechanisms and timings verified; whole-task net delivery benefit and broader transfer not yet proven"
+}

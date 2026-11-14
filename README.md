@@ -2,13 +2,15 @@
 
 **v4.1.1** — 用冻结的验收契约、共享工作区 subagent 波次和确定性门控推进交付；用测量反馈选择下一轮策略。
 
-当前优化把内容绑定、可恢复收账和局部策略学习接成可执行路径：旧的 `EFFICIENCY` / `STRATEGY-PICK` 保持轻量归因；需要晋升工具策略时，另用固定协议、配对成本测量和新留出实例决定启用、保留或撤回。优化仍在进行；局部 Python 策略实验已跑通，完整 agent 效用与通用自主进化尚未得到证明。
+当前实现把内容绑定、可恢复收账和局部策略学习接成可执行路径：旧的 `EFFICIENCY` / `STRATEGY-PICK` 保持轻量归因；需要晋升工具策略时，另用固定协议、配对成本测量和新留出实例决定启用、保留或撤回。真实本地测试工作流的留出耗时下降约 31%，两个后续实例实际消费合格策略后合计下降约 30%；完整 agent 效用、模型费用与通用迁移仍未证明。原始归档、学习成本和适用范围见[资格与路由评估](docs/evals/qualified-routing-20261114/README.md)。
 
 可重跑证据与设计边界见 [本次评估记录](docs/evaluation-design.md)。门控复跑证明的是契约被满足；真实效率、可迁移性必须通过固定预算下的留出任务对照证明。
 
-入口/恢复可用 `goal_host.py enter` 识别唯一真实宿主回执，再用 `goal_ctl.sh context` 获取带版本的执行地图。crew 图 v2 绑定实际输入并复用未失效单元；`--policy-state` 让既有合格策略实际限制派工，撤回后拒绝旧版本。原 Gate、账本和预算保持完成依据。见[端到端小示例](examples/learning-edge/README.md)与[本轮实现记录](docs/deepening-execution.md)；示例受控晋升不代表真实 agent 效用已获证明。
+入口/恢复可用 `goal_host.py enter` 识别唯一真实宿主回执，再用 `goal_ctl.sh context` 获取带版本的执行地图。crew 图 v2 绑定实际输入并复用未失效单元；`--policy-state` 在原作用域、依赖、容量和预算内消费合格路由，撤回后拒绝旧版本。原 Gate、账本和预算保持完成依据。见[端到端小示例](examples/learning-edge/README.md)与[本轮实现记录](docs/deepening-execution.md)；示例受控晋升不代表真实 agent 效用已获证明。
 
 减少机械往返的新路径：`goal_host.py enter … --context` 在绑定宿主与预算后直接返回地图；`submissions.stamp` 运行原冒烟与盖戳，`submissions.close` 直接接收实际判断。通常的确定性契约只填进展、退出意图、复审结论和复审证据四项，程序推导操作身份、检查数并执行原终验；不用先写 proposal 再刷新地图。原调用方式保持兼容，版本过期仍拒绝提交。机制测量和收益边界见[直接提交评估](docs/evals/direct-submit-20261113/README.md)。
+
+本地策略实验要求新比较先用好坏样本校准真实 grader，再执行配对试验；输出直接提供失败证据、当前选择和下一轮新留出样本要求。后续执行与派工核对绑定的资格报告；旧记录仍可恢复，重新启用需在原统计历史中取得新资格。执行地图与指纹路径同时减少重复读取和逐文件临时写入，仍完整验证历史、实际内容及原 Gate。运行方式见[策略实验](examples/evolution-dedupe/README.md)。
 
 ```
 objective → contract (AC-1..N, each with a NAMED failable check) → user approval stamp

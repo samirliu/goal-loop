@@ -1,0 +1,11 @@
+{
+  "objective": "close default calibration and qualified learning consumption while proving end-to-end execution benefit",
+  "requirements": [
+    "Every newly evaluated file or checkpoint policy must calibrate good and bad outputs before workers; failed instruments preserve incumbent",
+    "Existing records remain readable/recoverable/executable without resetting exposure or alpha history",
+    "Expired budgets do not execute calibration or policies, and are not mislabeled as broken instruments",
+    "Actual learned decisions are consumed with full acceptance and total cost evidence",
+    "Production regressions, bounds and independent evidence remain intact"
+  ],
+  "goal_complete": false
+}

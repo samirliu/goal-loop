@@ -183,19 +183,22 @@ gp_tree_digest(){
         fi
       fi
     done < "$tmp/watch"
-    : > "$tmp/normalized" || exit 4
-    while IFS= read -r -d '' path; do printf '%s\0' "${path#./}" >> "$tmp/normalized" || exit 4; done < "$tmp/paths"
-    LC_ALL=C sort -zu "$tmp/normalized" > "$tmp/sorted" || exit 4
-    : > "$tmp/records" || exit 4
     # Python also expands initialized Gitlinks, binding their HEAD and actual
     # worktree bytes. The shell fallback supports ordinary entries only; it
     # must refuse repositories rather than hash them as empty directories.
     # A runtime hashing error never falls back.
     if command -v python3 >/dev/null 2>&1 && [ -f "$_gp_parse_dir/goal_tree_digest.py" ] && \
        python3 -I -c 'import os,sys; sys.exit(0 if os.name == "posix" and hasattr(os,"O_NOFOLLOW") else 1)' 2>/dev/null; then
+      # The Python record hasher already normalizes, deduplicates and sorts
+      # paths. Avoid opening an append file once for every inventory entry.
+      # Retain the checked external sort and all discovery/self-test failures.
+      LC_ALL=C sort -zu "$tmp/paths" > "$tmp/sorted" || exit 4
       python3 -I "$_gp_parse_dir/goal_tree_digest.py" "$tmp/sorted" "$tmp/watch-missing" "$tmp/deleted" "$tmp/index"
       exit $?
     fi
+    while IFS= read -r -d '' path; do printf '%s\0' "${path#./}" || exit 4; done < "$tmp/paths" > "$tmp/normalized" || exit 4
+    LC_ALL=C sort -zu "$tmp/normalized" > "$tmp/sorted" || exit 4
+    : > "$tmp/records" || exit 4
     while IFS= read -r -d '' path; do
       case "$path" in 160000\ *) echo 'GATE: ERROR gitlink-requires-python' >&2; exit 4 ;; esac
     done < "$tmp/index"

@@ -138,7 +138,7 @@ def policy_identity(policy):
 
 
 def routing(project, graph, policy_state=None):
-    """Consume the existing qualified archive; only a serial restriction is allowed."""
+    """Consume a qualified recommendation within the existing graph and budget."""
     if policy_state is None:
         return None
     root = Path(project).resolve(strict=True)
@@ -162,16 +162,22 @@ def routing(project, graph, policy_state=None):
         if selected is None or selected['policy'] is None:
             return dict(state=str(state), selection=selected, decision=dict(match=False, choice='baseline', reason='no-qualified-policy'),
                         input_sha256=store._hash(store._encode(payload)), elapsed=time.monotonic()-started)
-        output, rc, reason, error, selected = engine.run_enabled(state, min(2, max(0, cap-time.monotonic())) if cap else 2,
-                                                               store._encode(payload), with_identity=True)
+        output, rc, reason, error, selected, qualification = engine.run_enabled(
+            state, min(2, max(0, cap-time.monotonic())) if cap else 2,
+            store._encode(payload), with_qualification=True)
         require(rc == 0 and reason is None, 'routing policy failed: ' + str(reason or error or rc))
         decision = json.loads(output)
         require(isinstance(decision, dict) and set(decision) == {'match', 'choice', 'reason'}
-                and type(decision['match']) is bool and decision['choice'] in ('baseline', 'serial')
+                and type(decision['match']) is bool and decision['choice'] in ('baseline', 'serial', 'crew')
                 and isinstance(decision['reason'], str) and 0 < len(decision['reason']) <= 512
                 and (decision['match'] or decision['choice'] == 'baseline'), 'invalid bounded routing decision')
+        side = 'candidate' if selected['policy'] == qualification['policies']['candidate'] else 'baseline'
+        costs = [pair[side]['elapsed'] for phase in qualification['phases'].values() for pair in phase['pairs']]
+        require(costs and all(type(v) in (int, float) and math.isfinite(v) and v > 0 for v in costs),
+                'qualified routing needs measured positive trial costs')
         return dict(state=str(state), selection=selected, decision=decision, input_sha256=store._hash(store._encode(payload)),
-                    output_sha256=store._hash(output), elapsed=time.monotonic()-started)
+                    output_sha256=store._hash(output), elapsed=time.monotonic()-started,
+                    observed_cost_upper=max(costs), cost_basis='paired-program-and-grader; observed, not guaranteed')
     except engine.ExperimentError as exc:
         raise ValueError('routing: ' + str(exc)) from exc
 
@@ -185,11 +191,27 @@ def policy_current(policy):
         fd = engine.policy_lock(state, False)
         try:
             engine.require_settled(state)
-            require(engine.enabled_policy(state) == policy['selection'], 'routing policy changed; replan before dispatch')
+            selected = engine.enabled_policy(state)
+            require(selected == policy['selection'], 'routing policy changed; replan before dispatch')
+            engine.qualified_policy(state, selected)
         finally:
             os.close(fd)
     except engine.ExperimentError as exc:
         raise ValueError('routing: ' + str(exc)) from exc
+
+
+def parallel_possible(jobs, edges):
+    ancestors = {}
+    for job in jobs:
+        ancestors[job['id']] = set(edges[job['id']])
+        for dependency in edges[job['id']]:
+            ancestors[job['id']].update(ancestors[dependency])
+    return any(a['id'] not in ancestors[b['id']] and b['id'] not in ancestors[a['id']]
+               for i, a in enumerate(jobs) for b in jobs[i+1:])
+
+
+def policy_fits(policy, cap):
+    return cap is None or policy['observed_cost_upper'] + policy['elapsed'] < cap-time.monotonic()
 
 
 def unit_key(graph, task, contract):
@@ -344,6 +366,9 @@ def begin(project, graph_path, mode, trial, policy_state=None, retry_note=None):
     with read_ledger(project) as (state, _):
         cap, expired = budget.gate_limit(state, settlement=False)
         require(not expired and (cap is None or cap > time.monotonic()), 'time-budget-exhausted; no dispatch')
+        if policy is not None and policy['decision']['choice'] == 'crew' and mode == 'crew':
+            require(graph['capacity'] > 1 and parallel_possible(ordered, edges), 'qualified crew is dependency-or-scope-bound')
+            require(policy_fits(policy, cap), 'insufficient-qualified-budget; no dispatch')
         baseline = scope_digest(project, [n for j in ordered for n in j['files']])
         inputs = scope_digest(project, graph['inputs'])
         transport = 'cli' if __name__ == '__main__' else 'python-api'
@@ -617,13 +642,7 @@ def _plan(project, graph_path, history=None, policy=None):
     if len(set(trials)) != len(trials):
         report['reason'] = 'duplicate-trial-identity'
         return report
-    ancestors = {}
-    for job in jobs:
-        ancestors[job['id']] = set(edges[job['id']])
-        for dependency in edges[job['id']]:
-            ancestors[job['id']].update(ancestors[dependency])
-    if not any(a['id'] not in ancestors[b['id']] and b['id'] not in ancestors[a['id']]
-               for i, a in enumerate(jobs) for b in jobs[i+1:]):
+    if not parallel_possible(jobs, edges):
         report['reason'] = 'dependency-or-scope-bound'
         return report
     # A fixed latest window retains failures, never cherry-picks fast successes.
@@ -678,13 +697,23 @@ def _plan(project, graph_path, history=None, policy=None):
 
 
 def plan(project, graph_path, history=None, policy_state=None):
-    graph, _, _ = load_graph(graph_path)
+    graph, jobs, edges = load_graph(graph_path)
     policy = routing(project, graph, policy_state)
     report = _plan(project, graph_path, history, policy)
     if policy is not None:
         report['policy'] = policy
         if report['choice'] != 'stop' and policy['decision']['choice'] == 'serial':
             report.update(choice='serial', reason='qualified-routing-policy')
+        elif report['choice'] != 'stop' and policy['decision']['choice'] == 'crew':
+            with read_ledger(project) as (state, _):
+                cap, expired = budget.gate_limit(state, settlement=False)
+            if expired or not policy_fits(policy, cap):
+                report.update(choice='stop', reason='insufficient-qualified-budget', budget_fit='no')
+            elif graph['capacity'] > 1 and parallel_possible(jobs, edges):
+                report.update(choice='crew', reason='qualified-routing-policy', budget_fit='observed',
+                              qualified_cost_upper=policy['observed_cost_upper'])
+            else:
+                report.update(choice='serial', reason='dependency-or-scope-bound')
     return report
 
 

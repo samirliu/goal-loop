@@ -1,0 +1,84 @@
+{
+  "macos": {
+    "python_full_before_fixture_correction": {
+      "tests": 390,
+      "passed": 389,
+      "failed": 1,
+      "skipped": 0,
+      "seconds": 870.849,
+      "failure_ids": [
+        "test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch (test_incumbent.Incumbent.test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch)"
+      ],
+      "skip_details": [],
+      "log": "validation/goal-loop-qualified-routing-final-python-20261114.log"
+    },
+    "affected_suite_after_correction": {
+      "tests": 22,
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 163.587,
+      "failure_ids": [],
+      "skip_details": [],
+      "log": "validation/goal-loop-qualified-routing-incumbent-fixture-macos-20261114.log"
+    },
+    "shell_assertions": 603,
+    "parser_assertions": 81,
+    "companion_fixtures": 10,
+    "docs": "CONSISTENT",
+    "syntax": "passed",
+    "remaining_failures_after_fixture_correction": 0,
+    "verification_basis": "390-case full run plus all 22 cases in the affected suite after a fixture-only correction; no second whole-suite run",
+    "skill_validator": "passed with Python 3.12",
+    "data_replay_normal_and_optimized": "passed",
+    "original_gate_replay": "passed"
+  },
+  "linux": {
+    "python_full_before_fixture_correction": {
+      "tests": 390,
+      "passed": 387,
+      "failed": 1,
+      "skipped": 2,
+      "seconds": 1303.283,
+      "failure_ids": [
+        "test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch (test_incumbent.Incumbent.test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch)"
+      ],
+      "skip_details": [
+        "test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors (test_owner_watch_guard.GroupGuard.test_infinite_guard_stays_alive_without_stdout_or_lock_descriptors) ... skipped 'actual hard RLIMIT_NOFILE prevents inheriting infinity'",
+        "test_infinite_limit_normal_timeout_and_cancel (test_owner_watch_guard.GroupGuard.test_infinite_limit_normal_timeout_and_cancel) ... skipped 'actual hard RLIMIT_NOFILE prevents inheriting infinity'"
+      ],
+      "log": "validation/goal-loop-qualified-routing-final-linux-python-20261114.log"
+    },
+    "affected_suite_after_correction": {
+      "tests": 22,
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "seconds": 256.605,
+      "failure_ids": [],
+      "skip_details": [],
+      "log": "validation/goal-loop-qualified-routing-final-linux-incumbent-fixture-20261114.log"
+    },
+    "image": "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+    "uid": 1000,
+    "network": "none",
+    "init": true,
+    "shell_assertions": 603,
+    "parser_assertions": 81,
+    "companion_fixtures": 10,
+    "docs": "CONSISTENT",
+    "syntax": "passed",
+    "remaining_failures_after_fixture_correction": 0,
+    "verification_basis": "390-case full run plus all 22 cases in the affected suite after a fixture-only correction; no second whole-suite run",
+    "shellcheck": "passed",
+    "data_replay_normal_and_optimized": "passed"
+  },
+  "source_manifest": "final-source-manifest.json",
+  "study_manifest": "source-manifest.json",
+  "source_verification": "source-verification.json",
+  "independent_mutation_cases": 12,
+  "mutation_checked_with_optimization": true,
+  "all_original_failures_retained": true,
+  "full_run_failure_resolved_by_fixture_correction": true,
+  "caveat": "Do not report either initial 390-case run as all green or add the 22 retests to the unique coverage. Linux retains two capability skips."
+}

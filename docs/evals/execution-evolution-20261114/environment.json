@@ -1,0 +1,28 @@
+{
+  "macos": {
+    "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "bash": "GNU bash, version 3.2.57(1)-release (arm64-apple-darwin25)"
+  },
+  "linux": {
+    "docker_image_id": "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+    "architecture": "aarch64",
+    "python": "3.12.14",
+    "init": true,
+    "network": "none",
+    "source_mount": "read-only",
+    "full_suite_uid": 0,
+    "worktree_and_shell_uid": 1000
+  },
+  "full_suite_then_example_delta": {
+    "reason": "explicit example recheck replaced two assert statements after full suites started",
+    "new_test": "tests/test_evolution_example.py",
+    "normal_and_optimized_interpreters_checked": true
+  },
+  "first_linux_run": {
+    "init": false,
+    "failure": "test parent PID 1 violates existing distinct owner > 1 guard",
+    "disposition": "cancelled owned container after verified failures; rerun with --init; log retained",
+    "exit": 137
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "verified": true,
+  "routing": {
+    "pairs": 12,
+    "complete_workflows": 30,
+    "accepted_workflows": 29,
+    "known_bad_artifacts_rejected": 1,
+    "compared_test_implementations": 72,
+    "later_new_implementations": 12,
+    "development_gain": 0.4090434475241414,
+    "holdout_gain": 0.3078726653913418,
+    "later_costs": {
+      "baseline": 30.896478957962245,
+      "learned": 21.609820207813755
+    },
+    "later_gain": 0.3005733683370173,
+    "learning_seconds": 468.8823639580514,
+    "minimum_later_calls_to_repay_experiment_only": 101
+  },
+  "upgrade": {
+    "pairs": 40,
+    "same_program": true,
+    "statistical_evaluations_before": 2,
+    "statistical_evaluations_after": 3,
+    "holdout_gain": 0.7878465719230916
+  },
+  "hot_paths": {
+    "small-store": 0.44584657635364366,
+    "small-digest": 0.011890745317757245,
+    "small-context": 0.10771561525781281,
+    "large-store": 0.050456052482174774,
+    "large-digest": 0.36474915063197055,
+    "large-context": 0.3228271439227939
+  },
+  "original_acceptance_rechecked": true
+}

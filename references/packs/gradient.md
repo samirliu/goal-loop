@@ -121,6 +121,33 @@ incumbent/candidate checkpoint pair, so it can compare multiple owned files,
 including additions and removals. Keep shared dependencies inside the recorded
 scope and use a separate state directory per policy scope.
 
+Every new comparison must declare `calibration.good` and `calibration.bad` fixture
+lists (`output`/`expected` file paths). The actual grader must accept the good
+outputs and reject the bad outputs before either policy is dispatched. These
+frozen known answers use the existing trial/run deadline; an invalid grader
+preserves the incumbent and does not consume held-out testing budget. Missing
+fixtures fail before state creation. An expired run executes neither grader nor
+policy; it is recorded as budget exhaustion rather than a broken instrument.
+
+New selections bind the exact qualification report SHA-256. `run-enabled` and
+production dispatch validate that report, frozen inputs/instruments, calibration
+outputs, and paired eligibility before consuming the archive. Historical records
+and transactions remain readable and recoverable; an old selection without this
+binding requires a new calibrated comparison with fresh holdout in the same
+state directory. Successful requalification refreshes the receipt even for
+unchanged program bytes, so earlier plans must be regenerated. Testing/exposure
+history is retained. A verified baseline remains the fallback after regression.
+
+For routing policies, measure the complete downstream tool/worker workflow,
+including preparation, coordination, checks, close and original acceptance.
+Faster recommendation printing does not establish dispatch benefit. A qualified
+`choice:crew` can change an unknown-cost serial recommendation only within the
+existing graph's independent domains and capacity, when observed trial cost plus
+policy overhead fits the remaining allowance. Explicit inline remains inline.
+Outside the validated context, return baseline. See the [repository-regression
+experiment](../../examples/learning-regression/README.md) for actual local jobs;
+it is not an agent-model or native `/goal` comparison.
+
 The runner gives both variants the same input in fresh workspaces and measures
 setup, worker, and grading under a single trial allowance. Promotion requires
 complete paired development and fresh holdout evidence above the preset floor
@@ -141,3 +168,8 @@ withdrawal and generate a repair against new development/holdout inputs in
 the same statistical-budget state. The [recorded agent proposal](../../docs/evals/agent-evolution/README.md)
 demonstrates this sequence with independently reconstructed raw outcomes;
 its local execution gains do not measure total agent cost or generalization.
+
+The experiment result includes bounded `feedback`: raw failure paths and
+stderr, the current selection and the next sequential alpha/minimum fresh
+pair count. Read it again with `goal_evolve.py feedback --state … --run …`.
+An old report never silently stands in for the current enabled selection.

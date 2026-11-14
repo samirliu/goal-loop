@@ -1,0 +1,43 @@
+test_changed_adopted_parent_cannot_authorize_child (test_learning_flow.LearningFlow.test_changed_adopted_parent_cannot_authorize_child) ... ok
+test_changed_interface_between_validation_and_adoption_is_rejected (test_learning_flow.LearningFlow.test_changed_interface_between_validation_and_adoption_is_rejected) ... ok
+test_changed_qualification_blocks_planning_dispatch_and_native_prepare_but_allows_cancel (test_learning_flow.LearningFlow.test_changed_qualification_blocks_planning_dispatch_and_native_prepare_but_allows_cancel) ... ok
+test_context_cannot_relabel_a_borrowed_reader_as_writer (test_learning_flow.LearningFlow.test_context_cannot_relabel_a_borrowed_reader_as_writer) ... ok
+test_context_does_not_send_an_unbooked_or_claimed_wave_back_to_work (test_learning_flow.LearningFlow.test_context_does_not_send_an_unbooked_or_claimed_wave_back_to_work) ... ok
+test_context_rejects_stale_artifact_and_corrupt_ledger (test_learning_flow.LearningFlow.test_context_rejects_stale_artifact_and_corrupt_ledger) ... ok
+test_context_stamp_consumes_revision_under_original_writer_lock (test_learning_flow.LearningFlow.test_context_stamp_consumes_revision_under_original_writer_lock) ... ok
+test_controlled_policy_is_consumed_through_prepare_but_duplicates_serial_baseline (test_learning_flow.LearningFlow.test_controlled_policy_is_consumed_through_prepare_but_duplicates_serial_baseline)
+Mechanism coverage only; qualification telemetry remains controlled. ... CONTROLLED_POLICY_CONSUMPTION {"kind": "mechanism-only; controlled qualification and native receipts", "observations": [{"variant": "baseline", "plan": {"choice": "serial", "reason": "insufficient-observed-costs", "condition": "31d10a01f8298489b50b2ce3074fa9a85ba1b56e8eb1fa1ac0a892dd3a9743c8", "serial_lower": null, "crew_upper": null, "observations": null, "failures": null, "pending": null, "tokens": null, "money": null, "budget_fit": "unknown", "effective_dependencies": {"T1": [], "T2": []}}, "begin_mode": "inline", "consumed": null, "prepared": true, "independent_checks_passed": true}, {"variant": "candidate", "plan": {"choice": "serial", "reason": "qualified-routing-policy", "condition": "a4e72d8bbed9fcca1c3d65325cd9cc7e37e3b3acc49ca70c3cb1dbc04d73360e", "serial_lower": null, "crew_upper": null, "observations": 0, "failures": 0, "pending": 0, "tokens": null, "money": null, "budget_fit": "unknown", "effective_dependencies": {"T1": [], "T2": []}, "single_observations": 0, "policy": {"state": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-test-58dwf5_q/.goal/proposals/routing", "selection": {"policy": "e1ea8206aae16275b1722aa16e44bd211d4f89eea820929ca3030c4dc95a13c6", "program": "policies/e1ea8206aae16275b1722aa16e44bd211d4f89eea820929ca3030c4dc95a13c6.py", "protocol": "e5972d7437113407385a10455b8567d4181966cb09af931631d0bf264afec053", "qualification": "5cb42021c495c532d04813969bc06dd4348e5e6901fb92dfc6cccd45835a5982", "run": "cfa00915ad7a4740b2f7386c04bc0127", "version": 1}, "decision": {"match": true, "choice": "serial", "reason": "measured unit costs"}, "input_sha256": "07c96090620966f8879dd4159799295f1dc11060af2f49c862d6f4c0bef78799", "output_sha256": "54013983b51b7ab59eb3aed5f112eb757c3a19a90169f6ac01ddb542152d6969", "elapsed": 0.06649620807729661, "observed_cost_upper": 1, "cost_basis": "paired-program-and-grader; observed, not guaranteed"}}, "begin_mode": "inline", "consumed": {"cost_basis": "paired-program-and-grader; observed, not guaranteed", "decision": {"choice": "serial", "match": true, "reason": "measured unit costs"}, "elapsed": 0.06672841683030128, "input_sha256": "07c96090620966f8879dd4159799295f1dc11060af2f49c862d6f4c0bef78799", "observed_cost_upper": 1, "output_sha256": "54013983b51b7ab59eb3aed5f112eb757c3a19a90169f6ac01ddb542152d6969", "selection": {"policy": "e1ea8206aae16275b1722aa16e44bd211d4f89eea820929ca3030c4dc95a13c6", "program": "policies/e1ea8206aae16275b1722aa16e44bd211d4f89eea820929ca3030c4dc95a13c6.py", "protocol": "e5972d7437113407385a10455b8567d4181966cb09af931631d0bf264afec053", "qualification": "5cb42021c495c532d04813969bc06dd4348e5e6901fb92dfc6cccd45835a5982", "run": "cfa00915ad7a4740b2f7386c04bc0127", "version": 1}, "state": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-crew-test-58dwf5_q/.goal/proposals/routing"}, "prepared": true, "independent_checks_passed": true}], "behavior_difference": false}
+ok
+test_expired_context_offers_no_dispatch_and_receipt_does_not_invent_go (test_learning_flow.LearningFlow.test_expired_context_offers_no_dispatch_and_receipt_does_not_invent_go) ... ok
+test_first_real_hook_entry_has_a_usable_map_before_contract_exists (test_learning_flow.LearningFlow.test_first_real_hook_entry_has_a_usable_map_before_contract_exists) ... ok
+test_holdout_rejection_preserves_the_consumed_routing_version (test_learning_flow.LearningFlow.test_holdout_rejection_preserves_the_consumed_routing_version) ... ok
+test_installed_entry_cannot_launch_harness (test_learning_flow.LearningFlow.test_installed_entry_cannot_launch_harness) ... ok
+test_prepare_is_stable_until_the_actual_budget_changes (test_learning_flow.LearningFlow.test_prepare_is_stable_until_the_actual_budget_changes) ... ok
+test_qualified_crew_cannot_override_dependencies_capacity_or_observed_budget (test_learning_flow.LearningFlow.test_qualified_crew_cannot_override_dependencies_capacity_or_observed_budget) ... ERROR
+test_qualified_crew_changes_unknown_cost_baseline_and_respects_explicit_inline (test_learning_flow.LearningFlow.test_qualified_crew_changes_unknown_cost_baseline_and_respects_explicit_inline) ... ok
+test_qualified_policy_changes_dispatch_and_mismatch_retains_baseline (test_learning_flow.LearningFlow.test_qualified_policy_changes_dispatch_and_mismatch_retains_baseline) ... ok
+test_related_inputs_interfaces_and_outputs_invalidate_reuse (test_learning_flow.LearningFlow.test_related_inputs_interfaces_and_outputs_invalidate_reuse) ... ok
+test_repair_dispatches_only_failed_unit_and_preserves_good_bytes (test_learning_flow.LearningFlow.test_repair_dispatches_only_failed_unit_and_preserves_good_bytes) ... ok
+test_same_archive_requalified_on_fresh_inputs_invalidates_old_plan (test_learning_flow.LearningFlow.test_same_archive_requalified_on_fresh_inputs_invalidates_old_plan) ... ok
+test_task_rename_cannot_reset_retry_cap (test_learning_flow.LearningFlow.test_task_rename_cannot_reset_retry_cap) ... ok
+test_unique_prompt_enter_preserves_earliest_origin_and_rejects_ambiguity (test_learning_flow.LearningFlow.test_unique_prompt_enter_preserves_earliest_origin_and_rejects_ambiguity) ... ok
+test_v2_rejects_wait_without_a_consumed_artifact (test_learning_flow.LearningFlow.test_v2_rejects_wait_without_a_consumed_artifact) ... ok
+test_withdrawal_and_pending_transition_block_stale_dispatch (test_learning_flow.LearningFlow.test_withdrawal_and_pending_transition_block_stale_dispatch) ... ok
+
+======================================================================
+ERROR: test_qualified_crew_cannot_override_dependencies_capacity_or_observed_budget (test_learning_flow.LearningFlow.test_qualified_crew_cannot_override_dependencies_capacity_or_observed_budget)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_learning_flow.py", line 333, in test_qualified_crew_cannot_override_dependencies_capacity_or_observed_budget
+    slow, _, _ = self.qualified_policy(choice='crew', cost_scale=100)
+                 ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/m/repo/goal-loop/tests/test_learning_flow.py", line 295, in qualified_policy
+    result = engine.experiment(protocol, p.state)
+  File "/Users/m/repo/goal-loop/scripts/goal_evolve.py", line 803, in experiment
+    raise ExperimentError('holdout inputs already exposed; use fresh held-out tasks')
+crew_evolve.ExperimentError: holdout inputs already exposed; use fresh held-out tasks
+
+----------------------------------------------------------------------
+Ran 23 tests in 20.207s
+
+FAILED (errors=1)

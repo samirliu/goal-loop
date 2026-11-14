@@ -1,0 +1,54 @@
+{
+  "objective": "以你最大能力提高当前仓库执行效率和自主进化能力，直到你认为得分达到9分以上",
+  "goal_status": "active",
+  "self_assessment": 8.7,
+  "requirements": [
+    {
+      "requirement": "降低实际执行成本，保留原有验收",
+      "status": "locally-proven",
+      "evidence": [
+        "benchmark.json",
+        "source-manifest.json"
+      ],
+      "limit": "15 paired local measurements; complete-agent net delivery benefit unproven"
+    },
+    {
+      "requirement": "根据真实失败改进并消费策略",
+      "status": "locally-proven",
+      "evidence": [
+        "sequence.json",
+        "raw-evolution.tar.gz",
+        "verify.py",
+        "later-task.json"
+      ],
+      "limit": "one local function family; broad transfer unproven"
+    },
+    {
+      "requirement": "避免错误仪器及优化模式下的假通过",
+      "status": "partly-proven",
+      "evidence": [
+        "optimized-example-counterexample.json",
+        "mutation-checks.json",
+        "tests/test_evolve_calibration.py"
+      ],
+      "limit": "calibration enforced when declared; legacy uncalibrated protocols remain supported"
+    },
+    {
+      "requirement": "当前源码的完整回归和故障恢复保持有效",
+      "status": "proven-for-current-scope",
+      "evidence": [
+        "validation/",
+        "source-manifest.json"
+      ],
+      "limit": "full suites 376 plus separate example delta 1; Linux has two actual unlimited-FD capability gaps after non-root permission retest"
+    },
+    {
+      "requirement": "综合得分达到9分以上",
+      "status": "not-achieved",
+      "evidence": [
+        "README.md"
+      ],
+      "limit": "do not substitute local mechanism and timing proof for whole-task utility"
+    }
+  ]
+}

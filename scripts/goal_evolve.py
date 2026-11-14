@@ -192,6 +192,9 @@ def finish_policy_transition(state, pending):
             or (before != after and (selected is None or selected['run'] != pending['run']
                                      or selected['protocol'] != report['protocol']))):
         raise ExperimentError('policy transition selection/report mismatch')
+    if before != after and selected is not None and selected.get('qualification') is not None:
+        if selected['qualification'] != digest(encode(report)):
+            raise ExperimentError('policy transition qualification/report mismatch')
     # An unchanged pointer may reference the earlier successful qualification.
     if previous is not None and selected is not None and previous['version'] != selected['version']:
         raise ExperimentError('policy transition version mismatch')
@@ -275,9 +278,14 @@ def load_protocol(path, project=None):
     data = path.read_bytes()
     protocol = json.loads(data)
     required = {'version', 'baseline', 'candidate', 'grader', 'development', 'holdout',
-                'minimum_pairs', 'minimum_cost_gain', 'quality_tolerance', 'trial_seconds', 'budget_seconds'}
+                'minimum_pairs', 'minimum_cost_gain', 'quality_tolerance', 'trial_seconds', 'budget_seconds', 'calibration'}
     version = protocol.get('version') if isinstance(protocol, dict) else None
-    if type(version) is not int or version not in (1, 2) or set(protocol) != required.union({'entry'} if version == 2 else ()):
+    if type(version) is int and version in (1, 2) and 'calibration' not in protocol:
+        raise ExperimentError('calibration-required: declare good and bad output/expected fixtures before a new comparison; '
+                              'existing archives remain readable and recoverable')
+    fields = required.union({'entry'} if version == 2 else ())
+    if (type(version) is not int or version not in (1, 2)
+            or set(protocol) != fields):
         raise ExperimentError('unknown experiment protocol')
     minimum = protocol['minimum_pairs']
     if type(minimum) is not int or minimum < 6:
@@ -323,6 +331,25 @@ def load_protocol(path, project=None):
                 raise ExperimentError('development/holdout task inputs must be distinct')
             seen.add(identity)
             phases[phase].append((identity, task, expected))
+    if 'calibration' in protocol:
+        calibration = protocol['calibration']
+        if not isinstance(calibration, dict) or set(calibration) != {'good', 'bad'}:
+            raise ExperimentError('calibration requires good and bad fixtures')
+        known = set()
+        phases['calibration'] = []
+        for kind in ('good', 'bad'):
+            cases = calibration[kind]
+            if not isinstance(cases, list) or not cases:
+                raise ExperimentError('calibration needs at least one ' + kind + ' fixture')
+            for index, case in enumerate(cases):
+                if not isinstance(case, dict) or set(case) != {'output', 'expected'}:
+                    raise ExperimentError('invalid calibration fixture')
+                output, expected = read(case['output']), read(case['expected'])
+                identity = digest(encode([output.decode('utf-8'), expected.decode('utf-8')]))
+                if identity in known:
+                    raise ExperimentError('calibration fixtures must be distinct')
+                known.add(identity)
+                phases['calibration'].append((kind, index, output, expected))
     fingerprint = digest(encode({str(Path(name).relative_to(path.parent)): digest(data)
                                 for name, data in sorted(frozen.items())}))
     return protocol, programs, phases, frozen, fingerprint
@@ -424,6 +451,28 @@ def apply_grade(record, result, rc, reason):
         record.update(reason='instrument-invalid', grader_error=str(exc))
 
 
+def calibrate(grader, cases, seconds, deadline, run):
+    """Test the actual grader on frozen known answers before running policies."""
+    started = time.monotonic()
+    rows = []
+    for kind, index, output, expected in cases:
+        record = dict(ok=False, floor=None, horizon=None, score=None)
+        result, rc, reason, error = run_program(
+            grader, encode({'output': output.decode('utf-8'), 'expected': expected.decode('utf-8')}),
+            min(deadline, time.monotonic() + seconds))
+        apply_grade(record, result, rc, reason)
+        matched = record.get('reason') != 'instrument-invalid' and record['ok'] == (kind == 'good')
+        name = 'calibration-%s-%s.out' % (kind, index)
+        atomic_bytes(run / name, result)
+        rows.append(dict(kind=kind, index=index, matched=matched, observed=record,
+                         grader_exit=rc, reason=reason, stderr=error,
+                         output=name, output_sha256=digest(result)))
+        if not matched:
+            break
+    return dict(status='passed' if len(rows) == len(cases) and all(row['matched'] for row in rows)
+                else 'failed', cases=rows, elapsed=time.monotonic() - started)
+
+
 def compare(pairs, protocol, alpha=0.05):
     """Preregistered paired cost improvement with exact one-sided sign test."""
     if len(pairs) < protocol['minimum_pairs'] or any(not row[side]['ok'] for row in pairs for side in ('baseline', 'candidate')):
@@ -459,10 +508,13 @@ def policy_record(state, data):
     if data is None:
         return None
     record = json.loads(data)
-    if (not isinstance(record, dict) or set(record) != {'version', 'policy', 'program', 'run', 'protocol'}
+    fields = {'version', 'policy', 'program', 'run', 'protocol'}
+    if (not isinstance(record, dict) or set(record) not in (fields, fields | {'qualification'})
             or type(record['version']) is not int or record['version'] not in (1, 2)
             or not hash_identity(record['run'], 32) or not hash_identity(record['protocol'])):
         raise ExperimentError('invalid enabled policy record')
+    if 'qualification' in record and (record['policy'] is None or not hash_identity(record['qualification'])):
+        raise ExperimentError('invalid policy qualification identity')
     identity = record['policy']
     suffix = '.py' if record['version'] == 1 else '.json'
     if (identity is not None and (not isinstance(identity, str) or len(identity) != 64
@@ -478,7 +530,74 @@ def enabled_policy(state):
     return policy_record(state, optional_bytes(state / 'enabled.json'))
 
 
-def run_enabled(state, seconds, stdin, with_identity=False):
+def qualified_policy(state, selected=None, with_report=False):
+    """Validate the immutable qualification before consuming an active policy.
+
+    Historical pointers remain readable for recovery. They do not silently
+    acquire the guarantees of a newly calibrated, evidence-bound comparison.
+    """
+    selected = enabled_policy(state) if selected is None else selected
+    if selected is None or selected['policy'] is None:
+        return (selected, None) if with_report else selected
+    if 'qualification' not in selected:
+        raise ExperimentError('policy-requalification-required: compare the active archive with good/bad calibration and fresh holdout')
+    try:
+        run = material_path(state, selected['run'])
+        raw = optional_bytes(run / 'report.json')
+        if raw is None or digest(raw) != selected['qualification']:
+            raise ExperimentError('policy-qualification-invalid: report checksum mismatch')
+        report = json.loads(raw)
+        if (not isinstance(report, dict) or report.get('version') != selected['version']
+                or report.get('run') != selected['run'] or report.get('protocol') != selected['protocol']
+                or report.get('enabled') != selected['policy']):
+            raise ExperimentError('policy-qualification-invalid: selection/report mismatch')
+        frozen = optional_bytes(run / 'protocol.json')
+        if frozen is None or digest(frozen) != report['frozen_manifest_sha256']:
+            raise ExperimentError('policy-qualification-invalid: frozen manifest changed')
+        manifest = json.loads(frozen)
+        source = Path(manifest['source'])
+        if not source.is_absolute() or str(source) not in manifest['files']:
+            raise ExperimentError('policy-qualification-invalid: missing frozen protocol source')
+        hashes = {}
+        for name, checksum in manifest['files'].items():
+            relative = Path(name).relative_to(source.parent).as_posix()
+            hashes[relative] = checksum
+            if not hash_identity(checksum) or digest(material_path(run, 'frozen/' + relative).read_bytes()) != checksum:
+                raise ExperimentError('policy-qualification-invalid: frozen material changed')
+        if digest(encode(hashes)) != manifest['fingerprint'] or manifest['fingerprint'] != selected['protocol']:
+            raise ExperimentError('policy-qualification-invalid: protocol fingerprint mismatch')
+        protocol = manifest['protocol']
+        calibration = report['calibration']
+        expected = [(kind, index) for kind in ('good', 'bad') for index in range(len(protocol['calibration'][kind]))]
+        if (calibration['status'] != 'passed' or not all(protocol['calibration'].values())
+                or [(row['kind'], row['index']) for row in calibration['cases']] != expected):
+            raise ExperimentError('policy-qualification-invalid: incomplete calibration')
+        for row in calibration['cases']:
+            if (row['matched'] is not True or row['observed']['ok'] != (row['kind'] == 'good')
+                    or digest(material_path(run, row['output']).read_bytes()) != row['output_sha256']):
+                raise ExperimentError('policy-qualification-invalid: calibration evidence changed')
+        if selected['policy'] == report['policies']['candidate']:
+            evaluation = report['holdout_evaluation']
+            if (report['status'] != 'enabled' or report['within_budget'] is not True
+                    or type(evaluation) is not int or evaluation < 1
+                    or report['holdout_alpha'] != .05 / (evaluation * (evaluation + 1))):
+                raise ExperimentError('policy-qualification-invalid: candidate not qualified')
+            for phase in ('development', 'holdout'):
+                value = report['phases'][phase]
+                alpha = .05 if phase == 'development' else report['holdout_alpha']
+                if (len(value['pairs']) != value['scheduled_pairs'] or value['scheduled_pairs'] != len(protocol[phase])
+                        or not compare(value['pairs'], protocol, alpha)['pass']):
+                    raise ExperimentError('policy-qualification-invalid: incomplete or ineligible pairs')
+        else:
+            rows = [pair for phase in report['phases'].values() for pair in phase['pairs']]
+            if selected['policy'] != report['policies']['baseline'] or not rows or not all(pair['baseline']['ok'] for pair in rows):
+                raise ExperimentError('policy-qualification-invalid: no verified fallback')
+        return (selected, report) if with_report else selected
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise ExperimentError('policy-qualification-invalid: ' + str(exc)) from exc
+
+
+def run_enabled(state, seconds, stdin, with_identity=False, with_qualification=False):
     if not math.isfinite(seconds) or seconds <= 0:
         raise ExperimentError('execution budget must be positive and finite')
     end = run_deadline(time.monotonic() + seconds)
@@ -486,7 +605,7 @@ def run_enabled(state, seconds, stdin, with_identity=False):
     directory = policy_lock(state, False)
     try:
         require_settled(state)
-        selected = enabled_policy(state)
+        selected, qualification = qualified_policy(state, with_report=True)
         if selected is None or selected['policy'] is None:
             raise ExperimentError('no qualified policy enabled')
         program = material_path(state, selected['program']).read_bytes()
@@ -503,6 +622,8 @@ def run_enabled(state, seconds, stdin, with_identity=False):
         # Holding the reader lock through cleanup prevents a cooperating writer
         # from publishing a withdrawal while this execution is being released.
         result = run_program(program, stdin, end)
+        if with_qualification:
+            return (*result, selected, qualification)
         return (*result, selected) if with_identity else result
     finally:
         os.close(directory)
@@ -516,6 +637,74 @@ def run_deadline(local_end):
             raise ExperimentError('invalid runner deadline')
         return min(local_end, outer_end)
     return local_end
+
+
+def testing_budget(state):
+    data = optional_bytes(state / 'statistical-budget.json')
+    value = json.loads(data) if data is not None else {'version': 1, 'evaluations': 0}
+    if (not isinstance(value, dict) or set(value) != {'version', 'evaluations'}
+            or type(value['version']) is not int or value['version'] != 1
+            or type(value['evaluations']) is not int or value['evaluations'] < 0):
+        raise ExperimentError('invalid sequential testing budget')
+    return value
+
+
+def feedback(state_path, run_id):
+    """Read-only repair guidance derived from a recorded run and current selection."""
+    if not hash_identity(run_id, 32):
+        raise ExperimentError('invalid feedback run identity')
+    state = Path(state_path).resolve(strict=True)
+    directory = policy_lock(state, False)
+    try:
+        require_settled(state)
+        run = material_path(state, run_id)
+        report = json.loads(optional_bytes(run / 'report.json'))
+        protocol = json.loads(optional_bytes(run / 'protocol.json'))['protocol']
+        if report['run'] != run_id:
+            raise ExperimentError('feedback run/report mismatch')
+        evaluation = testing_budget(state)['evaluations'] + 1
+        alpha = .05 / (evaluation * (evaluation + 1))
+        pairs = max(protocol['minimum_pairs'], math.ceil(-math.log2(alpha)))
+        findings, decisions = [], {}
+        for phase, value in report['phases'].items():
+            decisions[phase] = value['decision']
+            for index, pair in enumerate(value['pairs']):
+                for side in ('baseline', 'candidate'):
+                    row = pair[side]
+                    if not row['ok'] and len(findings) < 4:
+                        findings.append(dict(phase=phase, index=index, side=side, case=pair['case'],
+                            reason=row.get('reason'), stderr=row.get('stderr', '')[:4096],
+                            input=str(material_path(run, 'frozen/' + protocol[phase][index]['input'])),
+                            output=str(run / ('%s-%s-%s.out' % (phase, index, side)))))
+        calibration = report.get('calibration', {'status': 'not-declared', 'cases': []})
+        selection = enabled_policy(state)
+        historical = (selection['policy'] if selection else None) != report['enabled']
+        if report['status'] == 'enabled' and selection is not None:
+            historical |= selection['run'] != run_id or selection['protocol'] != report['protocol']
+        qualification = dict(verified=True, reason=None)
+        try:
+            qualified_policy(state, selection)
+        except ExperimentError as exc:
+            qualification = dict(verified=False, reason=str(exc))
+        next_action = ('repair-instrument' if report['status'] == 'instrument-invalid' else
+                       'repair-candidate' if report['status'] == 'withdrawn' else
+                       'repair-baseline' if report['status'] == 'blocked-no-qualified-policy' else
+                       'increase-fresh-pairs' if any(d.get('reason') == 'holdout-underpowered' for d in decisions.values()) else
+                       'monitor-enabled-policy' if report['status'] in ('enabled', 'retained-insufficient-counterevidence') else
+                       'revise-candidate')
+        return dict(run=run_id, status=report['status'], selection=selection,
+                    selection_changed_since_run=historical,
+                    calibration=dict(status=calibration['status'],
+                                     failures=[row for row in calibration['cases'] if not row['matched']]),
+                    qualification=qualification,
+                    next_action='requalify-policy' if not qualification['verified'] else
+                                'review-current-selection' if historical else next_action,
+                    findings=findings, decisions=decisions,
+                    next_holdout=dict(evaluation=evaluation, alpha=alpha, minimum_pairs=pairs,
+                                      fresh_inputs_required=True,
+                                      exposure_registry=str(state / 'used-holdout.json')))
+    finally:
+        os.close(directory)
 
 
 def record_trial(run, phase, index, side, case_id, record, output):
@@ -563,12 +752,15 @@ def commit_policy(state, guard, report, materials):
     current = policy_record(state, before)
     incumbent = current['policy'] if current else None
     after = before
-    if report['status'] != 'instrument-invalid' and (current is None or incumbent != report['enabled']):
+    if report['status'] != 'instrument-invalid' and (current is None or incumbent != report['enabled'] or report['status'] == 'enabled'):
         identity = report['enabled']
         suffix = '.py' if report['version'] == 1 else '.json'
-        after = encode({'version': report['version'], 'policy': identity,
-                        'program': 'policies/' + identity + suffix if identity is not None else None,
-                        'run': report['run'], 'protocol': report['protocol']})
+        record = {'version': report['version'], 'policy': identity,
+                  'program': 'policies/' + identity + suffix if identity is not None else None,
+                  'run': report['run'], 'protocol': report['protocol']}
+        if identity is not None:
+            record['qualification'] = digest(encode(report))
+        after = encode(record)
     pending = dict(version=1, phase='transition', run=report['run'], before=blob(before), after=blob(after),
                    report_before=blob(optional_bytes(state / report['run'] / 'report.json')),
                    report=report, materials=materials)
@@ -610,11 +802,7 @@ def experiment(protocol_path, state_path, project=None):
         if used.intersection(holdout_ids):
             raise ExperimentError('holdout inputs already exposed; use fresh held-out tasks')
         budget_path = state / 'statistical-budget.json'
-        testing = json.loads(budget_path.read_bytes()) if budget_path.exists() else {'version': 1, 'evaluations': 0}
-        if (not isinstance(testing, dict) or set(testing) != {'version', 'evaluations'}
-                or type(testing['version']) is not int or testing['version'] != 1
-                or type(testing['evaluations']) is not int or testing['evaluations'] < 0):
-            raise ExperimentError('invalid sequential testing budget')
+        testing = testing_budget(state)
         policies = state / 'policies'; policies.mkdir(exist_ok=True)
         suffix = '.py' if version == 1 else '.json'
         for name in ('baseline', 'candidate'):
@@ -637,12 +825,13 @@ def experiment(protocol_path, state_path, project=None):
             copy.parent.mkdir(parents=True, exist_ok=True)
             copy.write_bytes(data)
             materials[relative.as_posix()] = digest(data)
-        protocol_record = {'protocol': protocol, 'fingerprint': fingerprint,
+        protocol_record = {'protocol': protocol, 'fingerprint': fingerprint, 'source': str(Path(protocol_path).resolve()),
                            'files': {name: digest(data) for name, data in frozen.items()}}
         atomic(run / 'protocol.json', protocol_record)
         materials['protocol.json'] = digest(encode(protocol_record))
         report = {'version': version, 'run': run_id, 'protocol': fingerprint, 'policies': identities,
                   'runner_sha256': digest(runner), 'status': 'candidate', 'phases': {},
+                  'frozen_manifest_sha256': materials['protocol.json'],
                   'runtime_sources': {path.name: digest(data) for path, data in runtime_sources.items()},
                   'runtime': {'python': sys.version, 'executable': sys.executable, 'platform': sys.platform},
                   'enabled': None, 'tokens': None, 'money': None}
@@ -662,7 +851,30 @@ def experiment(protocol_path, state_path, project=None):
                      report=json.loads(encode(report)), materials=dict(materials))
         publish_pending(state, guard)
         transition_fault('evaluating-published')
-        for phase, cases in phases.items():
+        def verify_frozen():
+            if (Path(__file__).read_bytes() != runner
+                    or any(not Path(name).is_file() or Path(name).read_bytes() != data
+                           for name, data in {**frozen, **runtime_sources}.items())):
+                report.update(status='instrument-invalid', elapsed=time.monotonic() - started,
+                              enabled=current['policy'] if current else None)
+                commit_policy(state, guard, report, materials)
+                raise ExperimentError('frozen experiment material changed; report=' + str(run / 'report.json'))
+
+        if time.monotonic() >= deadline:
+            report.update(status='run-budget', elapsed=time.monotonic() - started, within_budget=False,
+                          calibration=dict(status='not-executed', cases=[], reason='run-budget', elapsed=0))
+            report['status'], report['enabled'] = disposition(report, identities, current, False)
+            return commit_policy(state, guard, report, materials)
+        report['calibration'] = calibrate(programs['grader'], phases['calibration'],
+                                          protocol['trial_seconds'], deadline, run)
+        materials.update({row['output']: row['output_sha256'] for row in report['calibration']['cases']})
+        verify_frozen()
+        if report['calibration']['status'] != 'passed':
+            report.update(status='instrument-invalid', enabled=current['policy'] if current else None,
+                          elapsed=time.monotonic() - started, within_budget=time.monotonic() <= deadline)
+            return commit_policy(state, guard, report, materials)
+        for phase in ('development', 'holdout'):
+            cases = phases[phase]
             pairs = []
             alpha = 0.05
             if time.monotonic() >= deadline:
@@ -706,14 +918,9 @@ def experiment(protocol_path, state_path, project=None):
                 pairs.append(pair)
                 # Frozen source/inputs are checked after every pair; a worker
                 # cannot win by quietly replacing the original evaluator.
-                if (Path(__file__).read_bytes() != runner
-                        or any(not Path(name).is_file() or Path(name).read_bytes() != data
-                               for name, data in {**frozen, **runtime_sources}.items())):
-                    report.update(status='instrument-invalid', elapsed=time.monotonic() - started)
-                    report['phases'][phase] = {'pairs': pairs, 'decision': {'pass': False, 'reason': 'frozen-material-changed'}}
-                    report['enabled'] = current['policy'] if current else None
-                    commit_policy(state, guard, report, materials)
-                    raise ExperimentError('frozen experiment material changed; report=' + str(run / 'report.json'))
+                report['phases'][phase] = {'scheduled_pairs': len(cases), 'pairs': pairs,
+                                          'decision': {'pass': False, 'reason': 'frozen-material-changed'}}
+                verify_frozen()
                 if any(not pair[side]['ok'] for side in ('baseline', 'candidate')):
                     break  # A failed pair cannot pass this phase.
             decision = compare(pairs, protocol, alpha=alpha)
@@ -738,6 +945,13 @@ def experiment(protocol_path, state_path, project=None):
 
 
 def main(argv):
+    if argv[:1] == ['feedback']:
+        parser = argparse.ArgumentParser(description='Read recorded failures and the next fresh-holdout requirement')
+        parser.add_argument('--state', required=True)
+        parser.add_argument('--run', required=True)
+        args = parser.parse_args(argv[1:])
+        print(json.dumps(feedback(args.state, args.run)))
+        return 0
     if argv[:1] == ['recover']:
         parser = argparse.ArgumentParser(description='Finish a recorded policy switch without replaying trials')
         parser.add_argument('--state', required=True)
@@ -766,7 +980,8 @@ def main(argv):
     arguments = parser.parse_args(argv)
     result = experiment(arguments.protocol, arguments.state, arguments.project)
     print(json.dumps({'status': result['status'], 'enabled': result['enabled'],
-                      'elapsed': result['elapsed'], 'report': str(Path(arguments.state) / result['run'] / 'report.json')}))
+                      'elapsed': result['elapsed'], 'report': str(Path(arguments.state) / result['run'] / 'report.json'),
+                      'feedback': feedback(arguments.state, result['run'])}))
     return 0
 
 

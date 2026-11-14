@@ -23,7 +23,7 @@ FROM_DISK = object()
 
 
 @contextlib.contextmanager
-def access(project, write=False, recovery=False):
+def access(project, write=False, recovery=False, verify=True):
     root = Path(project).resolve(strict=True)
     state = root / '.goal'
     fd = os.open(state, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
@@ -42,7 +42,7 @@ def access(project, write=False, recovery=False):
             store.fcntl.flock(fd, (store.fcntl.LOCK_EX if write else store.fcntl.LOCK_SH) | store.fcntl.LOCK_NB)
         pending = (state / 'store/pending').exists()
         crew.require(recovery or not pending, 'recovery-required: run goal_ctl.sh recover --project ' + shlex.quote(str(root)))
-        if not pending:
+        if not pending and verify:
             store.verify_views(state)
         yield root, state, fd
     finally:
@@ -485,7 +485,8 @@ def show(project, auto=False):
     root = Path(project).resolve(strict=True)
     if not (root/'.goal').exists():
         return initial_view(root, auto)[0]
-    with access(project, recovery=True) as (root, state, fd):
+    # compile_view validates the views immediately, under this same lock.
+    with access(project, recovery=True, verify=False) as (root, state, fd):
         value, _ = compile_view(root, state, fd, auto)
         return value
 
@@ -515,7 +516,7 @@ def run(project, revision, action, auto=False):
             os.execvp(commands[action][0], commands[action])
         finally:
             os.close(fd)
-    with access(project, write=action in ('stamp', 'gate', 'verify', 'close', 'retry-close', 'receipt', 'recover'), recovery=action == 'recover') as (root, state, fd):
+    with access(project, write=action in ('stamp', 'gate', 'verify', 'close', 'retry-close', 'receipt', 'recover'), recovery=action == 'recover', verify=False) as (root, state, fd):
         value, commands = compile_view(root, state, fd, auto)
         crew.require(value['revision'] == revision, 'stale-context: regenerate goal_ctl.sh context')
         if action != 'recover':
@@ -537,7 +538,7 @@ def submit(project, revision, action, request=None, auto=False):
     """Apply explicit intent at one bound version, then use original entrypoints."""
     crew.require(action in ('stamp', 'close'), 'unsupported submission action')
     crew.require(isinstance(request, dict), 'submission must be a JSON object')
-    with access(project, write=True) as (root, state, fd):
+    with access(project, write=True, verify=False) as (root, state, fd):
         value, commands = compile_view(root, state, fd, auto)
         crew.require(value['revision'] == revision, 'stale-context: regenerate goal_ctl.sh context')
         crew.require(action in value.get('submissions', {}), 'submission unavailable; use current context')
@@ -587,7 +588,8 @@ def submit(project, revision, action, request=None, auto=False):
 
 
 def receipt(project):
-    with access(project, write=True) as (root, state, fd):
+    # The checks below validate before AND after the original audit/Gate.
+    with access(project, write=True, verify=False) as (root, state, fd):
         before = store.verify_views(state)
         cap, _ = budget.gate_limit(state, settlement=True)
         checks = {name: protected(root, ['bash', str(HERE/script), *args, '--project', str(root)], cap, fd, 'exclusive-read')

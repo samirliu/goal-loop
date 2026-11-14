@@ -47,11 +47,13 @@ description: |-
 | 契约/执行出现 | 需要的说明 |
 |---|---|
 | `judged` / `calib:` / `probe:` / `metric:` / `sd:` / `var:` | `references/packs/instrument.md` |
-| `objective: maximize` / `minimize` / `exit: forge` / horizon / `--strategy` | `references/packs/gradient.md` |
+| `objective: maximize` / `minimize` / `exit: forge` / horizon / `--strategy` / 策略晋升或复用 | `references/packs/gradient.md` |
 | `external:` / `window:` | `references/packs/external.md` |
 | 实际需要原生 worker 协作 | `references/crew.md` 与 `references/host.md` |
 
 判断类 AC 在 claim 前由全新冷席终验，生产者不自裁；校准必须识别好/坏样本。优化类先建立真实基线，再填地图要求的 score/strategy/dry；`pre-reg.md` 由 stamp 播种，实际策略与反证只在使用优化能力时补齐。forge 的**指标批评席**必须以证据检查盲区与刷分路径；读数或 dry 不能由代理指标/产量替代。EFFICIENCY 只作诊断，净交付收益仍需同预算留出对照。
+
+可复用策略先绑定真实触发与适用范围，再用好/坏产物校准冻结 grader、执行原配对比较；`run-enabled` 与派工只消费绑定资格报告哈希的归档。路由策略测整波净交付成本，打印建议更快不算收益；并行建议仍受图、容量、截止与显式串行约束。根据 `feedback` 修复并使用新的留出输入，不重置统计预算；旧记录可恢复，重新启用需重新取得资格。具体协议在 gradient pack。
 
 ## 使用 crew 时
 

@@ -85,6 +85,12 @@ def prepare(root, counterexample=False, repair=False, project=None, candidate_fi
     root.mkdir(parents=True, exist_ok=True)
     candidate = Path(candidate_file).read_text() if candidate_file is not None else REPAIRED if repair else CANDIDATE
     (root / 'grader.py').write_text(GRADER)
+    calibration = {'good': [], 'bad': []}
+    for label, sample in [('good', '[2,1]'), ('bad-order', '[1,2]'), ('bad-format', 'not JSON')]:
+        output = 'calibration-' + label + '.txt'
+        (root / output).write_text(sample)
+        calibration['good' if label == 'good' else 'bad'].append(dict(output=output, expected='calibration-gold.txt'))
+    (root / 'calibration-gold.txt').write_text('[2,1]')
     if project is None:
         (root / 'baseline.py').write_text(BASELINE + DRIVER)
         (root / 'candidate.py').write_text(candidate + DRIVER)
@@ -119,7 +125,7 @@ def prepare(root, counterexample=False, repair=False, project=None, candidate_fi
         phases[phase] = cases
     protocol = dict(version=1 if project is None else 2, grader='grader.py',
                     minimum_pairs=6, minimum_cost_gain=0.15, quality_tolerance=0,
-                    trial_seconds=5, budget_seconds=60, **phases, **policies)
+                    trial_seconds=5, budget_seconds=60, calibration=calibration, **phases, **policies)
     path = root / 'protocol.json'
     path.write_text(json.dumps(protocol, indent=2))
     (root / 'proposal-source.json').write_text(json.dumps(dict(
@@ -160,10 +166,12 @@ if __name__ == '__main__':
     enabled = json.loads((args.output / 'state/enabled.json').read_bytes())
     if enabled['policy'] is not None:
         program = args.output / 'state' / enabled['program']
-        assert hashlib.sha256(program.read_bytes()).hexdigest() == enabled['policy']
+        if hashlib.sha256(program.read_bytes()).hexdigest() != enabled['policy']:
+            raise RuntimeError('enabled policy archive hash mismatch')
         case = json.loads(protocol.read_bytes())['development'][0]
         output = subprocess.run([*runner, 'run-enabled', *state_args, '--seconds', '5'],
                                 input=(protocol.parent / case['input']).read_bytes(),
                                 capture_output=True, timeout=5, check=True)
-        assert json.loads(output.stdout) == json.loads((protocol.parent / case['expected']).read_bytes())
+        if json.loads(output.stdout) != json.loads((protocol.parent / case['expected']).read_bytes()):
+            raise RuntimeError('enabled artifact failed independent recheck')
         print('enabled artifact independently rechecked: PASS')

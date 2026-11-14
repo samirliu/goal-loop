@@ -125,7 +125,10 @@ class Incumbent(ProjectCase):
         protocol = dict(version=2, baseline=candidate, candidate=base, entry='a.txt',
                         grader='absent.py', development=[], holdout=[],
                         minimum_pairs=6, minimum_cost_gain=.15, quality_tolerance=0,
-                        trial_seconds=1, budget_seconds=10)
+                        trial_seconds=1, budget_seconds=10,
+                        calibration=dict(good=[dict(output='good.txt', expected='gold.txt')],
+                                         bad=[dict(output='bad.txt', expected='gold.txt')]))
+        # Pair preflight must reject before reading the absent grader/fixtures.
         path = self.project / 'protocol.json'
         path.write_text(json.dumps(protocol))
         trial_state = self.project / '.goal/proposals/test'

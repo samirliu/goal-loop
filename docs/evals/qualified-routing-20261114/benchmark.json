@@ -1,0 +1,839 @@
+{
+  "scope": "local production entry costs; synthetic history; not end-to-end agent utility",
+  "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+  "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+  "sources": {
+    "before": {
+      "goal_audit.sh": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb",
+      "goal_bounded.py": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c",
+      "goal_context.py": "fcba8cd49cc1d00d79d36a243d8d3bf0b41c94178a82975933a0ba29bda28ef0",
+      "goal_crew.py": "431cdd1936800c6dca9fc03ba46ae71c5f31a7d7cf3edd9621b8f10bb430f591",
+      "goal_ctl.sh": "599e362b4d72949f4dfa5ac6f7c54abb2e6eae04467dbd07f5c7ad8eec26d3d3",
+      "goal_evolve.py": "2a660c109648286f655e84bc74f0acb5e0b4a0db08e6ec1e22799e7fb271cca3",
+      "goal_forge.py": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb",
+      "goal_gate.sh": "ac2571808ae804f57c9ef5376698f8b54fb4632676d6424bf78ca79f1a94f824",
+      "goal_hook.sh": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87",
+      "goal_host.py": "3ea93a92bf125aa5543846e7dd472a6be7e79b56ff2ad50dc546d44e07e1e151",
+      "goal_host_command.py": "5dd63083301040150fbe7e346052ffdb529754b3fd5415fa90dd9e926b4ae608",
+      "goal_host_config.py": "fcb9118c8ce1b9a940bfeed1cc289155f4366c301ff2acaa926cb5c0d494f1f5",
+      "goal_loop.sh": "c059480a6b5827efaaccead8bf88ff4544417892b348b47428c934a2fa74a36b",
+      "goal_owner_watch.py": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+      "goal_parse.sh": "1c33a08b2df1a5764672ee9953783e681a640fa0481197f7e266ee0b22e23b70",
+      "goal_runner.py": "19d7857fe9e1249071dac1ec105050b6d56b1d778aeb2613e2867ff1f10b7d01",
+      "goal_store.py": "aca070768478bc8f98f742042c5ce4dd6534c83bab408d451b2912bbdb457f56",
+      "goal_strategy.awk": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+      "goal_trace.py": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb",
+      "goal_tree_digest.py": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d"
+    },
+    "after": {
+      "goal_audit.sh": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb",
+      "goal_bounded.py": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c",
+      "goal_context.py": "729e1beb5f3232b7bea2d23a6c9f4b4832a834e7a34f3b0b633407d97159ba13",
+      "goal_crew.py": "c09d895bd7187f1532fb25346da9fa854bdb4c6c629a5421ff45445fc652f48b",
+      "goal_ctl.sh": "599e362b4d72949f4dfa5ac6f7c54abb2e6eae04467dbd07f5c7ad8eec26d3d3",
+      "goal_evolve.py": "fd6ed98c1d673e61dbfe35b7d33347bf99a639776fcec549c8d7eabe7da0529e",
+      "goal_forge.py": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb",
+      "goal_gate.sh": "ac2571808ae804f57c9ef5376698f8b54fb4632676d6424bf78ca79f1a94f824",
+      "goal_hook.sh": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87",
+      "goal_host.py": "3ea93a92bf125aa5543846e7dd472a6be7e79b56ff2ad50dc546d44e07e1e151",
+      "goal_host_command.py": "5dd63083301040150fbe7e346052ffdb529754b3fd5415fa90dd9e926b4ae608",
+      "goal_host_config.py": "fcb9118c8ce1b9a940bfeed1cc289155f4366c301ff2acaa926cb5c0d494f1f5",
+      "goal_loop.sh": "c059480a6b5827efaaccead8bf88ff4544417892b348b47428c934a2fa74a36b",
+      "goal_owner_watch.py": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+      "goal_parse.sh": "ce74f9c17de8560ddc58973e00f311f0083563d928eb34b8af4f0c33550b6538",
+      "goal_runner.py": "19d7857fe9e1249071dac1ec105050b6d56b1d778aeb2613e2867ff1f10b7d01",
+      "goal_store.py": "222756b1fb63055fb7d920b990a95cf88fd83bb5053c1a032d80bc90808f41de",
+      "goal_strategy.awk": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+      "goal_trace.py": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb",
+      "goal_tree_digest.py": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d"
+    }
+  },
+  "cases": {
+    "small-store": {
+      "pairs": [
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.0002168749924749136,
+          "after": 0.0001373749691992998
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.0001233341172337532,
+          "before": 0.00020258291624486446
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.00020004203543066978,
+          "after": 0.00010912492871284485
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.0001082499511539936,
+          "before": 0.00019804202020168304
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.0001971661113202572,
+          "after": 0.00010895798914134502
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.00011445884592831135,
+          "before": 0.00020541693083941936
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.00021074991673231125,
+          "after": 0.00011199992150068283
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.00011420901864767075,
+          "before": 0.00020762509666383266
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.00019937497563660145,
+          "after": 0.00010616588406264782
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.0001058338675647974,
+          "before": 0.0002043331041932106
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.0001968329306691885,
+          "after": 0.00010770815424621105
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.0001063330564647913,
+          "before": 0.00020120805129408836
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.0001968329306691885,
+          "after": 0.00010624993592500687
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.00010591698810458183,
+          "before": 0.0001990830060094595
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.00019691698253154755,
+          "after": 0.00011487514711916447
+        }
+      ],
+      "median_seconds": {
+        "before": 0.00020004203543066978,
+        "after": 0.00010895798914134502
+      },
+      "cost_gain": 0.44584657635364366,
+      "after_faster_pairs": 15,
+      "identities_equal": true
+    },
+    "small-digest": {
+      "pairs": [
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.08949695806950331,
+          "after": 0.08536845911294222
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.08480829186737537,
+          "before": 0.08489554189145565
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.08570004091598094,
+          "after": 0.08514562505297363
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.08854004205204546,
+          "before": 0.09312733286060393
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.09288174984976649,
+          "after": 0.09264070796780288
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.08707895805127919,
+          "before": 0.0852798328269273
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.08894591615535319,
+          "after": 0.08609491703100502
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.08553795795887709,
+          "before": 0.08662029099650681
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.0862193750217557,
+          "after": 0.08494137483648956
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.0851995840203017,
+          "before": 0.0860625000204891
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.08673266600817442,
+          "after": 0.08527554082684219
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.08725083293393254,
+          "before": 0.0864826668985188
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.08554512495175004,
+          "after": 0.08522420888766646
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.0865307089406997,
+          "before": 0.08605499984696507
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.08619979210197926,
+          "after": 0.08502779179252684
+        }
+      ],
+      "median_seconds": {
+        "before": 0.0862193750217557,
+        "after": 0.08536845911294222
+      },
+      "cost_gain": 0.011890745317757245,
+      "after_faster_pairs": 12,
+      "identities_equal": true
+    },
+    "small-context": {
+      "pairs": [
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.2124119580257684,
+          "after": 0.19425595900975168
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.18640887481160462,
+          "before": 0.21028337511233985
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.21550370892509818,
+          "after": 0.19703995808959007
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.19884149986319244,
+          "before": 0.21650324994698167
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.21318720886483788,
+          "after": 0.18924083304591477
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.18747554207220674,
+          "before": 0.21828695805743337
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.21143050002865493,
+          "after": 0.18877516593784094
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.19161120802164078,
+          "before": 0.21471708291210234
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.21301495912484825,
+          "after": 0.19011887488886714
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.19005812495015562,
+          "before": 0.2134199591819197
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.21417487505823374,
+          "after": 0.1932744588702917
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.18922791699878871,
+          "before": 0.2109276670962572
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.21557304193265736,
+          "after": 0.19060954195447266
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.18844295805320144,
+          "before": 0.21405025012791157
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.21701074996963143,
+          "after": 0.18929412495344877
+        }
+      ],
+      "median_seconds": {
+        "before": 0.21405025012791157,
+        "after": 0.19005812495015562
+      },
+      "cost_gain": 0.10771561525781281,
+      "after_faster_pairs": 15,
+      "identities_equal": true
+    },
+    "large-store": {
+      "pairs": [
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.026812374824658036,
+          "after": 0.02585158310830593
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.025934208882972598,
+          "before": 0.027108000125735998
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.027132792165502906,
+          "after": 0.02589591685682535
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.025618499843403697,
+          "before": 0.026987167075276375
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.027055874932557344,
+          "after": 0.02586450008675456
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.025696999859064817,
+          "before": 0.027074791956692934
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.02710179192945361,
+          "after": 0.02579641598276794
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.025497749913483858,
+          "before": 0.027023999951779842
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.02819224982522428,
+          "after": 0.027031125035136938
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.026304291794076562,
+          "before": 0.02711737505160272
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.027029833057895303,
+          "after": 0.02586933388374746
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.025716833071783185,
+          "before": 0.02746512508019805
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.02767479093745351,
+          "after": 0.02565920795314014
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.02576058404520154,
+          "before": 0.02763658296316862
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.027451334055513144,
+          "after": 0.025737165939062834
+        }
+      ],
+      "median_seconds": {
+        "before": 0.027108000125735998,
+        "after": 0.02579641598276794
+      },
+      "cost_gain": 0.050456052482174774,
+      "after_faster_pairs": 15,
+      "identities_equal": true
+    },
+    "large-digest": {
+      "pairs": [
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.2775627081282437,
+          "after": 0.17276220791973174
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.1723784999921918,
+          "before": 0.2792397500015795
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.27621245803311467,
+          "after": 0.17448137514293194
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.17348899994976819,
+          "before": 0.27271858300082386
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.2731871251016855,
+          "after": 0.20655541704036295
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.17563591594807804,
+          "before": 0.28741212491877377
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.2804182081017643,
+          "after": 0.17547191702760756
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.17313500004820526,
+          "before": 0.27431766712106764
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.27119674999266863,
+          "after": 0.17198924999684095
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.1748970418702811,
+          "before": 0.28168604196980596
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.27817287505604327,
+          "after": 0.17279895907267928
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.17790320795029402,
+          "before": 0.274793041869998
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.274621999822557,
+          "after": 0.17253199988044798
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.17154712486080825,
+          "before": 0.27657595789059997
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.2772605000063777,
+          "after": 0.17412908398546278
+        }
+      ],
+      "median_seconds": {
+        "before": 0.27657595789059997,
+        "after": 0.17348899994976819
+      },
+      "cost_gain": 0.36474915063197055,
+      "after_faster_pairs": 15,
+      "identities_equal": true
+    },
+    "large-context": {
+      "pairs": [
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.4935624999925494,
+          "after": 0.3387148748151958
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.33394645899534225,
+          "before": 0.48869529203511775
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.49597216700203717,
+          "after": 0.3304197499528527
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.3299269999843091,
+          "before": 0.49262691708281636
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.4976914171129465,
+          "after": 0.3301798750180751
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.3284615830052644,
+          "before": 0.48693645908497274
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.5068420418538153,
+          "after": 0.33908762503415346
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.339391625020653,
+          "before": 0.48686191719025373
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.5002598338760436,
+          "after": 0.33157641696743667
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.33455662499181926,
+          "before": 0.49046966689638793
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.4855759160127491,
+          "after": 0.3305517081171274
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.33085966599173844,
+          "before": 0.48670624988153577
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.4935235830489546,
+          "after": 0.33644187496975064
+        },
+        {
+          "order": [
+            "after",
+            "before"
+          ],
+          "after": 0.33951633307151496,
+          "before": 0.5005019579548389
+        },
+        {
+          "order": [
+            "before",
+            "after"
+          ],
+          "before": 0.487903333036229,
+          "after": 0.3334722078870982
+        }
+      ],
+      "median_seconds": {
+        "before": 0.49262691708281636,
+        "after": 0.3334722078870982
+      },
+      "cost_gain": 0.3228271439227939,
+      "after_faster_pairs": 15,
+      "identities_equal": true
+    }
+  }
+}

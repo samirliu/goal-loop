@@ -80,8 +80,8 @@ def inputs(project, seed, clear=True):
         os.chdir(previous)
 
 
-def trial(project, graph_path, definition, mode, label, delay, fail=None, recovery=False):
-    wave = crew.Wave(project, crew.begin(project, graph_path, mode, label))
+def trial(project, graph_path, definition, mode, label, delay, fail=None, recovery=False, policy_state=None):
+    wave = crew.Wave(project, crew.begin(project, graph_path, mode, label, policy_state=policy_state))
     if recovery:
         wave.stage('recovery', 'begin')
     children, logs, ready_lines = {}, {}, {}

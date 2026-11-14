@@ -1,0 +1,3 @@
+help: PASS
+{"optimized": false, "empty_cases_rejected": true, "no_workflow_or_output_created": true}
+{"optimized": true, "empty_cases_rejected": true, "no_workflow_or_output_created": true}

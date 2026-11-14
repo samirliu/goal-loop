@@ -7,3 +7,6 @@ Thumbs.db
 *~
 *.bak
 *.tmp
+__pycache__/
+*.py[cod]
+.pytest_cache/

@@ -1,0 +1,271 @@
+test_field_reads_current_bytes_after_change (test_ac_parse.ACParsing.test_field_reads_current_bytes_after_change) ... ok
+test_matches_six_hundred_frozen_original_outputs (test_ac_parse.ACParsing.test_matches_six_hundred_frozen_original_outputs) ... ok
+test_budget_temp_symlinks_do_not_overwrite_user_files (test_budget.Budget.test_budget_temp_symlinks_do_not_overwrite_user_files) ... ok
+test_deadline_limits_workers_and_resume (test_budget.Budget.test_deadline_limits_workers_and_resume) ... ok
+test_executor_exit_stops_background_children (test_budget.Budget.test_executor_exit_stops_background_children) ... ok
+test_executor_nonzero_still_checks_gate (test_budget.Budget.test_executor_nonzero_still_checks_gate) ... ok
+test_expired_contract_prevents_any_worker (test_budget.Budget.test_expired_contract_prevents_any_worker) ... ok
+test_missing_executor_fails_closed (test_budget.Budget.test_missing_executor_fails_closed) ... ok
+test_owner_sigkill_stops_owned_process_group (test_budget.Budget.test_owner_sigkill_stops_owned_process_group) ... ok
+test_resume_cannot_override_live_owner (test_budget.Budget.test_resume_cannot_override_live_owner) ... FAIL
+test_resume_rejects_persisted_clock_rollback (test_budget.Budget.test_resume_rejects_persisted_clock_rollback) ... ok
+test_supervisor_ignores_ambient_python_startup (test_budget.Budget.test_supervisor_ignores_ambient_python_startup) ... ok
+test_supervisor_setup_failure_is_state_error (test_budget.Budget.test_supervisor_setup_failure_is_state_error) ... ok
+test_wall_clock_regression_does_not_extend_budget (test_budget.Budget.test_wall_clock_regression_does_not_extend_budget) ... ok
+test_wallclock_leading_zeros_are_decimal (test_budget.Budget.test_wallclock_leading_zeros_are_decimal) ... ok
+test_crash_after_pointer_rolls_forward_and_retry_does_not_rerun (test_close_commit.CloseCommit.test_crash_after_pointer_rolls_forward_and_retry_does_not_rerun) ... ok
+test_crash_before_pointer_rolls_back_then_same_id_can_retry (test_close_commit.CloseCommit.test_crash_before_pointer_rolls_back_then_same_id_can_retry) ... ok
+test_default_id_is_unique_and_invalid_id_does_not_write (test_close_commit.CloseCommit.test_default_id_is_unique_and_invalid_id_does_not_write) ... ok
+test_lost_acknowledgement_does_not_consume_a_second_iteration (test_close_commit.CloseCommit.test_lost_acknowledgement_does_not_consume_a_second_iteration) ... ok
+test_retry_is_read_only_even_after_newer_commit (test_close_commit.CloseCommit.test_retry_is_read_only_even_after_newer_commit) ... ok
+test_uncommitted_old_journal_cannot_rollback_newer_version (test_close_commit.CloseCommit.test_uncommitted_old_journal_cannot_rollback_newer_version) ... ok
+test_changed_product_request_and_evidence_reject_old_actions (test_context_actions.BriefContextActions.test_changed_product_request_and_evidence_reject_old_actions) ... ok
+test_claims_without_evidence_or_with_bad_product_cannot_go (test_context_actions.BriefContextActions.test_claims_without_evidence_or_with_bad_product_cannot_go) ... ok
+test_context_without_auto_preserves_unapproved_initial_entry (test_context_actions.BriefContextActions.test_context_without_auto_preserves_unapproved_initial_entry) ... ok
+test_expired_map_can_settle_passing_work_without_dispatch_or_new_budget (test_context_actions.BriefContextActions.test_expired_map_can_settle_passing_work_without_dispatch_or_new_budget) ... ok
+test_expiry_cannot_consume_an_old_work_or_close_map (test_context_actions.BriefContextActions.test_expiry_cannot_consume_an_old_work_or_close_map) ... ok
+test_interruption_after_commit_replays_original_id_and_arguments (test_context_actions.BriefContextActions.test_interruption_after_commit_replays_original_id_and_arguments) ... ok
+test_interruption_before_commit_recovers_original_request (test_context_actions.BriefContextActions.test_interruption_before_commit_recovers_original_request) ... ok
+test_presentation_reduces_repetition_without_changing_bound_actions (test_context_actions.BriefContextActions.test_presentation_reduces_repetition_without_changing_bound_actions) ... ok
+test_recorded_wave_maps_plan_begin_prepare_and_missing_native_receipt (test_context_actions.BriefContextActions.test_recorded_wave_maps_plan_begin_prepare_and_missing_native_receipt) ... ok
+test_single_task_from_empty_project_through_fresh_final_receipt (test_context_actions.BriefContextActions.test_single_task_from_empty_project_through_fresh_final_receipt) ... ok
+test_changed_product_request_and_evidence_reject_old_actions (test_context_actions.ContextActions.test_changed_product_request_and_evidence_reject_old_actions) ... ok
+test_claims_without_evidence_or_with_bad_product_cannot_go (test_context_actions.ContextActions.test_claims_without_evidence_or_with_bad_product_cannot_go) ... ok
+test_context_without_auto_preserves_unapproved_initial_entry (test_context_actions.ContextActions.test_context_without_auto_preserves_unapproved_initial_entry) ... ok
+test_expired_map_can_settle_passing_work_without_dispatch_or_new_budget (test_context_actions.ContextActions.test_expired_map_can_settle_passing_work_without_dispatch_or_new_budget) ... ok
+test_expiry_cannot_consume_an_old_work_or_close_map (test_context_actions.ContextActions.test_expiry_cannot_consume_an_old_work_or_close_map) ... ok
+test_interruption_after_commit_replays_original_id_and_arguments (test_context_actions.ContextActions.test_interruption_after_commit_replays_original_id_and_arguments) ... ok
+test_interruption_before_commit_recovers_original_request (test_context_actions.ContextActions.test_interruption_before_commit_recovers_original_request) ... ok
+test_recorded_wave_maps_plan_begin_prepare_and_missing_native_receipt (test_context_actions.ContextActions.test_recorded_wave_maps_plan_begin_prepare_and_missing_native_receipt) ... ok
+test_single_task_from_empty_project_through_fresh_final_receipt (test_context_actions.ContextActions.test_single_task_from_empty_project_through_fresh_final_receipt) ... ok
+test_broken_smoke_does_not_stamp (test_context_submit.ContextEntry.test_broken_smoke_does_not_stamp) ... ok
+test_enter_from_real_shaped_prompt_keeps_earliest_origin (test_context_submit.ContextEntry.test_enter_from_real_shaped_prompt_keeps_earliest_origin) ... ok
+test_entry_preserves_manual_approval_marker_without_auto_flag (test_context_submit.ContextEntry.test_entry_preserves_manual_approval_marker_without_auto_flag) ... ok
+test_entry_reports_context_store_errors_through_normal_host_error_path (test_context_submit.ContextEntry.test_entry_reports_context_store_errors_through_normal_host_error_path) ... ok
+test_failing_business_criterion_can_be_stamped_before_its_repair (test_context_submit.ContextEntry.test_failing_business_criterion_can_be_stamped_before_its_repair) ... ok
+test_mutating_smoke_does_not_stamp (test_context_submit.ContextEntry.test_mutating_smoke_does_not_stamp) ... ok
+test_numeric_contract_keeps_explicit_observed_counts (test_context_submit.ContextEntry.test_numeric_contract_keeps_explicit_observed_counts) ... ok
+test_one_entry_initializes_binds_and_returns_current_map (test_context_submit.ContextEntry.test_one_entry_initializes_binds_and_returns_current_map) ... ok
+test_single_submission_smokes_then_stamps_original_contract (test_context_submit.ContextEntry.test_single_submission_smokes_then_stamps_original_contract) ... ok
+test_actual_business_failure_stays_failed_and_charges_false_claim (test_context_submit.ContextSubmit.test_actual_business_failure_stays_failed_and_charges_false_claim) ... ok
+test_artifact_change_rejects_before_writing_request_or_booking (test_context_submit.ContextSubmit.test_artifact_change_rejects_before_writing_request_or_booking) ... ok
+test_committed_request_cannot_be_booked_again_with_old_revision (test_context_submit.ContextSubmit.test_committed_request_cannot_be_booked_again_with_old_revision) ... ok
+test_contract_and_plan_changes_reject_old_judgments (test_context_submit.ContextSubmit.test_contract_and_plan_changes_reject_old_judgments) ... ok
+test_derived_protocol_controls_cannot_be_overridden (test_context_submit.ContextSubmit.test_derived_protocol_controls_cannot_be_overridden) ... ok
+test_emitted_submission_requires_only_actual_judgments (test_context_submit.ContextSubmit.test_emitted_submission_requires_only_actual_judgments) ... ok
+test_expired_inherited_budget_is_not_renewed (test_context_submit.ContextSubmit.test_expired_inherited_budget_is_not_renewed) ... ok
+test_manual_counts_cannot_override_automatic_evidence (test_context_submit.ContextSubmit.test_manual_counts_cannot_override_automatic_evidence) ... ok
+test_missing_review_is_not_inferred_from_passing_checks (test_context_submit.ContextSubmit.test_missing_review_is_not_inferred_from_passing_checks) ... ok
+test_one_observed_version_accepts_judgments_and_runs_fresh_original_gate (test_context_submit.ContextSubmit.test_one_observed_version_accepts_judgments_and_runs_fresh_original_gate) ... ok
+test_postcommit_crash_recovers_original_arguments_without_rebooking (test_context_submit.ContextSubmit.test_postcommit_crash_recovers_original_arguments_without_rebooking) ... ok
+test_precommit_crash_retains_exact_request_for_original_recovery (test_context_submit.ContextSubmit.test_precommit_crash_retains_exact_request_for_original_recovery) ... ok
+test_replaced_proposal_invalidates_observed_version (test_context_submit.ContextSubmit.test_replaced_proposal_invalidates_observed_version) ... ok
+test_contended_writer_respects_expired_deadline (test_controller_writers.ControllerWriters.test_contended_writer_respects_expired_deadline) ... ok
+test_killed_close_blocks_readers_and_recovers_without_replaying_checks (test_controller_writers.ControllerWriters.test_killed_close_blocks_readers_and_recovers_without_replaying_checks) ... ok
+test_malformed_deadline_refuses_writer_without_changing_ledger (test_controller_writers.ControllerWriters.test_malformed_deadline_refuses_writer_without_changing_ledger) ... ok
+test_two_writers_never_commit_the_same_iteration (test_controller_writers.ControllerWriters.test_two_writers_never_commit_the_same_iteration) ... ok
+test_absent_stage_is_unknown_and_explicit_no_operation_is_zero (test_crew.Crew.test_absent_stage_is_unknown_and_explicit_no_operation_is_zero) ... FAIL
+test_after_adoption_changes_still_fail_even_if_final_checker_is_weak (test_crew.Crew.test_after_adoption_changes_still_fail_even_if_final_checker_is_weak) ... FAIL
+test_all_cost_history_expires_when_frozen_input_bytes_change (test_crew.Crew.test_all_cost_history_expires_when_frozen_input_bytes_change) ... FAIL
+test_changed_input_cannot_reuse_frozen_trial (test_crew.Crew.test_changed_input_cannot_reuse_frozen_trial) ... ok
+test_changed_output_cannot_reuse_adoption (test_crew.Crew.test_changed_output_cannot_reuse_adoption) ... FAIL
+test_cli_records_real_cross_process_lifecycle (test_crew.Crew.test_cli_records_real_cross_process_lifecycle) ... ok
+test_coupled_task_waits_for_adopted_dependency (test_crew.Crew.test_coupled_task_waits_for_adopted_dependency) ... FAIL
+test_decision_flips_with_observed_startup_cost (test_crew.Crew.test_decision_flips_with_observed_startup_cost) ... FAIL
+test_different_producer_transports_cannot_be_pooled (test_crew.Crew.test_different_producer_transports_cannot_be_pooled) ... FAIL
+test_dropped_worker_preserves_adopted_output_and_fault_cost (test_crew.Crew.test_dropped_worker_preserves_adopted_output_and_fault_cost) ... FAIL
+test_frozen_instrument_cannot_be_swapped (test_crew.Crew.test_frozen_instrument_cannot_be_swapped) ... ok
+test_new_earlier_budget_is_used_before_dispatch_and_undispatched_work_is_booked (test_crew.Crew.test_new_earlier_budget_is_used_before_dispatch_and_undispatched_work_is_booked) ... ok
+test_overlap_adds_serial_precedence_and_invalid_graph_does_not_book (test_crew.Crew.test_overlap_adds_serial_precedence_and_invalid_graph_does_not_book) ... ok
+test_public_cli_reads_api_observations_without_changing_their_transport (test_crew.Crew.test_public_cli_reads_api_observations_without_changing_their_transport) ... FAIL
+test_recorded_marginal_gain_does_not_lower_ten_percent_gate (test_crew.Crew.test_recorded_marginal_gain_does_not_lower_ten_percent_gate) ... FAIL
+test_repeated_trial_identity_is_not_independent_replication (test_crew.Crew.test_repeated_trial_identity_is_not_independent_replication) ... FAIL
+test_single_baseline_cannot_cross_different_frozen_input_bytes (test_crew.Crew.test_single_baseline_cannot_cross_different_frozen_input_bytes) ... FAIL
+test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width (test_crew.Crew.test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width) ... 
+  test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width (test_crew.Crew.test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width) (single_worker_seconds=10) ... FAIL
+  test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width (test_crew.Crew.test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width) (single_worker_seconds=30) ... FAIL
+  test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width (test_crew.Crew.test_single_worker_baseline_prevents_false_crew_benefit_and_accounts_for_width) (single_worker_seconds=50) ... FAIL
+test_unknown_startup_cannot_become_zero_cost (test_crew.Crew.test_unknown_startup_cannot_become_zero_cost) ... FAIL
+test_correct_bare_delivery_needs_no_goal_loop_metadata (test_delivery_evaluation.DeliveryEvaluation.test_correct_bare_delivery_needs_no_goal_loop_metadata) ... ok
+test_deadline_model_source_and_missing_positions_are_rejected (test_delivery_evaluation.DeliveryEvaluation.test_deadline_model_source_and_missing_positions_are_rejected) ... ok
+test_false_green_bad_product_and_changed_grader_are_rejected (test_delivery_evaluation.DeliveryEvaluation.test_false_green_bad_product_and_changed_grader_are_rejected) ... ok
+test_filter_does_not_save_thinking_or_credentials (test_delivery_evaluation.DeliveryEvaluation.test_filter_does_not_save_thinking_or_credentials) ... ok
+test_goal_loop_cannot_reuse_bare_acceptance_or_fake_gate (test_delivery_evaluation.DeliveryEvaluation.test_goal_loop_cannot_reuse_bare_acceptance_or_fake_gate) ... ok
+test_no_final_late_final_and_cancel_are_not_deliveries (test_delivery_evaluation.DeliveryEvaluation.test_no_final_late_final_and_cancel_are_not_deliveries) ... ok
+test_reserved_validation_positions_keep_global_identity (test_delivery_evaluation.DeliveryEvaluation.test_reserved_validation_positions_keep_global_identity) ... ok
+test_candidate_identity_cannot_borrow_baseline_archive (test_evolution_verifier.EvolutionVerifier.test_candidate_identity_cannot_borrow_baseline_archive) ... ok
+test_final_pointer_identifies_the_run_that_selected_its_bytes (test_evolution_verifier.EvolutionVerifier.test_final_pointer_identifies_the_run_that_selected_its_bytes) ... ok
+test_grader_identity_is_bound_to_frozen_program (test_evolution_verifier.EvolutionVerifier.test_grader_identity_is_bound_to_frozen_program) ... ok
+test_inconclusive_holdout_retains_current_policy (test_evolution_verifier.EvolutionVerifier.test_inconclusive_holdout_retains_current_policy) ... ok
+test_large_but_inconsistent_slowdown_is_not_confirmed_regression (test_evolution_verifier.EvolutionVerifier.test_large_but_inconsistent_slowdown_is_not_confirmed_regression) ... ok
+test_missed_budget_retains_existing_policy_without_promotion (test_evolution_verifier.EvolutionVerifier.test_missed_budget_retains_existing_policy_without_promotion) ... ok
+test_optimized_python_preserves_original_98_pair_verification (test_evolution_verifier.EvolutionVerifier.test_optimized_python_preserves_original_98_pair_verification) ... ok
+test_optimized_python_rejects_candidate_identity_substitution (test_evolution_verifier.EvolutionVerifier.test_optimized_python_rejects_candidate_identity_substitution) ... ok
+test_optimized_python_rejects_unjustified_withdrawal (test_evolution_verifier.EvolutionVerifier.test_optimized_python_rejects_unjustified_withdrawal) ... ok
+test_original_98_pairs_reconstruct_both_directions_and_transitions (test_evolution_verifier.EvolutionVerifier.test_original_98_pairs_reconstruct_both_directions_and_transitions) ... ok
+test_protocol_metadata_cannot_change_frozen_threshold (test_evolution_verifier.EvolutionVerifier.test_protocol_metadata_cannot_change_frozen_threshold) ... ok
+test_regression_flag_cannot_override_frozen_cost_threshold (test_evolution_verifier.EvolutionVerifier.test_regression_flag_cannot_override_frozen_cost_threshold) ... ok
+test_report_cannot_forge_within_budget (test_evolution_verifier.EvolutionVerifier.test_report_cannot_forge_within_budget) ... ok
+test_successful_pairs_cannot_promote_outside_budget (test_evolution_verifier.EvolutionVerifier.test_successful_pairs_cannot_promote_outside_budget) ... ok
+test_ten_percent_slowdown_does_not_justify_withdrawal (test_evolution_verifier.EvolutionVerifier.test_ten_percent_slowdown_does_not_justify_withdrawal) ... ok
+test_broken_grader_does_not_withdraw_an_enabled_policy (test_evolve.Evolution.test_broken_grader_does_not_withdraw_an_enabled_policy) ... ok
+test_changed_grader_leaves_failed_trace_and_preserves_enabled_policy (test_evolve.Evolution.test_changed_grader_leaves_failed_trace_and_preserves_enabled_policy) ... ok
+test_development_gain_then_complete_holdout_regression_keeps_incumbent (test_evolve.Evolution.test_development_gain_then_complete_holdout_regression_keeps_incumbent) ... ok
+test_enough_pairs_before_deadline_does_not_qualify_a_partial_phase (test_evolve.Evolution.test_enough_pairs_before_deadline_does_not_qualify_a_partial_phase) ... ok
+test_former_development_inputs_cannot_be_used_as_holdout (test_evolve.Evolution.test_former_development_inputs_cannot_be_used_as_holdout) ... ok
+test_inconclusive_monitor_retains_incumbent_and_does_not_reset_testing_budget (test_evolve.Evolution.test_inconclusive_monitor_retains_incumbent_and_does_not_reset_testing_budget) ... ok
+test_noop_or_overlapping_tasks_refused_before_state_creation (test_evolve.Evolution.test_noop_or_overlapping_tasks_refused_before_state_creation) ... ok
+test_only_replicated_eligible_cost_improvement_passes (test_evolve.Evolution.test_only_replicated_eligible_cost_improvement_passes) ... ok
+test_real_worker_failure_and_timeout_are_measured_not_dropped (test_evolve.Evolution.test_real_worker_failure_and_timeout_are_measured_not_dropped) ... FAIL
+test_registry_promotes_and_withdraws_without_reusing_holdout (test_evolve.Evolution.test_registry_promotes_and_withdraws_without_reusing_holdout) ... ok
+test_trial_budget_covers_worker_and_grader_together (test_evolve.Evolution.test_trial_budget_covers_worker_and_grader_together) ... FAIL
+test_always_fail_grader_is_detected_on_good_sample (test_evolve_calibration.Calibration.test_always_fail_grader_is_detected_on_good_sample) ... ok
+test_always_pass_grader_cannot_enable_incorrect_fast_policy (test_evolve_calibration.Calibration.test_always_pass_grader_cannot_enable_incorrect_fast_policy) ... FAIL
+test_bad_instrument_preserves_incumbent_and_sequential_budget (test_evolve_calibration.Calibration.test_bad_instrument_preserves_incumbent_and_sequential_budget) ... ERROR
+test_calibration_source_mutation_cannot_qualify (test_evolve_calibration.Calibration.test_calibration_source_mutation_cannot_qualify) ... ok
+test_calibration_timeout_is_bounded_and_never_a_product_regression (test_evolve_calibration.Calibration.test_calibration_timeout_is_bounded_and_never_a_product_regression) ... ok
+test_feedback_refuses_path_escape_and_pending_transition (test_evolve_calibration.Calibration.test_feedback_refuses_path_escape_and_pending_transition) ... ok
+test_feedback_reports_real_failure_and_next_nonresetting_sample_requirement (test_evolve_calibration.Calibration.test_feedback_reports_real_failure_and_next_nonresetting_sample_requirement) ... FAIL
+test_good_and_bad_calibration_then_original_paired_qualification (test_evolve_calibration.Calibration.test_good_and_bad_calibration_then_original_paired_qualification) ... FAIL
+test_malformed_or_escaping_calibration_refused_before_state_creation (test_evolve_calibration.Calibration.test_malformed_or_escaping_calibration_refused_before_state_creation) ... ok
+test_acceptance_check_cannot_replace_the_archived_scope_during_close (test_forge.ForgeCoverage.test_acceptance_check_cannot_replace_the_archived_scope_during_close) ... ok
+test_clear_receipts_without_dry_probes_never_complete_forge (test_forge.ForgeCoverage.test_clear_receipts_without_dry_probes_never_complete_forge) ... ok
+test_coverage_can_grow_without_dropping_earlier_cases_or_failures (test_forge.ForgeCoverage.test_coverage_can_grow_without_dropping_earlier_cases_or_failures) ... ok
+test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe (test_forge.ForgeCoverage.test_declared_new_input_exposes_a_defect_missed_by_positive_only_probe) ... ok
+test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit (test_forge.ForgeCoverage.test_exhausted_budget_preserves_unprobed_scope_and_cannot_earn_dry_credit) ... ok
+test_failed_floor_skips_probe_spend_and_cannot_become_dry (test_forge.ForgeCoverage.test_failed_floor_skips_probe_spend_and_cannot_become_dry) ... ok
+test_legacy_forge_migration_retains_history_and_requires_new_probe_evidence (test_forge.ForgeCoverage.test_legacy_forge_migration_retains_history_and_requires_new_probe_evidence) ... ok
+test_open_critic_finding_and_stale_critic_cannot_earn_dry_credit (test_forge.ForgeCoverage.test_open_critic_finding_and_stale_critic_cannot_earn_dry_credit) ... ok
+test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope (test_forge.ForgeCoverage.test_plan_input_and_checker_edits_invalidate_the_frozen_probe_scope) ... ok
+test_probe_ledger_mutation_leaves_a_recoverable_pending_transaction (test_forge.ForgeCoverage.test_probe_ledger_mutation_leaves_a_recoverable_pending_transaction) ... ok
+test_renamed_duplicate_probe_does_not_earn_new_coverage (test_forge.ForgeCoverage.test_renamed_duplicate_probe_does_not_earn_new_coverage) ... ok
+test_repeated_clear_records_stability_and_explicit_blind_spots (test_forge.ForgeCoverage.test_repeated_clear_records_stability_and_explicit_blind_spots) ... ok
+test_stamp_requires_a_declared_probe_scope_before_any_commit (test_forge.ForgeCoverage.test_stamp_requires_a_declared_probe_scope_before_any_commit) ... ok
+test_ambient_supervision_marker_cannot_skip_the_bound (test_gate_budget.GateBudget.test_ambient_supervision_marker_cannot_skip_the_bound) ... ok
+test_expired_standalone_batch_does_not_give_every_ac_new_time (test_gate_budget.GateBudget.test_expired_standalone_batch_does_not_give_every_ac_new_time) ... ok
+test_hash_preparation_is_inside_the_same_bound (test_gate_budget.GateBudget.test_hash_preparation_is_inside_the_same_bound) ... ok
+test_borrowed_nested_gate_keeps_shorter_global_cap (test_gate_entry_budget.GateEntryBudget.test_borrowed_nested_gate_keeps_shorter_global_cap) ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_borrowed_nested_gate_keeps_shorter_global_cap", "completed": [], "contexts": [], "elapsed": 0.05165379200479947, "fresh_access_entries": [], "inherited_cap": 256646.061276745, "limits": [], "phases": [{"end": 256643.600388579, "phase": "ledger-verification", "start": 256643.599975995}], "returncode": 4, "spans": [], "started_monotonic": 256643.561276745, "stderr": "OWNER_WATCH: ERROR requires a distinct positive owner PID and command\n", "stdout": ""}
+FAIL
+test_borrowed_reader_preserves_time_spent_before_nested_gate (test_gate_entry_budget.GateEntryBudget.test_borrowed_reader_preserves_time_spent_before_nested_gate) ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_borrowed_reader_preserves_time_spent_before_nested_gate", "completed": [], "contexts": [], "elapsed": 2.053664210019633, "fresh_access_entries": [], "limits": [], "phases": [{"end": 256647.024821872, "phase": "ledger-verification", "start": 256647.024374622}], "returncode": 4, "spans": [], "started_monotonic": 256644.983499829, "stderr": "OWNER_WATCH: ERROR requires a distinct positive owner PID and command\n", "stdout": ""}
+FAIL
+test_expired_green_claim_with_ac_reader_process_latency (test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_ac_reader_process_latency)
+The finite window includes repeated AC field process startup too. ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_ac_reader_process_latency", "completed": ["0", "0"], "contexts": [["256648.668534248", "256651.643709959"], ["256649.098730165", "256652.072411802"]], "delayed_ac_processes": ["s/.*check: *`([^`]*)`.*/\\1/p", "s/.*probe: *`([^`]*)`.*/\\1/p"], "elapsed": 0.788557416992262, "fresh_access_entries": [], "limits": [], "phases": [], "returncode": 0, "spans": [{"elapsed": 0.004021458007628098, "kind": "measurement", "label": "check:AC-1", "result": 0, "start_monotonic": 256649.75931829, "state": "complete"}, {"elapsed": 0.6909264999849256, "kind": "acceptance", "label": "check", "result": 0, "start_monotonic": 256649.162497498, "state": "complete"}], "started_monotonic": 256649.070228206, "stderr": "", "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-9a9cedba1bd0208136b7d46707b80dee7bccab22e8d9fc999529a99b200ea998 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n"}
+ok
+test_expired_green_claim_with_state_reader_process_latency (test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_state_reader_process_latency)
+28/76 with repeatable process-start pressure, not random CPU load. ... GATE_ENTRY_OBSERVATION {"access_elapsed": 0.4090172500000335, "case": "test_gate_entry_budget.GateEntryBudget.test_expired_green_claim_with_state_reader_process_latency", "completed": ["0"], "contexts": [["256651.928262916", "256654.899872584"]], "delayed_lookups": [], "elapsed": 0.4395902499963995, "fresh_access_entries": [256651.928191416], "limits": [{"cap": 256654.89987258366, "expired": true, "inherited_cap": null, "observed": 256651.966799458, "origin": "256651.928262916"}, {"cap": 256654.899872584, "expired": true, "inherited_cap": "256654.899872584", "observed": 256652.076381958, "origin": "256651.928262916"}], "phases": [{"end": 256651.928281874, "phase": "lock", "start": 256651.928278666}, {"end": 256651.928889291, "phase": "ledger-verification", "start": 256651.928341708}, {"end": 256652.027352499, "phase": "ledger-verification", "start": 256652.026749166}, {"end": 256652.113388749, "phase": "fingerprint", "start": 256652.113286291}, {"end": 256652.279548791, "phase": "fingerprint", "start": 256652.279443749}], "returncode": 0, "spans": [{"elapsed": 0.3367617499898188, "kind": "acceptance", "label": "check", "result": 0, "start_monotonic": 256651.993926708, "state": "complete"}, {"elapsed": 0.004110124980797991, "kind": "measurement", "label": "check:AC-1", "result": 0, "start_monotonic": 256652.229360583, "state": "complete"}], "started_monotonic": 256651.897618416, "stderr": "", "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-9a9cedba1bd0208136b7d46707b80dee7bccab22e8d9fc999529a99b200ea998 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n"}
+ok
+test_fresh_future_origin_and_supervision_marker_cannot_grant_time (test_gate_entry_budget.GateEntryBudget.test_fresh_future_origin_and_supervision_marker_cannot_grant_time) ... GATE_ENTRY_OBSERVATION {"access_elapsed": 2.983486918004928, "case": "test_gate_entry_budget.GateEntryBudget.test_fresh_future_origin_and_supervision_marker_cannot_grant_time", "completed": [], "contexts": [["256653.740166875", "256656.709184159"]], "elapsed": 3.020317918009823, "fresh_access_entries": [256653.740074], "injected_origin": "260253.7028305", "limits": [{"cap": 256656.7091841591, "expired": true, "inherited_cap": null, "observed": 256655.791297418, "origin": "256653.740166875"}, {"cap": 256656.709184159, "expired": true, "inherited_cap": "256656.709184159", "observed": 256655.90058421, "origin": "256653.740166875"}], "phases": [{"end": 256653.74019525, "phase": "lock", "start": 256653.740191292}, {"end": 256655.743451959, "phase": "ledger-verification", "start": 256653.740294375}, {"end": 256655.85178296, "phase": "ledger-verification", "start": 256655.851322376}, {"end": 256655.937771585, "phase": "fingerprint", "start": 256655.937702835}], "returncode": 2, "spans": [{"elapsed": 0.8923891249869484, "kind": "verification", "label": "verify", "result": 124, "start_monotonic": 256655.81911621, "state": "complete"}, {"elapsed": 0.6785889589809813, "kind": "measurement", "label": "check:AC-1", "result": 124, "start_monotonic": 256656.032915793, "state": "complete"}], "started_monotonic": 256653.703243, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": "", "view_read": {"finished": 256655.743281959, "real_views_verified": true, "started": 256653.740310584}}
+ok
+test_python_startup_delay_spends_the_same_settlement (test_gate_entry_budget.GateEntryBudget.test_python_startup_delay_spends_the_same_settlement) ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_python_startup_delay_spends_the_same_settlement", "completed": ["0"], "contexts": [["256659.736139128", "256661.099739470"], ["256659.736139128", "256661.099739470"]], "elapsed": 3.0174020010163076, "fresh_access_entries": [], "limits": [], "phases": [], "returncode": 2, "spans": [{"elapsed": 0.04333633300848305, "kind": "measurement", "label": "check:AC-2", "result": 124, "start_monotonic": 256661.058252129, "state": "complete"}, {"elapsed": 1.0046178759948816, "kind": "measurement", "label": "check:AC-1", "result": 0, "start_monotonic": 256660.006231128, "state": "complete"}, {"elapsed": 1.2979377089941408, "kind": "verification", "label": "verify", "result": 124, "start_monotonic": 256659.803785003, "state": "complete"}], "started_monotonic": 256658.094301919, "startup_delay_marker": true, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": "GATE: VERIFY AC-1|PASS|exit=0\n"}
+ok
+test_slow_real_view_preflight_spends_the_same_settlement (test_gate_entry_budget.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement) ... GATE_ENTRY_OBSERVATION {"access_elapsed": 2.984600710013183, "case": "test_gate_entry_budget.GateEntryBudget.test_slow_real_view_preflight_spends_the_same_settlement", "completed": [], "contexts": [["256662.518677963", "256665.488546422"]], "elapsed": 3.019888042996172, "fresh_access_entries": [256662.518604046], "limits": [{"cap": 256665.48854642166, "expired": true, "inherited_cap": null, "observed": 256664.566828255, "origin": "256662.518677963"}, {"cap": 256665.488546422, "expired": true, "inherited_cap": "256665.488546422", "observed": 256664.67226238, "origin": "256662.518677963"}], "phases": [{"end": 256662.518697504, "phase": "lock", "start": 256662.518694338}, {"end": 256664.523871672, "phase": "ledger-verification", "start": 256662.518762379}, {"end": 256664.623540214, "phase": "ledger-verification", "start": 256664.623129547}, {"end": 256664.709451964, "phase": "fingerprint", "start": 256664.709384047}], "returncode": 2, "spans": [{"elapsed": 0.8991145010222681, "kind": "verification", "label": "verify", "result": 124, "start_monotonic": 256664.59253213, "state": "complete"}, {"elapsed": 0.6895826259860769, "kind": "measurement", "label": "check:AC-1", "result": 124, "start_monotonic": 256664.801340005, "state": "complete"}], "started_monotonic": 256662.483316713, "stderr": "GATE: NO-GO reason=verification-time-budget-exhausted\n", "stdout": "", "view_read": {"finished": 256664.523685172, "real_views_verified": true, "started": 256662.518772671}}
+ok
+test_unbudgeted_batch_has_only_individual_check_timeouts (test_gate_entry_budget.GateEntryBudget.test_unbudgeted_batch_has_only_individual_check_timeouts) ... GATE_ENTRY_OBSERVATION {"access_elapsed": null, "case": "test_gate_entry_budget.GateEntryBudget.test_unbudgeted_batch_has_only_individual_check_timeouts", "completed": ["0", "1", "2"], "contexts": [["256665.784590131", "missing"], ["256665.784590131", "missing"], ["256665.784590131", "missing"], ["256665.784590131", "missing"]], "elapsed": 5.856081293022726, "fresh_access_entries": [], "limits": [], "phases": [], "returncode": 2, "spans": [{"elapsed": 1.108589125011349, "kind": "measurement", "label": "check:AC-3", "result": 0, "start_monotonic": 256668.360263215, "state": "complete"}, {"elapsed": 1.1086170420167036, "kind": "measurement", "label": "check:AC-1", "result": 0, "start_monotonic": 256666.050283381, "state": "complete"}, {"elapsed": 2.0036654180148616, "kind": "measurement", "label": "check:AC-4", "result": 124, "start_monotonic": 256669.515115923, "state": "complete"}, {"elapsed": 5.760048252006527, "kind": "verification", "label": "verify", "result": 2, "start_monotonic": 256665.846510631, "state": "complete"}, {"elapsed": 1.1088506249943748, "kind": "measurement", "label": "check:AC-2", "result": 0, "start_monotonic": 256667.203286298, "state": "complete"}], "started_monotonic": 256665.757155048, "stderr": "GATE: NO-GO reason=verify-failures:fail=0 broken=1\n", "stdout": "GATE: VERIFY AC-1|PASS|exit=0\nGATE: VERIFY AC-2|PASS|exit=0\nGATE: VERIFY AC-3|PASS|exit=0\nGATE: VERIFY AC-4|BROKEN|check not executable (rc=124) \n"}
+ok
+test_begin_refuses_symlink_evidence_parent (test_goal_store.CloseDurability.test_begin_refuses_symlink_evidence_parent) ... ok
+test_failed_view_sync_preserves_recovery_marker_and_old_state (test_goal_store.CloseDurability.test_failed_view_sync_preserves_recovery_marker_and_old_state) ... ok
+test_finish_syncs_file_and_directory_before_removing_marker (test_goal_store.CloseDurability.test_finish_syncs_file_and_directory_before_removing_marker) ... ok
+test_concurrent_readers_never_mix_views (test_goal_store.StoreTests.test_concurrent_readers_never_mix_views) ... EVOLVE_HOLDOUT_REJECTION {"status": "holdout-rejected", "development_gain": 0.5, "holdout_gain": -0.5, "holdout_pairs": 8, "holdout_alpha": 0.008333333333333333, "pointer_unchanged": true, "incumbent_sha256": "b1b5ba90c098a185c4d07e423f324505bd5a7ec2b15b8037aac61d5a5e3c4f4d", "history_preserved": true, "run_enabled_exit": 0, "run_enabled_stdout": "candidate\n"}
+ok
+test_corruption_and_missing_pointer_fail_closed (test_goal_store.StoreTests.test_corruption_and_missing_pointer_fail_closed) ... ok
+test_crash_before_and_after_pointer (test_goal_store.StoreTests.test_crash_before_and_after_pointer) ... ok
+test_first_generation_crash_recovers (test_goal_store.StoreTests.test_first_generation_crash_recovers) ... ok
+test_initial_migration_and_idempotency (test_goal_store.StoreTests.test_initial_migration_and_idempotency) ... ok
+test_invalid_lock_timeout_rejected (test_goal_store.StoreTests.test_invalid_lock_timeout_rejected) ... ok
+test_invalid_names_and_torn_pointer (test_goal_store.StoreTests.test_invalid_names_and_torn_pointer) ... ok
+test_lock_symlink_is_not_followed (test_goal_store.StoreTests.test_lock_symlink_is_not_followed) ... ok
+test_lock_timeout_does_not_publish (test_goal_store.StoreTests.test_lock_timeout_does_not_publish) ... ok
+test_lock_timeout_preserves_existing_head_and_generations (test_goal_store.StoreTests.test_lock_timeout_preserves_existing_head_and_generations) ... ok
+test_missing_committed_predecessor_is_not_an_empty_history (test_goal_store.StoreTests.test_missing_committed_predecessor_is_not_an_empty_history) ... ok
+test_missing_nofollow_fails_closed (test_goal_store.StoreTests.test_missing_nofollow_fails_closed) ... ok
+test_nested_paths_are_preserved_and_unsafe_names_rejected (test_goal_store.StoreTests.test_nested_paths_are_preserved_and_unsafe_names_rejected) ... ok
+test_open_and_read_never_create_store_files (test_goal_store.StoreTests.test_open_and_read_never_create_store_files) ... ok
+test_recover_preserves_unknown_and_corrupt_entries (test_goal_store.StoreTests.test_recover_preserves_unknown_and_corrupt_entries) ... ok
+test_simultaneous_writers_compare_and_swap (test_goal_store.StoreTests.test_simultaneous_writers_compare_and_swap) ... ok
+test_bridge_ack_ready_structured_completion_and_independent_adoption (test_host.Host.test_bridge_ack_ready_structured_completion_and_independent_adoption) ... FAIL
+test_cancellation_token_kills_only_owned_command_and_needs_host_confirmation (test_host.Host.test_cancellation_token_kills_only_owned_command_and_needs_host_confirmation) ... FAIL
+test_changed_launcher_cannot_bind_a_worker (test_host.Host.test_changed_launcher_cannot_bind_a_worker) ... ok
+test_claude_launcher_binds_and_runs_original_owned_ready (test_host.Host.test_claude_launcher_binds_and_runs_original_owned_ready) ... FAIL
+test_expired_budget_denies_hooks_and_no_wave_dispatch (test_host.Host.test_expired_budget_denies_hooks_and_no_wave_dispatch) ... ok
+test_first_explicit_prompt_is_captured_before_initialization_and_reentry (test_host.Host.test_first_explicit_prompt_is_captured_before_initialization_and_reentry) ... ok
+test_first_worker_tool_binds_ticket_and_codex_keeps_normal_permissions (test_host.Host.test_first_worker_tool_binds_ticket_and_codex_keeps_normal_permissions) ... ok
+test_interrupt_only_requests_and_structured_errors_keep_missing_output (test_host.Host.test_interrupt_only_requests_and_structured_errors_keep_missing_output) ... ok
+test_missing_launcher_cannot_bind_a_worker (test_host.Host.test_missing_launcher_cannot_bind_a_worker) ... ok
+test_native_claude_rewrite_does_not_auto_approve_permissions (test_host.Host.test_native_claude_rewrite_does_not_auto_approve_permissions) ... ok
+test_native_hooks_correlate_only_nonce_call_and_native_agent_id (test_host.Host.test_native_hooks_correlate_only_nonce_call_and_native_agent_id) ... ok
+test_non_goal_noop_and_explicit_prompt_entry_cache (test_host.Host.test_non_goal_noop_and_explicit_prompt_entry_cache) ... ok
+test_nonce_capacity_and_scope_rejection_preserve_failed_attempt (test_host.Host.test_nonce_capacity_and_scope_rejection_preserve_failed_attempt) ... ok
+test_other_worker_can_be_cancelled_while_validator_is_running (test_host.Host.test_other_worker_can_be_cancelled_while_validator_is_running) ... ok
+test_registered_write_edit_stay_in_owned_paths_and_can_retry (test_host.Host.test_registered_write_edit_stay_in_owned_paths_and_can_retry) ... STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-5f9dbkr0/1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "./scratch/../1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-5f9dbkr0/2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out.extra", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": ".goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-5f9dbkr0-outside.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": null, "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write requires file_path"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-5f9dbkr0/1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "./scratch/../1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-5f9dbkr0/2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out.extra", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": ".goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-5f9dbkr0-outside.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": null, "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write requires file_path"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+ok
+test_short_write_lock_contention_waits_and_records_each_ready_once (test_host.Host.test_short_write_lock_contention_waits_and_records_each_ready_once) ... ok
+test_structured_leaf_symlink_escape_and_parent_permissions (test_host.Host.test_structured_leaf_symlink_escape_and_parent_permissions) ... STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-293vei5z/1.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-293vei5z/1.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-293vei5z/1.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": null, "file_path": "/tmp/goal-write-outside-gjqthwsj/parent.py", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": null, "file_path": "/tmp/goal-write-outside-gjqthwsj/parent.py", "response": {}, "tool": "Edit"}
+ok
+test_structured_write_subtree_checks_symlinks_and_control_paths (test_host.Host.test_structured_write_subtree_checks_symlinks_and_control_paths) ... STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-_5spp0rs/owned/nested/new.py", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../owned/new.py", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/.goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-_5spp0rs/owned/nested/new.py", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../owned/new.py", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/.goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-_5spp0rs/owned/escape/new.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-_5spp0rs/owned/escape/new.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/tmp/goal-host-bridge-_5spp0rs/owned/escape/../new.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+ok
+test_symlink_launcher_cannot_bind_a_worker (test_host.Host.test_symlink_launcher_cannot_bind_a_worker) ... ok
+test_symlinked_state_and_cancel_target_are_refused (test_host.Host.test_symlinked_state_and_cancel_target_are_refused) ... ok
+test_actual_loop_resume_preserves_origin_and_run (test_host_budget.HostBudget.test_actual_loop_resume_preserves_origin_and_run) ... ok
+test_clock_regression_and_uncommitted_views_fail_without_writes (test_host_budget.HostBudget.test_clock_regression_and_uncommitted_views_fail_without_writes) ... ok
+test_earlier_observed_entry_is_preserved_when_adopted_later (test_host_budget.HostBudget.test_earlier_observed_entry_is_preserved_when_adopted_later) ... ok
+test_host_faults_use_same_pointer_commit_and_exact_recovery (test_host_budget.HostBudget.test_host_faults_use_same_pointer_commit_and_exact_recovery) ... ok
+test_host_observation_requires_exclusive_ledger_ownership (test_host_budget.HostBudget.test_host_observation_requires_exclusive_ledger_ownership) ... ok
+test_invalid_receipts_and_budgets_do_not_write (test_host_budget.HostBudget.test_invalid_receipts_and_budgets_do_not_write) ... ok
+test_late_real_gate_go_is_not_timely (test_host_budget.HostBudget.test_late_real_gate_go_is_not_timely) ... ok
+test_real_planning_delay_and_gate_elapsed_survive_owner_restart (test_host_budget.HostBudget.test_real_planning_delay_and_gate_elapsed_survive_owner_restart) ... ok
+test_reboot_keeps_origin_and_rejects_nonadvancing_wall_clock (test_host_budget.HostBudget.test_reboot_keeps_origin_and_rejects_nonadvancing_wall_clock) ... /usr/local/lib/python3.12/unittest/mock.py:2217: ResourceWarning: unclosed file <_io.FileIO name=3 mode='rb' closefd=True>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.12/unittest/mock.py:2217: ResourceWarning: unclosed file <_io.FileIO name=5 mode='rb' closefd=True>
+  def __init__(self, name, parent):
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_reentry_and_larger_allowance_never_extend_either_clock (test_host_budget.HostBudget.test_reentry_and_larger_allowance_never_extend_either_clock) ... ok
+test_script_entry_remains_accurate_and_v1_api_still_works (test_host_budget.HostBudget.test_script_entry_remains_accurate_and_v1_api_still_works) ... ok
+test_cancel_stops_owned_descendants_and_preserves_other_worker (test_host_cancel.HostCancellation.test_cancel_stops_owned_descendants_and_preserves_other_worker) ... FAIL
+test_cancelled_ticket_never_releases_a_new_command (test_host_cancel.HostCancellation.test_cancelled_ticket_never_releases_a_new_command) ... FAIL
+test_host_deadline_caps_longer_command_allowance (test_host_cancel.HostCancellation.test_host_deadline_caps_longer_command_allowance) ... FAIL
+test_fixed_worker_check_uses_project_cwd_without_granting_adoption (test_host_command.HostCommand.test_fixed_worker_check_uses_project_cwd_without_granting_adoption) ... FAIL
+test_pre_cancel_never_releases_command (test_host_command.HostCommand.test_pre_cancel_never_releases_command) ... FAIL
+test_ticket_cancel_stops_descendants_and_keeps_sibling_and_parent_trace (test_host_command.HostCommand.test_ticket_cancel_stops_descendants_and_keeps_sibling_and_parent_trace) ... FAIL
+test_wrapper_rechecks_shortened_budget_instead_of_ticket_original_deadline (test_host_command.HostCommand.test_wrapper_rechecks_shortened_budget_instead_of_ticket_original_deadline) ... FAIL
+test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch (test_incumbent.Incumbent.test_evolution_rejects_unrelated_checkpoint_pair_before_dispatch) ... 

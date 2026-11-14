@@ -30,6 +30,28 @@ python3 -I scripts/goal_evolve.py path/to/protocol.json --state .goal/proposals/
 
 protocol 的精确格式由本例生成：version、baseline/candidate/grader 的相对文件路径、development/holdout 的 input/expected 对、minimum_pairs、minimum_cost_gain、quality_tolerance、trial_seconds、budget_seconds。策略与 grader 是单文件、标准库 Python 程序；策略 stdin 是原始任务输入，stdout 是产物；grader stdin 是 `{"output":"原始 stdout","expected":"预期原料"}`，输出 `{"floor":true,"horizon":true,"score":1}`。score 越高越好，此入口优化的是质量不退步条件下的总试验成本。
 
+本例默认还声明 `calibration`，在任何策略试跑前执行真实 grader：
+
+```json
+"calibration": {
+  "good": [{"output": "calibration-good.txt", "expected": "calibration-gold.txt"}],
+  "bad": [{"output": "calibration-bad-order.txt", "expected": "calibration-gold.txt"},
+          {"output": "calibration-bad-format.txt", "expected": "calibration-gold.txt"}]
+}
+```
+
+这些文件包含已知产物和金标，不是策略源码。好样本的 floor/horizon 必须均为 true，坏样本至少一项为 false；每个 grader 输出仍须满足原严格格式。样本、grader、原始校准输出进入冻结材料及恢复校验。所有新比较必须声明校准，缺失时在创建状态前拒绝。校准消耗原总预算；错误、超时或篡改在试跑前停止，不花留出统计预算，不撤回既有策略。运行到期尚未开始校准时，不运行 grader 或策略，也不把它误记为仪器故障。
+
+新 `enabled.json` 还绑定资格报告的 SHA-256。后续 `run-enabled` 与实际派工会核对报告、冻结原料、校准原始输出及配对资格，改证据后不能继续消费。旧报告与旧事务仍可读取、恢复；无资格绑定的旧指针会返回 `policy-requalification-required`，不会自动获得新保证。在同一 `--state` 中，用实际归档作为基线/候选，补好坏样本并使用新的留出输入重新比较。即使启用的程序字节相同，通过后也会刷新资格回执，旧派工须重新规划；曝光记录和统计预算不清零。
+
+每次实验的 JSON 现在直接包含 `feedback`：实际失败输入/输出路径、stderr、保留或撤回的真实选择，以及下一次留出所需的最少新样本数。恢复会话可重新读取：
+
+```sh
+python3 -I scripts/goal_evolve.py feedback --state .goal/proposals/evolution --run <报告中的run>
+```
+
+反馈只派生修复方向，不生成 PASS 或修改策略；历史报告与当前启用选择不同时明确提示先复核当前选择。修复仍需 agent 根据真实反例提出，再用新的输入重新比较，既有统计预算不会清零。
+
 ## 多文件检查点
 
 ```bash

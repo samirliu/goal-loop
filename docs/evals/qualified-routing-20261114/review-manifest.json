@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "files": {
+    "README.md": {
+      "sha256": "0d8144808d2debe28dba657e0e5f5d5238d295f1b0f742372e73a4a0b8808f91",
+      "bytes": 9677,
+      "mode": 420
+    },
+    "archive.json": {
+      "sha256": "ba6b0ac87a791810a1ad559a9b36491f7c5c1070a41887b3f48267ef8144cc53",
+      "bytes": 133,
+      "mode": 420
+    },
+    "assessment.json": {
+      "sha256": "799e33a7a64ead4ad74306c3dd798b79f84aa821f7381d30d9ea69687364cb07",
+      "bytes": 2427,
+      "mode": 420
+    },
+    "benchmark.json": {
+      "sha256": "44fcb36d4cc5d0b5168d2c5b2def66f3206d62fb25ef5f885e8173fa9d7853ee",
+      "bytes": 21611,
+      "mode": 420
+    },
+    "check_mutations.py": {
+      "sha256": "d10d45feb98564ffd39d4f889638abb572302430b298a1a1a399a337c70bdffb",
+      "bytes": 4923,
+      "mode": 420
+    },
+    "commands.json": {
+      "sha256": "c5d6defb7dbe996b12dc831cb6f75cacd1b6b2b226df780dc9be243aadf4056c",
+      "bytes": 10141,
+      "mode": 420
+    },
+    "final-source-manifest.json": {
+      "sha256": "fb1016b55c970e5d77dd933f596a2ce3b4db2b8602d489921446b1da57b24272",
+      "bytes": 17991,
+      "mode": 420
+    },
+    "gate-replay.json": {
+      "sha256": "85612523eed740e68ed51a2e3a82c6e580354f0e455af04a22228274e9b7196f",
+      "bytes": 1052,
+      "mode": 420
+    },
+    "later-summary.json": {
+      "sha256": "a1a2f5fd1babe0c3339293bf745b9c6a667eb01bd789f65d1e046d6127d63495",
+      "bytes": 1030,
+      "mode": 420
+    },
+    "mutation-checks.json": {
+      "sha256": "5f9984062998fd7dac07c97e54b82346a255b29577a732c5aee0d6cfd0b1d5e8",
+      "bytes": 1586,
+      "mode": 420
+    },
+    "plan.json": {
+      "sha256": "75a201b59de1bf0cb9feca7f7c48cf8e00d95d7aaedde0a56c8ddfea7db9d128",
+      "bytes": 702,
+      "mode": 420
+    },
+    "preregistration.json": {
+      "sha256": "bd76acc8f9a87aca0e45ecf5b41197111daf770c5cf5fe06c9d8088edf4b4456",
+      "bytes": 474,
+      "mode": 420
+    },
+    "raw-study.tar.xz": {
+      "sha256": "db3f9f8350cb58f8ac02fdecc7ad99f29b21eb0b7d5d817980c3e1dd0dace536",
+      "bytes": 3322956,
+      "mode": 420
+    },
+    "replay.json": {
+      "sha256": "aa65fe2619270c9e8afa63f7444a01cc946e13dae58872d9492f0509e3105a6c",
+      "bytes": 1053,
+      "mode": 420
+    },
+    "routing-experiment.log": {
+      "sha256": "070c188b79565961e6b02434e1c7c2ec8949292e20da669e6c92829eec6f673a",
+      "bytes": 1969,
+      "mode": 420
+    },
+    "source-drift.json": {
+      "sha256": "7c05e1c07b78065626aea3ef990723cf52e98056c18c90d66b033b43d52bc363",
+      "bytes": 889,
+      "mode": 420
+    },
+    "source-manifest.json": {
+      "sha256": "dec16faac4b27a3905f39108dc5dd233771ec0ab41fda42244e5f1a8aa19f4ab",
+      "bytes": 17991,
+      "mode": 420
+    },
+    "source-verification.json": {
+      "sha256": "47be542db22d33ab732d2f82dc1bf009be96d70cf3b4a27c70de95e0c35a3183",
+      "bytes": 564,
+      "mode": 420
+    },
+    "upgrade-experiment.log": {
+      "sha256": "b62e0506cbb5ba20055874300538781c4cfc67c7d0d64ffd8c6f491c7ec85903",
+      "bytes": 2034,
+      "mode": 420
+    },
+    "upgrade-plan.json": {
+      "sha256": "ae5aaec68c11f0f2f6324af793c25e07e79c9c206dbe50d6b91dfc465cab350d",
+      "bytes": 856,
+      "mode": 420
+    },
+    "validation/goal-loop-bound-qualification-recovery-20261114.log": {
+      "sha256": "5cf21967eeb27e690c56a8e1cefd0aa0f498f298b2007c99c11f52632f6b01cc",
+      "bytes": 2511,
+      "mode": 420
+    },
+    "validation/goal-loop-bound-qualification-tests-20261114.log": {
+      "sha256": "e875a3b2efce939a7346709fe1a4c88f3ec5225d9844511a242f3c1c906f29fd",
+      "bytes": 4083,
+      "mode": 420
+    },
+    "validation/goal-loop-consumer-qualification-tests-20261114.log": {
+      "sha256": "345d35e850bd7e14ce6ecd0dea8501976a6bafe47c3d66b5f9907cdf427be603",
+      "bytes": 1210,
+      "mode": 420
+    },
+    "validation/goal-loop-qualification-final-docs-20261114.log": {
+      "sha256": "bd3d582709cc6a78a799f0492ef0f575ea2eaa47ff98c017b7846537cc9b191a",
+      "bytes": 7243,
+      "mode": 420
+    },
+    "validation/goal-loop-qualification-optimized-20261114.log": {
+      "sha256": "6d268f9239a5fba18f1ee4a86b746bfaf68524dafddbda020722469165e37bd7",
+      "bytes": 1210,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-crew-flow-final-20261114.log": {
+      "sha256": "041663d0e71b84cb8a38c3dbf9ec1e0f33928969b7ba98d5f285af2e41560d62",
+      "bytes": 6976,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-crew-flow-tests-20261114.log": {
+      "sha256": "dafca7277f363853502feb6338782768594fb2231bb11bd3ae5e6c033663a668",
+      "bytes": 8054,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-crew-regression-20261114.log": {
+      "sha256": "cbd29f1ca6702b63427ad3f1a97239b29906438960d1f2c304854bb999decea2",
+      "bytes": 3369,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-consumer-cli-check-20261114.log": {
+      "sha256": "52d9ce4a918299cc4044971546f15c664e29c5d33a1c65dfee93c5c0c472834f",
+      "bytes": 190,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-benchmark-20261114.log": {
+      "sha256": "d08c707e711c1a94a1f6c0b6ef04c009407054bf987c113ed1d3ee0fa58f2790",
+      "bytes": 1359,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-linux-companion-20261114.log": {
+      "sha256": "126fa8aff1221bd9c4fce47a472a3d1e7a3a34a198f0ab4862ea4bd40745c61a",
+      "bytes": 258,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-linux-docs-20261114.log": {
+      "sha256": "bd3d582709cc6a78a799f0492ef0f575ea2eaa47ff98c017b7846537cc9b191a",
+      "bytes": 7243,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-linux-incumbent-fixture-20261114.log": {
+      "sha256": "d81a8febd57b4564def9db2b46a79551250de4630c40bf30a6788e17d5428691",
+      "bytes": 3714,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-linux-parser-20261114.log": {
+      "sha256": "33c2aba09d4a6863458b5ffdb901f63357adaddbbb0274906d4004c20ba92310",
+      "bytes": 2440,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-linux-python-20261114.log": {
+      "sha256": "4375ed7a455f9cbf524fe1c37636da362597c83d7499cd371ce4b0bef91d356f",
+      "bytes": 88265,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-linux-replay-20261114.log": {
+      "sha256": "aa65fe2619270c9e8afa63f7444a01cc946e13dae58872d9492f0509e3105a6c",
+      "bytes": 1053,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-linux-replay-optimized-20261114.log": {
+      "sha256": "aa65fe2619270c9e8afa63f7444a01cc946e13dae58872d9492f0509e3105a6c",
+      "bytes": 1053,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-linux-shell-20261114.log": {
+      "sha256": "95a4e7ac7523711d4e83a881538a91bcd4695fd4051c094791df3666fa751bf6",
+      "bytes": 27499,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-linux-shellcheck-20261114.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-linux-syntax-20261114.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-macos-companion-20261114.log": {
+      "sha256": "126fa8aff1221bd9c4fce47a472a3d1e7a3a34a198f0ab4862ea4bd40745c61a",
+      "bytes": 258,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-macos-diff-20261114.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-macos-docs-20261114.log": {
+      "sha256": "bd3d582709cc6a78a799f0492ef0f575ea2eaa47ff98c017b7846537cc9b191a",
+      "bytes": 7243,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-macos-parser-20261114.log": {
+      "sha256": "33c2aba09d4a6863458b5ffdb901f63357adaddbbb0274906d4004c20ba92310",
+      "bytes": 2440,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-macos-shell-20261114.log": {
+      "sha256": "dfb02be9a78ae9d4f8362ef13156c381afa07cfdd29332254a4a6f7a54433d72",
+      "bytes": 27517,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-macos-skill-20261114.log": {
+      "sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+      "bytes": 16,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-macos-syntax-20261114.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-python-20261114.log": {
+      "sha256": "4a51a167dd60a587c05fc0d47c01dbe96412264a2a81c6611a104c9ba7c3b5dc",
+      "bytes": 90859,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-final-report-docs-20261114.log": {
+      "sha256": "bd3d582709cc6a78a799f0492ef0f575ea2eaa47ff98c017b7846537cc9b191a",
+      "bytes": 7243,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-incumbent-fixture-macos-20261114.log": {
+      "sha256": "3ce3c841827d94b860dd0aae0e35b51b25884950cb8393dec8834fce535fe1aa",
+      "bytes": 3714,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-independent-replay-20261114.log": {
+      "sha256": "aa65fe2619270c9e8afa63f7444a01cc946e13dae58872d9492f0509e3105a6c",
+      "bytes": 1053,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-mutation-checks-20261114.log": {
+      "sha256": "5f9984062998fd7dac07c97e54b82346a255b29577a732c5aee0d6cfd0b1d5e8",
+      "bytes": 1586,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-mutation-checks-optimized-20261114.log": {
+      "sha256": "5f9984062998fd7dac07c97e54b82346a255b29577a732c5aee0d6cfd0b1d5e8",
+      "bytes": 1586,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-optimized-replay-20261114.log": {
+      "sha256": "aa65fe2619270c9e8afa63f7444a01cc946e13dae58872d9492f0509e3105a6c",
+      "bytes": 1053,
+      "mode": 420
+    },
+    "validation/goal-loop-qualified-routing-original-gate-replay-20261114.log": {
+      "sha256": "85612523eed740e68ed51a2e3a82c6e580354f0e455af04a22228274e9b7196f",
+      "bytes": 1052,
+      "mode": 420
+    },
+    "validation/goal-loop-required-calibration-tests-20261114.log": {
+      "sha256": "ab539b7a9ca2904d6500258243e19377e07165316c9a230fc85240d1df8ef8f2",
+      "bytes": 4083,
+      "mode": 420
+    },
+    "validation.json": {
+      "sha256": "efdab2095645b3f9a438c2e5b32708172794f6bf0a2be3dddbc9bbd7d7312d6a",
+      "bytes": 3553,
+      "mode": 420
+    },
+    "verify.py": {
+      "sha256": "e042e30ccf55e97392cb1f36140f72a23ddfc59f47830159cde75880db2e13a5",
+      "bytes": 22037,
+      "mode": 420
+    }
+  }
+}

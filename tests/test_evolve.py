@@ -27,9 +27,14 @@ class Evolution(unittest.TestCase):
     def protocol(self, suffix, offset=0):
         root = self.root / suffix; root.mkdir()
         for name, code in (('baseline.py', b'print("baseline")\n'), ('candidate.py', b'print("candidate")\n'),
-                           ('grader.py', b'import json;print(json.dumps({"floor":False,"horizon":False,"score":0}))\n')):
+                           ('grader.py', b'import json,sys\nv=json.load(sys.stdin);p=v["output"].strip()==v["expected"].strip()\n'
+                            b'print(json.dumps(dict(floor=p,horizon=True,score=int(p))))\n')):
             (root / name).write_bytes(code)
         config = dict(self.config)
+        for name, value in [('good.txt', 'baseline'), ('bad.txt', 'wrong'), ('gold.txt', 'baseline')]:
+            (root / name).write_text(value)
+        config['calibration'] = {kind: [dict(output=kind+'.txt', expected='gold.txt')]
+                                 for kind in ('good', 'bad')}
         for phase, base in (('development', 0), ('holdout', 100)):
             config[phase] = []
             for index in range(6):
@@ -234,7 +239,15 @@ class Evolution(unittest.TestCase):
                 clock[0] = 11
             return self.telemetry(*args)
 
+        def grade(program, stdin, deadline):
+            # Only process I/O is controlled in this fake-clock test. The real
+            # calibration parser and known-answer matching still execute.
+            value = json.loads(stdin)
+            passed = value['output'].strip() == value['expected'].strip()
+            return evolve.encode(dict(floor=passed, horizon=True, score=int(passed))), 0, None, ''
+
         with mock.patch.object(evolve.time, 'monotonic', side_effect=lambda: clock[0]), \
+                mock.patch.object(evolve, 'run_program', side_effect=grade), \
                 mock.patch.object(evolve, 'trial', side_effect=advance):
             result = evolve.experiment(protocol, self.state)
         phase = result['phases']['development']
