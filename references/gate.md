@@ -193,6 +193,17 @@ digests by construction.
 
 ## 3 Check order (first failure decides)
 
+For visual-quality work, `quality: visual AC-N views=...` binds a calibrated
+judged quality floor. Original fidelity wording can require the declaration
+even when the author selected only exit-code ACs. Stamp freezes the objective,
+available original host request, view scope and anchor bytes. The named quality
+AC must PASS, and its bound JSON review must cover every declared view with
+current image hashes and an empty unresolved-findings list. A bare adversarial
+clear or the general UNVERIFIABLE allowance cannot waive this floor. See
+[visual acceptance](packs/visual.md) for the schema and semantic review duties.
+Legacy visual contracts missing this coverage require review/amendment; old
+GO receipts remain historical and do not authorize new completion.
+
 ```
 0  state.rec keys complete                    else 4
 0b forge: dry_streak/dry_limit present        else 4

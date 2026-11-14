@@ -1,0 +1,106 @@
+test_field_reads_current_bytes_after_change (test_ac_parse.ACParsing.test_field_reads_current_bytes_after_change) ... ok
+test_matches_six_hundred_frozen_original_outputs (test_ac_parse.ACParsing.test_matches_six_hundred_frozen_original_outputs) ... ok
+test_budget_temp_symlinks_do_not_overwrite_user_files (test_budget.Budget.test_budget_temp_symlinks_do_not_overwrite_user_files) ... ok
+test_deadline_limits_workers_and_resume (test_budget.Budget.test_deadline_limits_workers_and_resume) ... ok
+test_executor_exit_stops_background_children (test_budget.Budget.test_executor_exit_stops_background_children) ... ok
+test_executor_nonzero_still_checks_gate (test_budget.Budget.test_executor_nonzero_still_checks_gate) ... ok
+test_expired_contract_prevents_any_worker (test_budget.Budget.test_expired_contract_prevents_any_worker) ... ok
+test_missing_executor_fails_closed (test_budget.Budget.test_missing_executor_fails_closed) ... ok
+test_owner_sigkill_stops_owned_process_group (test_budget.Budget.test_owner_sigkill_stops_owned_process_group) ... ok
+test_resume_cannot_override_live_owner (test_budget.Budget.test_resume_cannot_override_live_owner) ... ok
+test_resume_rejects_persisted_clock_rollback (test_budget.Budget.test_resume_rejects_persisted_clock_rollback) ... ok
+test_supervisor_ignores_ambient_python_startup (test_budget.Budget.test_supervisor_ignores_ambient_python_startup) ... ok
+test_supervisor_setup_failure_is_state_error (test_budget.Budget.test_supervisor_setup_failure_is_state_error) ... ok
+test_wall_clock_regression_does_not_extend_budget (test_budget.Budget.test_wall_clock_regression_does_not_extend_budget) ... ok
+test_wallclock_leading_zeros_are_decimal (test_budget.Budget.test_wallclock_leading_zeros_are_decimal) ... ok
+test_crash_after_pointer_rolls_forward_and_retry_does_not_rerun (test_close_commit.CloseCommit.test_crash_after_pointer_rolls_forward_and_retry_does_not_rerun) ... ok
+test_crash_before_pointer_rolls_back_then_same_id_can_retry (test_close_commit.CloseCommit.test_crash_before_pointer_rolls_back_then_same_id_can_retry) ... ok
+test_default_id_is_unique_and_invalid_id_does_not_write (test_close_commit.CloseCommit.test_default_id_is_unique_and_invalid_id_does_not_write) ... ok
+test_lost_acknowledgement_does_not_consume_a_second_iteration (test_close_commit.CloseCommit.test_lost_acknowledgement_does_not_consume_a_second_iteration) ... ok
+test_retry_is_read_only_even_after_newer_commit (test_close_commit.CloseCommit.test_retry_is_read_only_even_after_newer_commit) ... ok
+test_uncommitted_old_journal_cannot_rollback_newer_version (test_close_commit.CloseCommit.test_uncommitted_old_journal_cannot_rollback_newer_version) ... ok
+test_changed_product_request_and_evidence_reject_old_actions (test_context_actions.BriefContextActions.test_changed_product_request_and_evidence_reject_old_actions) ... ok
+test_claims_without_evidence_or_with_bad_product_cannot_go (test_context_actions.BriefContextActions.test_claims_without_evidence_or_with_bad_product_cannot_go) ... ok
+test_context_without_auto_preserves_unapproved_initial_entry (test_context_actions.BriefContextActions.test_context_without_auto_preserves_unapproved_initial_entry) ... ok
+test_expired_map_can_settle_passing_work_without_dispatch_or_new_budget (test_context_actions.BriefContextActions.test_expired_map_can_settle_passing_work_without_dispatch_or_new_budget) ... ok
+test_expiry_cannot_consume_an_old_work_or_close_map (test_context_actions.BriefContextActions.test_expiry_cannot_consume_an_old_work_or_close_map) ... ok
+test_interruption_after_commit_replays_original_id_and_arguments (test_context_actions.BriefContextActions.test_interruption_after_commit_replays_original_id_and_arguments) ... ok
+test_interruption_before_commit_recovers_original_request (test_context_actions.BriefContextActions.test_interruption_before_commit_recovers_original_request) ... ok
+test_presentation_reduces_repetition_without_changing_bound_actions (test_context_actions.BriefContextActions.test_presentation_reduces_repetition_without_changing_bound_actions) ... ok
+test_recorded_wave_maps_plan_begin_prepare_and_missing_native_receipt (test_context_actions.BriefContextActions.test_recorded_wave_maps_plan_begin_prepare_and_missing_native_receipt) ... ok
+test_single_task_from_empty_project_through_fresh_final_receipt (test_context_actions.BriefContextActions.test_single_task_from_empty_project_through_fresh_final_receipt) ... ok
+test_changed_product_request_and_evidence_reject_old_actions (test_context_actions.ContextActions.test_changed_product_request_and_evidence_reject_old_actions) ... ok
+test_claims_without_evidence_or_with_bad_product_cannot_go (test_context_actions.ContextActions.test_claims_without_evidence_or_with_bad_product_cannot_go) ... ok
+test_context_without_auto_preserves_unapproved_initial_entry (test_context_actions.ContextActions.test_context_without_auto_preserves_unapproved_initial_entry) ... ok
+test_expired_map_can_settle_passing_work_without_dispatch_or_new_budget (test_context_actions.ContextActions.test_expired_map_can_settle_passing_work_without_dispatch_or_new_budget) ... ok
+test_expiry_cannot_consume_an_old_work_or_close_map (test_context_actions.ContextActions.test_expiry_cannot_consume_an_old_work_or_close_map) ... ok
+test_interruption_after_commit_replays_original_id_and_arguments (test_context_actions.ContextActions.test_interruption_after_commit_replays_original_id_and_arguments) ... ok
+test_interruption_before_commit_recovers_original_request (test_context_actions.ContextActions.test_interruption_before_commit_recovers_original_request) ... ok
+test_recorded_wave_maps_plan_begin_prepare_and_missing_native_receipt (test_context_actions.ContextActions.test_recorded_wave_maps_plan_begin_prepare_and_missing_native_receipt) ... ok
+test_single_task_from_empty_project_through_fresh_final_receipt (test_context_actions.ContextActions.test_single_task_from_empty_project_through_fresh_final_receipt) ... ok
+test_broken_smoke_does_not_stamp (test_context_submit.ContextEntry.test_broken_smoke_does_not_stamp) ... ok
+test_enter_from_real_shaped_prompt_keeps_earliest_origin (test_context_submit.ContextEntry.test_enter_from_real_shaped_prompt_keeps_earliest_origin) ... ok
+test_entry_preserves_manual_approval_marker_without_auto_flag (test_context_submit.ContextEntry.test_entry_preserves_manual_approval_marker_without_auto_flag) ... ok
+test_entry_reports_context_store_errors_through_normal_host_error_path (test_context_submit.ContextEntry.test_entry_reports_context_store_errors_through_normal_host_error_path) ... ok
+test_failing_business_criterion_can_be_stamped_before_its_repair (test_context_submit.ContextEntry.test_failing_business_criterion_can_be_stamped_before_its_repair) ... ok
+test_mutating_smoke_does_not_stamp (test_context_submit.ContextEntry.test_mutating_smoke_does_not_stamp) ... ok
+test_numeric_contract_keeps_explicit_observed_counts (test_context_submit.ContextEntry.test_numeric_contract_keeps_explicit_observed_counts) ... ok
+test_one_entry_initializes_binds_and_returns_current_map (test_context_submit.ContextEntry.test_one_entry_initializes_binds_and_returns_current_map) ... ok
+test_single_submission_smokes_then_stamps_original_contract (test_context_submit.ContextEntry.test_single_submission_smokes_then_stamps_original_contract) ... Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/__main__.py", line 18, in <module>
+    main(module=None)
+    ~~~~^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/main.py", line 104, in __init__
+    self.runTests()
+    ~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/main.py", line 270, in runTests
+    self.result = testRunner.run(self.test)
+                  ~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/runner.py", line 257, in run
+    test(result)
+    ~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+           ~~~~~~~~^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/suite.py", line 122, in run
+    test(result)
+    ~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+           ~~~~~~~~^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/suite.py", line 122, in run
+    test(result)
+    ~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+           ~~~~~~~~^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/suite.py", line 122, in run
+    test(result)
+    ~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/case.py", line 725, in __call__
+    return self.run(*args, **kwds)
+           ~~~~~~~~^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/case.py", line 669, in run
+    self._callTestMethod(testMethod)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/case.py", line 615, in _callTestMethod
+    result = method()
+  File "/Users/m/repo/goal-loop/tests/test_context_submit.py", line 200, in test_single_submission_smokes_then_stamps_original_contract
+    self.author(self.entry()); view=self.f.view(); result=self.stamp(view)
+                                    ~~~~~~~~~~~^^
+  File "/Users/m/repo/goal-loop/tests/test_context_actions.py", line 26, in view
+    result = subprocess.run(['bash', str(ROOT/'scripts/goal_ctl.sh'), 'context', '--project', str(self.project), '--auto'],
+                            capture_output=True, text=True, timeout=15)
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 557, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 1221, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py", line 2153, in _communicate
+    ready = selector.select(timeout)
+  File "/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/selectors.py", line 398, in select
+    fd_event_list = self._selector.poll(timeout)
+KeyboardInterrupt

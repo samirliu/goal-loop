@@ -1,0 +1,16 @@
+{
+  "scope": "Fix goal-loop intent/visual acceptance, not rewrite the Hagia Sophia artifact",
+  "baseline": "6ae3e78",
+  "requirements": [
+    "Reject original all-mechanical visual contract",
+    "Bind quality to the original available request, explicit visual AC and all promised views",
+    "Require actual calibrated independent judgment; reject open findings and substituted/stale review artifacts",
+    "Keep deterministic fast lane, deadlines, transaction recovery and old nonvisual contracts",
+    "Do not claim semantic truth from keyword detection or hashes"
+  ],
+  "validation": [
+    "Actual old/new controller and Gate integration",
+    "Case raw evidence and structured-image false-positive counterexample",
+    "Normal and optimized interpreter, relevant regressions, both platforms where available"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "result": 2,
+  "stdout": "",
+  "stderr": "QUALITY: ERROR quality-contract-required: visual intent needs quality: visual AC-N views=... and a calibrated judged AC\nGATE: NO-GO reason=quality-contract-invalid:see QUALITY error; preserve the original request hint=see-reason\n"
+}

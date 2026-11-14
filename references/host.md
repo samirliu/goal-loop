@@ -15,6 +15,7 @@
 可选 `--brief` 只隐藏内部绑定哈希和重复的收账字段；完整绑定仍在原锁内重新计算，动作与 revision 相同。它只作诊断选项；真实小样本未建立完整交付提速，默认保留完整地图。
 只有会话已授权自动批准时才加 `--auto`；默认不添加自动批准标记。授权选项也是版本绑定的一部分。
 首次 hook 只建立账本、尚无 goal.md 时，context 返回最小契约模板和写入路径；不替用户写入或批准，也不要求重新 init 或阅读实现源码。填好并冒烟后重新取 context，才提供带当前版本的 stamp 命令。
+首次进入使用 `--request-stdin` 从 stdin 传用户原始任务文本；显式 `/goal-loop 目标` hook 已捕获原文时以该原文为准。原任务文本只保存在本地 goal 宿主回执，用于契约覆盖检查；普通对话、后续提示与 worker 正文仍不捕获。续跑保留原文，更换原目标应先走契约修订，不能覆盖回执。
 每条 action 带账本/产物/工作计划/接口/策略版本；run 消费时在目录锁内重算，过期拒绝后重新派生。
 它只是派生地图，不是新账本或完成权威。完整 status 和原始错误仍可读取。
 
@@ -40,6 +41,17 @@
 ```sh
 python3 -I ${GOAL_SKILL}/scripts/goal_host.py begin PROJECT BACKEND SESSION SECONDS
 ```
+
+无 prompt hook 的首次手动入口（例如通过 Skill 工具加载后执行）可写为：
+
+```sh
+python3 -I ${GOAL_SKILL}/scripts/goal_host.py begin PROJECT BACKEND SESSION SECONDS --request-stdin --context <<'GOAL_REQUEST'
+<用户原始任务文本>
+GOAL_REQUEST
+```
+
+地图的 `quality` 给出已捕获原请求、视觉质量 AC、机位范围与复审记录模板。只有实际执行了冷席判读后才填写 findings/summary 并绑定质量判词；普通确定性任务保持原四项提交判断。
+请求输入须 UTF-8 并关闭 stdin；读取最多占用 10 秒且受本次/继承截止约束，输入上限 2 MiB。手动入口在读 stdin 前记录工具起点，读取时间也计入原预算；管道一直不关闭时拒绝进入，不重新起表。
 
 没有 prompt hook 的宿主记录 `host-tool-entry`，不能回填更早的思考时间。
 重复 begin、resume、较大的新预算都不能延长原截止。它可以先于契约初始化；

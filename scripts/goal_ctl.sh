@@ -250,6 +250,8 @@ case "$cmd" in
         exit 2
       fi
     fi
+    quality_freeze=$(python3 -I "$here/goal_quality.py" freeze --project "$project") \
+      || { echo 'CTL: ERROR stamp-refused: invalid visual quality contract (see QUALITY error)' >&2; exit 2; }
     h=$(gp_ac_body_hash "$project")
     mutation_id=$(python3 -I "$here/goal_store.py" mutation-journal "$sd" begin stamp "${_goal_ctl_args[@]}") || exit 4
     # Budget knobs written in goal.md BIND at stamp. They used to be
@@ -297,7 +299,7 @@ case "$cmd" in
         printf '%s=%s;' "$scr" "$h"
       done
     )
-    printf '%s\n' "$freeze$forge_freeze" > "$sd/check_freeze" || exit 4
+    printf '%s\n' "$freeze$forge_freeze$quality_freeze" > "$sd/check_freeze" || exit 4
     if [ -n "$forge_freeze" ]; then
       mkdir -p "$sd/evidence/raw" || exit 4
       python3 -I "$here/goal_forge.py" archive --project "$project" --expected "$forge_freeze" \

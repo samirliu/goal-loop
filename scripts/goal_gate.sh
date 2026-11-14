@@ -553,6 +553,12 @@ if [ "$exit_mode" = forge ]; then
   forge_freeze=$(python3 -I "$here/goal_forge.py" freeze --project "$project") || fail "forge-plan-invalid:see probe scope"
   freeze_now="$freeze_now$forge_freeze"
 fi
+quality_freeze=$(python3 -I "$here/goal_quality.py" freeze --project "$project") \
+  || fail "quality-contract-invalid:see QUALITY error; preserve the original request"
+freeze_now="$freeze_now$quality_freeze"
+quality_ac=""
+[ -z "$quality_freeze" ] || quality_ac=$(r < "$sd/goal.md" | sed -nE 's/^quality: visual (AC-[0-9]+) views=.*/\1/p')
+quality_evidence=""
 norm_freeze(){ printf '%s' "$1" | tr ';' '\n' | sed '/^$/d' | sort | tr '\n' ';'; }
 if [ "$(norm_freeze "$freeze_now")" != "$(norm_freeze "$freeze_st")" ]; then
   fail "check-script-tampered:stamped=$(norm_freeze "$freeze_st") now=$(norm_freeze "$freeze_now")"
@@ -693,6 +699,7 @@ for id in $ac_ids; do
   fi
   [ "$vi" = "$iter" ] && [ "$vd" = "$digest" ] || fail "not-covered:$id (verdict bound to iter=$vi digest=$vd)"
   [ "$v" != FAIL ] || fail "open-FAIL:$id"
+  [ "$id" != "$quality_ac" ] || [ "$v" = PASS ] || fail "quality-judgment-required:$id (visual quality cannot be waived as unverifiable)"
   total=$((total+1))
   if [ "$v" = PASS ]; then
     [ -n "$ev" ] || fail "evidence-missing:$id"
@@ -703,6 +710,7 @@ for id in $ac_ids; do
     # greedy match to the digest: token - artifact paths with spaces are
     # legal file names; stopping at whitespace silently loses the path.
     art=$(gp_ev_artifact "$ev"); dig=$(gp_ev_digest "$ev")
+    [ "$id" != "$quality_ac" ] || quality_evidence="$art"
     [ -n "$art" ] && [ -n "$dig" ] || fail "verdict-unbound:$id (PASS evidence must cite artifact: <path> and digest: <sha256> - the seat must say WHAT it judged)"
     if [ -f "$project/$art" ]; then
       now=$(sha256_std "$project/$art")
@@ -884,6 +892,10 @@ fi
 if [ "$mode" = quality ]; then
   [ -n "$primary" ] && [ -n "$observed_score" ] || fail "quality-objective-required"
   [ "${deadline_expired:-0}" != 1 ] || blocked time-budget-exhausted
+  if [ -n "$quality_freeze" ]; then
+    python3 -I "$here/goal_quality.py" review --project "$project" --evidence "$quality_evidence" \
+      || fail "quality-review-invalid:see QUALITY error"
+  fi
   echo "GATE: QUALITY-OK digest=$digest iter=$iter score=$observed_score"
   exit 0
 fi
@@ -972,6 +984,10 @@ if [ "$exit_mode" = forge ] && [ "$mode" != checkpoint ]; then
   coverage=" coverage=declared"
 fi
 outcome=GO
+if [ -n "$quality_freeze" ]; then
+  python3 -I "$here/goal_quality.py" review --project "$project" --evidence "$quality_evidence" \
+    || fail "quality-review-invalid:see QUALITY error (clear cannot waive goal-related findings)"
+fi
 [ "$mode" != checkpoint ] || outcome=CHECKPOINT-OK
 if [ -n "$primary" ]; then
   echo "GATE: $outcome digest=$digest iter=$iter ac=$total pass=$passn unverified=$unv mode=$exit_mode score=$observed_score best=${best:-$observed_score}$coverage"

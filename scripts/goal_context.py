@@ -19,6 +19,9 @@ crew = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(crew)
 store, budget = crew.store, crew.budget
 HERE = Path(__file__).resolve().parent
+QUALITY_SPEC = importlib.util.spec_from_file_location('context_quality', HERE/'goal_quality.py')
+quality = importlib.util.module_from_spec(QUALITY_SPEC)
+QUALITY_SPEC.loader.exec_module(quality)
 FROM_DISK = object()
 
 
@@ -337,6 +340,7 @@ def compile_view(root, state, fd, auto=False):
     plan = (state / 'work-plan.md').read_text() if (state / 'work-plan.md').exists() else ''
     log = (state / 'loop-log.md').read_text()
     stamped = re.search(r'^approved: [0-9a-f]{6,}', contract, re.M) is not None
+    quality_info = quality.context(root)
     waves = [crew.load(p) for p in sorted((state/'evidence/crew').glob('*.json'))]
     units, policies = {}, {}
     for wave in sorted(waves, key=lambda w: w['started']):
@@ -379,6 +383,7 @@ def compile_view(root, state, fd, auto=False):
     binding['execution'] = execution
     binding['implementation'] = {path.name: store._hash(path.read_bytes()) for path in sorted(HERE.iterdir())
                                  if path.is_file() and path.suffix in ('.py', '.sh', '.awk')}
+    binding['quality'] = store._hash(store._encode(quality_info))
     revision = store._hash(store._encode(binding))
     commands = {'status': ['bash', str(HERE / 'goal_ctl.sh'), 'status', '--project', str(root)],
                 'audit': ['bash', str(HERE / 'goal_audit.sh'), '--project', str(root)],
@@ -388,6 +393,8 @@ def compile_view(root, state, fd, auto=False):
         commands['verify'] = ['bash', str(HERE/'goal_gate.sh'), '--verify', '--project', str(root)]
     if not stamped and authored and not expired:
         commands['stamp'] = ['bash', str(HERE / 'goal_ctl.sh'), 'stamp', '--project', str(root)] + (['--auto'] if auto else [])
+        if quality_info['error']:
+            commands.pop('stamp', None)
     if expired or not authored:
         commands = {'status': commands['status']}
     objective = re.search(r'^## (?:Goal|Objective)[^\n]*\n+([^#<][^\n]*)', contract, re.M)
@@ -446,6 +453,10 @@ def compile_view(root, state, fd, auto=False):
                  settle_command=actions(root, revision, {'receipt': commands['receipt']}, auto)['receipt']['command'] if 'receipt' in commands else None,
                  evidence=dict(contract=str(state/'goal.md'), ledger=str(state/'store/commits'),
                                log=str(state/'loop-log.md'), host=str(state/'evidence/host')))
+    if quality_info['required'] or quality_info['original_requests']:
+        value['quality'] = quality_info
+        if quality_info['error']:
+            value['next'] = 'repair-quality-contract' if not stamped else 'review-contract-quality'
     if stamped and not claimed:
         value['close_input'] = {k: v for k, v in close.items() if k != 'values' or close['sha256'] is not None}
         value['implementation'] = dict(tasks=value['pending'], source=str(state/'work-plan.md'),

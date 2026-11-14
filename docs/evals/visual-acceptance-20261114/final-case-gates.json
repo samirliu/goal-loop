@@ -1,0 +1,14 @@
+[
+  {
+    "project": "baseline-live",
+    "result": 2,
+    "stdout": "",
+    "stderr": "QUALITY: ERROR quality-contract-required: visual intent needs quality: visual AC-N views=... and a calibrated judged AC\nGATE: NO-GO reason=quality-contract-invalid:see QUALITY error; preserve the original request hint=see-reason\n"
+  },
+  {
+    "project": "visual-flow-fixed",
+    "result": 0,
+    "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-0f3252573e37084bca621c0f3f71b60fc3508ac3f4750cb41d54b71a637fe5c6 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n",
+    "stderr": "GATE: NOTE judge-score-unrecorded (AC-1 claimed without a numeric judge score; R13 stays inert - record --judge-score N to activate the divergence guard)\n"
+  }
+]

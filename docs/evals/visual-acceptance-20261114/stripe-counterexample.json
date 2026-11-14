@@ -1,0 +1,44 @@
+{
+  "scope": "Original renderer smoke analyser accepts a non-building image; not a new quality judge or utility measurement",
+  "width": 96,
+  "height": 64,
+  "colors": [
+    [
+      200,
+      145,
+      40
+    ],
+    [
+      25,
+      20,
+      10
+    ],
+    [
+      255,
+      250,
+      230
+    ],
+    [
+      90,
+      50,
+      10
+    ]
+  ],
+  "verdict": {
+    "ok": true,
+    "profile": "interior",
+    "metrics": {
+      "meanLuma": 0.4653803921568352,
+      "stdLuma": 0.3492109802833715,
+      "p05": 0.0797686274509804,
+      "p95": 0.9788980392156862,
+      "contrast": 0.8493027982952527,
+      "edgeDensity": 0.6328901960785409,
+      "goldFraction": 0.5,
+      "darkFraction": 0.25,
+      "brightFraction": 0.25,
+      "samples": 6144
+    },
+    "reasons": []
+  }
+}

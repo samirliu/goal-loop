@@ -28,8 +28,8 @@ description: |-
 
 默认串行完成实际业务；多个文件不等于需要 crew。普通确定性任务只走下面四步，不额外填策略表、抄检查数或自行拼 CLI 参数。
 
-1. **进入并取图**：`python3 -I <skill>/scripts/goal_host.py enter <project> <seconds> --context` 一次绑定最早宿主预算并返回 `context`。无唯一真实回执时，用实际 backend/session 调用 `begin … --context`，不猜身份。已有自动执行授权才加 `--auto`；授权沿用，不重复索要。
-2. **作者契约并盖戳**：按地图给出的路径/template 写业务 AC 与 work-plan；每条 AC 都有能失败的指名检查。写好后取一次新地图，执行 `submissions.stamp.command`，程序运行原冒烟、检查冻结与盖戳。初始业务 FAIL 可以成为修复起点；BROKEN、变更树/账本或不完整检查不能盖戳。预算参数在盖戳时绑定，不能延长既有截止。
+1. **进入并取图**：`python3 -I <skill>/scripts/goal_host.py enter <project> <seconds> --context` 一次绑定最早宿主预算并返回 `context`。首次进入加 `--request-stdin`，stdin 传用户原始任务文本；已有 prompt 回执时以宿主捕获原文为准。无唯一真实回执时，用实际 backend/session 调用 `begin … --request-stdin --context`，不猜身份。续跑沿用原请求与截止，不用新的改写覆盖。已有自动执行授权才加 `--auto`；授权沿用，不重复索要。
+2. **作者契约并盖戳**：Objective 保留用户目标原文，再逐项写业务 AC 与 work-plan；不得把“逼真/美观/可信”等目标改写成只剩实现自检。先按原始请求加载下面的能力说明，每条 AC 都有能失败的指名检查。写好后取一次新地图，执行 `submissions.stamp.command`，程序运行原冒烟、检查冻结与盖戳。初始业务 FAIL 可以成为修复起点；BROKEN、变更树/账本或不完整检查不能盖戳。预算参数在盖戳时绑定，不能延长既有截止。
 3. **实现并实际复审**：实现业务、执行适当项目检查、检查反例与兼容性，真实更新 work-plan。复审结束时取新地图，直接按 `submissions.close.template` 提交实际判断；执行其 `command`，JSON 作为 stdin。通常完成意图只填 progress、exit_signal、adversarial、adversarial_note；计数、身份、request 文件、版本消费与终验由程序处理。只有模板要求实际计数时才运行 `actions.verify` 取观测。缺字段按原错误补实际证据；禁止把勾选或 worker 自述补成 PASS/clear。
 4. **按原终验交付**：claim 提交会执行原收账及 `goal_audit.sh`/Gate，最后的原终验回执必须 `completion_verified=true` 且退出码为 0 才交付。只报业务结果、实际验收、未解决项和必要产物路径；原始账本按需提供。普通继续迭代不要求编造 clear；`progress=no` 须给真实 `strategy_delta`。
 
@@ -46,12 +46,15 @@ description: |-
 
 | 契约/执行出现 | 需要的说明 |
 |---|---|
+| 原始请求要求视觉品质、逼真、实物复刻或整体美观（即使 AC 暂时全写成 `exit=0`） | `references/packs/visual.md` 与 `references/packs/instrument.md` |
 | `judged` / `calib:` / `probe:` / `metric:` / `sd:` / `var:` | `references/packs/instrument.md` |
-| `objective: maximize` / `minimize` / `exit: forge` / horizon / `--strategy` / 策略晋升或复用 | `references/packs/gradient.md` |
+| 原始请求“尽可能好/逼真”等持续优化，或 `objective: maximize` / `minimize` / `exit: forge` / horizon / `--strategy` / 策略晋升或复用 | `references/packs/gradient.md` |
 | `external:` / `window:` | `references/packs/external.md` |
 | 实际需要原生 worker 协作 | `references/crew.md` 与 `references/host.md` |
 
 判断类 AC 在 claim 前由全新冷席终验，生产者不自裁；校准必须识别好/坏样本。优化类先建立真实基线，再填地图要求的 score/strategy/dry；`pre-reg.md` 由 stamp 播种，实际策略与反证只在使用优化能力时补齐。forge 的**指标批评席**必须以证据检查盲区与刷分路径；读数或 dry 不能由代理指标/产量替代。EFFICIENCY 只作诊断，净交付收益仍需同预算留出对照。
+
+复审先核对原始目标是否被 AC 覆盖，再判断产物。已知影响目标的缺陷必须修复或保持为 finding/未完成工作；写进“诚实边界”不能自行免除。预算到期可交付现有结果及缺口，不能把未完成目标改称 GO。
 
 可复用策略先绑定真实触发与适用范围，再用好/坏产物校准冻结 grader、执行原配对比较；`run-enabled` 与派工只消费绑定资格报告哈希的归档。路由策略测整波净交付成本，打印建议更快不算收益；并行建议仍受图、容量、截止与显式串行约束。根据 `feedback` 修复并使用新的留出输入，不重置统计预算；旧记录可恢复，重新启用需重新取得资格。具体协议在 gradient pack。
 

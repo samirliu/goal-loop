@@ -1,0 +1,76 @@
+test_bridge_ack_ready_structured_completion_and_independent_adoption (test_host.Host.test_bridge_ack_ready_structured_completion_and_independent_adoption) ... ok
+test_cancellation_token_kills_only_owned_command_and_needs_host_confirmation (test_host.Host.test_cancellation_token_kills_only_owned_command_and_needs_host_confirmation) ... ok
+test_changed_launcher_cannot_bind_a_worker (test_host.Host.test_changed_launcher_cannot_bind_a_worker) ... ok
+test_claude_launcher_binds_and_runs_original_owned_ready (test_host.Host.test_claude_launcher_binds_and_runs_original_owned_ready) ... ok
+test_expired_budget_denies_hooks_and_no_wave_dispatch (test_host.Host.test_expired_budget_denies_hooks_and_no_wave_dispatch) ... ok
+test_first_explicit_prompt_is_captured_before_initialization_and_reentry (test_host.Host.test_first_explicit_prompt_is_captured_before_initialization_and_reentry) ... ok
+test_first_worker_tool_binds_ticket_and_codex_keeps_normal_permissions (test_host.Host.test_first_worker_tool_binds_ticket_and_codex_keeps_normal_permissions) ... ok
+test_interrupt_only_requests_and_structured_errors_keep_missing_output (test_host.Host.test_interrupt_only_requests_and_structured_errors_keep_missing_output) ... ok
+test_missing_launcher_cannot_bind_a_worker (test_host.Host.test_missing_launcher_cannot_bind_a_worker) ... ok
+test_native_claude_rewrite_does_not_auto_approve_permissions (test_host.Host.test_native_claude_rewrite_does_not_auto_approve_permissions) ... ok
+test_native_hooks_correlate_only_nonce_call_and_native_agent_id (test_host.Host.test_native_hooks_correlate_only_nonce_call_and_native_agent_id) ... ok
+test_non_goal_noop_and_explicit_prompt_entry_cache (test_host.Host.test_non_goal_noop_and_explicit_prompt_entry_cache) ... FAIL
+test_nonce_capacity_and_scope_rejection_preserve_failed_attempt (test_host.Host.test_nonce_capacity_and_scope_rejection_preserve_failed_attempt) ... ok
+test_other_worker_can_be_cancelled_while_validator_is_running (test_host.Host.test_other_worker_can_be_cancelled_while_validator_is_running) ... ok
+test_registered_write_edit_stay_in_owned_paths_and_can_retry (test_host.Host.test_registered_write_edit_stay_in_owned_paths_and_can_retry) ... STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-a5xf1936/1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "./scratch/../1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-a5xf1936/2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out.extra", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": ".goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-a5xf1936-outside.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": null, "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write requires file_path"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-a5xf1936/1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "./scratch/../1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-a5xf1936/2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out.extra", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": ".goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-a5xf1936-outside.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": null, "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write requires file_path"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+ok
+test_short_write_lock_contention_waits_and_records_each_ready_once (test_host.Host.test_short_write_lock_contention_waits_and_records_each_ready_once) ... ok
+test_structured_leaf_symlink_escape_and_parent_permissions (test_host.Host.test_structured_leaf_symlink_escape_and_parent_permissions) ... STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-9m_3x9wq/1.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-9m_3x9wq/1.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-9m_3x9wq/1.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": null, "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-write-outside-7b0aw7gz/parent.py", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "1.out", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": null, "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-write-outside-7b0aw7gz/parent.py", "response": {}, "tool": "Edit"}
+ok
+test_structured_write_subtree_checks_symlinks_and_control_paths (test_host.Host.test_structured_write_subtree_checks_symlinks_and_control_paths) ... STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-59t5qhn5/owned/nested/new.py", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../owned/new.py", "response": {}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/.goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-59t5qhn5/owned/nested/new.py", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../owned/new.py", "response": {}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/../2.out", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside owned scope"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "owned/.goal/state.rec", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write to .goal refused"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-59t5qhn5/owned/escape/new.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-59t5qhn5/owned/escape/new.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Edit"}
+STRUCTURED_WRITE_HOOK {"agent": "write-worker", "file_path": "/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-host-bridge-59t5qhn5/owned/escape/../new.py", "response": {"hookSpecificOutput": {"hookEventName": "PreToolUse", "permissionDecision": "deny", "permissionDecisionReason": "goal-loop: structured worker write outside project"}}, "tool": "Write"}
+ok
+test_symlink_launcher_cannot_bind_a_worker (test_host.Host.test_symlink_launcher_cannot_bind_a_worker) ... ok
+test_symlinked_state_and_cancel_target_are_refused (test_host.Host.test_symlinked_state_and_cancel_target_are_refused) ... ok
+
+======================================================================
+FAIL: test_non_goal_noop_and_explicit_prompt_entry_cache (test_host.Host.test_non_goal_noop_and_explicit_prompt_entry_cache)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_host.py", line 218, in test_non_goal_noop_and_explicit_prompt_entry_cache
+    self.assertNotIn('private body', ''.join(p.read_text() for p in host.folder(project)[1].glob('*.json')))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'private body' unexpectedly found in '{"payload":{"origin":{"backend":"claude","boot":"652ed2a096e121ab1523b3307a5af0789d372cf18f4d2165ead81585b53aa83a","epoch":1794657924.6778471,"kind":"prompt","monotonic":1843499.450349125,"session":"prompt-session"},"project":"/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/prompt-goal-k6qvarrg","request":"private body","version":1},"sha256":"87c9bee92345a879a1a6f2cea79fa2bcdc1ceba9130361f058b771f2cb9bc00d"}{"payload":{"active":true,"backend":"claude","project":"/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/prompt-goal-k6qvarrg","request":"private body","run":"b06ea8c78ddb4c20b5b4dcc12f5f600c","seconds":30,"session":"prompt-session","version":1},"sha256":"4e34193db01a501c7c8cf2e23725f4aa266909c0f1cf539ad80891f09ce9dc9b"}'
+
+----------------------------------------------------------------------
+Ran 20 tests in 19.473s
+
+FAILED (failures=1)

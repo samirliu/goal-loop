@@ -13,6 +13,7 @@ import math
 import os
 from pathlib import Path
 import re
+import select
 import shlex
 import subprocess
 import sys
@@ -105,10 +106,31 @@ def capture(backend, session, kind):
                 epoch=time.time(), monotonic=time.monotonic(), boot=budget.boot_identity())
 
 
-def begin(project, backend, session, seconds, origin=None):
+def request_stdin(seconds):
+    """Read explicit task text without hanging entry on an open caller pipe."""
+    require(math.isfinite(seconds) and seconds > 0, 'invalid host budget')
+    end = time.monotonic() + min(10, seconds)
+    outer = os.environ.get('GOAL_RUNNER_MONOTONIC_END')
+    if outer:
+        require(math.isfinite(float(outer)), 'invalid inherited request deadline')
+        end = min(end, float(outer))
+    data = bytearray()
+    while True:
+        remaining = end-time.monotonic()
+        require(remaining > 0 and select.select([sys.stdin.fileno()], [], [], remaining)[0],
+                'original request stdin timed out; close the input pipe')
+        chunk = os.read(sys.stdin.fileno(), 65536)
+        if not chunk:
+            return data.decode('utf-8')
+        data.extend(chunk)
+        require(len(data) <= 2*1024*1024, 'original request exceeds 2 MiB')
+
+
+def begin(project, backend, session, seconds, origin=None, request=None):
     """Bind an explicit goal session; manual entry observes tool entry only."""
     backend, session = identity(backend), identity(session)
     require(type(seconds) in (int, float) and math.isfinite(seconds) and seconds > 0, 'invalid host budget')
+    require(request is None or isinstance(request, str) and request.strip(), 'invalid original request')
     observed = capture(backend, session, 'tool') if origin is None else budget.host_origin(origin)
     require(observed['backend'] == backend and observed['session'] == session, 'origin/session mismatch')
     root = Path(project).resolve(strict=True)
@@ -120,23 +142,35 @@ def begin(project, backend, session, seconds, origin=None):
         require(result.returncode == 0, 'goal initialization failed')
     with locked(root, create=True) as (_, path):
         cached = session_path(path, backend, session, 'prompt')
-        if origin is None and cached.exists():
+        captured_request = None
+        if cached.exists():
             receipt = load(cached)
             require(receipt.get('project') == str(root), 'prompt target mismatch')
-            observed = receipt['origin']
-        adopted = budget.adopt_host(state, observed, seconds)
+            prompt_origin = budget.host_origin(receipt['origin'])
+            if origin is None or (observed['kind'] == 'tool' and observed['boot'] == prompt_origin['boot']
+                                  and prompt_origin['monotonic'] <= observed['monotonic']):
+                observed = prompt_origin
+            captured_request = receipt.get('request')
         target = session_path(path, backend, session)
         previous = load(target) if target.exists() else None
+        original_request = captured_request or request
+        if previous and previous.get('request') is not None:
+            require(original_request is None or original_request == previous['request'],
+                    'original request changed; review the contract amendment instead of replacing the request')
+            original_request = previous['request']
+        adopted = budget.adopt_host(state, observed, seconds)
         if previous:
             require(previous['run'] == adopted['run'], 'session belongs to another run')
         value = dict(version=1, backend=backend, session=session, project=str(root), run=adopted['run'],
                      seconds=min(seconds, previous['seconds']) if previous else seconds, active=True)
+        if original_request is not None:
+            value['request'] = original_request
         save(target, value)
         return dict(value, scope=adopted['scope'], deadline_epoch=adopted['deadline'],
                     deadline_monotonic=adopted['monotonic']['deadline'])
 
 
-def enter(project, seconds, backend=None, session=None):
+def enter(project, seconds, backend=None, session=None, request=None):
     """Discover only a unique recorded host identity; never invent a session."""
     root, path = folder(project)
     with locked(root):
@@ -154,7 +188,7 @@ def enter(project, seconds, backend=None, session=None):
                           and (session is None or r['session'] == session)}
         require(len(identities) == 1, 'missing/ambiguous recorded host identity; use begin with actual backend/session')
         chosen_backend, chosen_session = next(iter(identities))
-    return begin(root, chosen_backend, chosen_session, seconds)
+    return begin(root, chosen_backend, chosen_session, seconds, request=request)
 
 
 def active(path, root, session=None, backend=None):
@@ -623,7 +657,13 @@ def hook(payload, backend, project=None):
         with locked(root):
             cached = session_path(path, backend, session, 'prompt')
             if not cached.exists():
-                save(cached, dict(version=1, project=str(root), origin=origin))
+                value = dict(version=1, project=str(root), origin=origin)
+                # A later follow-up is not the original request of an already
+                # bound manual session. Keep its earlier text and origin.
+                bound = session_path(path, backend, session)
+                if requested and not bound.exists():
+                    value['request'] = prompt
+                save(cached, value)
         return {}
     try:
         current = active(path, root, session, backend)
@@ -701,11 +741,13 @@ def main():
     p = commands.add_parser('begin')
     p.add_argument('project'); p.add_argument('backend'); p.add_argument('session'); p.add_argument('seconds', type=float)
     p.add_argument('--origin', type=Path)
+    p.add_argument('--request-stdin', action='store_true', help='capture the verbatim original user request from stdin')
     p.add_argument('--context', action='store_true', help='return the current action map with the bound host entry')
     p.add_argument('--auto', action='store_true', help='context: only with existing automatic approval authorization')
     p = commands.add_parser('enter')
     p.add_argument('project'); p.add_argument('seconds', type=float)
     p.add_argument('--backend'); p.add_argument('--session')
+    p.add_argument('--request-stdin', action='store_true', help='capture the verbatim original user request from stdin')
     p.add_argument('--context', action='store_true', help='return the current action map with the bound host entry')
     p.add_argument('--auto', action='store_true', help='context: only with existing automatic approval authorization')
     p = commands.add_parser('prepare')
@@ -730,10 +772,13 @@ def main():
             else:
                 raise
     elif args.command == 'enter':
-        result = enter(args.project, args.seconds, args.backend, args.session)
+        result = enter(args.project, args.seconds, args.backend, args.session,
+                       request_stdin(args.seconds) if args.request_stdin else None)
     elif args.command == 'begin':
+        observed = (json.loads(args.origin.read_bytes()) if args.origin else
+                    capture(args.backend, args.session, 'tool') if args.request_stdin else None)
         result = begin(args.project, args.backend, args.session, args.seconds,
-                       json.loads(args.origin.read_bytes()) if args.origin else None)
+                       observed, request_stdin(args.seconds) if args.request_stdin else None)
     elif args.command == 'prepare':
         result = prepare(args.project, args.wave, args.task, args.session, args.call_id)
     elif args.command == 'attach':

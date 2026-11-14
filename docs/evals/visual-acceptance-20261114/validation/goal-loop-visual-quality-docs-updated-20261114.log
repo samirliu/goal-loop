@@ -1,0 +1,153 @@
+  ok   - C1 companion reference resolves: contract-forge/tests/run_fixtures.sh
+  ok   - C1 companion reference resolves: tests/run_fixtures.sh
+  ok   - C1 companion reference resolves: contract-forge/tests/run_fixtures.sh
+  ok   - C1 all internal cited files exist (external skipped=0)
+  ok   - C2 SKILL.md title says v4.1.1
+  ok   - C3 references/patterns.md TOC 1 has a heading
+  ok   - C3 references/patterns.md TOC 2 has a heading
+  ok   - C3 references/patterns.md TOC 3 has a heading
+  ok   - C5 references/crew.md has: NEVER a GO signal
+  ok   - C5 references/crew.md has: work-plan.md
+  ok   - C5 references/crew.md has: No `isolation: worktree`
+  ok   - C5 references/crew.md has: Do not invent new loop-log keys
+  ok   - C5 references/gate.md has: never WRITE `.goal/`
+  ok   - C5 references/crew.md has: INLINED
+  ok   - C5 SKILL.md has: 禁止
+  ok   - C5 SKILL.md has: worktree
+  ok   - C5 references/gate.md has: R9
+  ok   - C5 references/gate.md has: R10
+  ok   - C5 references/gate.md has: R11
+  ok   - C5 references/gate.md has: probe:
+  ok   - C5 references/gate.md has: R12
+  ok   - C5 SKILL.md has: goal_audit.sh
+  ok   - C5 references/crew.md has: calibration anchors
+  ok   - C5 SKILL.md has: 指标批评席
+  ok   - C5 references/gate.md has: R13
+  ok   - C5 references/gate.md has: DIVERGENCE
+  ok   - C5 scripts/goal_gate.sh has: DIVERGENCE
+  ok   - C5 scripts/goal_ctl.sh has: judge-score
+  ok   - C5 scripts/goal_gate.sh has: probe-failed
+  ok   - C5 scripts/goal_gate.sh has: score-regressed
+  ok   - C5 scripts/goal_gate.sh has: missing-strategy-delta
+  ok   - C5 scripts/goal_ctl.sh has: strategy-delta
+  FAIL - C5 scripts/goal_parse.sh missing: (exit|objective|horizon-waived):
+  ok   - C5 scripts/goal_ctl.sh has: gp_ac_body_hash
+  ok   - C5 scripts/goal_gate.sh has: gp_ac_body_hash
+  ok   - C5 scripts/goal_ctl.sh has: gp_hash_std
+  ok   - C5 SKILL.md has: minimize
+  ok   - C5 references/gate.md has: low-water for minimize
+  ok   - C5 scripts/goal_parse.sh has: minimize)  echo "minimize"
+  ok   - C5 scripts/goal_gate.sh has: dir=minimize
+  ok   - C5 scripts/goal_ctl.sh has: obj_dir
+  ok   - C5 SKILL.md has: 盖戳时绑定
+  ok   - C5 scripts/goal_ctl.sh has: BIND at stamp
+  ok   - C5 scripts/goal_gate.sh has: hint=fix-AC
+  ok   - C5 scripts/goal_gate.sh has: verdict-unbound
+  ok   - C5 scripts/goal_gate.sh has: contract-malformed
+  ok   - C5 scripts/goal_ctl.sh has: false-complete-counted
+  ok   - C5 scripts/goal_gate.sh has: calibration-missing
+  ok   - C5 scripts/goal_gate.sh has: calibration-broken
+  ok   - C5 references/gate.md has: R15
+  ok   - C5 references/gate.md has: calibration-missing
+  ok   - C5 references/crew.md has: calibration is MANDATORY
+  ok   - C5 assets/goal.contract.md has: calib:
+  ok   - C5 SKILL.md has: calib:
+  ok   - C5 SKILL.md has: 小任务快车道
+  ok   - C5 scripts/goal_ctl.sh has: CTL: NEXT
+  ok   - C5 scripts/goal_ctl.sh has: last_hint=
+  ok   - C5 references/gate.md has: crew:1]
+  ok   - C5 scripts/goal_ctl.sh has: bad-task:
+  ok   - C5 scripts/goal_gate.sh has: check-mutated-ledger
+  ok   - C5 scripts/goal_gate.sh has: ledger_digest
+  ok   - C5 scripts/goal_gate.sh has: unknown-ac-id
+  ok   - C5 scripts/goal_gate.sh has: duplicate AC id
+  ok   - C5 scripts/goal_gate.sh has: unparseable-state:
+  ok   - C5 scripts/goal_ctl.sh has: never produce a score
+  ok   - C5 scripts/goal_ctl.sh has: stamp-refused: goal.md has no
+  ok   - C5 scripts/goal_ctl.sh has: false-complete-flag-ignored
+  ok   - C5 references/gate.md has: check-mutated-ledger
+  ok   - C5 references/gate.md has: NEGATIVE water marks
+  ok   - C5 scripts/goal_gate.sh has: metric-flat
+  ok   - C5 scripts/goal_gate.sh has: extract_metric
+  ok   - C5 scripts/goal_gate.sh has: strip_ansi
+  ok   - C5 scripts/goal_gate.sh has: tolerance
+  ok   - C5 references/gate.md has: R14
+  ok   - C5 SKILL.md has: hint=
+  ok   - C5 SKILL.md has: bind-seat
+  ok   - C5 scripts/goal_gate.sh has: graceful delivery of passing work
+  ok   - C5 SKILL.md has: 不没收已通过的交付
+  ok   - C5 references/gate.md has: strategy=<label>
+  ok   - C5 references/gate.md has: peer-notes
+  ok   - C5 references/crew.md has: peer-notes
+  ok   - C5 references/patterns.md has: complex-goal contract shapes
+  ok   - C5 SKILL.md has: --strategy
+  ok   - C5 SKILL.md has: peer-notes
+  ok   - C5 SKILL.md has: EFFICIENCY
+  ok   - C5 scripts/goal_ctl.sh has: --strategy
+  ok   - C5 scripts/goal_ctl.sh has: strat_show
+  ok   - C5 scripts/goal_ctl.sh has: CTL: EFFICIENCY
+  ok   - C5 scripts/goal_ctl.sh has: eval-gap:
+  ok   - C5 scripts/goal_ctl.sh has: promote:
+  ok   - C5 scripts/goal_ctl.sh has: attribution-unused:
+  ok   - C5 scripts/goal_audit.sh has: recovery-vocabulary
+  ok   - C5 scripts/goal_parse.sh has: stall-recovered
+  ok   - C5 references/crew.md has: stall-recovered
+  ok   - C5 references/crew.md has: tool-error-fixed
+  ok   - C5 references/crew.md has: re-run:stall
+  ok   - C5 references/crew.md has: `[ ]` (OPEN)
+  ok   - C5 references/crew.md has: fallback:provider-fatal
+  ok   - C5 scripts/goal_audit.sh has: fallback-vocabulary
+  ok   - C5 SKILL.md has: --fault
+  ok   - C5 references/crew.md has: breakpoint brief
+  ok   - C5 references/crew.md has: take-over
+  ok   - C5 references/crew.md has: faults.rec
+  ok   - C5 references/crew.md has: open-items
+  ok   - C5 references/gate.md has: faults.rec
+  ok   - C5 references/gate.md has: open-items
+  ok   - C5 scripts/goal_ctl.sh has: CTL: FAULT
+  ok   - C5 scripts/goal_ctl.sh has: bad-fault-class
+  ok   - C5 scripts/goal_ctl.sh has: unbacked-task-suffix
+  ok   - C5 scripts/goal_audit.sh has: unbacked-suffix
+  ok   - C5 scripts/goal_audit.sh has: unbooked-fault
+  ok   - C5 scripts/goal_gate.sh has: open-items
+  ok   - C5 scripts/goal_gate.sh has: close-open-item
+  ok   - C5 scripts/goal_parse.sh has: gp_fault_suffix
+  ok   - C5 examples/quickstart-one-shot/run.sh has: --adversarial clear
+  ok   - C6 no case knowledge leaked into generic skill files
+  ok   - C7 SKILL has invariant GATE
+  ok   - C7 SKILL has invariant BIND
+  ok   - C7 SKILL has invariant PROVE
+  ok   - C7 SKILL has invariant GRADIENT
+  ok   - C7 SKILL has invariant FENCE
+  ok   - C7 SKILL.md free of R-numbers
+  ok   - C7 pack exists: instrument.md
+  ok   - C7 pack exists: gradient.md
+  ok   - C7 pack exists: external.md
+  ok   - C7 gate.md maps GATE
+  ok   - C7 gate.md maps BIND
+  ok   - C7 gate.md maps PROVE
+  ok   - C7 gate.md maps GRADIENT
+  ok   - C7 gate.md maps FENCE
+  ok   - C7 legacy R1 retained
+  ok   - C7 legacy R2 retained
+  ok   - C7 legacy R3 retained
+  ok   - C7 legacy R4 retained
+  ok   - C7 legacy R5 retained
+  ok   - C7 legacy R6 retained
+  ok   - C7 legacy R7 retained
+  ok   - C7 legacy R8 retained
+  ok   - C7 legacy R9 retained
+  ok   - C7 legacy R10 retained
+  ok   - C7 legacy R11 retained
+  ok   - C7 legacy R12 retained
+  ok   - C7 legacy R13 retained
+  ok   - C7 legacy R14 retained
+  ok   - C7 legacy R15 retained
+  ok   - C7 legacy R16 retained
+  ok   - C7 legacy R17 retained
+  ok   - C7 legacy R18 retained
+  ok   - C7 legacy R19 retained
+  ok   - C7 SKILL activates pack instrument.md
+  ok   - C7 SKILL activates pack gradient.md
+  ok   - C7 SKILL activates pack external.md
+== docs consistency: DRIFT ==

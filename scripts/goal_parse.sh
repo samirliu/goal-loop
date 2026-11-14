@@ -374,7 +374,7 @@ gp_objective_dir(){ gp_goal_r "$1" | sed -nE 's/^objective: *(maximize|minimize)
 # contract-tampered. This is that one definition.
 gp_ac_body(){
   { gp_goal_r "$1" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
-    gp_goal_r "$1" | grep -E '^(exit|objective|horizon-waived):' || true
+    gp_goal_r "$1" | grep -E '^(exit|objective|horizon-waived|quality):' || true
   }
 }
 gp_ac_body_hash(){ gp_ac_body "$1" | gp_hash_std | cut -c1-8; }

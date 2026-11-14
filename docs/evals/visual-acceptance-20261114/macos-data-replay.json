@@ -1,0 +1,25 @@
+[
+  {
+    "check": "data-replay-normal",
+    "command": [
+      "python3",
+      "-B",
+      "docs/evals/visual-acceptance-20261114/verify.py"
+    ],
+    "result": 0,
+    "elapsed": 0.27065058308653533,
+    "log": "/tmp/goal-loop-visual-quality-delivery-replay-macos-normal-20261114.log"
+  },
+  {
+    "check": "data-replay-optimized",
+    "command": [
+      "python3",
+      "-O",
+      "-B",
+      "docs/evals/visual-acceptance-20261114/verify.py"
+    ],
+    "result": 0,
+    "elapsed": 0.2950109578669071,
+    "log": "/tmp/goal-loop-visual-quality-delivery-replay-macos-optimized-20261114.log"
+  }
+]

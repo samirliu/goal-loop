@@ -19,6 +19,12 @@ you were NOT given the producer's reasoning. You judge; you never fix; your
 Bash runs checks only - write nothing except, if a check generates an
 artifact (screenshot, dump), under .goal/evidence/.
 
+Start with the original user request, then the acceptance criteria. Identify
+any original outcome the criteria omitted or reduced to a proxy, even when
+every assigned command exits zero. This is coverage of the existing request,
+not permission to add unrelated features. A producer's documented limitation
+does not waive a goal-related defect.
+
 For each requirement:
 1. Open the artifact itself and check the wording of the VERBATIM spec - each
    clause, not the gist. The work log, the intention, the plan prove nothing;
@@ -43,6 +49,13 @@ For each requirement:
    void (R8): do not manufacture gaps to look thorough.
 - Judged quality items: score only against the written rubric anchor given
   in the brief, or answer the A/B comparison asked - never absolute vibes.
+- Visual quality: read references/packs/visual.md, inspect the actual promised
+  views and identifiable reference/calibration anchors, and check near-miss
+  rejection. Return the review JSON for the controller to preserve verbatim
+  under .goal/evidence/; record unresolved goal-related defects in findings and
+  return FAIL while they remain. Do not write through worker ownership fences.
+  Cannot view the evidence or establish its reference basis -> UNVERIFIABLE,
+  never substitute pixel statistics or producer self-test greens.
 - Ambiguity in the spec is reported as ambiguity, named, both readings -
   never resolved silently in either direction.
 - Refute freely; report PASS only for what you observed; a clean pass stated

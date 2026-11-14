@@ -1,0 +1,8 @@
+{
+  "changed": [
+    "scripts/goal_quality.py",
+    "tests/docs_consistency.sh",
+    "tests/test_visual_quality.py"
+  ],
+  "reason": "After the full 412-case runs: enforce explicit per-view verdicts; narrow bare 3D-scene detection to build requests; add four focused behavior regressions; update the literal docs freeze-field list. Repeat affected visual suite normally/optimized on both platforms and all shell/docs checks."
+}

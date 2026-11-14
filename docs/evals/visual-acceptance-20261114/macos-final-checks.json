@@ -1,0 +1,43 @@
+[
+  {
+    "check": "shell",
+    "command": [
+      "bash",
+      "tests/run_tests.sh",
+      "--jobs=4"
+    ],
+    "result": 0,
+    "elapsed": 173.1319640420843,
+    "log": "/tmp/goal-loop-visual-quality-final-macos-shell-20261114.log"
+  },
+  {
+    "check": "parser",
+    "command": [
+      "bash",
+      "tests/test_parse.sh"
+    ],
+    "result": 0,
+    "elapsed": 0.26372845913283527,
+    "log": "/tmp/goal-loop-visual-quality-final-macos-parser-20261114.log"
+  },
+  {
+    "check": "companion",
+    "command": [
+      "bash",
+      "companions/contract-forge/tests/run_fixtures.sh"
+    ],
+    "result": 0,
+    "elapsed": 1.1781748330686241,
+    "log": "/tmp/goal-loop-visual-quality-final-macos-companion-20261114.log"
+  },
+  {
+    "check": "docs",
+    "command": [
+      "bash",
+      "tests/docs_consistency.sh"
+    ],
+    "result": 0,
+    "elapsed": 0.5772822080180049,
+    "log": "/tmp/goal-loop-visual-quality-final-macos-docs-20261114.log"
+  }
+]

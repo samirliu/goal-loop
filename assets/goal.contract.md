@@ -6,6 +6,13 @@ Status: DRAFT            <!-- flip to APPROVED only by the stamp below -->
 
 <the user's objective, in the user's own words>
 
+<!-- Preserve quality requirements here, before choosing checks. For visual
+     fidelity/realism, read references/packs/visual.md and declare, for example:
+       quality: visual AC-3 views=exterior,interior
+     That AC must be judged, calibrated on a real good anchor and a plausible
+     near miss, and bind the review JSON covering all declared views. Pixel
+     statistics and internal geometry checks do not replace this floor. -->
+
 ## Exit policy
 
 exit: threshold

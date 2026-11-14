@@ -1,6 +1,6 @@
 # Pack: instrument (PROVE)
 
-**Open when:** AC or brief uses `judged` · `calib:` · `probe:` · `metric:` · `sd:` · `var:` · cold-seat terminal review.
+**Open when:** original brief requires visual quality/fidelity, or AC/brief uses `judged` · `calib:` · `probe:` · `metric:` · `sd:` · `var:` · cold-seat terminal review.
 
 **Invariant: PROVE** — an instrument must prove itself before its number or verdict is trusted.
 **Also touches BIND** — a judged PASS is void without `artifact:` + `digest:` binding.
@@ -70,6 +70,13 @@ Legacy aliases: `R5 R9 R14 R15 R17a` → PROVE / BIND.
 ### Goodhart sentinel (every AC)
 
 Ask: *can this be satisfied without advancing the goal?* If yes, it is a proxy metric — rewrite or delete. Size/ratio ACs must cite a real spec source.
+
+Run the same question against the **whole original request** before accepting
+the AC set. For visual work, use [visual acceptance](visual.md): pixel contrast,
+edge density or colour coverage are rendering smoke checks, not a fidelity
+judge. Good/bad fixtures must distinguish plausible task failures, not just
+empty output. Shared implementation constants or the same assertions on two
+hosts establish consistency, not an independent external truth.
 
 ---
 
