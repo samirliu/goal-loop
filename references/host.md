@@ -7,10 +7,10 @@
 
 ## 最早入口
 
-正常入口先用 `python3 -I ${GOAL_SKILL}/scripts/goal_host.py enter PROJECT SECONDS`。
+正常入口先用 `python3 -I "${GOAL_SKILL}/scripts/goal_host.py" enter PROJECT SECONDS`。
 它只从本项目唯一真实 prompt 回执（或唯一活跃会话）取 backend/session，调用原 begin；
 有歧义时拒绝并要求传真实身份，绝不猜 session。无 hook 的显式 bridge 仍用下面的 begin。
-随后 `bash ${GOAL_SKILL}/scripts/goal_ctl.sh context --project PROJECT` 输出当前状态和准确命令。
+随后 `bash "${GOAL_SKILL}/scripts/goal_ctl.sh" context --project PROJECT` 输出当前状态和准确命令。
 入口加 `--context` 会在同一调用中返回 `host` 与 `context`，省去单独取图。显式 `begin` 也支持；只有原来已授权自动批准时再加 `--auto`，默认保持手动批准标记。重复入口仍收紧原预算，不能续期。
 可选 `--brief` 只隐藏内部绑定哈希和重复的收账字段；完整绑定仍在原锁内重新计算，动作与 revision 相同。它只作诊断选项；真实小样本未建立完整交付提速，默认保留完整地图。
 只有会话已授权自动批准时才加 `--auto`；默认不添加自动批准标记。授权选项也是版本绑定的一部分。
@@ -29,7 +29,7 @@
 
 输入文件只是调用参数，不是新账本。动作绑定它们的字节、相关回执、产物、策略及工具版本；消费前在原锁下重核，过期或变化后拒绝。context 直接持有读锁，所以 pending 期间也能只读展示 recover。新的原事务 journal 与提交回执保留精确 argv；恢复后 `retry-close` 沿用原请求，只返回历史结果。地图读取有界；到期只提供结算路径，调用各原入口既有的有限验收窗口，不额外改写整次收账预算，更短继承截止仍优先。
 
-`python3 -I ${GOAL_SKILL}/scripts/goal_context.py receipt PROJECT` 在同一截止执行原 audit/Gate，
+`python3 -I "${GOAL_SKILL}/scripts/goal_context.py" receipt PROJECT` 在同一截止执行原 audit/Gate，
 返回原输出、策略消费版本、单元复用来源与未解决项。只有两者实际通过才有 completion_verified=true。
 到期后只使用原有限结算，不能借状态查看开新预算。
 
@@ -39,13 +39,13 @@
 下文 `${GOAL_SKILL}` 代表已安装 skill 的绝对目录；PROJECT 使用实际项目路径。
 
 ```sh
-python3 -I ${GOAL_SKILL}/scripts/goal_host.py begin PROJECT BACKEND SESSION SECONDS
+python3 -I "${GOAL_SKILL}/scripts/goal_host.py" begin PROJECT BACKEND SESSION SECONDS
 ```
 
 无 prompt hook 的首次手动入口（例如通过 Skill 工具加载后执行）可写为：
 
 ```sh
-python3 -I ${GOAL_SKILL}/scripts/goal_host.py begin PROJECT BACKEND SESSION SECONDS --request-stdin --context <<'GOAL_REQUEST'
+python3 -I "${GOAL_SKILL}/scripts/goal_host.py" begin PROJECT BACKEND SESSION SECONDS --request-stdin --context <<'GOAL_REQUEST'
 <用户原始任务文本>
 GOAL_REQUEST
 ```
@@ -125,16 +125,25 @@ claude --plugin-dir /ABS/goal-loop
 claude plugin validate /ABS/goal-loop
 ```
 
-插件同时加载仓库根目录的 skill、hooks 和带命名空间的 agents。
+插件从固定 `skills/goal-loop` 入口加载由根 SKILL.md 生成的完整正文；
+`${CLAUDE_PLUGIN_ROOT}` 是脚本、参考和资源的实施目录，缓存目录名不参与 skill 名称。
+插件同时加载 hooks、5 个带命名空间的 agents，以及可选 companion 的调用入口。
 按次加载后使用 `/goal-loop-host:goal-loop …目标`，可明确选择当前仓库版本，
 避免同名旧全局 skill 的装载顺序影响。普通 `/goal-loop` 仍使用 README 的安装入口。
 保留旧的全局 agent 安装时，不要把同一波当成两套 worker。此适配器和旧
 `goal_hook.sh` 的完成阻挡作用不同；最终 GO 仍由原 gate 决定。
 
+持久安装可先 `claude plugin marketplace add /ABS/goal-loop`，再
+`claude plugin install goal-loop-host@goal-loop`。隔离构建及 skill 安装见 README。
+仅安装 skill 不会注册原生 hooks；使用显式 bridge，或选择完整插件启用自动事件。
+安装后应通过宿主的 `agents` 命令核对角色；本机 cc-haha 源码版需要
+`CLAUDE_CODE_USE_NATIVE_FILE_SEARCH=1` 才能发现全局角色，完整插件不需要此变通。
+本地 marketplace 的源目录需要保留，不能把版本缓存存在等同于宿主脱离源目录可用。
+
 Codex 配置生成器只向 stdout 输出，不覆盖现有 hook：
 
 ```sh
-python3 -I ${GOAL_SKILL}/scripts/goal_host_config.py codex > /tmp/goal-loop-hooks.json
+python3 -I "${GOAL_SKILL}/scripts/goal_host_config.py" codex > /tmp/goal-loop-hooks.json
 ```
 
 将其合并进项目 `.codex/hooks.json`，按正常 `/hooks` 流程 review/trust。

@@ -8,7 +8,7 @@ description: |-
   Not for trivial one-pass tasks or pure Q&A.
 ---
 
-# Goal Loop (v4.1.1)
+# Goal Loop (v4.1.2)
 
 契约定义成功，原收账与门控验证完成。持久状态在 `.goal/`；机械参数由执行地图派生，模型负责需求、实现和实际复审。
 
@@ -28,7 +28,7 @@ description: |-
 
 默认串行完成实际业务；多个文件不等于需要 crew。普通确定性任务只走下面四步，不额外填策略表、抄检查数或自行拼 CLI 参数。
 
-1. **进入并取图**：`python3 -I <skill>/scripts/goal_host.py enter <project> <seconds> --context` 一次绑定最早宿主预算并返回 `context`。首次进入加 `--request-stdin`，stdin 传用户原始任务文本；已有 prompt 回执时以宿主捕获原文为准。无唯一真实回执时，用实际 backend/session 调用 `begin … --request-stdin --context`，不猜身份。续跑沿用原请求与截止，不用新的改写覆盖。已有自动执行授权才加 `--auto`；授权沿用，不重复索要。
+1. **进入并取图**：`python3 -I "<skill>/scripts/goal_host.py" enter "<project>" <seconds> --context` 一次绑定最早宿主预算并返回 `context`。`<skill>` 是实施目录的绝对路径，shell 路径加引号以支持含空格的安装目录。首次进入加 `--request-stdin`，stdin 传用户原始任务文本；已有 prompt 回执时以宿主捕获原文为准。无唯一真实回执时，用实际 backend/session 调用 `begin … --request-stdin --context`，不猜身份。续跑沿用原请求与截止，不用新的改写覆盖。已有自动执行授权才加 `--auto`；授权沿用，不重复索要。
 2. **作者契约并盖戳**：Objective 保留用户目标原文，再逐项写业务 AC 与 work-plan；不得把“逼真/美观/可信”等目标改写成只剩实现自检。文件存在、格式正确、内部一致只证明这些事实，不能替代内容正确、完整或业务结果。先按原始请求加载下面的能力说明，每条 AC 都有能失败的指名检查。写好后取一次新地图，执行 `submissions.stamp.command`，程序运行原冒烟、检查冻结与盖戳。初始业务 FAIL 可以成为修复起点；BROKEN、变更树/账本或不完整检查不能盖戳。预算参数在盖戳时绑定，不能延长既有截止。
 3. **实现并实际复审**：实现业务、执行适当项目检查、检查反例与兼容性，真实更新 work-plan。复审结束时取新地图，直接按 `submissions.close.template` 提交实际判断；执行其 `command`，JSON 作为 stdin。通常完成意图只填 progress、exit_signal、adversarial、adversarial_note；计数、身份、request 文件、版本消费与终验由程序处理。只有模板要求实际计数时才运行 `actions.verify` 取观测。缺字段按原错误补实际证据；禁止把勾选或 worker 自述补成 PASS/clear。
 4. **按原终验交付**：claim 提交会执行原收账及 `goal_audit.sh`/Gate，最后的原终验回执必须 `completion_verified=true` 且退出码为 0 才交付。只报业务结果、实际验收、未解决项和必要产物路径；原始账本按需提供。普通继续迭代不要求编造 clear；`progress=no` 须给真实 `strategy_delta`。
@@ -74,7 +74,7 @@ description: |-
 
 GO（rc=0）交付；BLOCKED（rc=3）报告；NO-GO（rc=2）修复后继续。Stop hook 可选；不能覆盖预算或把重复续跑当进展。无参 `/goal-loop` 用 context/status 接续，不创建新目标。
 
-正常运行只用宿主模型、工具和原生 worker，不启动第二宿主、模型客户端、服务或队列。独立开发运行器仅在仓库 `devtools/` 显式选择。自检：`tests/run_tests.sh`、`tests/docs_consistency.sh`。
+正常运行只用宿主模型、工具和原生 worker，不启动第二宿主、模型客户端、服务或队列。独立开发运行器仅在仓库 `devtools/` 显式选择。安装依赖检查：`python3 -I "<skill>/scripts/goal_install.py" doctor`；安装冒烟：`bash "<skill>/examples/quickstart-one-shot/run.sh"`。源码仓库的开发回归另用 `tests/run_tests.sh`、`tests/docs_consistency.sh`，不随安装包分发；安装冒烟不能代替实际目标验收。
 
 ## 兼容的直接调用
 

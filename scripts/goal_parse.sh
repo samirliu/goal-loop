@@ -25,7 +25,8 @@ gp_r(){ tr -d '\r'; }
 if ! command -v gawk >/dev/null 2>&1; then
   for _gp_gawk in "$HOME/.local/bin/gawk" /opt/homebrew/bin/gawk /usr/local/bin/gawk /usr/bin/gawk; do
     if [ -x "$_gp_gawk" ]; then
-      gawk(){ "$_gp_gawk" "$@"; }
+      _gp_gawk_bin="$_gp_gawk"
+      gawk(){ "$_gp_gawk_bin" "$@"; }
       break
     fi
   done

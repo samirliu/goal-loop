@@ -1,6 +1,6 @@
 # goal-loop
 
-**v4.1.1** — 用冻结的验收契约、共享工作区 subagent 波次和确定性门控推进交付；用测量反馈选择下一轮策略。
+**v4.1.2** — 用冻结的验收契约、共享工作区 subagent 波次和确定性门控推进交付；用测量反馈选择下一轮策略。
 
 当前实现把内容绑定、可恢复收账和局部策略学习接成可执行路径：旧的 `EFFICIENCY` / `STRATEGY-PICK` 保持轻量归因；需要晋升工具策略时，另用固定协议、配对成本测量和新留出实例决定启用、保留或撤回。此前冻结版本的本地测试工作流留出耗时下降约 31%，两个后续实例实际消费合格策略后合计下降约 30%；完整 agent 效用、模型费用与通用迁移仍未证明。原始归档、学习成本和适用范围见[资格与路由评估](docs/evals/qualified-routing-20261114/README.md)。
 
@@ -29,48 +29,69 @@ objective → contract (AC-1..N, each with a NAMED failable check) → user appr
 
 ## Install / 安装
 
-Two pieces, both required / 两件套，缺一不可：
+推荐完整插件安装，适用于 Claude Code 及提供同一插件接口的 cc-haha。本轮按本机 `claude-haha` 的真实加载器和 CLI 验证；若你的启动命令叫 `cc-haha`，用它替换下文 `claude-haha`。
 
 ```bash
-# 1) skill 本体 → Claude Code 的 skills 目录
-git clone https://github.com/samirliu/goal-loop.git
-mkdir -p ~/.claude/skills/goal-loop
-cp -r goal-loop/SKILL.md goal-loop/VERSION goal-loop/assets \
-      goal-loop/references goal-loop/scripts \
-      goal-loop/examples goal-loop/companions \
-      ~/.claude/skills/goal-loop/
+# 在源码仓库里先检查依赖，不安装软件或修改全局设置
+python3 scripts/goal_install.py doctor
 
-# 2) 5 个 agent 定义 → agents 目录
-mkdir -p ~/.claude/agents
-cp goal-loop/agents/*.md ~/.claude/agents/
+# 从明确的文件清单构建完整包，隔离源码仓库里的本地文件
+python3 scripts/goal_install.py plugin --output /ABS/goal-loop-package
+claude-haha plugin validate /ABS/goal-loop-package
 
-# 可选：companion skill contract-forge（盖戳前访谈，不是硬依赖）
-# cp -R goal-loop/companions/contract-forge ~/.claude/skills/
+# 方式一：当前会话直接使用完整插件（skill、5 个 agent、8 类 hooks）
+claude-haha --plugin-dir /ABS/goal-loop-package
+# 在会话中调用 /goal-loop-host:goal-loop <目标>
 
-# 升级到 v4：清掉旧文件（Agent Teams 后端已整体移除）
-rm -f ~/.claude/skills/goal-loop/scripts/goal_team.sh \
-      ~/.claude/skills/goal-loop/references/teams.md
+# 方式二：持久安装；先添加本仓提供的 marketplace，再安装插件
+claude-haha plugin marketplace add /ABS/goal-loop-package
+claude-haha plugin install goal-loop-host@goal-loop
 ```
 
-- Windows（git-bash）路径同上：`C:\Users\<你>\.claude\skills\goal-loop\` 与 `C:\Users\<你>\.claude\agents\`。当前收账锁需要支持 `fcntl.flock` 的 POSIX Python 3；原生 Windows Python 不支持，Windows 下的完整运行尚未验证。
-- 原生预算/worker 事件接入另见 [宿主适配](references/host.md)：Claude Code 可用本仓库的 opt-in plugin；Codex 提供配置生成器，当前 Work 使用显式 bridge。仅复制 skill 不会自动安装 hooks。
-- 按次使用 `claude --plugin-dir /ABS/goal-loop` 会同时加载当前 skill、agents 和 hooks；调用 `/goal-loop-host:goal-loop <objective>` 可避开同名旧全局 skill，无需覆盖全局安装。
-- 依赖：`grep / sed / gawk / sha1sum|cksum`，工作树内容指纹还需 `sha256sum`、`shasum` 或 `openssl` 中之一；**无 jq**。控制器及门控/审计读取需要 POSIX Python 3 的目录锁，无人值守运行器还需要进程组监督；缺少时拒绝执行。独立 `--digest` 保留 shell 后备路径，有 Python 时加速。CR 与 `LC_ALL` 已内置处理。门控 check/probe/external 均通过 Python 进程组监督限时（默认 120s），不依赖 GNU timeout。
-  - **macOS**：系统 `bash` 是 3.2，系统 `awk` 是 BSD —— 脚本已兼容 bash 3.2；`gawk` 必装且会自动发现 `~/.local/bin/gawk`、Homebrew 路径。`brew install gawk`。
-  - **Linux**：`apt install gawk`（通常已带）。
-- Smoke test / 冒烟验证（不耗 API）：
+本地 marketplace 的安装包目录应保留；本机 cc-haha 的启动读取会直接访问它。开发时也可用 `--plugin-dir /ABS/goal-loop` 直接加载工作树；持久安装使用上面构建的目录，避免宿主把仓库中的本地未跟踪文件一起缓存。
+
+插件使用固定的 `skills/goal-loop` 发现入口，正文从根 SKILL.md 生成，实施路径由 `${CLAUDE_PLUGIN_ROOT}` 绑定。即使插件缓存目录名是版本号，调用名仍是 `/goal-loop-host:goal-loop`。5 个角色使用 `goal-loop-host:` 前缀；可选 companion 也可直接调用 `/goal-loop-host:contract-forge`。更新后重新加载插件/开启新会话；4.1.2 的版本号用于区别旧缓存。
+
+仅安装 skill 时，下面一条命令同时复制运行资源、参考文档、示例和 5 个原生角色，避免漏复制 agent 或协议文档。必须显式指定配置目录；不会覆盖已有同名 skill/agent，不会改写 settings.json。
 
 ```bash
-bash ~/.claude/skills/goal-loop/scripts/goal_gate.sh --check
-# 无 .goal/ 的目录里应返回 rc=4, reason=no-goal-dir —— 说明门控在岗
-bash goal-loop/tests/run_tests.sh
-# 场景套件应 fail=0 全绿 —— 门控语义的回归
-# 默认 --jobs=8 并行分片（约 3–4 分钟）；--jobs=1 串行；--only 78-90 增量
-bash goal-loop/tests/docs_consistency.sh
-# 文档一致性（活文档字面量）应 CONSISTENT
+python3 scripts/goal_install.py skill --config-dir ~/.claude --with-companion
+# 新会话使用 /goal-loop <目标>，或 Skill 工具的 goal-loop
+```
+
+安装后用 `claude-haha agents` 核对 5 个 `goal-*` 角色。本机源码版 `999.0.0-local` 的默认文件搜索会静默漏载全局 agent；使用下面的宿主选项可恢复发现，或直接选择完整插件。这个选项不写入设置，启动后续会话时也需携带。官方 Claude Code 2.1.83 的相同安装无需该选项。
+
+```bash
+CLAUDE_CODE_USE_NATIVE_FILE_SEARCH=1 claude-haha agents
+CLAUDE_CODE_USE_NATIVE_FILE_SEARCH=1 claude-haha
+```
+
+| 模式 | skill / 角色 | 原生事件接入 |
+| --- | --- | --- |
+| 完整插件（推荐） | 2 个带命名空间的 skill、5 个角色 | 自动加载本插件的 8 类 hooks |
+| skill 安装 | goal-loop、5 个全局角色；companion 可选 | 使用显式 host bridge；不自动注册 hooks |
+
+skill 模式的脚本和协议能力完整，但没有自动事件覆盖。需要自动预算/worker 生命周期事件时使用完整插件，见[宿主适配](references/host.md)。两种模式都保留判断校准、视觉判读、优化/forge、外部结算、crew、学习/回滚和恢复入口。安装文件由 `assets/install-files.json` 明确列举；构建不携带 `.git`、本地设置、缓存、未跟踪文件或外层模型客户端。随包保留仓库的离线参考/历史证据，因此完整包约 200 MiB。
+
+依赖：POSIX Python 3.10+（验证版本 3.12/3.14，需 `fcntl.flock` 与进程组）、Bash 3.2+、GNU awk 和常见 UNIX 工具；工作树指纹还需 `sha256sum`、`shasum` 或 `openssl` 中之一。无 jq、无 GNU timeout 硬依赖。macOS 可用系统 Bash 3.2，需另备 `gawk`（如 `brew install gawk`）；Linux 可用 `apt install gawk`。Doctor 只检查，不自动安装依赖。原生 Windows Python 不支持当前 POSIX 锁；git-bash 本身不能补齐这一能力，完整 Windows 运行未验证。
+
+安装后冒烟（不调用模型 API）：
+
+```bash
+python3 ~/.claude/skills/goal-loop/scripts/goal_install.py doctor
 bash ~/.claude/skills/goal-loop/examples/quickstart-one-shot/run.sh
-# 小任务快车道：单 AC 最小契约应 GO（rc=0）—— 证明仪式的下限
+# 应得到真实 GO；完整回归在源码仓库运行：
+bash tests/run_tests.sh
+bash tests/docs_consistency.sh
 ```
+
+开发者可用本地 cc-haha 源码重复验证安装（隔离配置、不启动推理会话）：
+
+```bash
+python3 devtools/check_claude_install.py --harness-root /ABS/claude-code-haha --output /TMP/fresh-install-check
+```
+
+检查会保留实际 CLI/加载器回执、默认角色发现结果、路径搬移后的 GO 和 hook 命令回放。回放不代表已验证模型执行期间的实时 hook 投递。
 
 ## Quick start — in-session / 快速开始 — 会话内
 

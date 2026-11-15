@@ -1,0 +1,68 @@
+{
+  "host": "999.0.0-local (Claude Code)",
+  "version": "4.1.2",
+  "persistent_install": true,
+  "version_cache_and_relocation": true,
+  "plugin_skills": 2,
+  "plugin_roles": 5,
+  "hook_commands_replayed": [
+    "UserPromptSubmit",
+    "PreToolUse",
+    "PostToolUse",
+    "PostToolUseFailure",
+    "SubagentStart",
+    "SubagentStop",
+    "Stop",
+    "SessionEnd"
+  ],
+  "standalone_roles_missing_by_default": [
+    "goal-adjudicator",
+    "goal-checker-req",
+    "goal-critic",
+    "goal-mech-worker",
+    "goal-worker"
+  ],
+  "standalone_with_native_file_search": true,
+  "installed_go": [
+    "skill",
+    "plugin"
+  ],
+  "companion_fixtures": [
+    "skill",
+    "plugin"
+  ],
+  "settings_preserved": true,
+  "inference_tested": false,
+  "live_hook_delivery_tested": false,
+  "baseline_commit": "2703fee3de3edbd041e6742fb88cdceab149dce8",
+  "payload_files": 1189,
+  "regression": {
+    "macos_installation": 10,
+    "linux_installation": 10,
+    "shell": 603,
+    "parser": 81,
+    "host": 20,
+    "docs": 153
+  },
+  "legacy_discovery_fixture": {
+    "actual_skill": "goal-loop-host:4.1.1",
+    "expected_skill": "goal-loop-host:goal-loop",
+    "minimal_discovery_only": true
+  },
+  "official_claude": "2.1.83",
+  "role_models_tools_and_bodies_retained": true,
+  "limitations": [
+    "No provider/model task was executed",
+    "Hook commands used synthetic payloads; live host delivery was not exercised",
+    "Standalone skills need explicit host bridge; no automatic hooks installed",
+    "The tested cc-haha default file search omits global roles; native file search is required for standalone mode",
+    "Full payload keeps offline evidence and is about 200 MiB",
+    "No native Windows guarantee"
+  ],
+  "native_payload_differs_from_final_tree": [
+    "README.md"
+  ],
+  "post_native_documentation_only": true,
+  "latest_installation_regression_rerun": true,
+  "linux_image": "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490"
+}

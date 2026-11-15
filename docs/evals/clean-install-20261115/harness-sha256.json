@@ -1,0 +1,10 @@
+{
+  "src/utils/plugins/pluginLoader.ts": "ea9e401340f7d9ca0e8f247b2015208660fa3a8710d05aa45ec95703cc088d09",
+  "src/utils/plugins/loadPluginCommands.ts": "019d56133c75b3e5ac967bbc7b45e0be10a679ae27887ae5fcd5d9e6e74936c2",
+  "src/utils/plugins/loadPluginAgents.ts": "8e3a4de1fbaeb3a841f7b6b86592c8303ecc7b83e0590f64cb393b68381e28a0",
+  "src/skills/loadSkillsDir.ts": "d66e37fd2db4404b75330223831c5fd7f278afef58a92bc660fb86d002833744",
+  "src/tools/AgentTool/loadAgentsDir.ts": "06cb0d5a3e05b5b59d0e48aef0e0c3af24f9677e642f3243a619b66459ab4eab",
+  "src/utils/markdownConfigLoader.ts": "fe157236c4b29f3d99ca56f993687c142a431db1f52f09da66f5659692d6a0a6",
+  "src/utils/ripgrep.ts": "bf4bfadbbbea5d5d35a13eea9159ae59f9780d28ee907d6bd5cc1bd1f30a8c70",
+  "bin/claude-haha": "1acd6aef485ab28117e7445b47110e4cfeccd9f94068d596f84b54d0a03dd7ce"
+}

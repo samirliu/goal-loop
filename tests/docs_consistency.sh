@@ -15,7 +15,7 @@ set -u
 export LC_ALL=C.UTF-8
 
 here=$(cd "$(dirname "$0")/.." && pwd)
-cd "$here"
+cd "$here" || exit 1
 fail=0
 ok(){ echo "  ok   - $1"; }
 bad(){ fail=1; echo "  FAIL - $1"; }
@@ -205,8 +205,9 @@ EOF
 
 # C6 generality: case knowledge stays in examples/. Generic skill surfaces
 # must not name any validation case or its domain recipe.
+# The install inventory names example paths as packaging data, not instructions.
 leak=$(grep -nE 'tsp-minimize|logcli|svg-dash|goal-loop-case-|波音|b747|threejs|THREEJS|goal-loop-747' \
-        SKILL.md references/*.md references/packs/*.md scripts/*.sh tests/*.sh assets/* 2>/dev/null | grep -v '^tests/docs_consistency.sh:' || true)
+        SKILL.md references/*.md references/packs/*.md scripts/*.sh tests/*.sh assets/* 2>/dev/null | grep -v -e '^tests/docs_consistency.sh:' -e '^assets/install-files.json:' || true)
 if [ -z "$leak" ]; then
   ok "C6 no case knowledge leaked into generic skill files"
 else
