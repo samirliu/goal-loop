@@ -5,6 +5,7 @@ description: |-
   acceptance contract, scoped subagent waves, and measured strategy feedback.
   Use for /goal-loop, multi-step delivery, or iterative optimization with
   objective checks. Supports resumable disk state and verifier calibration.
+  Includes bounded recursive improvement of evidenced execution policies.
   Not for trivial one-pass tasks or pure Q&A.
 ---
 
@@ -12,7 +13,7 @@ description: |-
 本插件的实施目录是 `${CLAUDE_PLUGIN_ROOT}`。下文 `<skill>`、`${GOAL_SKILL}` 和所有相对资源路径都以此目录为准，宿主显示的 Base directory 仅是发现入口。给 worker/checker 的资源路径须从实施目录构造为绝对路径。调用本插件的角色时使用 `goal-loop-host:goal-worker`、`goal-loop-host:goal-mech-worker`、`goal-loop-host:goal-critic`、`goal-loop-host:goal-checker-req`、`goal-loop-host:goal-adjudicator`；其余契约、预算、权限和终验协议不变。
 
 
-# Goal Loop (v4.1.4)
+# Goal Loop (v4.2.0)
 
 契约定义成功，原收账与门控验证完成。持久状态在 `.goal/`；机械参数由执行地图派生，模型负责需求、实现和实际复审。
 
@@ -55,6 +56,7 @@ description: |-
 | 原始请求的内容准确、完整或忠实等关键结果需要判断，尚无能直接验证它的业务检查（即使 AC 全为文件/格式自检） | `references/packs/instrument.md` |
 | `judged` / `calib:` / `probe:` / `metric:` / `sd:` / `var:` | `references/packs/instrument.md` |
 | 原始请求“尽可能好/逼真”等持续优化，或 `objective: maximize` / `minimize` / `exit: forge` / horizon / `--strategy` / 策略晋升或复用 | `references/packs/gradient.md` |
+| 用户要求递归式自我改进/RSI，或执行中出现值得复用修复的实际重复失败、已测瓶颈 | `references/packs/improvement.md`，复用 gradient 的校准与比较协议 |
 | 原始请求依赖树外事实，如当前版本的外部审批、实际部署或生产结果；或 `external:` / `window:` | `references/packs/external.md` |
 | 实际需要原生 worker 协作 | `references/crew.md` 与 `references/host.md` |
 
@@ -65,6 +67,8 @@ description: |-
 原文与全部校准锚点内容在盖戳时冻结，普通非视觉任务也适用。校准的好/坏判词分别绑定实际样本路径与完整 SHA-256；只引用文件名不算校准。优化任务没有显式 horizon waiver 时，至少一个校准盲区 AC 必须实际 PASS，不能借 UNVERIFIABLE 配额免除。
 
 可复用策略先绑定真实触发与适用范围，再用好/坏产物校准冻结 grader、执行原配对比较；`run-enabled` 与派工只消费绑定资格报告哈希的归档。路由策略测整波净交付成本，打印建议更快不算收益；并行建议仍受图、容量、截止与显式串行约束。根据 `feedback` 修复并使用新的留出输入，不重置统计预算；旧记录可恢复，重新启用需重新取得资格。具体协议在 gradient pack。
+
+递归改进时，宿主模型负责提案和审查；合格提案器也可根据自身源码及反馈生成候选。用 `.goal/proposals/improvement.json` 接入地图。下一代继承实际启用归档，先独立比较、再消费于真实任务，依据反馈继续改进或撤回。固定同一目标内的尝试上限、时间储备、原验收与评估内核；不靠换 state 清零历史。到限后收束原目标，合格方法仍可用于交付；反思文本、候选生成或推荐打印不计作改进收益。
 
 ## 使用 crew 时
 

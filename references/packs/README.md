@@ -9,6 +9,7 @@ the contract; contract/CLI keys also activate it.
 | `visual.md` | Original request for visual quality, realism, faithful reconstruction or overall appearance; then use instrument |
 | `instrument.md` | Original content correctness/completeness needs judgment beyond file/format checks; `judged` · `calib:` · `probe:` · `metric:` · `sd:` · `var:` · cold-seat brief |
 | `gradient.md` | `objective:` · `exit: forge` · horizon · `--strategy` · policy cost comparison / promotion · EFFICIENCY / eval-gap / promote |
+| `improvement.md` | Requested recursive self-improvement / RSI, or an evidenced recurring execution-method defect worth repairing within the current goal |
 | `external.md` | Original outcome depends on out-of-tree facts; `external:` · `window:` · deferred settle |
 
 Invariant map (authoritative table + check order: `references/gate.md`):
@@ -18,6 +19,7 @@ Invariant map (authoritative table + check order: `references/gate.md`):
 | `visual.md` | PROVE / BIND / FENCE (goal coverage, visual judgment and unresolved findings) |
 | `instrument.md` | PROVE (and BIND for evidence hashes) |
 | `gradient.md` | GRADIENT (and FENCE for strategy_delta honesty) |
+| `improvement.md` | GRADIENT / PROVE / BIND / FENCE (qualified generations, actual use, fixed acceptance and original budget) |
 | `external.md` | FENCE (out-of-tree settle) / BIND (`deferred.rec`) |
 
 Ordinary deterministic contract authoring level 0 needs **no** pack:

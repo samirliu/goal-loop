@@ -769,7 +769,7 @@ def commit_policy(state, guard, report, materials):
     return finish_policy_transition(state, pending)
 
 
-def experiment(protocol_path, state_path, project=None):
+def experiment(protocol_path, state_path, project=None, proposal_guard=None):
     started = time.monotonic()
     runner = Path(__file__).read_bytes()
     protocol, programs, phases, frozen, fingerprint = load_protocol(protocol_path, project)
@@ -777,6 +777,9 @@ def experiment(protocol_path, state_path, project=None):
     support = ['goal_bounded.py', 'goal_owner_watch.py', 'goal_trace.py']
     if version == 2:
         support.append('goal_store.py')
+    if proposal_guard:
+        support = [p.name for p in sorted(Path(__file__).parent.iterdir())
+                   if p.is_file() and p.suffix in ('.py', '.sh', '.awk')]
     runtime_sources = {Path(__file__).with_name(name): Path(__file__).with_name(name).read_bytes()
                        for name in support}
     deadline = run_deadline(started + protocol['budget_seconds'])
@@ -793,6 +796,7 @@ def experiment(protocol_path, state_path, project=None):
             raise ExperimentError('use a separate state directory for a different protocol version')
         if current is not None and current.get('policy') not in (None, identities['baseline'], identities['candidate']):
             raise ExperimentError('protocol does not compare the currently enabled policy')
+        provenance = proposal_guard(state, current, protocol, programs, None) if proposal_guard else None
         used_path = state / 'used-holdout.json'
         previous = json.loads(used_path.read_bytes()) if used_path.exists() else []
         if not isinstance(previous, list) or any(not isinstance(value, str) or len(value) != 64 for value in previous):
@@ -835,6 +839,8 @@ def experiment(protocol_path, state_path, project=None):
                   'runtime_sources': {path.name: digest(data) for path, data in runtime_sources.items()},
                   'runtime': {'python': sys.version, 'executable': sys.executable, 'platform': sys.platform},
                   'enabled': None, 'tokens': None, 'money': None}
+        if provenance is not None:
+            report['improvement'] = provenance
         if version == 2:
             report['checkpoints'] = {side: protocol[side] for side in ('baseline', 'candidate')}
             report['context'] = programs['baseline'].context
@@ -852,7 +858,13 @@ def experiment(protocol_path, state_path, project=None):
         publish_pending(state, guard)
         transition_fault('evaluating-published')
         def verify_frozen():
-            if (Path(__file__).read_bytes() != runner
+            guard_changed = False
+            if proposal_guard:
+                try:
+                    guard_changed = proposal_guard(state, current, protocol, programs, run_id) != provenance
+                except (ValueError, OSError, ExperimentError):
+                    guard_changed = True
+            if (guard_changed or Path(__file__).read_bytes() != runner
                     or any(not Path(name).is_file() or Path(name).read_bytes() != data
                            for name, data in {**frozen, **runtime_sources}.items())):
                 report.update(status='instrument-invalid', elapsed=time.monotonic() - started,

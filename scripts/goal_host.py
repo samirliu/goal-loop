@@ -713,7 +713,7 @@ def control_command(root, path, current, payload):
         if len(args) < 4 or not re.fullmatch(r'[0-9a-f]{64}', args[2]):
             return False
         if args[0] == 'run' and not sep:
-            return args[3] in ('status', 'receipt', 'close', 'retry-close', 'recover', 'end') and args[4:] in ([], ['--auto'])
+            return args[3] in ('status', 'receipt', 'close', 'retry-close', 'recover', 'recover-improvement', 'end') and args[4:] in ([], ['--auto'])
         return args[0] == 'submit' and args[3] == 'close' and args[4:] in (
             ['--input', '-'], ['--auto', '--input', '-'])
     if sep:

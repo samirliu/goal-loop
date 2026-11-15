@@ -226,7 +226,7 @@ def initial_view(root, auto):
                            next='Use goal_host.py begin with those actual inputs before execution; it also initializes the ledger.')), commands
 
 
-def execution_view(root, state, head, waves, enabled):
+def execution_view(root, state, head, waves, enabled, default_policy_state=None):
     """Describe existing crew/host entrypoints without running a policy/planner."""
     graph_path = store._close_path(state, 'proposals/crew.json')
     graph_bytes = read_input(graph_path)
@@ -250,13 +250,16 @@ def execution_view(root, state, head, waves, enabled):
     path = store._close_path(state, 'proposals/execution.json')
     data = read_input(path)
     request = json.loads(data) if data else {}
+    if default_policy_state is not None and 'policy_state' not in request:
+        request['policy_state'] = default_policy_state
     crew.require(isinstance(request, dict) and set(request) <= {'mode', 'trial', 'policy_state', 'receipts', 'retry_note'}, 'unknown execution input fields')
     receipts = request.get('receipts', {})
     crew.require(isinstance(receipts, dict) and all(isinstance(k, str) and isinstance(v, dict)
                  and set(v) <= {'launch', 'terminal'} and all(isinstance(s, str) and s and '\0' not in s for s in v.values())
                  for k, v in receipts.items()), 'invalid execution receipt paths')
     binding['input'] = store._hash(data) if data else None
-    draft = dict(mode=None, trial='context-'+head[:20]+'-w'+str(len(waves)+1), policy_state=None, receipts={})
+    draft = dict(mode=None, trial='context-'+head[:20]+'-w'+str(len(waves)+1),
+                 policy_state=request.get('policy_state'), receipts={})
     description = dict(graph_input, path=str(path), template=draft,
                        next='Run plan, choose mode from its measured advice, and provide actual host receipt paths when available; regenerate context.')
     if not enabled:
@@ -368,6 +371,20 @@ def instrument_view(root, state, fd, cap):
         next='Restore the stamped instrument bytes, or use the authorized contract amendment protocol. Do not edit check_freeze or reset the budget.')
 
 
+def improvement_view(root):
+    source = root/'.goal/proposals/improvement.json'
+    if not source.exists():
+        return None, {}
+    spec = importlib.util.spec_from_file_location('context_improve', HERE/'goal_improve.py')
+    improve = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(improve)
+    try:
+        return improve.view(root)
+    except (ValueError, OSError, KeyError, TypeError, improve.engine.ExperimentError) as exc:
+        return dict(error=str(exc), next='repair-improvement-proposal',
+                    binding=dict(input=store._hash(read_input(source)))), {}
+
+
 def compile_view(root, state, fd, auto=False):
     if (state/'store/pending').exists():
         return recovery_view(root, state, auto)
@@ -430,9 +447,13 @@ def compile_view(root, state, fd, auto=False):
     ticked = any(s.startswith('- [x]') for s in plan.splitlines())
     unbooked = (len(blocks) == 1 and ticked) or any(w['finished'] is not None and
         (w.get('book_iteration') == int(counters['iteration']) or len(blocks) == 1) for w in waves)
+    improvement, improvement_commands = improvement_view(root)
     execution, exec_commands, exec_details, exec_input = execution_view(root, state, head, waves,
-        stamped and not expired and not claimed and not unbooked)
+        stamped and not expired and not claimed and not unbooked,
+        improvement.get('routing_state') if improvement else None)
     binding['execution'] = execution
+    if improvement is not None:
+        binding['improvement'] = improvement['binding']
     binding['host_sessions'] = sessions
     binding['instruments'] = instruments
     binding['implementation'] = {path.name: store._hash(path.read_bytes()) for path in sorted(HERE.iterdir())
@@ -492,6 +513,11 @@ def compile_view(root, state, fd, auto=False):
     if instruments and instruments['error']:
         commands = {k: v for k, v in commands.items() if k in ('status', 'receipt', 'close', 'retry-close')}
         next_step = 'repair-instrument-freeze'
+    if stamped and not claimed and not unbooked and not (instruments and instruments['error']):
+        commands.update({k:v for k, v in improvement_commands.items()
+                         if not expired or k == 'recover-improvement'})
+    if 'recover-improvement' in improvement_commands:
+        commands['recover-improvement'] = improvement_commands['recover-improvement']
     if end_command:
         commands['end'] = end_command
     value = dict(version=2, project=str(root), revision=revision, binding=binding,
@@ -514,6 +540,8 @@ def compile_view(root, state, fd, auto=False):
                                log=str(state/'loop-log.md'), host=str(state/'evidence/host')))
     if instruments:
         value['instruments'] = instruments
+    if improvement is not None:
+        value['improvement'] = improvement
     if end_command:
         value['session_end'] = dict(action='end', completion_verified=False,
             next='Use end when stopping this goal. It retains receipts and the original budget, requests worker cancellation, and releases the controller. Interrupt native workers and observe their terminal receipts separately.')
@@ -598,7 +626,7 @@ def run(project, revision, action, auto=False):
         if action not in ('recover', 'end'):
             _, expired_now = budget.gate_limit(state, settlement=False)
             value['expired'] = value.get('expired', False) or expired_now
-        crew.require(action in commands and commands[action] is not None and (not value.get('expired') or action in ('status', 'close', 'retry-close', 'receipt', 'recover', 'end')),
+        crew.require(action in commands and commands[action] is not None and (not value.get('expired') or action in ('status', 'close', 'retry-close', 'receipt', 'recover', 'recover-improvement', 'end')),
                      'action unavailable; settle with goal_context.py receipt')
         os.set_inheritable(fd, True)
         env = dict(os.environ, GOAL_ACCESS_FD=str(fd), GOAL_ACCESS_OWNER_PID=str(os.getpid()),

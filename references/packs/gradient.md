@@ -114,6 +114,11 @@ Controlled telemetry tests qualification and consumption, never real utility.
 
 ## 8 Executable local policy experiments
 
+To connect generations, actual use and failure feedback during the current
+goal, use [the recursive improvement pack](improvement.md). It wraps this
+same experiment engine and its existing exposure/selection/recovery state;
+it does not create another completion authority.
+
 Use the [paired protocol](../../examples/evolution-dedupe/README.md) when a
 worker proposes a reusable Python policy with a frozen independent evaluator.
 Run `goal_evolve.py protocol.json --state .goal/proposals/evolution`. Version 1

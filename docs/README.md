@@ -1,6 +1,6 @@
 # 文档索引
 
-当前版本 **4.1.4**。安装和日常使用以[仓库 README](../README.md)、[根 SKILL](../SKILL.md)及下列能力说明为准；插件入口由根 SKILL 生成。历史计划、暂停说明和冻结评估只对各自记录的版本有效。
+当前版本 **4.2.0**。安装和日常使用以[仓库 README](../README.md)、[根 SKILL](../SKILL.md)及下列能力说明为准；插件入口由根 SKILL 生成。历史计划、暂停说明和冻结评估只对各自记录的版本有效。
 
 ## 当前实现
 
@@ -10,12 +10,13 @@
 | 四步工作流和恢复路由 | [SKILL](../SKILL.md) |
 | 验收语义与不变量 | [Gate](../references/gate.md) |
 | 按原始需求选择能力 | [Packs](../references/packs/README.md) |
+| 执行策略的递归改进、实际消费、反例回退 | [Improvement](../references/packs/improvement.md) / [可运行例子](../examples/recursive-improvement/README.md) |
 | crew、角色、宿主预算与事件 | [Crew](../references/crew.md) / [Host](../references/host.md) |
 | 主账本、锁、提交身份与恢复边界 | [事务状态](transaction-state.md) |
 | 可执行示例和历史压力案例 | [Examples](../examples/README.md) |
 | 冻结实验、原始反例与复验范围 | [评估索引](evals/README.md) |
 
-4.1.4 修复到期 hook 连状态、收账和退出也拒绝的问题；提供保留账本及预算的 end，继续约束 worker；原生波次未收账不得重新派工。地图提前展示校验脚本冻结漂移，明确 graph 路径基准与冷审报告格式，保留原 Gate 的最终完成权威。4.1.3 的无预算执行及安装路径修复继续保留。
+4.2.0 将现有策略实验接入目标执行地图，加入固定资源分配、父子代追踪、实际消费、失败反馈及反例撤回。比较/选用沿用 goal_evolve；完成仍由原 controller/Gate 判断。4.1.4 的到期恢复、end、波次收账和冻结诊断，以及此前安装与预算修复继续保留。
 
 本地检查或合成 hook 回放不证明模型业务质量、实时 hook 投递或端到端提速。没有声明整体评分或通用迁移收益。每份评估都应按其源码快照、平台与明确限制阅读。
 
