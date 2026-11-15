@@ -1,5 +1,7 @@
 # Rule Compaction Implementation Plan
 
+> 历史文档：下文的“当前”、计划、暂停状态和测试结果均属于记录当时的版本；最新用法与证据范围见[文档索引](../../README.md)。保留原始结论，不追认当前源码或新一轮验证。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Collapse the R1–R19 legal surface into five invariants + on-demand protocol packs, with zero behavioral change to gate/ctl/parse/audit.

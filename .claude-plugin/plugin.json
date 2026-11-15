@@ -1,7 +1,10 @@
 {
   "name": "goal-loop-host",
-  "version": "4.1.2",
-  "skills": ["./skills", "./companions/contract-forge"],
+  "version": "4.1.3",
+  "skills": [
+    "./skills",
+    "./companions/contract-forge"
+  ],
   "agents": [
     "./agents/goal-worker.md",
     "./agents/goal-mech-worker.md",

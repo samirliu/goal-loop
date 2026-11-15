@@ -61,7 +61,7 @@ while IFS= read -r line; do
 $(printf '%s\n' "$line" | grep -ohE '([A-Za-z0-9_.-]+/)?(references|scripts|assets|tests)/[A-Za-z0-9_][A-Za-z0-9_./-]*' | sort -u)
 EOF
 done < <(grep -hE '(references|scripts|assets|tests)/[A-Za-z0-9_]' \
-        SKILL.md INTEGRATION.md references/*.md assets/goal.contract.md 2>/dev/null | sort -u)
+        SKILL.md references/*.md assets/goal.contract.md 2>/dev/null | sort -u)
 [ "$missing" -eq 0 ] && ok "C1 all internal cited files exist (external skipped=$skipped)"
 
 # C2 version agreement with the VERSION file

@@ -10,3 +10,8 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 .pytest_cache/
+
+# Machine-local analysis state and derived evaluation replay workspaces.
+.archify/
+.orphaned_at
+docs/evals/**/verification-*/

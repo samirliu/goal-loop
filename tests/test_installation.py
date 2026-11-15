@@ -25,7 +25,7 @@ class Installation(unittest.TestCase):
         cls.settings.write_text('{"permissions":{"allow":["Read"]},"hooks":{}}\n')
         cls.run_install(ROOT,'plugin','--output',str(cls.source))
         cls.run_install(cls.source,'skill','--config-dir',str(cls.config),'--with-companion')
-        cls.relocated=cls.work/'cache'/'goal-loop-host'/'4.1.2'
+        cls.relocated=cls.work/'cache'/'goal-loop-host'/(ROOT/'VERSION').read_text().strip()
         cls.relocated.parent.mkdir(parents=True)
         cls.source.rename(cls.relocated)
         cls.skill=cls.config/'skills/goal-loop'
@@ -95,6 +95,25 @@ class Installation(unittest.TestCase):
             self.assertEqual(card.read_text(),'user-owned\n')
             self.assertFalse((config/'skills').exists())
             self.assertEqual(list((config/'agents').iterdir()),[card])
+
+    def test_symlinked_config_parents_cannot_write_outside_the_config(self):
+        for folder in ('skills', 'agents'):
+            with self.subTest(folder=folder), tempfile.TemporaryDirectory(prefix='goal-install-symlink-') as tmp:
+                base=Path(tmp);config=base/'config';outside=base/'outside'
+                config.mkdir();outside.mkdir();(config/folder).symlink_to(outside,target_is_directory=True)
+                r=self.run_install(self.relocated,'skill','--config-dir',str(config),expected=2)
+                self.assertIn('real directory',r.stderr)
+                self.assertEqual(list(outside.iterdir()),[])
+                self.assertEqual(list(config.iterdir()),[config/folder])
+
+    def test_symlinked_install_lock_cannot_lock_an_unrelated_file(self):
+        with tempfile.TemporaryDirectory(prefix='goal-install-lock-link-') as tmp:
+            base=Path(tmp);config=base/'config';config.mkdir();outside=base/'outside';outside.write_text('keep\n')
+            (config/'.goal-loop-install.lock').symlink_to(outside)
+            self.run_install(self.relocated,'skill','--config-dir',str(config),expected=2)
+            self.assertEqual(outside.read_text(),'keep\n')
+            self.assertFalse((config/'skills').exists())
+            self.assertFalse((config/'agents').exists())
 
     def test_missing_payload_cannot_produce_a_successful_partial_package(self):
         with tempfile.TemporaryDirectory(prefix='goal-install-missing-') as tmp:

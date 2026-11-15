@@ -52,10 +52,12 @@ def access(project, write=False, recovery=False, verify=True):
         os.close(fd)
 
 
-def protected(root, command, cap, fd, mode='read'):
+def protected(root, command, cap, fd, mode='read', *, max_seconds=None):
     """Reuse the existing process supervisor and the one shared deadline."""
-    remaining = 30 if cap is None else max(0, cap-time.monotonic())
-    crew.require(remaining > 0, 'time-budget-exhausted')
+    remaining = None if cap is None else max(0, cap-time.monotonic())
+    if max_seconds is not None:
+        remaining = max_seconds if remaining is None else min(remaining, max_seconds)
+    crew.require(remaining is None or remaining > 0, 'time-budget-exhausted')
     descriptor, name = tempfile.mkstemp(prefix='goal-context-', dir=tempfile.gettempdir())
     os.close(descriptor)
     receipt = Path(name)
@@ -65,10 +67,11 @@ def protected(root, command, cap, fd, mode='read'):
         env['GOAL_RUNNER_MONOTONIC_END'] = str(cap)
     try:
         started = time.monotonic()
+        allowance = [] if remaining is None else ['--seconds', str(remaining)]
         result = subprocess.run([sys.executable, '-I', str(HERE / 'goal_bounded.py'), '--owner', str(os.getpid()),
-                                 '--seconds', str(remaining), '--receipt', name, '--kind', 'verification',
+                                 *allowance, '--receipt', name, '--kind', 'verification',
                                  '--label', 'context', '--', *command], cwd=root, env=env, pass_fds=(fd,),
-                                capture_output=True, text=True, timeout=remaining+3)
+                                capture_output=True, text=True, timeout=None if remaining is None else remaining+3)
         crew.require(result.returncode == 0 and receipt.read_text().strip().isdigit(), 'context command supervision failed')
         return dict(command=command, result=int(receipt.read_text()), stdout=result.stdout,
                     stderr=result.stderr, elapsed=time.monotonic()-started)
@@ -334,7 +337,8 @@ def compile_view(root, state, fd, auto=False):
     artifact = None
     settlement_cap = budget.gate_limit(state, settlement=True)[0] if expired else cap
     if authored:
-        digest = protected(root, ['bash', str(HERE / 'goal_gate.sh'), '--digest', '--project', str(root)], settlement_cap, fd)
+        digest = protected(root, ['bash', str(HERE / 'goal_gate.sh'), '--digest', '--project', str(root)], settlement_cap, fd,
+                           max_seconds=30)
         crew.require(digest['result'] == 0 and re.fullmatch(r'v2-[0-9a-f]{64}', digest['stdout'].strip()), 'artifact digest unavailable')
         artifact = digest['stdout'].strip()
     plan = (state / 'work-plan.md').read_text() if (state / 'work-plan.md').exists() else ''

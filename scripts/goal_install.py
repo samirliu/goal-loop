@@ -38,7 +38,9 @@ def plugin_entry(root=ROOT):
 
 def inventory():
     names = json.loads((ROOT/'assets/install-files.json').read_text())
-    require(isinstance(names, list) and names and len(names) == len(set(names)), 'invalid install inventory')
+    require(isinstance(names, list) and names and all(isinstance(name, str) and name for name in names),
+            'invalid install inventory: expected nonempty file paths')
+    require(len(names) == len(set(names)), 'invalid install inventory: duplicate file paths')
     for name in names:
         path = Path(name)
         require(not path.is_absolute() and '..' not in path.parts, 'unsafe install path')
@@ -70,6 +72,13 @@ def copy_payload(destination, names):
         shutil.copy2(ROOT/name, target)
 
 
+def config_parents(destination):
+    for name in ('skills', 'agents'):
+        path = destination/name
+        require(not path.is_symlink() and (not path.exists() or path.is_dir()),
+                'installation parent must be a real directory: '+str(path))
+
+
 def install(kind, destination, companion=False):
     names = inventory()
     dependencies = doctor()
@@ -85,14 +94,17 @@ def install(kind, destination, companion=False):
             stage.rename(destination)
         return dict(kind=kind, path=str(destination), files=len(names), dependencies=dependencies,
                     invoke='/goal-loop-host:goal-loop', hooks='bundled; activated by the host plugin loader')
+    config_parents(destination)
     targets = [destination/'skills/goal-loop', *[destination/'agents'/(name+'.md') for name in ROLES]]
     if companion:
         targets.append(destination/'skills/contract-forge')
     require(not any(p.exists() or p.is_symlink() for p in targets),
             'installation would overwrite an existing skill/agent; choose a clean config directory')
     destination.mkdir(parents=True, exist_ok=True)
-    with (destination/'.goal-loop-install.lock').open('a') as lock:
+    descriptor = os.open(destination/'.goal-loop-install.lock', os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(descriptor, 'a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        config_parents(destination)
         installed = []
         with tempfile.TemporaryDirectory(prefix='.goal-install-', dir=destination) as temporary:
             stage = Path(temporary);payload=stage/'payload';payload.mkdir()
@@ -110,6 +122,7 @@ def install(kind, destination, companion=False):
                 prepared.append((card,targets[-1]))
             try:
                 for source,target in prepared:
+                    config_parents(destination)
                     target.parent.mkdir(parents=True,exist_ok=True)
                     require(not target.exists() and not target.is_symlink(), 'target appeared during install: '+str(target))
                     source.rename(target);installed.append(target)

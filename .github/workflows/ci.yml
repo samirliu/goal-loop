@@ -1,6 +1,9 @@
 name: CI
 
-"on": [push, workflow_dispatch]
+"on": [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
 
 jobs:
   lint:
@@ -15,6 +18,11 @@ jobs:
       - name: Install shellcheck and gawk (macOS)
         if: runner.os == 'macOS'
         run: brew install shellcheck gawk  # macOS ships BSD awk; the scripts require gawk (see README)
+      - name: Install shellcheck and gawk (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y shellcheck gawk
+      - name: Check runtime dependencies
+        run: python3 -I scripts/goal_install.py doctor
       - name: Shellcheck the shipped scripts
         run: shellcheck --severity=warning scripts/*.sh devtools/*.sh  # developer runner retains the same lint coverage
       - name: Bash syntax check (bash -n)
@@ -29,6 +37,8 @@ jobs:
       - name: Scenario test suite (gate semantics, no API needed)
         run: |
           bash tests/run_tests.sh
+      - name: Parser edge cases
+        run: bash tests/test_parse.sh
       - name: Companion contract-forge lint fixtures
         run: bash companions/contract-forge/tests/run_fixtures.sh
       - name: Budget, ledger access, commit and recovery tests

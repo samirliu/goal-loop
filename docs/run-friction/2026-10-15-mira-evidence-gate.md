@@ -1,5 +1,7 @@
 # goal-loop 缺陷候选（修 skill 用）
 
+> 历史文档：下文的“当前”、计划、暂停状态和测试结果均属于记录当时的版本；最新用法与证据范围见[文档索引](../README.md)。保留原始结论，不追认当前源码或新一轮验证。
+
 | id | 现象 | 根因假设 | 严重度 | 建议修复 | 状态 |
 |----|------|----------|--------|----------|------|
 | SB-1 | AC 行多行 heredoc/命令导致 `expected:` 落在续行，gate 报 contract-malformed:AC-N（no expected: token） | goal_parse.sh `gp_ac_line_for` 只认单行 `^- AC-N`；契约模板示例未禁止多行 check | high | stamp 前强制 AC 单行化，或 parser 支持续行 AC；坏契约应 stamp-refused 而非 mid-loop NO-GO | open |

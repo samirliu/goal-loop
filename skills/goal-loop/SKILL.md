@@ -12,7 +12,7 @@ description: |-
 本插件的实施目录是 `${CLAUDE_PLUGIN_ROOT}`。下文 `<skill>`、`${GOAL_SKILL}` 和所有相对资源路径都以此目录为准，宿主显示的 Base directory 仅是发现入口。给 worker/checker 的资源路径须从实施目录构造为绝对路径。调用本插件的角色时使用 `goal-loop-host:goal-worker`、`goal-loop-host:goal-mech-worker`、`goal-loop-host:goal-critic`、`goal-loop-host:goal-checker-req`、`goal-loop-host:goal-adjudicator`；其余契约、预算、权限和终验协议不变。
 
 
-# Goal Loop (v4.1.2)
+# Goal Loop (v4.1.3)
 
 契约定义成功，原收账与门控验证完成。持久状态在 `.goal/`；机械参数由执行地图派生，模型负责需求、实现和实际复审。
 

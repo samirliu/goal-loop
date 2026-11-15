@@ -1,5 +1,7 @@
 # Rule Compaction Design — goal-loop
 
+> 历史文档：下文的“当前”、计划、暂停状态和测试结果均属于记录当时的版本；最新用法与证据范围见[文档索引](../../README.md)。保留原始结论，不追认当前源码或新一轮验证。
+
 **Date:** 2026-10-14  
 **Scope:** Documentation / legal-surface restructuring only (no behavioral change to gate/ctl/parse/audit/CLI/ledger schema)  
 **Trigger:** Objective review found R1–R19 rule accretion has passed the elegance line; controller legal load is the failure mode (“做歪”), not missing teeth.
