@@ -49,6 +49,11 @@ For each requirement:
    void (R8): do not manufacture gaps to look thorough.
 - Judged quality items: score only against the written rubric anchor given
   in the brief, or answer the A/B comparison asked - never absolute vibes.
+- Calibration grades must each name their actual fixture using `artifact:`
+  and its full SHA-256 `digest:`. Good/bad filenames alone do not bind an
+  observation; include the known-bad FAIL's binding too. Do not override
+  conflicting same-state observations or claim external approval from a
+  content review. Declared external facts still need actual settlement.
 - Visual quality: read references/packs/visual.md, inspect the actual promised
   views and identifiable reference/calibration anchors, and check near-miss
   rejection. Return the review JSON for the controller to preserve verbatim

@@ -1,0 +1,52 @@
+{
+  "independent_content_grade": "PASS",
+  "calibration_good": "PASS",
+  "calibration_bad": "FAIL",
+  "initial_external": "PENDING",
+  "initial_gate_result": 2,
+  "final_external": "APPROVED controlled fixture",
+  "final_receipt": {
+    "checks": {
+      "audit": {
+        "command": [
+          "bash",
+          "/Users/m/repo/goal-loop/scripts/goal_audit.sh",
+          "--project",
+          "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-loop-acceptance-audit-20261114-68ar43jg/settlement-final"
+        ],
+        "elapsed": 0.18887979094870389,
+        "result": 0,
+        "stderr": "",
+        "stdout": "AUDIT: WARN A8 judge-score-unrecorded (judged ACs present but no numeric judge= in scores.rec; pass --judge-score to close-iteration - R13 divergence guard is inert)\nAUDIT: clean (controller ledger hygiene OK)\n"
+      },
+      "gate": {
+        "command": [
+          "bash",
+          "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+          "--check",
+          "--project",
+          "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-loop-acceptance-audit-20261114-68ar43jg/settlement-final"
+        ],
+        "elapsed": 1.3468951659742743,
+        "result": 0,
+        "stderr": "GATE: NOTE judge-score-unrecorded (AC-2 claimed without a numeric judge score; R13 stays inert - record --judge-score N to activate the divergence guard)\n",
+        "stdout": "GATE: GO digest=v2-c06f901d55d4a40d4c28bb8b5f7efc18bbbf401dea8e556e016a26ceba77bcdf iter=1 ac=2 pass=2 unverified=0 mode=threshold\n"
+      }
+    },
+    "completion_verified": true,
+    "head": "526f58d5769d261fb0bf95bc5b5583d75c4838cd13c0f644ac9c9aadb87300e4",
+    "money": null,
+    "policies": [],
+    "project": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-loop-acceptance-audit-20261114-68ar43jg/settlement-final",
+    "reused_units": [],
+    "tokens": null,
+    "unresolved": [],
+    "version": 1
+  },
+  "external_queries": 4,
+  "same_report_sha256": "f14d0721be18e6f34ca5554c9f17c38fe6db85665205728c95e2ed66502c86c3",
+  "unchanged_independent_review_sha256": "a9ae34d6204a03bc826cbc73076b162990fe081efa613192bb3a20cc88013c50",
+  "iterations": 1,
+  "state_and_budget_unchanged_during_settlement": true,
+  "limitation": "Prebuilt controlled fixture; same raw independent content/calibration observations replayed against final kernel. No real approval service, native host lifecycle or efficiency claim."
+}

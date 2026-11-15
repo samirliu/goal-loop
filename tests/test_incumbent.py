@@ -181,8 +181,9 @@ class IntermediateCheckpoint(ProjectCase):
         evidence = f'artifact: artifact.txt digest: {sha}' if horizon == 'PASS' else 'PROBE=inspect REASON=missing'
         rows = [f'AC-3|{horizon}|{iteration}|{digest}|cat artifact.txt|{evidence}']
         if calibrate:
-            rows.extend([f'AC-3#good|PASS|{iteration}|{digest}|cat good.txt|good.txt',
-                         f'AC-3#bad|FAIL|{iteration}|{digest}|cat bad.txt|bad.txt'])
+            rows.extend([f'AC-3#{kind}|{verdict}|{iteration}|{digest}|cat {kind}.txt|'
+                         f'artifact: {kind}.txt digest: {hashlib.sha256((self.project/(kind+".txt")).read_bytes()).hexdigest()}'
+                         for kind, verdict in [('good', 'PASS'), ('bad', 'FAIL')]])
         return '\n'.join(rows) + '\n'
 
     def save(self, **kwargs):

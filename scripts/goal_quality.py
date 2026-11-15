@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bind visual acceptance to a calibrated judged AC and its actual view evidence.
+"""Bind original requests, calibration anchors and actual visual evidence.
 
 This checks declared coverage and evidence integrity, not image semantics.
 The cold reviewer still has to judge fidelity against the original request.
@@ -53,6 +53,13 @@ def read_file(root, name):
     return path.read_bytes()
 
 
+def calibration_anchor(root, name, label):
+    try:
+        return dict(path=name, sha256=digest(read_file(root, name)))
+    except (OSError, QualityError) as exc:
+        raise QualityError('calibration-broken:'+label+' '+str(exc)) from exc
+
+
 def requests(root):
     """Use original host-observed text when available; never invent missing text."""
     folder = root/'.goal/evidence/host'
@@ -78,6 +85,10 @@ def requests(root):
     return rows
 
 
+def brief_sections(text):
+    return re.findall(r'^## (?:Objective|Request|Goal)\s*\n([\s\S]*?)(?=^## |\Z)', text, re.M)
+
+
 def inspect(project):
     root = Path(project).resolve(strict=True)
     goal = root/'.goal/goal.md'
@@ -85,7 +96,7 @@ def inspect(project):
     # Only the brief, not commands, comments, calibration descriptions or
     # mentions in the rest of the contract, supplies automatic intent hints.
     clean = re.sub(r'<!--[\s\S]*?-->', '', text)
-    objectives = re.findall(r'^## (?:Objective|Request)\s*\n([\s\S]*?)(?=^## |\Z)', clean, re.M)
+    objectives = brief_sections(clean)
     original = requests(root)
     signals = [dict(source='.goal/goal.md#Objective', text=VISUAL.search(part)[0]) for part in objectives if VISUAL.search(part)]
     signals += [dict(source=row['source'], text=VISUAL.search(row['text'])[0]) for row in original if VISUAL.search(row['text'])]
@@ -117,14 +128,43 @@ def contract(project):
     for kind in ('good', 'bad'):
         match = re.search(r'\bcalib:[^|]*\b'+kind+r'\s*=\s*([^ |]+)', row)
         require(match is not None, 'quality-contract: quality AC needs good and bad calibration anchors')
-        anchors[kind] = dict(path=match[1], sha256=digest(read_file(root, match[1])))
+        anchors[kind] = calibration_anchor(root, match[1], spec['ac']+'/'+kind)
     require(anchors['good']['sha256'] != anchors['bad']['sha256'], 'quality-contract: good and bad anchors have identical bytes')
     # Approval changes at stamp; the original objective, declaration and
     # host-observed request must not change the qualification after stamp.
     clean = re.sub(r'<!--[\s\S]*?-->', '', text)
-    objectives = re.findall(r'^## (?:Objective|Request)\s*\n([\s\S]*?)(?=^## |\Z)', clean, re.M)
+    objectives = brief_sections(clean)
     frozen = dict(declaration=spec, objectives=objectives, original_requests=info['original_requests'], anchors=anchors)
     return info, encode(frozen)
+
+
+def acceptance_freeze(project, info, visual):
+    """Original intent and known answers are instruments for every task."""
+    root = Path(project).resolve(strict=True)
+    goal = root/'.goal/goal.md'
+    text = goal.read_text().replace('\r', '') if goal.exists() else ''
+    clean = re.sub(r'<!--[\s\S]*?-->', '', text)
+    objectives = brief_sections(clean)
+    brief = dict(objectives=objectives, original_requests=info['original_requests'])
+    tokens = ['brief='+digest(encode(brief))+';']
+    anchors = {}
+    for identity, row in re.findall(r'^- (AC-[0-9]+)\s*\|([^\n]*)$', clean, re.M):
+        row = re.sub(r'`[^`]*`', '', row)
+        if not re.search(r'\bcalib:[^|]*(?:good|bad)\s*=', row):
+            continue
+        pair = {}
+        for kind in ('good', 'bad'):
+            match = re.search(r'\bcalib:[^|]*\b'+kind+r'\s*=\s*([^ |]+)', row)
+            require(match is not None, 'calibration-malformed:'+identity+' needs good and bad anchors')
+            pair[kind] = calibration_anchor(root, match[1], identity+'/'+kind)
+        require(pair['good']['sha256'] != pair['bad']['sha256'],
+                'calibration-identical:'+identity+' good and bad anchors have identical bytes')
+        anchors[identity] = pair
+    if anchors:
+        tokens.append('calibration='+digest(encode(anchors))+';')
+    if visual:
+        tokens.extend(['quality='+digest(visual)+';', 'quality-ac='+info['declaration']['ac']+';'])
+    return ''.join(tokens)
 
 
 def review(project, evidence):
@@ -166,18 +206,21 @@ def validate_review(root, views, value):
 def context(project):
     try:
         info, frozen = contract(project)
+        info['acceptance_sha256'] = digest(acceptance_freeze(project, info, frozen).encode())
         info['error'] = None
         info['frozen_sha256'] = digest(frozen) if frozen else None
-    except QualityError as exc:
+    except (QualityError, OSError) as exc:
         try:
             info, _ = inspect(project)
         except QualityError:
             info = dict(required=True, signals=[], original_requests=[], declaration=None)
-        info.update(error=str(exc), frozen_sha256=None)
+        info.update(error=str(exc), frozen_sha256=None, acceptance_sha256=None)
     if info['required']:
         info['guidance'] = 'Read references/packs/visual.md. Judge the original request against actual views and references; pixel statistics are smoke checks. Bind the cold review JSON as the quality AC artifact.'
         info['review_template'] = dict(version=1, views={v:dict(artifact=None, sha256=None) for v in
             (info['declaration'] or {}).get('views', [])}, findings=None, summary=None)
+    elif info['error']:
+        info['guidance'] = 'Read references/packs/instrument.md. Preserve the original request and use distinct, frozen calibration anchors with content-bound grades.'
     return info
 
 
@@ -188,9 +231,8 @@ def main():
     parser.add_argument('--evidence')
     args = parser.parse_args()
     if args.command == 'freeze':
-        _, frozen = contract(args.project)
-        if frozen:
-            print('quality='+digest(frozen)+';', end='')
+        info, frozen = contract(args.project)
+        print(acceptance_freeze(args.project, info, frozen), end='')
     elif args.command == 'review':
         review(args.project, args.evidence)
     else:

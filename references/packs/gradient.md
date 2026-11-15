@@ -21,9 +21,10 @@ Legacy aliases: `R10 R11 R13 R17b R19` → GRADIENT / FENCE.
 
 - An objective is a **gradient**: what the number cannot see gets optimized away.
 - Stamp requires either:
-  - ≥1 judged AC (with `calib:` preferred) watching the qualities the metric can chase, **or**
+  - ≥1 judged AC with `calib:` watching the qualities the metric can chase, **or**
   - `horizon-waived: <why the blind spot is immaterial>` (frozen by the stamp).
 - Neither present → stamp refuses. Silent absence is the failure mode.
+- Without an explicit frozen waiver, the declared horizon must earn at least one calibrated PASS at completion. The general UNVERIFIABLE quota does not substitute for that guard; intermediate qualification/checkpoints retain their stricter no-UNVERIFIABLE rule.
 
 ## 3 Attribution (label the wave)
 

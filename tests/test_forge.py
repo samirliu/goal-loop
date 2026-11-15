@@ -210,7 +210,10 @@ class ForgeCoverage(unittest.TestCase):
         self.state.rename(legacy)
         shutil.copytree(legacy, self.state, ignore=shutil.ignore_patterns('store', 'runner.lock'))
         freeze = (self.state / 'check_freeze').read_text()
-        (self.state / 'check_freeze').write_text(freeze.split('forge=')[0] + '\n')
+        # Only legacy probe scope is missing; retain every other approved
+        # instrument/intent token, including fields that follow forge=.
+        retained = [token for token in freeze.strip().split(';') if token and not token.startswith('forge=')]
+        (self.state / 'check_freeze').write_text(';'.join(retained) + ';\n')
         for number in range(4):
             path = self.state / ('evidence/raw/%s.txt' % number)
             if path.exists():
@@ -218,6 +221,7 @@ class ForgeCoverage(unittest.TestCase):
                 path.write_text('\n'.join(rows) + '\n')
         history = (self.state / 'loop-log.md').read_bytes()
         self.call(CTL, 'migrate')
+        self.assertTrue(set(retained) <= set((self.state / 'check_freeze').read_text().strip().split(';')))
         self.assertEqual(history, (self.state / 'loop-log.md').read_bytes())
         self.assertIn('dry_streak=0', (self.state / 'state.rec').read_text())
         self.call(GATE, '--check', expected=2)

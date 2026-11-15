@@ -453,10 +453,11 @@ def compile_view(root, state, fd, auto=False):
                  settle_command=actions(root, revision, {'receipt': commands['receipt']}, auto)['receipt']['command'] if 'receipt' in commands else None,
                  evidence=dict(contract=str(state/'goal.md'), ledger=str(state/'store/commits'),
                                log=str(state/'loop-log.md'), host=str(state/'evidence/host')))
-    if quality_info['required'] or quality_info['original_requests']:
+    if quality_info['required'] or quality_info['original_requests'] or quality_info['error']:
         value['quality'] = quality_info
         if quality_info['error']:
-            value['next'] = 'repair-quality-contract' if not stamped else 'review-contract-quality'
+            repair = 'repair-quality-contract' if quality_info['required'] else 'repair-acceptance-contract'
+            value['next'] = repair if not stamped else 'review-contract-quality'
     if stamped and not claimed:
         value['close_input'] = {k: v for k, v in close.items() if k != 'values' or close['sha256'] is not None}
         value['implementation'] = dict(tasks=value['pending'], source=str(state/'work-plan.md'),

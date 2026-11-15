@@ -251,7 +251,9 @@ case "$cmd" in
       fi
     fi
     quality_freeze=$(python3 -I "$here/goal_quality.py" freeze --project "$project") \
-      || { echo 'CTL: ERROR stamp-refused: invalid visual quality contract (see QUALITY error)' >&2; exit 2; }
+      || { echo 'CTL: ERROR stamp-refused: invalid acceptance contract (see QUALITY error)' >&2; exit 2; }
+    freeze=$(gp_script_freeze "$project") \
+      || { echo 'CTL: ERROR stamp-refused: invalid instrument command' >&2; exit 2; }
     h=$(gp_ac_body_hash "$project")
     mutation_id=$(python3 -I "$here/goal_store.py" mutation-journal "$sd" begin stamp "${_goal_ctl_args[@]}") || exit 4
     # Budget knobs written in goal.md BIND at stamp. They used to be
@@ -285,20 +287,6 @@ case "$cmd" in
     # Sidecar file: close-iteration rewrites state.rec wholesale and would drop
     # a state.rec key; this freeze must survive every close.
     # NOTE: never use case patterns with ')' inside $( ) - /*) closes the sub.
-    freeze=""
-    freeze=$(
-      {
-        r < "$sd/goal.md" | sed -nE 's/.*check: *`([^`]*)`.*/\1/p'
-        r < "$sd/goal.md" | sed -nE 's/.*probe: *`([^`]*)`.*/\1/p'
-      } | tr ' \t' '\n\n' | grep -E '\.(sh|py|rb|js)$' | sort -u | while IFS= read -r scr; do
-        [ -n "$scr" ] || continue
-        f="$project/$scr"
-        [ "${scr#/}" != "$scr" ] && f="$scr"
-        [ -f "$f" ] || continue
-        h=$(gp_hash_std < "$f" | cut -c1-8)
-        printf '%s=%s;' "$scr" "$h"
-      done
-    )
     printf '%s\n' "$freeze$forge_freeze$quality_freeze" > "$sd/check_freeze" || exit 4
     if [ -n "$forge_freeze" ]; then
       mkdir -p "$sd/evidence/raw" || exit 4

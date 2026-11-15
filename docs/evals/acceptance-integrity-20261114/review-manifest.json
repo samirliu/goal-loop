@@ -1,0 +1,74 @@
+{
+  "README.md": {
+    "sha256": "a6e7c8d02c1e0df2e5ecfa9e4ff68e8b0d0abafb23136d6f4d19c9bcd017e4f8",
+    "bytes": 7030
+  },
+  "archive.json": {
+    "sha256": "c06f4cdcb78410b45de9cfdc50fbbb58628a8ece38a560b660b25442092024b6",
+    "bytes": 132
+  },
+  "commands.json": {
+    "sha256": "7f230d5abe971590e9d7a28db63a734f1cdca3bec58664adf44715cec4db6ae2",
+    "bytes": 12194
+  },
+  "comparison.json": {
+    "sha256": "8916f5d13f0ead0b540f7ce6275049ff78d687c2a304e18465e139827a574520",
+    "bytes": 2632
+  },
+  "environment.json": {
+    "sha256": "63e4417b8d846662151579ca2ca1f2cdab7429ffa79aafd0afdfda63b22e9837",
+    "bytes": 723
+  },
+  "raw-study.tar.xz": {
+    "sha256": "1e3c8da381a86ba75dd10d902a3aa0ee2b369304696c55e488d2da8c6ab26f6b",
+    "bytes": 568408
+  },
+  "replay/linux-normal.log": {
+    "sha256": "ab6bd19edb496c4375c4f4dc2f0da36c023e1d252076af5cebd2f0591ac96ebd",
+    "bytes": 406
+  },
+  "replay/linux-optimized.log": {
+    "sha256": "ab6bd19edb496c4375c4f4dc2f0da36c023e1d252076af5cebd2f0591ac96ebd",
+    "bytes": 406
+  },
+  "replay/macos-normal.log": {
+    "sha256": "ab6bd19edb496c4375c4f4dc2f0da36c023e1d252076af5cebd2f0591ac96ebd",
+    "bytes": 406
+  },
+  "replay/macos-optimized.log": {
+    "sha256": "ab6bd19edb496c4375c4f4dc2f0da36c023e1d252076af5cebd2f0591ac96ebd",
+    "bytes": 406
+  },
+  "replay-checks.json": {
+    "sha256": "ef4dd593b73e992652186cee4981525ef54baf7e4791360e9b2db32f67277eb3",
+    "bytes": 1703
+  },
+  "replay-result.json": {
+    "sha256": "ab6bd19edb496c4375c4f4dc2f0da36c023e1d252076af5cebd2f0591ac96ebd",
+    "bytes": 406
+  },
+  "settlement-final-result.json": {
+    "sha256": "e12dfc01d6ea6602fab61c05a0d19b474b20a7507f06be4a23b0493d8ce75cb4",
+    "bytes": 2439
+  },
+  "source-manifest.json": {
+    "sha256": "a9784ddd67e055d51996df0984f5f77385aa02d4e08479934e414ce143e09245",
+    "bytes": 14711
+  },
+  "validated-runtime-manifest.json": {
+    "sha256": "251e862cb05964c7015005241dfddbbfe71f465bb2237355dd32d596e48be51b",
+    "bytes": 7163
+  },
+  "validation-fixture-delta.json": {
+    "sha256": "2a88534d4bdcdcfdc96a791abc689d90c610400cb29c97558fd581d08c219ae2",
+    "bytes": 352
+  },
+  "validation.json": {
+    "sha256": "a957d54a5b20b17314ab9ce0c5a9b0d6d04177ae6314f19b20901a898b32747e",
+    "bytes": 14084
+  },
+  "verify.py": {
+    "sha256": "56c5668f622759cee91960c527f68a4039144bd336ad93b82d6a46fd9e3ce835",
+    "bytes": 9137
+  }
+}

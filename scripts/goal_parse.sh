@@ -379,6 +379,36 @@ gp_ac_body(){
 }
 gp_ac_body_hash(){ gp_ac_body "$1" | gp_hash_std | cut -c1-8; }
 
+# Freeze the directly named local instruments through one shared path.
+# Dependencies resolved by npm/imports still need explicit independent checks.
+gp_script_freeze(){
+  (
+  set -o pipefail
+  local scr f h
+  {
+    gp_goal_r "$1" | sed -nE 's/.*check: *`([^`]*)`.*/\1/p'
+    gp_goal_r "$1" | sed -nE 's/.*probe: *`([^`]*)`.*/\1/p'
+    gp_goal_r "$1" | sed -nE 's/.*external: *`([^`]*)`.*/\1/p'
+  } | python3 -I -c '
+import shlex, sys
+paths = set()
+for line in sys.stdin:
+    for token in shlex.split(line):
+        if token.endswith((".sh", ".py", ".rb", ".js", ".mjs", ".cjs")):
+            paths.add(token)
+for path in sorted(paths):
+    sys.stdout.buffer.write(path.encode("utf-8")+b"\0")
+' | while IFS= read -r -d '' scr; do
+    [ -n "$scr" ] || continue
+    f="$1/$scr"
+    [ "${scr#/}" != "$scr" ] && f="$scr"
+    [ -f "$f" ] || continue
+    h=$(gp_hash_std < "$f" | cut -c1-8) || exit 4
+    printf '%s=%s;' "$scr" "$h"
+  done
+  )
+}
+
 # expected token -> a routing class the gate understands
 gp_classify_expected(){
   local v=${1//[[:space:]]/}
@@ -389,7 +419,7 @@ gp_classify_expected(){
     minimize)  echo "minimize" ;;
     exit=[0-9]*) echo "rc ${v#exit=}" ;;
     *)
-      local op num pattern='^([<>=!]+)([0-9][0-9.]*)$'
+      local op num pattern='^([<>=!]+)(-?([0-9]+(\.[0-9]*)?|\.[0-9]+))$'
       if [[ "$v" =~ $pattern ]]; then
         op=${BASH_REMATCH[1]}; num=${BASH_REMATCH[2]}
         case "$op" in
@@ -413,8 +443,9 @@ gp_extract_metric(){                                     # $1 text $2 regex-or-e
     if (match($0, ENVIRON["MRE"], m)) {
       for (i = 1; i <= length(m); i++) if (m[i] != "") { print m[i]; exit }
     }
-  }' | sed -nE 's/^[^-0-9]*(-?[0-9]+(\.[0-9]+)?).*/\1/p' | head -1
-  # the leading-chars class must keep '-', or a captured "-10" is rewritten to 10
+  }' | sed -nE 's/^[[:space:]]*(-?([0-9]+(\.[0-9]*)?|\.[0-9]+))[[:space:]]*$/\1/p' | head -1
+  # Validate the entire capture. Truncating ".5", "1e3" or "1junk" changes
+  # the measurement instead of reporting an unsupported/broken instrument.
 }
 
 # ---- verdict evidence extraction --------------------------------------------

@@ -119,7 +119,9 @@ scripts/goal_ctl.sh|strategy-delta
 scripts/goal_parse.sh|(exit|objective|horizon-waived|quality):
 scripts/goal_ctl.sh|gp_ac_body_hash
 scripts/goal_gate.sh|gp_ac_body_hash
-scripts/goal_ctl.sh|gp_hash_std
+scripts/goal_ctl.sh|gp_script_freeze
+scripts/goal_gate.sh|gp_script_freeze
+scripts/goal_parse.sh|gp_hash_std
 SKILL.md|minimize
 references/gate.md|low-water for minimize
 scripts/goal_parse.sh|minimize)  echo "minimize"

@@ -7,9 +7,9 @@ the contract; contract/CLI keys also activate it.
 | Pack | Activate when you see |
 |---|---|
 | `visual.md` | Original request for visual quality, realism, faithful reconstruction or overall appearance; then use instrument |
-| `instrument.md` | `judged` · `calib:` · `probe:` · `metric:` · `sd:` · `var:` · cold-seat brief |
+| `instrument.md` | Original content correctness/completeness needs judgment beyond file/format checks; `judged` · `calib:` · `probe:` · `metric:` · `sd:` · `var:` · cold-seat brief |
 | `gradient.md` | `objective:` · `exit: forge` · horizon · `--strategy` · policy cost comparison / promotion · EFFICIENCY / eval-gap / promote |
-| `external.md` | `external:` · `window:` · deferred settle |
+| `external.md` | Original outcome depends on out-of-tree facts; `external:` · `window:` · deferred settle |
 
 Invariant map (authoritative table + check order: `references/gate.md`):
 

@@ -1,0 +1,121 @@
+[
+  {
+    "case": "calibration-identical-bytes",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "calibration-changed-after-stamp",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "calibration-unbound-hash",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "calibration-positive",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 0,
+    "after_accepted": true
+  },
+  {
+    "case": "unverified-optimization-horizon",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "judged-external-pending",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "external-checker-replaced",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "original-objective-reworded",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "negative-standard-deviation",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "negative-variance",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "duplicate-ac-id-control",
+    "before_result": 2,
+    "before_accepted": false,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "external-cache-from-previous-artifact",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "conflicting-calibration-grades",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "fractional-metric-promoted",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "scientific-metric-truncated",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "nonnumeric-metric-prefix",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  },
+  {
+    "case": "quoted-instrument",
+    "before_result": 0,
+    "before_accepted": true,
+    "after_result": 2,
+    "after_accepted": false
+  }
+]

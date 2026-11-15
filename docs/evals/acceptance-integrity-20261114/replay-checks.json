@@ -1,0 +1,78 @@
+[
+  {
+    "platform": "macos",
+    "mode": "normal",
+    "command": [
+      "python3",
+      "-B",
+      "docs/evals/acceptance-integrity-20261114/verify.py"
+    ],
+    "result": 0,
+    "elapsed": 0.7690990827977657,
+    "log": "replay/macos-normal.log"
+  },
+  {
+    "platform": "macos",
+    "mode": "optimized",
+    "command": [
+      "python3",
+      "-O",
+      "-B",
+      "docs/evals/acceptance-integrity-20261114/verify.py"
+    ],
+    "result": 0,
+    "elapsed": 0.8174234158359468,
+    "log": "replay/macos-optimized.log"
+  },
+  {
+    "platform": "linux",
+    "mode": "normal",
+    "command": [
+      "docker",
+      "run",
+      "--rm",
+      "--init",
+      "--user",
+      "1000:1000",
+      "--network",
+      "none",
+      "--mount",
+      "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+      "-w",
+      "/repo",
+      "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+      "python3",
+      "-B",
+      "docs/evals/acceptance-integrity-20261114/verify.py"
+    ],
+    "result": 0,
+    "elapsed": 0.5383645831607282,
+    "log": "replay/linux-normal.log"
+  },
+  {
+    "platform": "linux",
+    "mode": "optimized",
+    "command": [
+      "docker",
+      "run",
+      "--rm",
+      "--init",
+      "--user",
+      "1000:1000",
+      "--network",
+      "none",
+      "--mount",
+      "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+      "-w",
+      "/repo",
+      "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+      "python3",
+      "-O",
+      "-B",
+      "docs/evals/acceptance-integrity-20261114/verify.py"
+    ],
+    "result": 0,
+    "elapsed": 0.5485278330743313,
+    "log": "replay/linux-optimized.log"
+  }
+]

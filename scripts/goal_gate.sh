@@ -157,7 +157,9 @@ fail(){
     adversarial-finding:*)   hint=fix-adversarial-finding ;;
     raw-evidence-missing:*)  hint=attach-raw ;;
     calibration-missing:*)   hint=bind-calib-grades ;;
+    calibration-unbound:*)   hint=bind-calib-grades ;;
     calibration-*)           hint=fix-calib-fixture ;;
+    horizon-unverified*)     hint=bind-seat ;;
     deferred-pending:*)      hint=wait-for-source ;;
     time-budget-exhausted*)  hint=graceful-deliver ;;
     stagnation*|repeated-error*) hint=replan-or-stop ;;
@@ -248,28 +250,9 @@ baseline_validate(){                                   # fail-fast via fail(); f
 }
 classify_expected(){ gp_classify_expected "$1"; }       # grammar in goal_parse.sh
 
-run_one_check(){                                       # $1 id $2 class $3 op $4 num -> "id|VERDICT|detail"
-  # Both call sites use line=$(run_one_check ...). Drop locks in that outer
-  # waiting shell too; the main gate retains ownership until it terminates.
+run_external_check(){                                  # $1 id -> id|VERDICT|detail
   drop_check_locks
-  id="$1"; cls="$2"; m_op="${3:-}"; m_num="${4:-}"
-  cmd=$(ac_check_cmd "$id")
-  if [ -z "$cmd" ]; then printf '%s|BROKEN|no check command in AC line\n' "$id"; return; fi
-  # External layer (v2.9): `external:` is ADDITIVE verification on a
-  # deterministic AC - the in-tree check: floor still runs and can still
-  # FAIL on its own; the external command settles the AC against an
-  # out-of-tree source (CRM query, prod metric, async reviewer verdict).
-  # rc 75 (EX_TEMPPOAL) means "not ready yet" -> DEFERRED: neither pass nor
-  # fail, the loop waits instead of spinning. `window:` = cache validity:
-  # inside it the last recorded verdict IS the measurement; outside it the
-  # gate reruns the query. This is what makes a day-to-settle business fact
-  # an AC: the loop keeps working, the gate keeps counting, and the query
-  # costs one call per window instead of one per gate exit.
-  #
-  # The cache lives in .goal/evidence/deferred.rec: evidence is exempt from
-  # BOTH digests, so a cache write during a rerun batch trips neither
-  # check-mutated-tree nor check-mutated-ledger (R6: evidence is where
-  # measurement artifacts legitimately live).
+  id="$1"
   ext_state=""; ext_note=""
   ecmd=$(ac_external_cmd "$id")
   if [ -n "$ecmd" ]; then
@@ -277,8 +260,21 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
     gp_is_natural "$win" || { printf '%s|BROKEN|window must be whole seconds (got: %s)\n' "$id" "$win"; return; }
     rec=$(gp_defer_latest "$project" | gawk -F'|' -v w="$id" '$1==w{print $2"|"$3"|"$4}')
     cv=$(printf '%s' "$rec" | cut -d'|' -f1); ct=$(printf '%s' "$rec" | cut -d'|' -f2)
+    cached_note=$(printf '%s' "$rec" | cut -d'|' -f3-)
+    contract_identity=$(gp_goal_r "$project" | gp_tree_hash_stream) || { printf '%s|BROKEN|external contract identity unavailable\n' "$id"; return; }
+    instrument_identity=unstamped
+    if [ -f "$sd/check_freeze" ]; then
+      instrument_identity=$(gp_tree_hash_stream < "$sd/check_freeze") || { printf '%s|BROKEN|external instrument identity unavailable\n' "$id"; return; }
+    fi
+    external_project=$(cd "$project" && pwd -P) || { printf '%s|BROKEN|external project identity unavailable\n' "$id"; return; }
+    external_binding=$(printf '%s\0' "$external_project" "$id" "$ecmd" "$digest" "$contract_identity" "$instrument_identity" | gp_tree_hash_stream) \
+      || { printf '%s|BROKEN|external binding unavailable\n' "$id"; return; }
+    # A cached approval applies to this contract and artifact, not the next
+    # version bearing the same AC id. Old/future/unbound rows are remeasured.
+    case "$cached_note" in *" binding=$external_binding") : ;; *) cv="" ;; esac
     now=$(date +%s); ct=${ct:-0}
-    if { [ "$cv" = PASS ] || [ "$cv" = FAIL ]; } && [ $(( now - ct )) -le "$win" ]; then
+    if ! gp_is_natural "$ct" || [ "${#ct}" -gt "${#now}" ] || [ "$ct" -gt "$now" ]; then cv=""; ct=0; fi
+    if { [ "$cv" = PASS ] || [ "$cv" = FAIL ]; } && [ "$win" -gt 0 ] && [ $(( now - ct )) -lt "$win" ]; then
       ext_state="$cv"; ext_note="window=${win}s cached age=$(( now - ct ))s"
     elif [ "$cv" = DEFERRED ] && [ $(( now - ct )) -lt "$win" ]; then
       ext_state=DEFERRED; ext_note="not-ready ${ct:+$(( now - ct ))}s ago (window=${win}s)"
@@ -293,12 +289,20 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
         124|127)   ext_state=BROKEN; ext_note="external cmd rc=$ec_rc $ec_tail" ;;
         *)         ext_state=FAIL; ext_note="external rc=$ec_rc $ec_tail" ;;
       esac
-      printf '%s|%s|%s|%s\n' "$id" "$ext_state" "$now" "$ext_note" >> "$(gp_defer_path "$project")" \
+      printf '%s|%s|%s|%s binding=%s\n' "$id" "$ext_state" "$now" "$ext_note" "$external_binding" >> "$(gp_defer_path "$project")" \
         || { printf '%s|BROKEN|external receipt write failed\n' "$id"; return; }
     fi
-    [ "$ext_state" = FAIL ]   && { printf '%s|FAIL|external (out-of-tree claim): %s\n' "$id" "$ext_note"; return; }
-    [ "$ext_state" = BROKEN ] && { printf '%s|BROKEN|external: %s\n' "$id" "$ext_note"; return; }
+    printf '%s|%s|external: %s\n' "$id" "$ext_state" "$ext_note"
+  else
+    printf '%s|PASS|no external check\n' "$id"
   fi
+}
+
+run_one_check(){                                       # $1 id $2 class $3 op $4 num -> "id|VERDICT|detail"
+  drop_check_locks
+  id="$1"; cls="$2"; m_op="${3:-}"; m_num="${4:-}"
+  cmd=$(ac_check_cmd "$id")
+  if [ -z "$cmd" ]; then printf '%s|BROKEN|no check command in AC line\n' "$id"; return; fi
   # R9 verifier-of-the-verifier: metric/maximize numbers are untrustworthy
   # unless their probe (instrument alive) passes first.
   line=""
@@ -344,11 +348,16 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
   if [ -n "$sdre" ]; then
     v=$(extract_metric "$clean" "$sdre")
     [ -n "$v" ] || { printf '%s|BROKEN|sd regex matched nothing: %s\n' "$id" "$sdre"; return; }
-    spread=$(awk -v s="$v" 'BEGIN{print (s<0)?-s:s}')
+    awk -v s="$v" 'BEGIN{exit !(s>=0)}' || { printf '%s|BROKEN|negative standard deviation: %s\n' "$id" "$v"; return; }
+    spread=$(awk -v s="$v" 'BEGIN{print s+0}')
   elif [ -n "$varre" ]; then
     v=$(extract_metric "$clean" "$varre")
     [ -n "$v" ] || { printf '%s|BROKEN|var regex matched nothing: %s\n' "$id" "$varre"; return; }
-    spread=$(awk -v s="$v" 'BEGIN{s=(s<0)?-s:s; print sqrt(s)}')
+    awk -v s="$v" 'BEGIN{exit !(s>=0)}' || { printf '%s|BROKEN|negative variance: %s\n' "$id" "$v"; return; }
+    spread=$(awk -v s="$v" 'BEGIN{print sqrt(s)}')
+  fi
+  if [ -n "$spread" ] && ! [[ "$spread" =~ ^[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?$ ]]; then
+    printf '%s|BROKEN|nonfinite measurement spread\n' "$id"; return
   fi
   case "$cls" in
     exit0)
@@ -391,14 +400,11 @@ run_one_check(){                                       # $1 id $2 class $3 op $4
     *)
       printf '%s|BROKEN|unroutable expectation class\n' "$id"; return ;;
   esac
-  # Merge with the external layer (v2.9). Out-of-tree FAIL/BROKEN already
-  # returned. What is left: an in-tree FAIL/BROKEN stays decisive (the floor
-  # is not masked by "something is still pending"), and DEFERRED means
-  # "everything in-tree settled, one business fact is still pending" - the
-  # loop waits for it, that is not a failure and not a delivery.
-  if [ "$ext_state" = DEFERRED ]; then
-    bv=$(printf '%s' "$line" | cut -d'|' -f2)
-    [ "$bv" = PASS ] && line="$id|DEFERRED|in-tree settled, awaiting external: $ext_note"
+  # A failed local floor is decisive. A passing one additionally needs the
+  # external fact; do not collapse a pending external requirement into PASS.
+  if [ "$(printf '%s' "$line" | cut -d'|' -f2)" = PASS ] && [ -n "$(ac_external_cmd "$id")" ]; then
+    external_line=$(run_external_check "$id")
+    [ "$(printf '%s' "$external_line" | cut -d'|' -f2)" = PASS ] || line="$external_line"
   fi
   printf '%s\n' "$line"
 }
@@ -460,7 +466,20 @@ if [ "$mode" = verify ]; then
   for id in $(all_ac_ids); do
     if [ -n "${want// /}" ]; then case "$want" in *" $id "*) ;; *) continue ;; esac; fi
     cls=$(classify_expected "$(ac_expected "$id")")
-    if [ "$cls" = judged ]; then echo "GATE: VERIFY $id|SKIP|judged"; continue; fi
+    if [ "$cls" = judged ]; then
+      echo "GATE: VERIFY $id|SKIP|judged"
+      if [ -n "$(ac_external_cmd "$id")" ]; then
+        line=$(run_external_check "$id")
+        echo "GATE: EXTERNAL $line"
+        nchecked=$((nchecked+1))
+        case "$line" in
+          *'|FAIL|'*) nfail=$((nfail+1)) ;;
+          *'|BROKEN|'*) nbroken=$((nbroken+1)) ;;
+          *'|DEFERRED|'*) npending=$((npending+1)) ;;
+        esac
+      fi
+      continue
+    fi
     line=$(run_one_check "$id" "$cls" ${cls#metric})
     echo "GATE: VERIFY $line"
     nchecked=$((nchecked+1))
@@ -533,19 +552,7 @@ body=$(ac_body_hash)
 # silent metric edit (R3 spirit on the instrument body, not just the AC line).
 freeze_now=""
 if [ -f "$sd/goal.md" ]; then
-  freeze_now=$(
-    {
-      r < "$sd/goal.md" | sed -nE 's/.*check: *`([^`]*)`.*/\1/p'
-      r < "$sd/goal.md" | sed -nE 's/.*probe: *`([^`]*)`.*/\1/p'
-    } | tr ' \t' '\n\n' | grep -E '\.(sh|py|rb|js)$' | sort -u | while IFS= read -r scr; do
-      [ -n "$scr" ] || continue
-      f="$project/$scr"
-      [ "${scr#/}" != "$scr" ] && f="$scr"
-      [ -f "$f" ] || continue
-      h=$(gp_hash_std < "$f" | cut -c1-8)
-      printf '%s=%s;' "$scr" "$h"
-    done
-  )
+  freeze_now=$(gp_script_freeze "$project") || fail "instrument-freeze-invalid:see command syntax"
 fi
 freeze_st=""
 [ -f "$sd/check_freeze" ] && freeze_st=$(r < "$sd/check_freeze")
@@ -553,11 +560,18 @@ if [ "$exit_mode" = forge ]; then
   forge_freeze=$(python3 -I "$here/goal_forge.py" freeze --project "$project") || fail "forge-plan-invalid:see probe scope"
   freeze_now="$freeze_now$forge_freeze"
 fi
-quality_freeze=$(python3 -I "$here/goal_quality.py" freeze --project "$project") \
-  || fail "quality-contract-invalid:see QUALITY error; preserve the original request"
+if quality_freeze=$(python3 -I "$here/goal_quality.py" freeze --project "$project" 2>&1); then
+  :
+else
+  printf '%s\n' "$quality_freeze" >&2
+  case "$quality_freeze" in
+    *calibration-broken:*) fail "calibration-broken:see QUALITY error" ;;
+    *) fail "quality-contract-invalid:see QUALITY error; preserve the original request" ;;
+  esac
+fi
 freeze_now="$freeze_now$quality_freeze"
 quality_ac=""
-[ -z "$quality_freeze" ] || quality_ac=$(r < "$sd/goal.md" | sed -nE 's/^quality: visual (AC-[0-9]+) views=.*/\1/p')
+quality_ac=$(printf '%s' "$quality_freeze" | tr ';' '\n' | sed -nE 's/^quality-ac=(AC-[0-9]+)$/\1/p')
 quality_evidence=""
 norm_freeze(){ printf '%s' "$1" | tr ';' '\n' | sed '/^$/d' | sort | tr '\n' ';'; }
 if [ "$(norm_freeze "$freeze_now")" != "$(norm_freeze "$freeze_st")" ]; then
@@ -656,6 +670,7 @@ total=0; passn=0; unv=0
 observed_score=""
 observed_spread=""
 primary=$(objective_ac)
+horizon_pass=0
 for id in $ac_ids; do
   cls=$(classify_expected "$(ac_expected "$id")")
   if [ "$cls" != judged ]; then
@@ -668,7 +683,7 @@ for id in $ac_ids; do
       PASS)   total=$((total+1)); passn=$((passn+1))
               if [ "$id" = "$primary" ]; then
                 observed_score=$(printf '%s' "$detail" | sed -nE 's/.*observed=([0-9.\-]+).*$/\1/p' | tail -1)
-                observed_spread=$(printf '%s' "$detail" | sed -nE 's/.*spread=([0-9.]+).*$/\1/p' | tail -1)
+                observed_spread=$(printf '%s' "$detail" | sed -nE 's/.*spread=([0-9.eE+-]+).*$/\1/p' | tail -1)
               fi ;;
       DEFERRED)
               # An external fact is still pending. The loop must not deliver
@@ -733,20 +748,26 @@ for id in $ac_ids; do
       b_rec=$(printf '%s\n' "$lv" | gawk -F'|' -v want="$id#bad"  '$1==want{print}')
       gv=$(printf '%s' "$g_rec" | cut -d'|' -f2); gvi=$(printf '%s' "$g_rec" | cut -d'|' -f3); gvd=$(printf '%s' "$g_rec" | cut -d'|' -f4)
       bv=$(printf '%s' "$b_rec" | cut -d'|' -f2); bvi=$(printf '%s' "$b_rec" | cut -d'|' -f3); bvd=$(printf '%s' "$b_rec" | cut -d'|' -f4)
-      # Evidence must name the fixture the grade was read from (R5 spirit):
-      # an unbound grade is an invented grade, same as an unbound PASS.
-      # v2.7 strengthening - EXCLUSIVE citation: the good row quotes cg and
-      # never cb (and vice versa). A single blob quoting both fixture paths
-      # used to satisfy both rows at once; exclusivity forces the seat to
-      # say which artifact each grade actually saw.
+      # Each grade binds exactly its own fixture below. Substring citations
+      # cannot establish identity and fail for overlapping fixture names.
       gve=$(printf '%s' "$g_rec" | cut -d'|' -f5-)
       bve=$(printf '%s' "$b_rec" | cut -d'|' -f5-)
-      { [ "$gv" = PASS ] && [ "$gvi" = "$iter" ] && [ "$gvd" = "$digest" ] \
-        && printf '%s' "$gve" | grep -qF "$cg" && ! printf '%s' "$gve" | grep -qF "$cb"; } \
-        || fail "calibration-missing:$id/good (needs a fresh PASS verdict this iteration whose evidence quotes ONLY the good fixture $cg)"
-      { [ "$bv" = FAIL ] && [ "$bvi" = "$iter" ] && [ "$bvd" = "$digest" ] \
-        && printf '%s' "$bve" | grep -qF "$cb" && ! printf '%s' "$bve" | grep -qF "$cg"; } \
-        || fail "calibration-missing:$id/bad (known-bad fixture $cb needs a fresh FAIL verdict in the current iteration quoting ONLY $cb - a seat that cannot reject the bad case cannot be trusted on the real one)"
+      { [ "$gv" = PASS ] && [ "$gvi" = "$iter" ] && [ "$gvd" = "$digest" ]; } \
+        || fail "calibration-missing:$id/good (needs a fresh PASS verdict for fixture $cg)"
+      { [ "$bv" = FAIL ] && [ "$bvi" = "$iter" ] && [ "$bvd" = "$digest" ]; } \
+        || fail "calibration-missing:$id/bad (known-bad fixture $cb needs a fresh FAIL verdict)"
+      for side in good bad; do
+        [ "$(gp_verdict_conflict "$project" "$id#$side" "$iter" "$digest")" != yes ] \
+          || fail "verdict-conflict:$id#$side (calibration grades disagree on unchanged evidence)"
+        fixture="$cg"; grade_evidence="$gve"
+        [ "$side" = good ] || { fixture="$cb"; grade_evidence="$bve"; }
+        grade_artifact=$(gp_ev_artifact "$grade_evidence"); grade_digest=$(gp_ev_digest "$grade_evidence")
+        [ "$grade_artifact" = "$fixture" ] && [ "${#grade_digest}" -eq 64 ] \
+          || fail "calibration-unbound:$id/$side (grade must bind the actual fixture path and full SHA-256)"
+        [ "$(sha256_std "$project/$fixture")" = "$grade_digest" ] \
+          || fail "calibration-unbound:$id/$side (fixture digest mismatch)"
+      done
+      horizon_pass=$((horizon_pass+1))
     fi
     # Judge-score duty at the arbiter (v2.7): R13's divergence guard is only
     # alive while numeric judge scores are recorded. The moment a ledger
@@ -775,10 +796,23 @@ for id in $ac_ids; do
   else
     fail "bad-verdict:$id=$v"
   fi
+  if [ -n "$(ac_external_cmd "$id")" ]; then
+    external_line=$(run_external_check "$id")
+    external_verdict=$(printf '%s' "$external_line" | cut -d'|' -f2)
+    case "$external_verdict" in
+      PASS) : ;;
+      DEFERRED) fail "deferred-pending:$id ($external_line)" ;;
+      FAIL) fail "open-FAIL:$id ($external_line)" ;;
+      *) fail "check-broken:$id ($external_line)" ;;
+    esac
+  fi
 done
 [ $((unv*3)) -le "$total" ] || fail "unverifiable-excessive:unv=$unv total=$total"
 if { [ "$mode" = checkpoint ] || [ "$mode" = quality ]; } && [ "$unv" -gt 0 ]; then
   fail "checkpoint-unverifiable:unv=$unv"
+fi
+if [ -n "$primary" ] && [ -z "$(gp_horizon_waived "$project")" ] && [ "$horizon_pass" -eq 0 ]; then
+  fail "horizon-unverified (objective blind spot requires a calibrated PASS; UNVERIFIABLE cannot waive it)"
 fi
 
 # -10. guard against checks that mutated the tree mid-verification --------
@@ -892,7 +926,7 @@ fi
 if [ "$mode" = quality ]; then
   [ -n "$primary" ] && [ -n "$observed_score" ] || fail "quality-objective-required"
   [ "${deadline_expired:-0}" != 1 ] || blocked time-budget-exhausted
-  if [ -n "$quality_freeze" ]; then
+  if [ -n "$quality_ac" ]; then
     python3 -I "$here/goal_quality.py" review --project "$project" --evidence "$quality_evidence" \
       || fail "quality-review-invalid:see QUALITY error"
   fi
@@ -984,7 +1018,7 @@ if [ "$exit_mode" = forge ] && [ "$mode" != checkpoint ]; then
   coverage=" coverage=declared"
 fi
 outcome=GO
-if [ -n "$quality_freeze" ]; then
+if [ -n "$quality_ac" ]; then
   python3 -I "$here/goal_quality.py" review --project "$project" --evidence "$quality_evidence" \
     || fail "quality-review-invalid:see QUALITY error (clear cannot waive goal-related findings)"
 fi

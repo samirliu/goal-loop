@@ -31,6 +31,7 @@ Legacy aliases: `R5 R9 R14 R15 R17a` → PROVE / BIND.
 - `tolerance:` relative band on the objective water-mark compare (see `gradient.md`).
 - `sd:` / `var:` extract spread from the check’s own output (one capture group). Band becomes `max(2*spread/|best|, tolerance)`.
 - Declared-but-non-matching instrument = BROKEN, never a silently band-less compare.
+- Captures must be whole decimal values (including `.5` / `-.5`); units, trailing text and scientific notation are not silently truncated into other numbers. Print decimal output for this grammar. Negative standard deviation/variance is BROKEN, never an absolute-value noise allowance.
 
 ### Measurement shape rules (authoring)
 
@@ -65,14 +66,19 @@ Legacy aliases: `R5 R9 R14 R15 R17a` → PROVE / BIND.
 - Seat must grade `AC-N#good = PASS` ∧ `AC-N#bad = FAIL` in the current iteration+digest (derived-id rows in `verdicts.rec`).
 - A seat that cannot reject the known-bad case is not trustworthy on the real one.
 - Declared-but-missing fixtures → `calibration-broken` (fail-closed). Stamp refuses one-sided declarations or missing files.
-- Grade evidence must QUOTE the fixture it read (unbound grade = invented grade).
+- Good and bad fixtures must be distinct regular project-relative files with different bytes, including for nonvisual tasks. Stamp freezes their content with the original Objective/Request/Goal and any captured user request; a fresh grade cannot authorize a changed anchor.
+- Each grade must bind `artifact: <its fixture path> digest: <full SHA-256>`. Gate checks both paths and bytes, including the known-bad FAIL. Quoting a filename or binding a different artifact is insufficient. Same-state conflicting calibration grades are refused like conflicting parent grades; retain the failed attempt and repair the instrument before a fresh actual review.
+- Upgrading an already stamped contract without these bindings requires the normal amendment/approval and fresh calibration process. Do not edit `check_freeze` or invent hashes for historical observations.
 
 ### Goodhart sentinel (every AC)
 
 Ask: *can this be satisfied without advancing the goal?* If yes, it is a proxy metric — rewrite or delete. Size/ratio ACs must cite a real spec source.
 
 Run the same question against the **whole original request** before accepting
-the AC set. For visual work, use [visual acceptance](visual.md): pixel contrast,
+the AC set. A report can contain a table and a total while omitting a region
+and reporting a wrong sum. Check the source-to-output coverage and actual
+values, using a direct business check where possible and judgment where needed.
+For visual work, use [visual acceptance](visual.md): pixel contrast,
 edge density or colour coverage are rendering smoke checks, not a fidelity
 judge. Good/bad fixtures must distinguish plausible task failures, not just
 empty output. Shared implementation constants or the same assertions on two
