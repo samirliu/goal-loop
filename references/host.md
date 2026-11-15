@@ -23,6 +23,8 @@
 
 新请求优先使用 `submissions`：契约写好后执行 `submissions.stamp.command`，一次完成原 smoke 与 stamp。初始业务 FAIL 是修复工作的有效起点；只有完整、未变更树或账本且没有 BROKEN 的观测才能继续盖戳，原批准语义不变。
 
+启用递归改进后仍通过同一地图执行 verify、submissions.close 和 receipt。控制器持有排他锁时，改进状态和检查点只读派生复用该锁，不另开读锁，也不降低原来的写入排他性；无需删除改进声明或改用另一套收尾协议。
+
 完成实际工作与复审后取新地图，将 `submissions.close.template` 填为真实 JSON，并直接作为其 `command` 的 stdin。程序在原排他锁内先核对地图版本，再推导固定 operation_id、单任务文件域、符合条件的检查数与 claim 终验，校验字段并原子保存标准 proposal，随后同 PID 交给原 controller。模型无需先写 proposal 再取一次新地图。业务判断、复审、特殊契约观测仍由调用者提供；缺失不会从 PASS 猜出 clear。
 
 旧地图的 contract/artifact/plan/evidence/input/crew/policy/budget/implementation 绑定全部保留，scripts/ 中全部 Python、Bash、awk 文件的版本也参与绑定。输入只允许覆盖实际判断字段，不能替换程序派生的 operation_id、checks_source 或 receipt。提交被打断后，仍用原 pending/recover；提交前恢复沿用保存的 proposal，提交后重放沿用原 journal argv，当前终验仍由原 audit/Gate 执行。

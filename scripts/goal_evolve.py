@@ -39,7 +39,7 @@ class Bundle:
         return encode({'entry': self.entry, 'files': self.files, 'context': self.context})
 
 
-def checkpoint_programs(protocol, project):
+def checkpoint_programs(protocol, project, ledger_fd=None):
     if project is None:
         raise ExperimentError('version 2 requires --project')
     spec = importlib.util.spec_from_file_location('goal_store', Path(__file__).with_name('goal_store.py'))
@@ -48,7 +48,15 @@ def checkpoint_programs(protocol, project):
     state = Path(project).resolve(strict=True) / '.goal'
     fd = os.open(state, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
-        fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
+        if ledger_fd is None:
+            fcntl.flock(fd, fcntl.LOCK_SH | fcntl.LOCK_NB)
+        else:
+            local, borrowed = os.fstat(fd), os.fstat(ledger_fd)
+            if (local.st_dev, local.st_ino) != (borrowed.st_dev, borrowed.st_ino):
+                raise ExperimentError('borrowed checkpoint lock target mismatch')
+            duplicate = os.dup(ledger_fd)
+            os.close(fd)
+            fd = duplicate
         if (state / 'store/pending').exists():
             raise ExperimentError('checkpoint project requires recovery')
         store.verify_views(state)
@@ -273,7 +281,7 @@ def program_bytes(program):
     return program.archive() if isinstance(program, Bundle) else program
 
 
-def load_protocol(path, project=None):
+def load_protocol(path, project=None, ledger_fd=None):
     path = Path(path).resolve()
     data = path.read_bytes()
     protocol = json.loads(data)
@@ -310,7 +318,7 @@ def load_protocol(path, project=None):
         frozen[str(candidate)] = data
         return data
 
-    programs = (checkpoint_programs(protocol, project) if version == 2 else
+    programs = (checkpoint_programs(protocol, project, ledger_fd) if version == 2 else
                 {name: read(protocol[name]) for name in ('baseline', 'candidate')})
     programs['grader'] = read(protocol['grader'])
     if program_bytes(programs['baseline']) == program_bytes(programs['candidate']):

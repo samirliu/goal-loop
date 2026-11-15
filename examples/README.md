@@ -9,6 +9,7 @@ user's actual deliverable. Historical domain recipes remain in their case dirs.
 | [quickstart-one-shot/run.sh](quickstart-one-shot/run.sh) | Real controller close and Gate GO without a model |
 | [learning-edge](learning-edge/README.md) | Local repair/reuse and controlled policy transition/consumption |
 | [evolution-dedupe](evolution-dedupe/README.md) | Paired local tool-policy experiments |
+| [recursive-improvement](recursive-improvement/README.md) | Qualified generations, actual use, counterexample withdrawal and repair under one goal budget |
 | [learning-regression](learning-regression/README.md) | Real test workflow with qualified routing and withdrawal |
 | [crew-cost](crew-cost/README.md) | Frozen workload and measured serial/crew comparisons |
 

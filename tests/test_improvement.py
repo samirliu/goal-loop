@@ -416,6 +416,12 @@ print(json.dumps(dict(hypothesis='Refine the bounded proposal operator from actu
         (root/'rules.md').write_text('later live edit')
         actual, code, reason, _ = improve.consume(root, 2, b'actual input')
         self.assertEqual((actual, code, reason), (b'candidate-playbook\n', 0, None))
+        context_spec = importlib.util.spec_from_file_location('bundle_writer_context', ROOT/'scripts/goal_context.py')
+        context = importlib.util.module_from_spec(context_spec)
+        context_spec.loader.exec_module(context)
+        with context.access(root, write=True) as (_, _, fd):
+            self.assertEqual(improve.engine.load_protocol(protocol, root, ledger_fd=fd)[0]['version'], 2)
+            self.assertIsNotNone(improve.view(root, ledger_fd=fd)[0]['selected'])
 
 
 if __name__ == '__main__':

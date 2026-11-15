@@ -81,8 +81,8 @@ def config(root, inputs=True):
     return value, state, protocol
 
 
-def binding(root):
-    with crew.read_ledger(root) as (state, _):
+def binding(root, ledger_fd=None):
+    with crew.read_ledger(root, ledger_fd=ledger_fd) as (state, _):
         require((state/'runner.json').is_file(), 'improvement requires an existing bounded host run')
         runner = budget.runner_data((state/'runner.json').read_bytes())
         sessions = [host.load(p) for p in sorted((state/'evidence/host').glob('session-*.json'))]
@@ -223,10 +223,10 @@ def initialize(project):
         os.close(allocation_fd)
 
 
-def inspect(project, ignore=None, inputs=True):
+def inspect(project, ignore=None, inputs=True, ledger_fd=None):
     root = Path(project).resolve(strict=True)
     value, state, protocol_path = config(root, inputs)
-    bound, cap, expired = binding(root)
+    bound, cap, expired = binding(root, ledger_fd)
     record, identity = campaign(state)
     require(allocation(root, state, identity) is not None, 'start the improvement allocation before evaluation')
     require(record['binding'] == bound and record['declaration'] == declaration(value),
@@ -345,7 +345,7 @@ def suggest(project):
                 next='Host reviews these proposed files in a new experiment directory; preserve the evaluator and supply fresh holdout. Nothing was applied.')
 
 
-def view(project):
+def view(project, ledger_fd=None):
     """Read-only action input; no execution, auto-promotion or extra ledger."""
     root = Path(project).resolve(strict=True)
     if not (root/CONFIG).exists():
@@ -358,7 +358,7 @@ def view(project):
     command = [sys.executable, '-I', str(HERE/'goal_improve.py')]
     if not (state/CAMPAIGN).exists() or not (root/ALLOCATION).exists():
         _, _, protocol_path = config(root)
-        _, _, _, _, fingerprint = engine.load_protocol(protocol_path, root)
+        _, _, _, _, fingerprint = engine.load_protocol(protocol_path, root, ledger_fd)
         result['binding']['protocol'] = fingerprint
         result['next'] = 'start-improvement'
         return result, {'start-improvement':command+['start', str(root)]}
@@ -369,7 +369,7 @@ def view(project):
             result.update(next='recover-improvement', pending=True)
             result['binding']['pending'] = engine.digest(pending)
             return result, {'recover-improvement':command+['recover', str(root)]}
-        _, _, _, _, record, identity, history, selected, cutoff, expired = inspect(root, inputs=False)
+        _, _, _, _, record, identity, history, selected, cutoff, expired = inspect(root, inputs=False, ledger_fd=ledger_fd)
         result['binding'].update(campaign=identity, reports=engine.digest(engine.encode(history)), selection=selected,
                                  uses=uses(root, state, selected))
         result.update(attempts=len(history), max_attempts=record['declaration']['max_attempts'],
@@ -382,7 +382,7 @@ def view(project):
         needs_use = value['intent'] == 'improve' and selected and selected['policy'] and selected['policy'] != record['baseline'] and not result['actual_uses']
         result['next'] = 'finish-original-goal' if stopped else 'consume-or-stop' if needs_use else 'propose-and-evaluate'
         commands = {} if stopped or needs_use else {'evaluate-improvement':command+['evaluate', str(root)]}
-        _, cap, _ = binding(root)
+        _, cap, _ = binding(root, ledger_fd)
         result['consume_command'] = shlex.join(command+['consume', str(root), '--seconds', '2']) if selected and selected['policy'] and not expired and cap > time.monotonic() else None
         result['parent_archive'] = str(state/selected['program']) if selected and selected['policy'] else None
         result['routing_state'] = str(state) if value['consumer'] == 'routing' and selected and selected['policy'] else None
@@ -392,7 +392,7 @@ def view(project):
                 result['next'] = 'generate-next-proposal'
         try:
             _, _, protocol_path = config(root)
-            protocol, programs, phases, _, fingerprint = engine.load_protocol(protocol_path, root)
+            protocol, programs, phases, _, fingerprint = engine.load_protocol(protocol_path, root, ledger_fd)
             result['binding']['protocol'] = fingerprint
             result['protocol'] = str(protocol_path)
             if not stopped and not needs_use:
