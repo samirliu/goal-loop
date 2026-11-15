@@ -388,6 +388,16 @@ class LearningFlow(unittest.TestCase):
                 self.assertEqual(host.validate(f.project, item['ticket']), 0)
                 host.adopt(f.project, item['ticket'])
             self.assertTrue(native.Wave(f.project, wave).finish()['quality'])
+            # Native comparisons retain the real controller's one-wave/one-book
+            # lifecycle too. A measured variant is not a completion claim.
+            view = context.show(f.project, auto=True)
+            book = subprocess.run([sys.executable, '-I', str(ROOT/'scripts/goal_context.py'),
+                'submit', str(f.project), view['revision'], 'close', '--auto', '--input', '-'],
+                input=json.dumps(dict(task='T1[crew:2]', files='a.out,b.out', progress='yes', exit_signal='no')),
+                text=True, capture_output=True, timeout=20)
+            self.assertEqual(book.returncode, 2, book.stdout+book.stderr)
+            self.assertIn('iteration='+str(len(observations)+1)+'\n', (f.state/'state.rec').read_text())
+            self.assertNotIn('GATE: GO ', book.stdout)
             observations.append(dict(variant=label, plan=report, begin_mode=row['mode'],
                                      consumed=row.get('policy'), prepared=True, independent_checks_passed=True))
         self.assertEqual(modes, ['inline', 'inline'], 'a repeated baseline rule was counted as different execution')

@@ -181,7 +181,8 @@ def validate_review(root, views, value):
     require(isinstance(value, dict) and {'version', 'views', 'findings', 'summary'} <= set(value)
             and type(value['version']) is int and value['version'] == 1, 'quality-review: invalid review record')
     require(isinstance(value['findings'], list) and all(isinstance(x, str) and x.strip() for x in value['findings']),
-            'quality-review: findings must list unresolved goal-related defects')
+            'quality-review: findings must be a list of nonempty strings describing unresolved goal-related defects; '
+            'preserve the original report and request a correctly shaped cold review, never erase defects to pass')
     require(not value['findings'], 'quality-open-findings: '+str(value['findings']))
     require(value.get('verdict', 'PASS') == 'PASS' and value.get('completion_eligible', True) is True,
             'quality-review-conflict: review does not grant a quality PASS')
@@ -216,7 +217,10 @@ def context(project):
             info = dict(required=True, signals=[], original_requests=[], declaration=None)
         info.update(error=str(exc), frozen_sha256=None, acceptance_sha256=None)
     if info['required']:
-        info['guidance'] = 'Read references/packs/visual.md. Judge the original request against actual views and references; pixel statistics are smoke checks. Bind the cold review JSON as the quality AC artifact.'
+        info['guidance'] = ('Read references/packs/visual.md. Give the cold seat the verbatim request, AC, anchors, '
+            'actual views and this review_template. findings is a list of strings; retain detailed observations in extra fields. '
+            'A successful report-format check is not a quality PASS. Keep reviewed images immutable; '
+            'changed evidence needs a fresh worker/ticket after booking this wave. Bind the actual review JSON as the quality AC artifact.')
         info['review_template'] = dict(version=1, views={v:dict(artifact=None, sha256=None) for v in
             (info['declaration'] or {}).get('views', [])}, findings=None, summary=None)
     elif info['error']:

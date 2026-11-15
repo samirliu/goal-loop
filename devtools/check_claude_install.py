@@ -11,8 +11,10 @@ import os
 from pathlib import Path
 import re
 import shutil
+import shlex
 import subprocess
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 ROLES = {'goal-worker', 'goal-mech-worker', 'goal-critic', 'goal-checker-req', 'goal-adjudicator'}
@@ -157,10 +159,53 @@ def check(harness, output, bun):
             run('hook-enter', [sys.executable, '-I', relocated/'scripts/goal_host.py', 'enter', hook_project, '60', '--context'])
     prompts = list((hook_project/'.goal/evidence/host').glob('prompt-*.json'))
     require(len(prompts) == 1 and 'verify installed resources' in prompts[0].read_text(), 'namespaced prompt not captured')
+    # Compose the installed PreToolUse hook with real expired settlement;
+    # replaying hooks and running a GO separately misses this interaction.
+    settlement = output/'expired settlement'; settlement.mkdir()
+    ctl = relocated/'scripts/goal_ctl.sh'
+    context = relocated/'scripts/goal_context.py'
+    host = relocated/'scripts/goal_host.py'
+    run('settlement-init', ['bash', ctl, 'init', '--project', settlement])
+    (settlement/'answer').write_text('correct')
+    (settlement/'check.py').write_text('from pathlib import Path\nassert Path("answer").read_text()=="correct"\n')
+    (settlement/'.goal/goal.md').write_text('# Goal\n\n## Objective\n\nDeliver answer\n\n## Acceptance criteria\n\n'
+        '- AC-1 | answer correct | check: `python3 check.py` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n')
+    (settlement/'.goal/work-plan.md').write_text('- [x] T1 answer | files=answer\n')
+    run('settlement-stamp', ['bash', ctl, 'stamp', '--auto', '--project', settlement])
+    run('settlement-enter', [sys.executable, '-I', host, 'begin', settlement, 'claude', 'expired-installation-replay', '.2'])
+    time.sleep(.25)
+    original_runner = (settlement/'.goal/runner.json').read_bytes()
+    pretool = data['plugins'][0]['hooks']['PreToolUse'][0]['hooks'][0]['command']
+
+    def settlement_hook(label, command, allowed=True):
+        payload = dict(hook_event_name='PreToolUse', session_id='expired-installation-replay',
+                       cwd=str(settlement), tool_name='Bash', tool_input={'command': command})
+        result = json.loads(run(label, ['/bin/sh', '-c', pretool], extra=hook_env, stdin=json.dumps(payload)))
+        require(result == {} if allowed else result.get('hookSpecificOutput', {}).get('permissionDecision') == 'deny',
+                label+' unexpected expired hook decision')
+
+    view = json.loads(run('settlement-map', [sys.executable, '-I', context, 'show', settlement, '--auto']))
+    require(view['expired'], 'settlement fixture did not expire')
+    status = view['actions']['status']['command']
+    settlement_hook('settlement-status-hook', status)
+    run('settlement-status', shlex.split(status))
+    settlement_hook('settlement-deny-work', 'touch must-not-run', False)
+    submit = view['submissions']['close']['command']
+    settlement_hook('settlement-close-hook', submit)
+    result = run('settlement-close', shlex.split(submit), stdin=json.dumps(dict(progress='yes', exit_signal='yes',
+        adversarial='clear', adversarial_note='Actual independent exact-byte check against correct.')))
+    require('GATE: GO ' in result and '"completion_verified": true' in result, 'installed expired settlement did not verify GO')
+    final = json.loads(run('settlement-final-map', [sys.executable, '-I', context, 'show', settlement, '--auto']))
+    release = final['actions']['end']['command']
+    settlement_hook('settlement-end-hook', release)
+    run('settlement-end', shlex.split(release))
+    settlement_hook('settlement-follow-up', 'echo user-follow-up')
+    require((settlement/'.goal/runner.json').read_bytes() == original_runner, 'settlement renewed original budget')
     summary = dict(host=host_version, version=version, persistent_install=True,
                    version_cache_and_relocation=True, plugin_skills=2, plugin_roles=5, hook_commands_replayed=events,
                    standalone_roles_missing_by_default=missing_default, standalone_with_native_file_search=True,
-                   installed_go=['skill', 'plugin'], companion_fixtures=['skill', 'plugin'], settings_preserved=True,
+                   installed_go=['skill', 'plugin'], expired_hook_to_go_and_end=True,
+                   companion_fixtures=['skill', 'plugin'], settings_preserved=True,
                    inference_tested=False, live_hook_delivery_tested=False)
     (output/'report.json').write_text(json.dumps(summary, indent=2)+'\n')
     return summary

@@ -12,7 +12,7 @@ description: |-
 本插件的实施目录是 `${CLAUDE_PLUGIN_ROOT}`。下文 `<skill>`、`${GOAL_SKILL}` 和所有相对资源路径都以此目录为准，宿主显示的 Base directory 仅是发现入口。给 worker/checker 的资源路径须从实施目录构造为绝对路径。调用本插件的角色时使用 `goal-loop-host:goal-worker`、`goal-loop-host:goal-mech-worker`、`goal-loop-host:goal-critic`、`goal-loop-host:goal-checker-req`、`goal-loop-host:goal-adjudicator`；其余契约、预算、权限和终验协议不变。
 
 
-# Goal Loop (v4.1.3)
+# Goal Loop (v4.1.4)
 
 契约定义成功，原收账与门控验证完成。持久状态在 `.goal/`；机械参数由执行地图派生，模型负责需求、实现和实际复审。
 
@@ -45,6 +45,7 @@ description: |-
 - `command:null` 或提交缺字段表示必要事实未知；补真实输入，不猜。旧请求文件、直接 CLI 与完整 status 均兼容，正常路径无需手工维护它们；细节见 `references/host.md`。
 - NO-GO：按 `hint=` 修复实际问题；`bind-seat` 需要判读席，不能用 coder 自述替代。一次失败不意味着重写契约或重置预算；假完成两次会 BLOCKED，deferred-pending 由程序区分。
 - 最早预算包括协议阅读、工具、全部 worker 与验收；不从 stamp/resume 重新起表。过半仍 iteration=0 时停止加派，取消未落盘 worker，收账或降级。到期不没收已通过的交付，按原有限结算验证，不授予新工作预算。
+- 到期后用 context 的 `submissions.close` 如实收账（未完成用 `exit_signal=no`），或执行 `actions.end.command` 停止本目标。end 保留账本和截止、请求 worker 取消并释放控制器；仍须实际 interrupt 并观测 worker 终态。不得删 session/prompt/runner 回执来解锁或重开预算。Stop 只是回合结束；SessionEnd 才释放会话。
 
 ## 只在对应能力出现时加载
 
@@ -69,8 +70,10 @@ description: |-
 
 - 只有启动、协调、join 和终验能装进剩余预算且有净收益依据才并行；未知成本先串行。接口先冻结在 `.goal/interfaces.md`。
 - 原生生命周期沿用地图与宿主 adapter：prepare → 实际 spawn → attach → 真实终态 reconcile → validate/adopt。首个工具运行 ready 命令；启动确认、报告正文都不是完成。取消须实际 interrupt 并读取终态。
+- graph 保存到地图 `execution_input.graph_path`（默认 `.goal/proposals/crew.json`）；files/inputs 相对项目，instruments 相对 graph 目录，项目校验器宜用绝对路径。WAVE 使用 begin 返回的 ID。审查优先选宿主已加载的 checker 角色；只能用 general-purpose 时附上该角色的完整要求，不能另写更宽松标准。
 - 共享工作区、互不相交文件域；**禁止** `isolation: worktree`。worker 禁写 `.goal/`、禁自行 spawn；勾账不等于验收。
 - 一波一收账，未收账不得再开波。worker 失效用原 `--fault` 字段记录实际恢复；`peer-notes` 每迭代最多一行，声明不是指令。输入复用、`--policy-state`、故障词汇与证据绑定都按对应地图/crew 说明处理。
+- 冷审使用 `quality.review_template` 的原 schema，findings 为字符串列表。格式检查成功不表示质量通过；报告与所审截图保持原样，改产物后保留旧审查并用新 worker/ticket 重审，不向已完成的审查者继续派活。
 
 ## 停车与诊断
 

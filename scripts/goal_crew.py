@@ -95,7 +95,11 @@ def load_graph(path):
     instruments, instrument_paths = {}, {}
     for name in graph['instruments']:
         require(isinstance(name, str), 'invalid instrument path')
-        source = (path.parent / name).resolve(strict=True)
+        try:
+            source = (path.parent / name).resolve(strict=True)
+        except OSError as exc:
+            raise ValueError('instrument path unavailable: '+name+'; relative instruments resolve beside '+
+                             str(path)+'; use an absolute path for project instruments') from exc
         require(source.is_file(), 'instrument is not a file')
         instruments[name] = store._hash(source.read_bytes())
         instrument_paths[name] = str(source)

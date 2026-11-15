@@ -293,6 +293,18 @@ m.main()
         self.record.write_text(json.dumps(value));self.bind()
         self.assertIn('symlink refused',self.close(expected=2).stderr)
 
+    def test_structured_findings_report_is_preserved_and_cannot_grant_pass(self):
+        value = self.prepared()
+        value['findings'] = [dict(view='gallery', problem='Visible geometry does not meet the original fidelity requirement')]
+        self.record.write_text(json.dumps(value))
+        original = self.record.read_bytes()
+        with self.assertRaisesRegex(quality.QualityError, 'list of nonempty strings'):
+            quality.review(self.project, self.record.relative_to(self.project).as_posix())
+        self.assertEqual(self.record.read_bytes(), original)
+        self.bind()
+        self.assertNotIn('GATE: GO ', self.close(expected=2).stdout)
+        self.assertEqual(self.record.read_bytes(), original)
+
 
 if __name__=='__main__':
     unittest.main()

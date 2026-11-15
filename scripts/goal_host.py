@@ -153,6 +153,8 @@ def begin(project, backend, session, seconds, origin=None, request=None):
             captured_request = receipt.get('request')
         target = session_path(path, backend, session)
         previous = load(target) if target.exists() else None
+        require(previous is None or previous.get('active'),
+                'host session ended; its receipts and original budget are retained')
         original_request = captured_request or request
         if previous and previous.get('request') is not None:
             require(original_request is None or original_request == previous['request'],
@@ -191,15 +193,30 @@ def enter(project, seconds, backend=None, session=None, request=None):
     return begin(root, chosen_backend, chosen_session, seconds, request=request)
 
 
-def active(path, root, session=None, backend=None):
+def active(path, root, session=None, backend=None, include_ended=False, recovery=False):
     sessions = [load(p) for p in sorted(path.glob('session-*.json'))]
-    sessions = [s for s in sessions if s.get('active') and (session is None or s['session'] == session)
+    sessions = [s for s in sessions if (s.get('active') or include_ended) and (session is None or s['session'] == session)
                 and (backend is None or s['backend'] == backend)]
+    if include_ended and session is None and any(s.get('active') for s in sessions):
+        sessions = [s for s in sessions if s.get('active')]
     require(len(sessions) == 1, 'missing/ambiguous active goal session')
     value = sessions[0]
     require(value['project'] == str(root), 'host target changed')
-    with crew.read_ledger(root) as (state, _):
-        current = budget.runner_data((state / 'runner.json').read_bytes())
+    if recovery:
+        # Recovery and termination must remain reachable while a transaction
+        # is pending. Inspect identity only; work still uses read_ledger.
+        state = root / '.goal'
+        fd = os.open(state, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        try:
+            store.fcntl.flock(fd, store.fcntl.LOCK_SH | store.fcntl.LOCK_NB)
+            if not (state/'store/pending').exists():
+                store.verify_views(state)
+            current = budget.runner_data(safe(state/'runner.json').read_bytes())
+        finally:
+            os.close(fd)
+    else:
+        with crew.read_ledger(root) as (state, _):
+            current = budget.runner_data((state / 'runner.json').read_bytes())
     require(value['run'] == current['run'], 'host session belongs to another run')
     return value
 
@@ -305,10 +322,19 @@ def prepare(project, wave, task, session=None, call_id=None):
         worker = crew.Wave(root, wave)
         graph = crew.load(worker.path)
         require(task in graph['jobs'], 'unregistered host task')
+        prior = [r for r in attempts(path) if r['wave'] == wave and r['task'] == task]
+        with crew.read_ledger(root) as (state, _):
+            iteration = int(next(line.split('=', 1)[1] for line in (state/'state.rec').read_text().splitlines()
+                                 if line.startswith('iteration=')))
+        for old in attempts(path) if not prior else []:
+            if old['session'] == current['session'] and old['backend'] == current['backend'] and old['wave'] != wave:
+                previous_wave = crew.load(crew.Wave(root, old['wave']).path)
+                require(old.get('book_iteration', previous_wave.get('book_iteration', 0)) < iteration,
+                        'unbooked host wave: '+old['wave']+'; record actual results with submissions.close '
+                        '(exit_signal=no when incomplete) before preparing a fresh wave')
         require(not graph['jobs'][task].get('reused_from'), 'accepted unit is reused; prepare only the failed unit')
         crew.policy_current(graph.get('policy'))
         job = next(j for j in graph['graph']['jobs'] if j['id'] == task)
-        prior = [r for r in attempts(path) if r['wave'] == wave and r['task'] == task]
         require(len(prior) <= 1, 'ambiguous host attempt')
         if prior:
             row = prior[0]
@@ -320,7 +346,7 @@ def prepare(project, wave, task, session=None, call_id=None):
         else:
             row = dict(version=1, id=uuid.uuid4().hex, nonce=uuid.uuid4().hex,
                        project=str(root), wave=wave, task=task, files=job['files'],
-                       backend=current['backend'], session=current['session'], run=current['run'],
+                       backend=current['backend'], session=current['session'], run=current['run'], book_iteration=iteration,
                        call_id=identity(call_id) if call_id is not None else None,
                        agent_id=None, parent_agent_id=None, phase='preparing', outcome='running',
                        ready=None, receipts=[], boot=budget.boot_identity(), command_python=sys.executable,
@@ -469,7 +495,7 @@ def reconcile(project, receipt, session=None, backend=None):
     observed = statuses(receipt)
     digest = store._hash(store._encode(receipt))
     with locked(project) as (root, path):
-        current = active(path, root, session, backend)
+        current = active(path, root, session, backend, include_ended=True)
         result = []
         for agent, status in observed:
             rows = [r for r in attempts(path) if r['session'] == current['session']
@@ -508,6 +534,19 @@ def cancel(project, ticket):
     with locked(project) as (_, path):
         target, row = get(path, ticket)
         return _cancel(path, target, row)
+
+
+def end(project, session=None, backend=None):
+    """Release the controller, retain the ledger, and fence outstanding workers."""
+    with locked(project) as (root, path):
+        current = active(path, root, session, backend, include_ended=True, recovery=True)
+        for row in attempts(path):
+            if row['session'] == current['session'] and row['backend'] == current['backend']:
+                _cancel(path, path / ('attempt-' + row['id'] + '.json'), row)
+        current['active'] = False
+        save(session_path(path, current['backend'], current['session']), current)
+        return dict(current, cancellation='requested; observe actual native worker terminals separately',
+                    completion_verified=False)
 
 
 def validate(project, ticket):
@@ -582,7 +621,9 @@ def owned_shell(root, path, current, payload):
     require(len(linked) == 1, 'unregistered native worker; execute its exact owned_ready_command first')
     row = linked[0]
     crew.policy_current(crew.load(crew.Wave(root, row['wave']).path).get('policy'))
-    require(row['phase'] == 'prepared' and not safe(Path(row['cancel_file'])).exists(), 'attempt is not active or cancellation requested')
+    require(row['phase'] == 'prepared' and not safe(Path(row['cancel_file'])).exists(),
+            'attempt is not active or cancellation requested; retain this receipt, book the wave, '
+            'and prepare a fresh ticket/worker for new evidence; do not resume a completed reviewer')
     if not shell:
         if current['backend'] == 'claude' and payload.get('tool_name') in ('Write', 'Edit'):
             owned_write(root, row['files'], tool.get('file_path') if isinstance(tool, dict) else None)
@@ -626,6 +667,72 @@ def lifecycle(root, path, current, payload):
         save(target, event)
 
 
+def control_command(root, path, current, payload):
+    """Recognize literal controller commands, never arbitrary shell wrappers.
+
+    The original entrypoints still validate revision, receipts and settlement
+    limits. A quoted JSON heredoc is allowed only for the emitted close submit.
+    """
+    if payload.get('tool_name') not in ('Bash', 'shell', 'shell_command', 'exec_command', 'functions.exec_command'):
+        return False
+    tool = payload.get('tool_input', {})
+    if not isinstance(tool, dict):
+        return False
+    command = tool.get('cmd', tool.get('command'))
+    if not isinstance(command, str):
+        return False
+    line, sep, body = command.strip().partition('\n')
+    heredoc = re.fullmatch(r"(.+) <<'([A-Za-z_][A-Za-z0-9_]*)'", line) if sep else None
+    if sep:
+        if not heredoc or not body.endswith('\n' + heredoc[2]):
+            return False
+        try:
+            if not isinstance(json.loads(body[:-(len(heredoc[2])+1)]), dict):
+                return False
+        except ValueError:
+            return False
+        line = heredoc[1]
+    try:
+        argv = shlex.split(line)
+    except ValueError:
+        return False
+    # Canonical shell quoting rules out expansions, redirects and chained work.
+    if shlex.join(argv) != line:
+        return False
+    here = Path(__file__).resolve().parent
+    python = [sys.executable, '-I']
+    context = python + [str(here/'goal_context.py')]
+    host = python + [str(here/'goal_host.py')]
+    target = str(root)
+    if argv[:len(context)] == context:
+        args = argv[len(context):]
+        if len(args) < 2 or args[1] != target:
+            return False
+        if args[0] in ('show', 'receipt') and not sep:
+            return args[2:] in ([], ['--brief'], ['--auto'], ['--auto', '--brief']) if args[0] == 'show' else args[2:] == []
+        if len(args) < 4 or not re.fullmatch(r'[0-9a-f]{64}', args[2]):
+            return False
+        if args[0] == 'run' and not sep:
+            return args[3] in ('status', 'receipt', 'close', 'retry-close', 'recover', 'end') and args[4:] in ([], ['--auto'])
+        return args[0] == 'submit' and args[3] == 'close' and args[4:] in (
+            ['--input', '-'], ['--auto', '--input', '-'])
+    if sep:
+        return False
+    if argv[:len(host)] == host:
+        args = argv[len(host):]
+        if len(args) < 2 or args[1] != target:
+            return False
+        if args[0] == 'end':
+            return args[2:] == ['--session', current['session'], '--backend', current['backend']]
+        if args[0] == 'cancel' and len(args) == 3:
+            _, row = get(path, args[2])
+            return row['session'] == current['session'] and row['backend'] == current['backend']
+        if args[0] == 'reconcile' and len(args) == 7:
+            return args[3:] == ['--session', current['session'], '--backend', current['backend']]
+    prefix = ['bash', str(here/'goal_ctl.sh')]
+    return argv[:2] == prefix and len(argv) >= 5 and argv[2] in ('context', 'status') and argv[3:5] == ['--project', target] and argv[5:] in ([], ['--auto'], ['--brief'], ['--auto', '--brief'])
+
+
 def hook(payload, backend, project=None):
     require(isinstance(payload, dict), 'hook input must be an object')
     event, session = payload.get('hook_event_name'), payload.get('session_id')
@@ -666,13 +773,19 @@ def hook(payload, backend, project=None):
                 save(cached, value)
         return {}
     try:
-        current = active(path, root, session, backend)
+        current = active(path, root, session, backend, include_ended=True, recovery=True)
     except ValueError as exc:
         if 'missing/ambiguous' in str(exc):
             return {}
         raise
     if event == 'PreToolUse':
         try:
+            worker = payload.get('agent_id') is not None
+            if not current.get('active'):
+                return deny('host session ended; worker remains fenced') if worker else {}
+            if not worker and (payload.get('tool_name') in ('Read', 'Grep', 'Glob', 'AskUserQuestion', 'TaskGet', 'TaskList')
+                               or control_command(root, path, current, payload)):
+                return {}
             limits(root)
             shell_result = owned_shell(root, path, current, payload)
             if shell_result:
@@ -697,11 +810,17 @@ def hook(payload, backend, project=None):
                     save(record, row)
                     runtime(row, 'native-pre-tool')
         except ERRORS as exc:
-            return deny(str(exc))
+            reason = str(exc)
+            if not payload.get('agent_id') and 'time-budget-exhausted' in reason:
+                reason += '; read the current settlement/end actions with: ' + shlex.join([
+                    sys.executable, '-I', str(Path(__file__).with_name('goal_context.py').resolve()), 'show', str(root)])
+            return deny(reason)
         return {}
     if event in ('SubagentStart', 'SubagentStop', 'Stop', 'SessionEnd'):
         with locked(root):
             lifecycle(root, path, current, payload)
+        if event == 'SessionEnd':
+            end(root, session, backend)
         return {}
     if event == 'Interrupt':
         with locked(root):
@@ -752,6 +871,8 @@ def main():
     p.add_argument('--auto', action='store_true', help='context: only with existing automatic approval authorization')
     p = commands.add_parser('prepare')
     p.add_argument('project'); p.add_argument('wave'); p.add_argument('task'); p.add_argument('--session'); p.add_argument('--call-id')
+    p = commands.add_parser('end', help='release this controller without resetting budget or granting completion')
+    p.add_argument('project'); p.add_argument('--session'); p.add_argument('--backend')
     for name in ('attach', 'ready', 'cancel', 'validate', 'adopt'):
         p = commands.add_parser(name); p.add_argument('project'); p.add_argument('ticket')
         if name == 'attach': p.add_argument('receipt', type=Path)
@@ -781,6 +902,8 @@ def main():
                        observed, request_stdin(args.seconds) if args.request_stdin else None)
     elif args.command == 'prepare':
         result = prepare(args.project, args.wave, args.task, args.session, args.call_id)
+    elif args.command == 'end':
+        result = end(args.project, args.session, args.backend)
     elif args.command == 'attach':
         result = attach(args.project, args.ticket, json.loads(args.receipt.read_bytes()))
     elif args.command == 'reconcile':

@@ -59,6 +59,9 @@ For each requirement:
   rejection. Return the review JSON for the controller to preserve verbatim
   under .goal/evidence/; record unresolved goal-related defects in findings and
   return FAIL while they remain. Do not write through worker ownership fences.
+  Use quality.review_template's schema: findings is a list of nonempty strings;
+  retain structured details in additional observation fields. A successful
+  schema/hash check does not grant PASS. Keep the original fidelity threshold.
   Cannot view the evidence or establish its reference basis -> UNVERIFIABLE,
   never substitute pixel statistics or producer self-test greens.
 - Ambiguity in the spec is reported as ambiguity, named, both readings -

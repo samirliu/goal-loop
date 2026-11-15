@@ -113,3 +113,14 @@ declared view; an overall PASS cannot hide a failed or unverified camera.
 
 The execution map exposes the required views and a review template with unknown
 judgments left null. Do not copy a template or work-plan ticks into a PASS.
+
+Pass that template to the cold seat unchanged: `findings` is a list of
+nonempty strings, with detailed structured observations kept in extra fields.
+A JSON/schema/hash validator exiting zero proves report integrity only;
+FAIL views and unresolved findings still block quality acceptance. Preserve
+reviewed images and reports under distinct evidence paths when iterating.
+Once the reviewer returns, book the wave and use a fresh ticket/worker to
+judge changed evidence; resuming a completed seat neither renews its ticket
+nor provides a cold review. Check the map's instrument-freeze diagnostic
+before dispatch: adding a review route to a frozen check script also changes
+the instrument and requires restoration or authorized contract amendment.

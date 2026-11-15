@@ -33,6 +33,12 @@
 返回原输出、策略消费版本、单元复用来源与未解决项。只有两者实际通过才有 completion_verified=true。
 到期后只使用原有限结算，不能借状态查看开新预算。
 
+原生 PreToolUse 对控制器保留 Read/Grep/Glob、询问和精确的 context/status、收账、恢复、取消与 end 命令；新工作与 worker 仍受原截止限制。shell 必须复制地图的规范命令，不能附加其他命令、重定向或 wrapper。close 的 stdin 可用单个有引号的 JSON heredoc；程序仍核对原 revision、实际证据及有限结算窗口。
+
+停止目标用地图 `actions.end.command`，或 `python3 -I "${GOAL_SKILL}/scripts/goal_host.py" end PROJECT --session SESSION --backend BACKEND`。它保留全部回执及原预算，向所属未终态 worker 请求取消，释放控制器以继续普通对话；不能代替宿主 interrupt/真实终态，也不授予 GO。重复 end 幂等；已 end 的会话不能用 begin 续期。普通 Stop 只记录回合，SessionEnd 才自动 end。禁止删除 host/prompt/runner 文件来解除拦截。
+
+地图 `instruments` 在盖戳后提前检查原冻结校验脚本：发现变化则列出路径并停止建议新派工。还原原字节或走已授权的契约修订，不能改冻结记录。这个检查不代替最终 Gate。
+
 显式 `/goal-loop …目标` 或插件 `/goal-loop-host:goal-loop …目标` 的 UserPromptSubmit hook 记录 prompt 起点；普通
 对话、无参 status/continue 不创建目标。之后在开始执行时调用：
 
@@ -83,6 +89,7 @@ GOAL_REQUEST
   报告正文不参与判定；失败和取消也形成保留的尝试。
 - 完成后 `validate PROJECT TICKET`，通过再 `adopt PROJECT TICKET`。
   独立检查及文件摘要决定 first-valid/采用；Start/Stop 事件不能代替成功结果。
+- validate 的 exit=0 仅表示图中命名检查通过；报告格式正确不能清除报告中的缺陷或替代质量 AC。每波如实 close 后才准备下一波；未完成用 exit_signal=no。已完成 ticket 不再接受工作，证据变化后的冷审使用新 ticket 和全新审查者，保留旧证据。
 - 协调、join、恢复仍用 crew 的 `stage`。`finish` 重跑集成检查；最后照常
   `close-iteration` / audit / gate。telemetry 不授予 GO。
 

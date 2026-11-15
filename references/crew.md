@@ -21,6 +21,13 @@ in [the cost example](../examples/crew-cost/README.md). Keep backend/model/host
 identity, task shape, checker sources and read-only inputs explicit. Local
 process-demo measurements do not establish native Agent-tool startup costs.
 
+Use the map's `execution_input.graph_path` (normally `.goal/proposals/crew.json`)
+so the controller can discover the graph. `files` and `inputs` are relative to
+the project; `instruments` are relative to the graph JSON's directory. Prefer
+absolute instrument paths for project checks. A wave argument is the ID
+returned by begin, never a graph filename. Invalid graphs remain visible in
+the map with their path error; status and goal termination remain available.
+
 The adviser requires three recent inline and crew observations at comparable
 conditions (including actual immutable input bytes), retains failures, and compares the DAG's conservative observed
 cost range including startup, queue, coordination, join and validation. It
@@ -241,6 +248,14 @@ paths ONLY, rubric anchors, and calibration anchors (a known-good example
 and a known-bad example, or a named reference artifact - FIXED before the
 seat reads the new evidence). Never the producer's reasoning. Verdicts
 ternary with quoted observation; findings must bind evidence.
+
+Select the installed requirements-checker role when available; a generic
+worker needs that role's full instructions and the map's review template.
+Do not replace the original fidelity requirement with mere recognisability.
+A returned reviewer is terminal: preserve its report and images, book the
+wave, and prepare a new ticket/worker after changing the artifact. A passing
+report-format check is not a quality PASS. Native host prepare refuses a new
+wave while a previous wave in that session remains unbooked.
 
 When the AC declares `calib: good=<f> bad=<f>`, calibration is MANDATORY and
 mechanically gated (R15): the brief orders both fixtures FIRST (before the

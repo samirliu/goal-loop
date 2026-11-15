@@ -198,8 +198,12 @@ def recovery_view(root, state, auto):
     request = read_input(state/'proposals/close-iteration.json')
     binding = dict(head=store.Store(state/'store/commits').read()[0], pending=store._hash(pending),
                    views=store.guard_digest(state), close_input=store._hash(request) if request else None, auto=auto)
+    sessions, end_command = controller_view(root, state)
+    binding['host_sessions'] = sessions
     revision = store._hash(store._encode(binding))
     commands = {'recover': ['bash', str(HERE/'goal_ctl.sh'), 'recover', '--project', str(root)]}
+    if end_command:
+        commands['end'] = end_command
     value = dict(version=2, project=str(root), revision=revision, binding=binding, next='recover-ledger',
                  actions=actions(root, revision, commands, auto),
                  recovery=dict(operation_id=record.get('operation'), intent=record.get('intent'),
@@ -230,9 +234,18 @@ def execution_view(root, state, head, waves, enabled):
                   for p in sorted((state/'evidence/host').glob('*.json'))}
     binding = dict(host=host_files)
     commands, details = {}, {}
+    graph_input = dict(graph_path=str(graph_path),
+        path_bases=dict(files=str(root), inputs=str(root), instruments=str(graph_path.parent)),
+        next='Save the graph at graph_path. Use absolute instrument paths when checks live in the project; relative instruments resolve beside this JSON. Wave IDs come from begin-wave output, never a graph filename.')
     if graph_bytes is None:
-        return binding, commands, details, None
-    graph, _, _ = crew.load_graph(graph_path)
+        return binding, commands, details, graph_input
+    binding['graph_bytes'] = store._hash(graph_bytes)
+    try:
+        graph, _, _ = crew.load_graph(graph_path)
+    except (ValueError, OSError, KeyError, TypeError) as exc:
+        graph_input['error'] = str(exc)
+        binding['graph_error'] = str(exc)
+        return binding, commands, details, graph_input
     binding['graph'] = store._hash(store._encode(graph))
     path = store._close_path(state, 'proposals/execution.json')
     data = read_input(path)
@@ -244,7 +257,7 @@ def execution_view(root, state, head, waves, enabled):
                  for k, v in receipts.items()), 'invalid execution receipt paths')
     binding['input'] = store._hash(data) if data else None
     draft = dict(mode=None, trial='context-'+head[:20]+'-w'+str(len(waves)+1), policy_state=None, receipts={})
-    description = dict(path=str(path), template=draft,
+    description = dict(graph_input, path=str(path), template=draft,
                        next='Run plan, choose mode from its measured advice, and provide actual host receipt paths when available; regenerate context.')
     if not enabled:
         return binding, commands, details, description
@@ -275,7 +288,10 @@ def execution_view(root, state, head, waves, enabled):
             missing=([dict(name='mode', source='plan output and controller judgment; write '+str(path))] if not mode else [])+
                     ([dict(name='trial', source='This trial already exists; use the new template for a new wave, or resume the recorded wave.')] if repeated else []), sources=[str(graph_path), str(path)])
         return binding, commands, details, description
-    crew.require(len(active) == 1, 'multiple active waves; inspect actual host terminals before choosing another action')
+    if len(active) > 1:
+        description['error'] = 'multiple active waves; retain receipts, inspect native terminals, finish/book actual outcomes before further dispatch'
+        description['active_waves'] = [w['id'] for w in active]
+        return binding, {}, details, description
     wave = active[0]
     # Load checksummed host receipts with the existing adapter's reader.
     spec = importlib.util.spec_from_file_location('context_host', HERE/'goal_host.py')
@@ -322,6 +338,36 @@ def execution_view(root, state, head, waves, enabled):
     return binding, commands, details, description
 
 
+def controller_view(root, state):
+    spec = importlib.util.spec_from_file_location('context_controller', HERE/'goal_host.py')
+    host = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(host)
+    rows = [host.load(p) for p in sorted((state/'evidence/host').glob('session-*.json'))]
+    current = [r for r in rows if r.get('active') and r.get('project') == str(root)]
+    command = None
+    if len(current) == 1:
+        row = current[0]
+        command = [sys.executable, '-I', str(HERE/'goal_host.py'), 'end', str(root),
+                   '--session', row['session'], '--backend', row['backend']]
+    return rows, command
+
+
+def instrument_view(root, state, fd, cap):
+    """Expose the Gate's existing script freeze before another work wave."""
+    observed = protected(root, ['bash', '-c', 'source "$1"; gp_script_freeze "$2"',
+                               'goal-context-freeze', str(HERE/'goal_parse.sh'), str(root)], cap, fd,
+                         max_seconds=30)
+    crew.require(observed['result'] == 0, 'instrument-freeze-invalid: '+observed['stderr'])
+    def entries(value):
+        return dict(item.rsplit('=', 1) for item in value.strip().split(';') if item and '=' in item)
+    current = entries(observed['stdout'])
+    frozen = entries((state/'check_freeze').read_text())
+    frozen = {k: v for k, v in frozen.items() if k.endswith(('.sh', '.py', '.rb', '.js', '.mjs', '.cjs'))}
+    changed = sorted(k for k in set(current) | set(frozen) if current.get(k) != frozen.get(k))
+    return dict(error='check-script-tampered' if changed else None, changed=changed,
+        next='Restore the stamped instrument bytes, or use the authorized contract amendment protocol. Do not edit check_freeze or reset the budget.')
+
+
 def compile_view(root, state, fd, auto=False):
     if (state/'store/pending').exists():
         return recovery_view(root, state, auto)
@@ -345,6 +391,8 @@ def compile_view(root, state, fd, auto=False):
     log = (state / 'loop-log.md').read_text()
     stamped = re.search(r'^approved: [0-9a-f]{6,}', contract, re.M) is not None
     quality_info = quality.context(root)
+    instruments = instrument_view(root, state, fd, settlement_cap) if stamped else None
+    sessions, end_command = controller_view(root, state)
     waves = [crew.load(p) for p in sorted((state/'evidence/crew').glob('*.json'))]
     units, policies = {}, {}
     for wave in sorted(waves, key=lambda w: w['started']):
@@ -385,6 +433,8 @@ def compile_view(root, state, fd, auto=False):
     execution, exec_commands, exec_details, exec_input = execution_view(root, state, head, waves,
         stamped and not expired and not claimed and not unbooked)
     binding['execution'] = execution
+    binding['host_sessions'] = sessions
+    binding['instruments'] = instruments
     binding['implementation'] = {path.name: store._hash(path.read_bytes()) for path in sorted(HERE.iterdir())
                                  if path.is_file() and path.suffix in ('.py', '.sh', '.awk')}
     binding['quality'] = store._hash(store._encode(quality_info))
@@ -439,6 +489,11 @@ def compile_view(root, state, fd, auto=False):
         else:
             commands.pop('gate', None)
             commands.pop('receipt', None)
+    if instruments and instruments['error']:
+        commands = {k: v for k, v in commands.items() if k in ('status', 'receipt', 'close', 'retry-close')}
+        next_step = 'repair-instrument-freeze'
+    if end_command:
+        commands['end'] = end_command
     value = dict(version=2, project=str(root), revision=revision, binding=binding,
                  goal=objective[1].strip() if objective else (contract.splitlines() or ['Goal contract not authored'])[0], stamped=stamped,
                  acceptance=[line for line in contract.splitlines() if re.match(r'^- AC-[0-9]+\b', line)],
@@ -457,6 +512,11 @@ def compile_view(root, state, fd, auto=False):
                  settle_command=actions(root, revision, {'receipt': commands['receipt']}, auto)['receipt']['command'] if 'receipt' in commands else None,
                  evidence=dict(contract=str(state/'goal.md'), ledger=str(state/'store/commits'),
                                log=str(state/'loop-log.md'), host=str(state/'evidence/host')))
+    if instruments:
+        value['instruments'] = instruments
+    if end_command:
+        value['session_end'] = dict(action='end', completion_verified=False,
+            next='Use end when stopping this goal. It retains receipts and the original budget, requests worker cancellation, and releases the controller. Interrupt native workers and observe their terminal receipts separately.')
     if quality_info['required'] or quality_info['original_requests'] or quality_info['error']:
         value['quality'] = quality_info
         if quality_info['error']:
@@ -532,13 +592,13 @@ def run(project, revision, action, auto=False):
             os.execvp(commands[action][0], commands[action])
         finally:
             os.close(fd)
-    with access(project, write=action in ('stamp', 'gate', 'verify', 'close', 'retry-close', 'receipt', 'recover'), recovery=action == 'recover', verify=False) as (root, state, fd):
+    with access(project, write=action in ('stamp', 'gate', 'verify', 'close', 'retry-close', 'receipt', 'recover'), recovery=action in ('recover', 'end'), verify=False) as (root, state, fd):
         value, commands = compile_view(root, state, fd, auto)
         crew.require(value['revision'] == revision, 'stale-context: regenerate goal_ctl.sh context')
-        if action != 'recover':
+        if action not in ('recover', 'end'):
             _, expired_now = budget.gate_limit(state, settlement=False)
             value['expired'] = value.get('expired', False) or expired_now
-        crew.require(action in commands and commands[action] is not None and (not value.get('expired') or action in ('status', 'close', 'retry-close', 'receipt')),
+        crew.require(action in commands and commands[action] is not None and (not value.get('expired') or action in ('status', 'close', 'retry-close', 'receipt', 'recover', 'end')),
                      'action unavailable; settle with goal_context.py receipt')
         os.set_inheritable(fd, True)
         env = dict(os.environ, GOAL_ACCESS_FD=str(fd), GOAL_ACCESS_OWNER_PID=str(os.getpid()),
