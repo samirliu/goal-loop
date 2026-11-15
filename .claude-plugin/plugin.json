@@ -1,6 +1,6 @@
 {
   "name": "goal-loop-host",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "skills": [
     "./skills",
     "./companions/contract-forge"

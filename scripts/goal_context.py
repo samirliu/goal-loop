@@ -371,7 +371,7 @@ def instrument_view(root, state, fd, cap):
         next='Restore the stamped instrument bytes, or use the authorized contract amendment protocol. Do not edit check_freeze or reset the budget.')
 
 
-def improvement_view(root):
+def improvement_view(root, ledger_fd):
     source = root/'.goal/proposals/improvement.json'
     if not source.exists():
         return None, {}
@@ -379,7 +379,7 @@ def improvement_view(root):
     improve = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(improve)
     try:
-        return improve.view(root)
+        return improve.view(root, ledger_fd=ledger_fd)
     except (ValueError, OSError, KeyError, TypeError, improve.engine.ExperimentError) as exc:
         return dict(error=str(exc), next='repair-improvement-proposal',
                     binding=dict(input=store._hash(read_input(source)))), {}
@@ -447,7 +447,7 @@ def compile_view(root, state, fd, auto=False):
     ticked = any(s.startswith('- [x]') for s in plan.splitlines())
     unbooked = (len(blocks) == 1 and ticked) or any(w['finished'] is not None and
         (w.get('book_iteration') == int(counters['iteration']) or len(blocks) == 1) for w in waves)
-    improvement, improvement_commands = improvement_view(root)
+    improvement, improvement_commands = improvement_view(root, fd)
     execution, exec_commands, exec_details, exec_input = execution_view(root, state, head, waves,
         stamped and not expired and not claimed and not unbooked,
         improvement.get('routing_state') if improvement else None)

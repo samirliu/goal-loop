@@ -8,6 +8,7 @@ import importlib.util
 import json
 from pathlib import Path
 import random
+import shlex
 import subprocess
 import sys
 import time
@@ -151,10 +152,20 @@ def run(output, counterexample=False):
     else:
         require(checked.returncode == 0, 'second generation failed actual production work')
     (ledger/'work-plan.md').write_text('- [x] T1 sorted production output | files=answer.json\n')
-    final = command('close-iteration','--operation-id','recursive-demo-final','--task','T1','--files','answer.json',
-        '--checks-from-verify','--progress','yes','--exit-signal','yes','--adversarial','clear',
-        '--adversarial-note','Actual check.py compared consumed output with independent sorted production input including duplicates.', '--receipt')
+    context = improve.module('goal_context')
+    def mapped(name, command, request=None):
+        result = subprocess.run(shlex.split(command),input=None if request is None else json.dumps(request),
+                                cwd=project,capture_output=True,text=True,timeout=30)
+        (output/('mapped-'+name+'.txt')).write_text(result.stdout+result.stderr)
+        require(result.returncode == 0, 'mapped '+name+' failed: '+result.stdout+result.stderr)
+        return result
+    mapped('verify',context.show(project, auto=True)['actions']['verify']['command'])
+    view = context.show(project, auto=True)
+    final = mapped('close',view['submissions']['close']['command'],dict(progress='yes',exit_signal='yes',
+        adversarial='clear',adversarial_note='Actual check.py compared consumed output with independent sorted production input including duplicates.'))
     require('GATE: GO ' in final.stdout and '"completion_verified": true' in final.stdout, 'original Gate did not verify completion')
+    final_receipt = mapped('receipt',context.show(project, auto=True)['actions']['receipt']['command'])
+    require(json.loads(final_receipt.stdout)['completion_verified'], 'fresh mapped receipt did not verify completion')
     require((ledger/'runner.json').read_bytes() == original_runner, 'experiment renewed the goal budget')
     result = dict(generations=records, actual_consumer_pass=True, completion_verified=True,
         original_budget_preserved=True, model_generation_tested=False, scope='local sorting execution policy',

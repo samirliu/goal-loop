@@ -9,7 +9,7 @@ description: |-
   Not for trivial one-pass tasks or pure Q&A.
 ---
 
-# Goal Loop (v4.2.0)
+# Goal Loop (v4.2.1)
 
 契约定义成功，原收账与门控验证完成。持久状态在 `.goal/`；机械参数由执行地图派生，模型负责需求、实现和实际复审。
 

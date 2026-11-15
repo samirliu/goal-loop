@@ -1,6 +1,6 @@
 # goal-loop
 
-**v4.2.0** — 用冻结的验收契约、可恢复账本和确定性门控推进长任务。宿主负责模型与原生 worker，goal-loop 负责目标、证据、预算与完成判定。
+**v4.2.1** — 用冻结的验收契约、可恢复账本和确定性门控推进长任务。宿主负责模型与原生 worker，goal-loop 负责目标、证据、预算与完成判定。
 
 默认先串行完成业务；只有测量支持净收益时才使用 crew。视觉逼真度、内容正确性和外部结果需要相应判读或结算，不能用文件存在、像素统计或生产者自评替代。
 
@@ -96,6 +96,7 @@ python3 -I "/ABS/goal-loop-package/scripts/goal_host.py" enter /ABS/project 600 
 | 内容判读、校准与仪器 | [Instrument](references/packs/instrument.md) |
 | 视觉逼真度、参考和冷席证据 | [Visual](references/packs/visual.md) |
 | 优化、forge、策略晋升与撤回 | [Gradient](references/packs/gradient.md) |
+| 有界递归改进、提案器、多代消费与回退 | [Improvement](references/packs/improvement.md) |
 | 外部事实与延迟结算 | [External](references/packs/external.md) |
 | crew 文件域、检查及真实生命周期 | [Crew](references/crew.md) / [Host](references/host.md) |
 | 锁、幂等、中断与恢复 | [事务状态](docs/transaction-state.md) |

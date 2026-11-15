@@ -294,11 +294,22 @@ def scope_digest(project, files):
 
 
 @contextlib.contextmanager
-def read_ledger(project):
+def read_ledger(project, ledger_fd=None):
     state = Path(project).resolve(strict=True) / '.goal'
     fd = os.open(str(state), os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
     try:
-        store.fcntl.flock(fd, store.fcntl.LOCK_SH | store.fcntl.LOCK_NB)
+        if ledger_fd is None:
+            store.fcntl.flock(fd, store.fcntl.LOCK_SH | store.fcntl.LOCK_NB)
+        else:
+            # An in-process controller may already own the exclusive lock.
+            # Duplicate its description without flocking it: LOCK_SH on the
+            # duplicate would silently downgrade the controller's writer lock.
+            local, borrowed = os.fstat(fd), os.fstat(ledger_fd)
+            require((local.st_dev, local.st_ino) == (borrowed.st_dev, borrowed.st_ino),
+                    'borrowed ledger lock target mismatch')
+            duplicate = os.dup(ledger_fd)
+            os.close(fd)
+            fd = duplicate
         require(not (state / 'store/pending').exists(), 'recovery-required')
         store.verify_views(state)
         yield state, fd

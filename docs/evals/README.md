@@ -4,7 +4,7 @@
 
 | 主题 | 证据入口 | 适用范围 |
 | --- | --- | --- |
-| 2026-11-15 合并前仓库复验 | [当前审计](repository-review-20261115/README.md) | 本轮修复、清理和实际检查结果 |
+| 4.1.3 合并前仓库复验 | [冻结审计](repository-review-20261115/README.md) | 当时的修复、清理和实际检查范围；不代表后续版本 |
 | 干净安装与 cc-haha 发现 | [Clean install](clean-install-20261115/README.md) | 4.1.2 的原生加载/CLI、角色和合成 hook 回放；未运行模型 |
 | 验收完整性 | [Acceptance integrity](acceptance-integrity-20261114/README.md) | 原始请求、校准、外部结算、数值与脚本冻结的反例 |
 | 视觉质量 | [Visual acceptance](visual-acceptance-20261114/README.md) | 需求、参考/机位、冷席判读及原案例回放 |
