@@ -19,10 +19,14 @@ crew = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(crew)
 store, budget = crew.store, crew.budget
 HERE = Path(__file__).resolve().parent
+QUALITY_SPEC = importlib.util.spec_from_file_location('context_quality', HERE/'goal_quality.py')
+quality = importlib.util.module_from_spec(QUALITY_SPEC)
+QUALITY_SPEC.loader.exec_module(quality)
+FROM_DISK = object()
 
 
 @contextlib.contextmanager
-def access(project, write=False, recovery=False):
+def access(project, write=False, recovery=False, verify=True):
     root = Path(project).resolve(strict=True)
     state = root / '.goal'
     fd = os.open(state, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
@@ -41,17 +45,19 @@ def access(project, write=False, recovery=False):
             store.fcntl.flock(fd, (store.fcntl.LOCK_EX if write else store.fcntl.LOCK_SH) | store.fcntl.LOCK_NB)
         pending = (state / 'store/pending').exists()
         crew.require(recovery or not pending, 'recovery-required: run goal_ctl.sh recover --project ' + shlex.quote(str(root)))
-        if not pending:
+        if not pending and verify:
             store.verify_views(state)
         yield root, state, fd
     finally:
         os.close(fd)
 
 
-def protected(root, command, cap, fd, mode='read'):
+def protected(root, command, cap, fd, mode='read', *, max_seconds=None):
     """Reuse the existing process supervisor and the one shared deadline."""
-    remaining = 30 if cap is None else max(0, cap-time.monotonic())
-    crew.require(remaining > 0, 'time-budget-exhausted')
+    remaining = None if cap is None else max(0, cap-time.monotonic())
+    if max_seconds is not None:
+        remaining = max_seconds if remaining is None else min(remaining, max_seconds)
+    crew.require(remaining is None or remaining > 0, 'time-budget-exhausted')
     descriptor, name = tempfile.mkstemp(prefix='goal-context-', dir=tempfile.gettempdir())
     os.close(descriptor)
     receipt = Path(name)
@@ -61,10 +67,11 @@ def protected(root, command, cap, fd, mode='read'):
         env['GOAL_RUNNER_MONOTONIC_END'] = str(cap)
     try:
         started = time.monotonic()
+        allowance = [] if remaining is None else ['--seconds', str(remaining)]
         result = subprocess.run([sys.executable, '-I', str(HERE / 'goal_bounded.py'), '--owner', str(os.getpid()),
-                                 '--seconds', str(remaining), '--receipt', name, '--kind', 'verification',
+                                 *allowance, '--receipt', name, '--kind', 'verification',
                                  '--label', 'context', '--', *command], cwd=root, env=env, pass_fds=(fd,),
-                                capture_output=True, text=True, timeout=remaining+3)
+                                capture_output=True, text=True, timeout=None if remaining is None else remaining+3)
         crew.require(result.returncode == 0 and receipt.read_text().strip().isdigit(), 'context command supervision failed')
         return dict(command=command, result=int(receipt.read_text()), stdout=result.stdout,
                     stderr=result.stderr, elapsed=time.monotonic()-started)
@@ -88,9 +95,10 @@ def actions(root, revision, commands, auto=False, details=None):
             for name, cmd in commands.items()}
 
 
-def close_input(root, state, head, counters, contract, plan):
+def close_input(root, state, head, counters, contract, plan, data=FROM_DISK):
     path = store._close_path(state, 'proposals/close-iteration.json')
-    data = read_input(path)
+    if data is FROM_DISK:
+        data = read_input(path)
     known = dict(operation_id='context-i%s-%s' % (int(counters['iteration'])+1, head[:20]),
                  task=None, files=None)
     rows = re.findall(r'^- \[[ x]\] (T[0-9]+)\b[^\n]*?\bfiles[=:] *([^\n]+)', plan, re.M)
@@ -329,12 +337,14 @@ def compile_view(root, state, fd, auto=False):
     artifact = None
     settlement_cap = budget.gate_limit(state, settlement=True)[0] if expired else cap
     if authored:
-        digest = protected(root, ['bash', str(HERE / 'goal_gate.sh'), '--digest', '--project', str(root)], settlement_cap, fd)
+        digest = protected(root, ['bash', str(HERE / 'goal_gate.sh'), '--digest', '--project', str(root)], settlement_cap, fd,
+                           max_seconds=30)
         crew.require(digest['result'] == 0 and re.fullmatch(r'v2-[0-9a-f]{64}', digest['stdout'].strip()), 'artifact digest unavailable')
         artifact = digest['stdout'].strip()
     plan = (state / 'work-plan.md').read_text() if (state / 'work-plan.md').exists() else ''
     log = (state / 'loop-log.md').read_text()
     stamped = re.search(r'^approved: [0-9a-f]{6,}', contract, re.M) is not None
+    quality_info = quality.context(root)
     waves = [crew.load(p) for p in sorted((state/'evidence/crew').glob('*.json'))]
     units, policies = {}, {}
     for wave in sorted(waves, key=lambda w: w['started']):
@@ -375,8 +385,9 @@ def compile_view(root, state, fd, auto=False):
     execution, exec_commands, exec_details, exec_input = execution_view(root, state, head, waves,
         stamped and not expired and not claimed and not unbooked)
     binding['execution'] = execution
-    binding['implementation'] = {name: store._hash((HERE/name).read_bytes()) for name in
-        ('goal_context.py', 'goal_ctl.sh', 'goal_gate.sh', 'goal_parse.sh', 'goal_store.py', 'goal_runner.py', 'goal_crew.py', 'goal_host.py')}
+    binding['implementation'] = {path.name: store._hash(path.read_bytes()) for path in sorted(HERE.iterdir())
+                                 if path.is_file() and path.suffix in ('.py', '.sh', '.awk')}
+    binding['quality'] = store._hash(store._encode(quality_info))
     revision = store._hash(store._encode(binding))
     commands = {'status': ['bash', str(HERE / 'goal_ctl.sh'), 'status', '--project', str(root)],
                 'audit': ['bash', str(HERE / 'goal_audit.sh'), '--project', str(root)],
@@ -386,6 +397,8 @@ def compile_view(root, state, fd, auto=False):
         commands['verify'] = ['bash', str(HERE/'goal_gate.sh'), '--verify', '--project', str(root)]
     if not stamped and authored and not expired:
         commands['stamp'] = ['bash', str(HERE / 'goal_ctl.sh'), 'stamp', '--project', str(root)] + (['--auto'] if auto else [])
+        if quality_info['error']:
+            commands.pop('stamp', None)
     if expired or not authored:
         commands = {'status': commands['status']}
     objective = re.search(r'^## (?:Goal|Objective)[^\n]*\n+([^#<][^\n]*)', contract, re.M)
@@ -428,6 +441,7 @@ def compile_view(root, state, fd, auto=False):
             commands.pop('receipt', None)
     value = dict(version=2, project=str(root), revision=revision, binding=binding,
                  goal=objective[1].strip() if objective else (contract.splitlines() or ['Goal contract not authored'])[0], stamped=stamped,
+                 acceptance=[line for line in contract.splitlines() if re.match(r'^- AC-[0-9]+\b', line)],
                  iteration=counters.get('iteration'), breaker=counters.get('breaker'),
                  deadline_epoch=None if cap is None else time.time()+cap-time.monotonic(), deadline_monotonic=cap,
                  budget_scope=runner['scope'] if runner else 'contract-only',
@@ -443,10 +457,17 @@ def compile_view(root, state, fd, auto=False):
                  settle_command=actions(root, revision, {'receipt': commands['receipt']}, auto)['receipt']['command'] if 'receipt' in commands else None,
                  evidence=dict(contract=str(state/'goal.md'), ledger=str(state/'store/commits'),
                                log=str(state/'loop-log.md'), host=str(state/'evidence/host')))
+    if quality_info['required'] or quality_info['original_requests'] or quality_info['error']:
+        value['quality'] = quality_info
+        if quality_info['error']:
+            repair = 'repair-quality-contract' if quality_info['required'] else 'repair-acceptance-contract'
+            value['next'] = repair if not stamped else 'review-contract-quality'
     if stamped and not claimed:
         value['close_input'] = {k: v for k, v in close.items() if k != 'values' or close['sha256'] is not None}
         value['implementation'] = dict(tasks=value['pending'], source=str(state/'work-plan.md'),
-            judgment='Implement the named scope using host tools; run verify, review the artifact, then fill close_input. Ticks and worker reports never supply check counts.')
+            judgment=('Implement the named scope and perform actual review; submit judgments with submissions.close. '
+                      'The original verifier measures eligible counts; other contracts still require actual check observations. '
+                      'Legacy close_input remains available. Ticks and worker reports never supply PASS or clear.'))
     if exec_input:
         value['execution_input'] = exec_input
     if not authored and not expired:
@@ -455,6 +476,24 @@ def compile_view(root, state, fd, auto=False):
             template='# Goal\n\n## Objective\n\n<outcome>\n\n## Acceptance criteria\n\n'
                      '- AC-1 | <yes/no statement> | check: `<command>` | expected: exit=0\n\n'
                      '## Approval\n\napproved: PENDING\n')
+    # Submission consumes the observed revision before writing the supplied
+    # intent. The caller need not write a proposal and acquire a second map.
+    # Existing mapped actions remain available for compatibility and recovery.
+    submissions = {}
+    for action in ('stamp', 'close'):
+        if action not in commands:
+            continue
+        command = [sys.executable, '-I', str(HERE/'goal_context.py'), 'submit', str(root), revision, action]
+        if auto:
+            command.append('--auto')
+        if action == 'close':
+            command.extend(('--input', '-'))
+        template = (close['measured_template'] or close['template']) if action == 'close' else {}
+        submissions[action] = dict(command=shlex.join(command),
+            template={name: None for name, value in template.items() if value is None},
+            source='Actual controller judgments; original checks, approval, recovery and Gate still apply.')
+    if submissions:
+        value['submissions'] = submissions
     return value, commands
 
 
@@ -462,7 +501,8 @@ def show(project, auto=False):
     root = Path(project).resolve(strict=True)
     if not (root/'.goal').exists():
         return initial_view(root, auto)[0]
-    with access(project, recovery=True) as (root, state, fd):
+    # compile_view validates the views immediately, under this same lock.
+    with access(project, recovery=True, verify=False) as (root, state, fd):
         value, _ = compile_view(root, state, fd, auto)
         return value
 
@@ -492,7 +532,7 @@ def run(project, revision, action, auto=False):
             os.execvp(commands[action][0], commands[action])
         finally:
             os.close(fd)
-    with access(project, write=action in ('stamp', 'gate', 'verify', 'close', 'retry-close', 'receipt', 'recover'), recovery=action == 'recover') as (root, state, fd):
+    with access(project, write=action in ('stamp', 'gate', 'verify', 'close', 'retry-close', 'receipt', 'recover'), recovery=action == 'recover', verify=False) as (root, state, fd):
         value, commands = compile_view(root, state, fd, auto)
         crew.require(value['revision'] == revision, 'stale-context: regenerate goal_ctl.sh context')
         if action != 'recover':
@@ -510,8 +550,62 @@ def run(project, revision, action, auto=False):
         os.execvpe(commands[action][0], commands[action], env)
 
 
+def submit(project, revision, action, request=None, auto=False):
+    """Apply explicit intent at one bound version, then use original entrypoints."""
+    crew.require(action in ('stamp', 'close'), 'unsupported submission action')
+    crew.require(isinstance(request, dict), 'submission must be a JSON object')
+    with access(project, write=True, verify=False) as (root, state, fd):
+        value, commands = compile_view(root, state, fd, auto)
+        crew.require(value['revision'] == revision, 'stale-context: regenerate goal_ctl.sh context')
+        crew.require(action in value.get('submissions', {}), 'submission unavailable; use current context')
+        if action == 'stamp':
+            crew.require(not request, 'stamp submission takes no judgment fields')
+            # Smoke and approval share the existing deadline and write lock.
+            # A repair normally starts with failing criteria. A completed
+            # FAIL is a valid smoke observation, never a completion claim;
+            # broken, mutating or incomplete instruments must not be stamped.
+            measured = protected(root, commands['verify'], value['read_deadline'], fd, 'exclusive-read')
+            print(measured['stdout'], end='', flush=True)
+            print(measured['stderr'], end='', file=sys.stderr, flush=True)
+            initial_failure = measured['result'] == 2 and re.fullmatch(
+                r'GATE: NO-GO reason=verify-failures:fail=[1-9][0-9]* broken=0\s*', measured['stderr'])
+            if measured['result'] != 0 and not initial_failure:
+                raise SystemExit(measured['result'])
+            crew.require(not budget.gate_limit(state, settlement=False)[1], 'time-budget-exhausted')
+            argv = commands['stamp']
+        else:
+            counters = dict(line.split('=', 1) for line in (state/'state.rec').read_text().splitlines() if '=' in line)
+            contract = (state/'goal.md').read_text()
+            plan = (state/'work-plan.md').read_text() if (state/'work-plan.md').exists() else ''
+            head = value['binding']['head']
+            draft, _ = close_input(root, state, head, counters, contract, plan)
+            original = draft['measured_template'] or draft['template']
+            intent = dict(original)
+            crew.require(not {'operation_id', 'checks_source', 'receipt'}.intersection(request),
+                         'submission operation_id/checks_source/receipt are derived; use retry-close for historical requests')
+            intent.update(request)
+            if intent.get('exit_signal') == 'yes':
+                intent['receipt'] = 'yes'
+            else:
+                intent.pop('receipt', None)
+            # Reuse the same schema and exact ordered argv as file requests.
+            close, arguments = close_input(root, state, head, counters, contract, plan, store._encode(intent))
+            crew.require(not close['missing'], 'submission missing: ' + ', '.join(row['name'] for row in close['missing']))
+            path = store._close_path(state, 'proposals/close-iteration.json')
+            path.parent.mkdir(exist_ok=True)
+            store._atomic(path, store._encode(intent))
+            # Persist the validated request for the ORIGINAL journal/recovery
+            # path, without any model-authored intermediate protocol file.
+            argv = ['bash', str(HERE/'goal_ctl.sh'), *arguments]
+        os.set_inheritable(fd, True)
+        env = dict(os.environ, GOAL_ACCESS_FD=str(fd), GOAL_ACCESS_OWNER_PID=str(os.getpid()),
+                   GOAL_ACCESS_EXEC_PID=str(os.getpid()), GOAL_ACCESS_MODE='write')
+        os.execvpe(argv[0], argv, env)
+
+
 def receipt(project):
-    with access(project, write=True) as (root, state, fd):
+    # The checks below validate before AND after the original audit/Gate.
+    with access(project, write=True, verify=False) as (root, state, fd):
         before = store.verify_views(state)
         cap, _ = budget.gate_limit(state, settlement=True)
         checks = {name: protected(root, ['bash', str(HERE/script), *args, '--project', str(root)], cap, fd, 'exclusive-read')
@@ -529,15 +623,22 @@ def receipt(project):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('show', 'run', 'receipt'))
+    parser.add_argument('action', choices=('show', 'run', 'submit', 'receipt'))
     parser.add_argument('project')
     parser.add_argument('revision', nargs='?')
     parser.add_argument('operation', nargs='?')
     parser.add_argument('--auto', action='store_true', help='only with existing authorization for automatic contract approval')
     parser.add_argument('--brief', action='store_true', help='show: omit internal binding hashes and repeated close fields')
+    parser.add_argument('--input', help='submit: JSON file, or - for stdin; never an acceptance verdict')
     args = parser.parse_args()
     if args.brief and args.action != 'show':
         parser.error('--brief is only valid for show')
+    if args.input is not None and args.action != 'submit':
+        parser.error('--input is only valid for submit')
+    if args.action == 'submit':
+        request = (json.load(sys.stdin) if args.input == '-' else
+                   json.loads(Path(args.input).read_bytes()) if args.input else {})
+        submit(args.project, args.revision, args.operation, request, args.auto)
     if args.action == 'run':
         run(args.project, args.revision, args.operation, args.auto)
     result = show(args.project, args.auto) if args.action == 'show' else receipt(args.project)

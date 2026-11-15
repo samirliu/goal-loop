@@ -25,7 +25,8 @@ gp_r(){ tr -d '\r'; }
 if ! command -v gawk >/dev/null 2>&1; then
   for _gp_gawk in "$HOME/.local/bin/gawk" /opt/homebrew/bin/gawk /usr/local/bin/gawk /usr/bin/gawk; do
     if [ -x "$_gp_gawk" ]; then
-      gawk(){ "$_gp_gawk" "$@"; }
+      _gp_gawk_bin="$_gp_gawk"
+      gawk(){ "$_gp_gawk_bin" "$@"; }
       break
     fi
   done
@@ -183,19 +184,22 @@ gp_tree_digest(){
         fi
       fi
     done < "$tmp/watch"
-    : > "$tmp/normalized" || exit 4
-    while IFS= read -r -d '' path; do printf '%s\0' "${path#./}" >> "$tmp/normalized" || exit 4; done < "$tmp/paths"
-    LC_ALL=C sort -zu "$tmp/normalized" > "$tmp/sorted" || exit 4
-    : > "$tmp/records" || exit 4
     # Python also expands initialized Gitlinks, binding their HEAD and actual
     # worktree bytes. The shell fallback supports ordinary entries only; it
     # must refuse repositories rather than hash them as empty directories.
     # A runtime hashing error never falls back.
     if command -v python3 >/dev/null 2>&1 && [ -f "$_gp_parse_dir/goal_tree_digest.py" ] && \
        python3 -I -c 'import os,sys; sys.exit(0 if os.name == "posix" and hasattr(os,"O_NOFOLLOW") else 1)' 2>/dev/null; then
+      # The Python record hasher already normalizes, deduplicates and sorts
+      # paths. Avoid opening an append file once for every inventory entry.
+      # Retain the checked external sort and all discovery/self-test failures.
+      LC_ALL=C sort -zu "$tmp/paths" > "$tmp/sorted" || exit 4
       python3 -I "$_gp_parse_dir/goal_tree_digest.py" "$tmp/sorted" "$tmp/watch-missing" "$tmp/deleted" "$tmp/index"
       exit $?
     fi
+    while IFS= read -r -d '' path; do printf '%s\0' "${path#./}" || exit 4; done < "$tmp/paths" > "$tmp/normalized" || exit 4
+    LC_ALL=C sort -zu "$tmp/normalized" > "$tmp/sorted" || exit 4
+    : > "$tmp/records" || exit 4
     while IFS= read -r -d '' path; do
       case "$path" in 160000\ *) echo 'GATE: ERROR gitlink-requires-python' >&2; exit 4 ;; esac
     done < "$tmp/index"
@@ -371,10 +375,40 @@ gp_objective_dir(){ gp_goal_r "$1" | sed -nE 's/^objective: *(maximize|minimize)
 # contract-tampered. This is that one definition.
 gp_ac_body(){
   { gp_goal_r "$1" | awk '/^## Acceptance criteria[ ]*$/{f=1;next} f&&/^## /{f=0} f'
-    gp_goal_r "$1" | grep -E '^(exit|objective|horizon-waived):' || true
+    gp_goal_r "$1" | grep -E '^(exit|objective|horizon-waived|quality):' || true
   }
 }
 gp_ac_body_hash(){ gp_ac_body "$1" | gp_hash_std | cut -c1-8; }
+
+# Freeze the directly named local instruments through one shared path.
+# Dependencies resolved by npm/imports still need explicit independent checks.
+gp_script_freeze(){
+  (
+  set -o pipefail
+  local scr f h
+  {
+    gp_goal_r "$1" | sed -nE 's/.*check: *`([^`]*)`.*/\1/p'
+    gp_goal_r "$1" | sed -nE 's/.*probe: *`([^`]*)`.*/\1/p'
+    gp_goal_r "$1" | sed -nE 's/.*external: *`([^`]*)`.*/\1/p'
+  } | python3 -I -c '
+import shlex, sys
+paths = set()
+for line in sys.stdin:
+    for token in shlex.split(line):
+        if token.endswith((".sh", ".py", ".rb", ".js", ".mjs", ".cjs")):
+            paths.add(token)
+for path in sorted(paths):
+    sys.stdout.buffer.write(path.encode("utf-8")+b"\0")
+' | while IFS= read -r -d '' scr; do
+    [ -n "$scr" ] || continue
+    f="$1/$scr"
+    [ "${scr#/}" != "$scr" ] && f="$scr"
+    [ -f "$f" ] || continue
+    h=$(gp_hash_std < "$f" | cut -c1-8) || exit 4
+    printf '%s=%s;' "$scr" "$h"
+  done
+  )
+}
 
 # expected token -> a routing class the gate understands
 gp_classify_expected(){
@@ -386,7 +420,7 @@ gp_classify_expected(){
     minimize)  echo "minimize" ;;
     exit=[0-9]*) echo "rc ${v#exit=}" ;;
     *)
-      local op num pattern='^([<>=!]+)([0-9][0-9.]*)$'
+      local op num pattern='^([<>=!]+)(-?([0-9]+(\.[0-9]*)?|\.[0-9]+))$'
       if [[ "$v" =~ $pattern ]]; then
         op=${BASH_REMATCH[1]}; num=${BASH_REMATCH[2]}
         case "$op" in
@@ -410,8 +444,9 @@ gp_extract_metric(){                                     # $1 text $2 regex-or-e
     if (match($0, ENVIRON["MRE"], m)) {
       for (i = 1; i <= length(m); i++) if (m[i] != "") { print m[i]; exit }
     }
-  }' | sed -nE 's/^[^-0-9]*(-?[0-9]+(\.[0-9]+)?).*/\1/p' | head -1
-  # the leading-chars class must keep '-', or a captured "-10" is rewritten to 10
+  }' | sed -nE 's/^[[:space:]]*(-?([0-9]+(\.[0-9]*)?|\.[0-9]+))[[:space:]]*$/\1/p' | head -1
+  # Validate the entire capture. Truncating ".5", "1e3" or "1junk" changes
+  # the measurement instead of reporting an unsupported/broken instrument.
 }
 
 # ---- verdict evidence extraction --------------------------------------------

@@ -1,0 +1,7 @@
+{
+  "changed": [
+    "tests/test_forge.py"
+  ],
+  "production_runtime_changed": false,
+  "reason": "Repair legacy forge fixture to remove only forge token and assert preservation of all other approved bindings. Shell/optimized tests used identical production scripts and their unchanged test inputs. Full suites restarted against corrected fixture."
+}

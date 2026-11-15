@@ -1,0 +1,6 @@
+test_incorrect_later_output_is_rejected_with_and_without_optimization (test_evolution_example.ExampleRecheck.test_incorrect_later_output_is_rejected_with_and_without_optimization) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.620s
+
+OK

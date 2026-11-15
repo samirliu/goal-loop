@@ -7,21 +7,29 @@
 
 ## 最早入口
 
-正常入口先用 `python3 -I ${GOAL_SKILL}/scripts/goal_host.py enter PROJECT SECONDS`。
+正常入口先用 `python3 -I "${GOAL_SKILL}/scripts/goal_host.py" enter PROJECT SECONDS`。
 它只从本项目唯一真实 prompt 回执（或唯一活跃会话）取 backend/session，调用原 begin；
 有歧义时拒绝并要求传真实身份，绝不猜 session。无 hook 的显式 bridge 仍用下面的 begin。
-随后 `bash ${GOAL_SKILL}/scripts/goal_ctl.sh context --project PROJECT` 输出当前状态和准确命令。
+随后 `bash "${GOAL_SKILL}/scripts/goal_ctl.sh" context --project PROJECT` 输出当前状态和准确命令。
+入口加 `--context` 会在同一调用中返回 `host` 与 `context`，省去单独取图。显式 `begin` 也支持；只有原来已授权自动批准时再加 `--auto`，默认保持手动批准标记。重复入口仍收紧原预算，不能续期。
 可选 `--brief` 只隐藏内部绑定哈希和重复的收账字段；完整绑定仍在原锁内重新计算，动作与 revision 相同。它只作诊断选项；真实小样本未建立完整交付提速，默认保留完整地图。
 只有会话已授权自动批准时才加 `--auto`；默认不添加自动批准标记。授权选项也是版本绑定的一部分。
 首次 hook 只建立账本、尚无 goal.md 时，context 返回最小契约模板和写入路径；不替用户写入或批准，也不要求重新 init 或阅读实现源码。填好并冒烟后重新取 context，才提供带当前版本的 stamp 命令。
+首次进入使用 `--request-stdin` 从 stdin 传用户原始任务文本；显式 `/goal-loop 目标` hook 已捕获原文时以该原文为准。原任务文本只保存在本地 goal 宿主回执，用于契约覆盖检查；普通对话、后续提示与 worker 正文仍不捕获。续跑保留原文，更换原目标应先走契约修订，不能覆盖回执。
 每条 action 带账本/产物/工作计划/接口/策略版本；run 消费时在目录锁内重算，过期拒绝后重新派生。
 它只是派生地图，不是新账本或完成权威。完整 status 和原始错误仍可读取。
 
 地图覆盖未初始化、契约/冒烟、实施/派工、未收账、恢复及终验。每个 action 给出参数、证据来源、准确 `command` 和底层 `executes`；必要输入未知时 `command` 为 null。把 `close_input.template` 写到返回的 `.goal/proposals/close-iteration.json`，依据实际 verify 输出和复审补齐 null，然后重新取地图。work-plan 只提供任务/文件域，不能提供检查计数或批准。图任务另用 `execution_input` 补实际 mode 和原生 launch/terminal 回执路径；plan/begin/prepare/attach/reconcile/validate/adopt/finish 仍调用原入口，不启动宿主客户端。
 
+新请求优先使用 `submissions`：契约写好后执行 `submissions.stamp.command`，一次完成原 smoke 与 stamp。初始业务 FAIL 是修复工作的有效起点；只有完整、未变更树或账本且没有 BROKEN 的观测才能继续盖戳，原批准语义不变。
+
+完成实际工作与复审后取新地图，将 `submissions.close.template` 填为真实 JSON，并直接作为其 `command` 的 stdin。程序在原排他锁内先核对地图版本，再推导固定 operation_id、单任务文件域、符合条件的检查数与 claim 终验，校验字段并原子保存标准 proposal，随后同 PID 交给原 controller。模型无需先写 proposal 再取一次新地图。业务判断、复审、特殊契约观测仍由调用者提供；缺失不会从 PASS 猜出 clear。
+
+旧地图的 contract/artifact/plan/evidence/input/crew/policy/budget/implementation 绑定全部保留，scripts/ 中全部 Python、Bash、awk 文件的版本也参与绑定。输入只允许覆盖实际判断字段，不能替换程序派生的 operation_id、checks_source 或 receipt。提交被打断后，仍用原 pending/recover；提交前恢复沿用保存的 proposal，提交后重放沿用原 journal argv，当前终验仍由原 audit/Gate 执行。
+
 输入文件只是调用参数，不是新账本。动作绑定它们的字节、相关回执、产物、策略及工具版本；消费前在原锁下重核，过期或变化后拒绝。context 直接持有读锁，所以 pending 期间也能只读展示 recover。新的原事务 journal 与提交回执保留精确 argv；恢复后 `retry-close` 沿用原请求，只返回历史结果。地图读取有界；到期只提供结算路径，调用各原入口既有的有限验收窗口，不额外改写整次收账预算，更短继承截止仍优先。
 
-`python3 -I ${GOAL_SKILL}/scripts/goal_context.py receipt PROJECT` 在同一截止执行原 audit/Gate，
+`python3 -I "${GOAL_SKILL}/scripts/goal_context.py" receipt PROJECT` 在同一截止执行原 audit/Gate，
 返回原输出、策略消费版本、单元复用来源与未解决项。只有两者实际通过才有 completion_verified=true。
 到期后只使用原有限结算，不能借状态查看开新预算。
 
@@ -31,8 +39,19 @@
 下文 `${GOAL_SKILL}` 代表已安装 skill 的绝对目录；PROJECT 使用实际项目路径。
 
 ```sh
-python3 -I ${GOAL_SKILL}/scripts/goal_host.py begin PROJECT BACKEND SESSION SECONDS
+python3 -I "${GOAL_SKILL}/scripts/goal_host.py" begin PROJECT BACKEND SESSION SECONDS
 ```
+
+无 prompt hook 的首次手动入口（例如通过 Skill 工具加载后执行）可写为：
+
+```sh
+python3 -I "${GOAL_SKILL}/scripts/goal_host.py" begin PROJECT BACKEND SESSION SECONDS --request-stdin --context <<'GOAL_REQUEST'
+<用户原始任务文本>
+GOAL_REQUEST
+```
+
+地图的 `quality` 给出已捕获原请求、视觉质量 AC、机位范围与复审记录模板。只有实际执行了冷席判读后才填写 findings/summary 并绑定质量判词；普通确定性任务保持原四项提交判断。
+请求输入须 UTF-8 并关闭 stdin；读取最多占用 10 秒且受本次/继承截止约束，输入上限 2 MiB。手动入口在读 stdin 前记录工具起点，读取时间也计入原预算；管道一直不关闭时拒绝进入，不重新起表。
 
 没有 prompt hook 的宿主记录 `host-tool-entry`，不能回填更早的思考时间。
 重复 begin、resume、较大的新预算都不能延长原截止。它可以先于契约初始化；
@@ -106,16 +125,25 @@ claude --plugin-dir /ABS/goal-loop
 claude plugin validate /ABS/goal-loop
 ```
 
-插件同时加载仓库根目录的 skill、hooks 和带命名空间的 agents。
+插件从固定 `skills/goal-loop` 入口加载由根 SKILL.md 生成的完整正文；
+`${CLAUDE_PLUGIN_ROOT}` 是脚本、参考和资源的实施目录，缓存目录名不参与 skill 名称。
+插件同时加载 hooks、5 个带命名空间的 agents，以及可选 companion 的调用入口。
 按次加载后使用 `/goal-loop-host:goal-loop …目标`，可明确选择当前仓库版本，
 避免同名旧全局 skill 的装载顺序影响。普通 `/goal-loop` 仍使用 README 的安装入口。
 保留旧的全局 agent 安装时，不要把同一波当成两套 worker。此适配器和旧
 `goal_hook.sh` 的完成阻挡作用不同；最终 GO 仍由原 gate 决定。
 
+持久安装可先 `claude plugin marketplace add /ABS/goal-loop`，再
+`claude plugin install goal-loop-host@goal-loop`。隔离构建及 skill 安装见 README。
+仅安装 skill 不会注册原生 hooks；使用显式 bridge，或选择完整插件启用自动事件。
+安装后应通过宿主的 `agents` 命令核对角色；本机 cc-haha 源码版需要
+`CLAUDE_CODE_USE_NATIVE_FILE_SEARCH=1` 才能发现全局角色，完整插件不需要此变通。
+本地 marketplace 的源目录需要保留，不能把版本缓存存在等同于宿主脱离源目录可用。
+
 Codex 配置生成器只向 stdout 输出，不覆盖现有 hook：
 
 ```sh
-python3 -I ${GOAL_SKILL}/scripts/goal_host_config.py codex > /tmp/goal-loop-hooks.json
+python3 -I "${GOAL_SKILL}/scripts/goal_host_config.py" codex > /tmp/goal-loop-hooks.json
 ```
 
 将其合并进项目 `.codex/hooks.json`，按正常 `/hooks` 流程 review/trust。

@@ -1,0 +1,479 @@
+{
+  "version": 1,
+  "final_validation_commands": [
+    {
+      "check": "python",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "result": 0,
+      "elapsed": 1084.0439637501258,
+      "log": "final-macos-full-python.log",
+      "platform": "macos",
+      "archive_log": "final-macos-full-python.log",
+      "tests": 454,
+      "unittest_seconds": 1083.856,
+      "skipped": 0,
+      "skip_reasons": []
+    },
+    {
+      "check": "integrity-optimized",
+      "command": [
+        "python3",
+        "-O",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_acceptance_integrity.py",
+        "-v"
+      ],
+      "result": 0,
+      "elapsed": 137.08886241610162,
+      "log": "final-macos-focused-integrity-optimized.log",
+      "platform": "macos",
+      "archive_log": "final-macos-focused-integrity-optimized.log",
+      "tests": 38,
+      "unittest_seconds": 136.999,
+      "skipped": 0,
+      "skip_reasons": []
+    },
+    {
+      "check": "scenarios",
+      "command": [
+        "bash",
+        "tests/run_tests.sh",
+        "--jobs=4"
+      ],
+      "result": 0,
+      "elapsed": 216.9997489170637,
+      "log": "final-macos-shell-scenarios.log",
+      "platform": "macos",
+      "archive_log": "final-macos-shell-scenarios.log",
+      "checks": 603
+    },
+    {
+      "check": "parser",
+      "command": [
+        "bash",
+        "tests/test_parse.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.29636174999177456,
+      "log": "final-macos-shell-parser.log",
+      "platform": "macos",
+      "archive_log": "final-macos-shell-parser.log",
+      "checks": 81
+    },
+    {
+      "check": "companion",
+      "command": [
+        "bash",
+        "companions/contract-forge/tests/run_fixtures.sh"
+      ],
+      "result": 0,
+      "elapsed": 1.3313028749544173,
+      "log": "final-macos-shell-companion.log",
+      "platform": "macos",
+      "archive_log": "final-macos-shell-companion.log",
+      "checks": 10
+    },
+    {
+      "check": "docs",
+      "command": [
+        "bash",
+        "tests/docs_consistency.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.7145593329332769,
+      "log": "final-macos-shell-docs.log",
+      "platform": "macos",
+      "archive_log": "final-macos-shell-docs.log"
+    },
+    {
+      "check": "syntax",
+      "command": [
+        "bash",
+        "-c",
+        "for script in scripts/*.sh devtools/*.sh assets/*.sh companions/contract-forge/scripts/*.sh companions/contract-forge/tests/*.sh; do bash -n \"$script\" || exit 1; done"
+      ],
+      "result": 0,
+      "elapsed": 0.040917832870036364,
+      "log": "final-macos-shell-syntax.log",
+      "platform": "macos",
+      "archive_log": "final-macos-shell-syntax.log"
+    },
+    {
+      "check": "python",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "result": 0,
+      "elapsed": 1624.0737158330157,
+      "log": "final-linux-full-python.log",
+      "platform": "linux",
+      "archive_log": "final-linux-full-python.log",
+      "tests": 454,
+      "unittest_seconds": 1623.146,
+      "skipped": 2,
+      "skip_reasons": [
+        "actual hard RLIMIT_NOFILE prevents inheriting infinity",
+        "actual hard RLIMIT_NOFILE prevents inheriting infinity"
+      ]
+    },
+    {
+      "check": "integrity-optimized",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+        "python3",
+        "-O",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_acceptance_integrity.py",
+        "-v"
+      ],
+      "result": 0,
+      "elapsed": 219.82878783298656,
+      "log": "final-linux-focused-integrity-optimized.log",
+      "platform": "linux",
+      "archive_log": "final-linux-focused-integrity-optimized.log",
+      "tests": 38,
+      "unittest_seconds": 219.485,
+      "skipped": 0,
+      "skip_reasons": []
+    },
+    {
+      "check": "scenarios",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+        "bash",
+        "tests/run_tests.sh",
+        "--jobs=4"
+      ],
+      "result": 0,
+      "elapsed": 311.61250654095784,
+      "log": "final-linux-shell-scenarios.log",
+      "platform": "linux",
+      "archive_log": "final-linux-shell-scenarios.log",
+      "checks": 603
+    },
+    {
+      "check": "parser",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+        "bash",
+        "tests/test_parse.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.24060591589659452,
+      "log": "final-linux-shell-parser.log",
+      "platform": "linux",
+      "archive_log": "final-linux-shell-parser.log",
+      "checks": 81
+    },
+    {
+      "check": "companion",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+        "bash",
+        "companions/contract-forge/tests/run_fixtures.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.5598832920659333,
+      "log": "final-linux-shell-companion.log",
+      "platform": "linux",
+      "archive_log": "final-linux-shell-companion.log",
+      "checks": 10
+    },
+    {
+      "check": "docs",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+        "bash",
+        "tests/docs_consistency.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.41697958298027515,
+      "log": "final-linux-shell-docs.log",
+      "platform": "linux",
+      "archive_log": "final-linux-shell-docs.log"
+    },
+    {
+      "check": "syntax",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+        "bash",
+        "-c",
+        "for script in scripts/*.sh devtools/*.sh assets/*.sh companions/contract-forge/scripts/*.sh companions/contract-forge/tests/*.sh; do bash -n \"$script\" || exit 1; done"
+      ],
+      "result": 0,
+      "elapsed": 0.17491770791821182,
+      "log": "final-linux-shell-syntax.log",
+      "platform": "linux",
+      "archive_log": "final-linux-shell-syntax.log"
+    },
+    {
+      "check": "shellcheck",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+        "bash",
+        "-c",
+        "shellcheck --severity=warning scripts/*.sh devtools/*.sh"
+      ],
+      "result": 0,
+      "elapsed": 2.4572294999379665,
+      "log": "final-linux-shell-shellcheck.log",
+      "platform": "linux",
+      "archive_log": "final-linux-shell-shellcheck.log"
+    }
+  ],
+  "raw_records_in_archive": [
+    "baseline-cases/*/commands.json",
+    "baseline-extra-complete/*/commands.json",
+    "quoted-baseline/*/commands.json",
+    "final-v2-cases/*/commands.json",
+    "final-v2-extra/*/commands.json",
+    "quoted-after/*/commands.json",
+    "settlement-final-commands.json"
+  ],
+  "independently_reviewed_artifacts": [
+    "forward/independent-review.json",
+    "forward-settlement/independent-review.json"
+  ],
+  "note": "Native independent agent reviews have no fabricated equivalent shell/model API command. All final CLI argv above were recorded by the validation runner.",
+  "delivery_checks": [
+    {
+      "check": "docs",
+      "command": [
+        "bash",
+        "tests/docs_consistency.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.5027031670324504,
+      "log": "delivery-docs.log"
+    },
+    {
+      "check": "skill",
+      "command": [
+        "python3.12",
+        "/Users/m/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+        "."
+      ],
+      "result": 0,
+      "elapsed": 0.04558983398601413,
+      "log": "delivery-skill.log"
+    },
+    {
+      "check": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "result": 0,
+      "elapsed": 0.029873084044083953,
+      "log": "delivery-diff.log"
+    }
+  ],
+  "data_replay": [
+    {
+      "platform": "macos",
+      "mode": "normal",
+      "command": [
+        "python3",
+        "-B",
+        "docs/evals/acceptance-integrity-20261114/verify.py"
+      ],
+      "result": 0,
+      "elapsed": 0.7690990827977657,
+      "log": "replay/macos-normal.log"
+    },
+    {
+      "platform": "macos",
+      "mode": "optimized",
+      "command": [
+        "python3",
+        "-O",
+        "-B",
+        "docs/evals/acceptance-integrity-20261114/verify.py"
+      ],
+      "result": 0,
+      "elapsed": 0.8174234158359468,
+      "log": "replay/macos-optimized.log"
+    },
+    {
+      "platform": "linux",
+      "mode": "normal",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+        "python3",
+        "-B",
+        "docs/evals/acceptance-integrity-20261114/verify.py"
+      ],
+      "result": 0,
+      "elapsed": 0.5383645831607282,
+      "log": "replay/linux-normal.log"
+    },
+    {
+      "platform": "linux",
+      "mode": "optimized",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+        "python3",
+        "-O",
+        "-B",
+        "docs/evals/acceptance-integrity-20261114/verify.py"
+      ],
+      "result": 0,
+      "elapsed": 0.5485278330743313,
+      "log": "replay/linux-optimized.log"
+    }
+  ]
+}

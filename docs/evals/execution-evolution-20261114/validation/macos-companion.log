@@ -1,0 +1,11 @@
+ok   usage rc=2
+ok   good-threshold
+ok   good-objective-forge
+ok   good-pipe-in-backtick
+ok   bad-no-horizon
+ok   bad-pipe-spec
+ok   bad-calib-on-metric
+ok   bad-window-no-external
+ok   bad-objective-target
+ok   crlf-threshold
+== fixtures: pass=10 fail=0 ==

@@ -125,7 +125,10 @@ class Incumbent(ProjectCase):
         protocol = dict(version=2, baseline=candidate, candidate=base, entry='a.txt',
                         grader='absent.py', development=[], holdout=[],
                         minimum_pairs=6, minimum_cost_gain=.15, quality_tolerance=0,
-                        trial_seconds=1, budget_seconds=10)
+                        trial_seconds=1, budget_seconds=10,
+                        calibration=dict(good=[dict(output='good.txt', expected='gold.txt')],
+                                         bad=[dict(output='bad.txt', expected='gold.txt')]))
+        # Pair preflight must reject before reading the absent grader/fixtures.
         path = self.project / 'protocol.json'
         path.write_text(json.dumps(protocol))
         trial_state = self.project / '.goal/proposals/test'
@@ -178,8 +181,9 @@ class IntermediateCheckpoint(ProjectCase):
         evidence = f'artifact: artifact.txt digest: {sha}' if horizon == 'PASS' else 'PROBE=inspect REASON=missing'
         rows = [f'AC-3|{horizon}|{iteration}|{digest}|cat artifact.txt|{evidence}']
         if calibrate:
-            rows.extend([f'AC-3#good|PASS|{iteration}|{digest}|cat good.txt|good.txt',
-                         f'AC-3#bad|FAIL|{iteration}|{digest}|cat bad.txt|bad.txt'])
+            rows.extend([f'AC-3#{kind}|{verdict}|{iteration}|{digest}|cat {kind}.txt|'
+                         f'artifact: {kind}.txt digest: {hashlib.sha256((self.project/(kind+".txt")).read_bytes()).hexdigest()}'
+                         for kind, verdict in [('good', 'PASS'), ('bad', 'FAIL')]])
         return '\n'.join(rows) + '\n'
 
     def save(self, **kwargs):

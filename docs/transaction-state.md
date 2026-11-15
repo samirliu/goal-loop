@@ -86,6 +86,8 @@ runner 的 `runner.clock`、`runner.deadline` 与 `runner.json` 由目录排他�
 
 runner 执行器预留剩余时间的 10%（最多 3 秒）供结算；runner 与独立 gate 都先计算契约、持久化 runner 和继承 envelope 的最早截止。门控取得权威视图后，外层监督器覆盖指纹准备、probe、external、AC 检查与收尾；内层命令仍受 check_timeout 约束。耗尽后最多再做一次 3 秒的最终结算。嵌套检查共享该结算截止，不逐条重新领时。普通调用不能仅靠 GOAL_GATE_SUPERVISED 环境标记绕过监督，首次访问会清除它。没有总预算的契约仍保留逐条检查超时，不凭空创造总预算。gate 通过后保存实际完成时点与 `within-budget` / `after-deadline`，产品 GO 与预算内成功分开。
 
+context 的 stamp 冒烟与 receipt 终验沿用同一规则：没有总预算时不额外施加 30 秒整批截止，仍由原 gate 的逐条超时和进程所有权监督约束。只读地图的指纹准备单独保留最多 30 秒，已有更短预算仍优先；这不是验收检查的新预算。
+
 runner 与独立 gate 的 check/probe/external 复用 `goal_owner_watch.py` 的退出事件监督，均不依赖 GNU timeout。超时、owner 退出（包括未回收 zombie）或命令结束时清理所属进程组，先清理再回收 group leader，避免 PID 复用。通过不持有 IO/锁的组内守卫保留可发信号的成员，以处理仅剩 zombie 的组返回 EPERM 的行为。runner 锁留在监督器直到清理完成，不传给用户命令。监督器脱离 owner 的进程组，避免外层取消把内层监督器一并杀死，留下独立检查组。
 
 边界仍包括：遵守协议的 POSIX 本机入口，不是对任意同用户进程的权限隔离；主动 setsid 脱离所属组的工具、监督器自身被 SIGKILL、真实断电、网络文件系统和平台差异不能由这些本地测试推断。作者材料与 external 测量缓存不等同于控制器投影，也不声称整个文件系统都已事务化。W4—W9 的行为与效用评估继续独立完成。

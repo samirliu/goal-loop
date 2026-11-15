@@ -1,6 +1,6 @@
 # Pack: external (FENCE · out-of-tree settle)
 
-**Open when:** AC declares `external:` and/or `window:`.
+**Open when:** the original request depends on out-of-tree facts, or AC declares `external:` and/or `window:`. Author the observable external outcome before reducing the request to local build/file checks.
 
 **Invariant: FENCE** — out-of-tree facts settle via a cache, never by guessing.
 **Also touches BIND** — deferred verdicts live in `.goal/evidence/deferred.rec` (digest-exempt by design).
@@ -13,6 +13,7 @@ Legacy aliases: `R18` → FENCE (settle) / BIND (`deferred.rec`).
 
 - `external: \`<command>\`` settles the AC against an **out-of-tree** source (CRM, prod metrics, async reviewer).
 - The in-tree `check:` floor **still runs**. A floor FAIL/BROKEN is decisive — “something is still pending” never masks a failure.
+- A judged AC also owes its declared external check. The seat's PASS does not grant external approval. `--verify` reports the judgment as SKIP and the actual external measurement separately; it never manufactures a judged PASS.
 
 ## 2 rc=75 = DEFERRED (wait, not deliver)
 
@@ -24,6 +25,7 @@ Legacy aliases: `R18` → FENCE (settle) / BIND (`deferred.rec`).
 
 - `window: <seconds>` (default 3600) is the cache validity for the external verdict.
 - Inside the window, the recorded row in `.goal/evidence/deferred.rec` **is** the measurement (one query per window, not one per gate exit).
+- Cache validity is per artifact version, contract and external command. A newer artifact cannot reuse the old version's approval. The detail stores a content binding; legacy/unbound or future-dated rows are remeasured. `window: 0` disables reuse.
 - `deferred.rec` fields: `id|verdict|tstamp|detail` — append-only; latest-per-id wins by (tstamp, file order).
 - Evidence directory is digest-exempt: cache writes do not trip `check-mutated-ledger`.
 

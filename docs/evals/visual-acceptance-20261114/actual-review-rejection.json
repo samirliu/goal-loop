@@ -1,0 +1,7 @@
+{
+  "actual_cold_review": "FAIL",
+  "views": 6,
+  "findings": 3,
+  "machine_rejection": "quality-open-findings: ['F1: The exterior and minaret views visibly expose large gaps between the roof masses and walls. The current delivery does not present a complete, credible exterior envelope.', 'F2: The nave and apse views open onto large sky regions and show disconnected architectural pieces. A continuous, coherent enclosed interior has not been delivered in these representative views.', 'F3: The gallery view is unusable: almost the entire 3D viewport is dark and no gallery architecture can be inspected.']",
+  "image_hashes_verified": true
+}

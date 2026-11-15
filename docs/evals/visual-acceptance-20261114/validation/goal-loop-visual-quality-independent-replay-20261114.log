@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/docs/evals/visual-acceptance-20261114/verify.py", line 156, in <module>
+    main()
+    ~~~~^^
+  File "/Users/m/repo/goal-loop/docs/evals/visual-acceptance-20261114/verify.py", line 151, in main
+    result = verify(Path(tmp))
+  File "/Users/m/repo/goal-loop/docs/evals/visual-acceptance-20261114/verify.py", line 106, in verify
+    require(passed['verdict']=='PASS' and passed['completion_eligible'] is True and passed['findings']==[]
+                                          ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'completion_eligible'

@@ -1,0 +1,51 @@
+[
+  {
+    "check": "data-replay-normal",
+    "command": [
+      "docker",
+      "run",
+      "--rm",
+      "--init",
+      "--user",
+      "1000:1000",
+      "--network",
+      "none",
+      "--mount",
+      "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+      "-w",
+      "/repo",
+      "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+      "python3",
+      "-B",
+      "docs/evals/visual-acceptance-20261114/verify.py"
+    ],
+    "result": 0,
+    "elapsed": 0.4536549998447299,
+    "log": "/tmp/goal-loop-visual-quality-independent-replay-linux-normal-20261114.log"
+  },
+  {
+    "check": "data-replay-optimized",
+    "command": [
+      "docker",
+      "run",
+      "--rm",
+      "--init",
+      "--user",
+      "1000:1000",
+      "--network",
+      "none",
+      "--mount",
+      "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+      "-w",
+      "/repo",
+      "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+      "python3",
+      "-O",
+      "-B",
+      "docs/evals/visual-acceptance-20261114/verify.py"
+    ],
+    "result": 0,
+    "elapsed": 0.4375951671972871,
+    "log": "/tmp/goal-loop-visual-quality-independent-replay-linux-optimized-20261114.log"
+  }
+]

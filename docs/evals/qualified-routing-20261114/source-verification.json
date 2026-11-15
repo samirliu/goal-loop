@@ -1,0 +1,15 @@
+{
+  "files": 130,
+  "matches_current": true,
+  "study_manifest_files": 130,
+  "changes_since_study": [
+    "README.md",
+    "devtools/consume_regression.py",
+    "examples/learning-regression/README.md",
+    "tests/test_incumbent.py"
+  ],
+  "new_files": [],
+  "production_implementation_changed_since_study": false,
+  "workflow_implementation_changed_since_study": false,
+  "scope": "Final payload source checks; evaluation files are indexed separately. The consumer CLI added a nonempty-case guard; earlier utility remains bound to its original frozen source."
+}

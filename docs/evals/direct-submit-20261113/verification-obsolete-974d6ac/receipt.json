@@ -1,0 +1,22 @@
+{
+  "commit": "974d6ac83db8208badb3a73ead33b4659b4b6357",
+  "run": 43438021005,
+  "conclusion": "cancelled",
+  "reason": "Obsolete instructions: removed duplicated model work and aligned default workflow with implemented direct submission. Full CI will run on final commit.",
+  "jobs": [
+    {
+      "platform": "macos",
+      "job_id": 131928050069,
+      "conclusion": "cancelled",
+      "raw_log_sha256": "04d01748ff03bec24906b7bd0de166868df1d774d08b3eb00f776cc9d7283fde"
+    },
+    {
+      "platform": "ubuntu",
+      "job_id": 131928050482,
+      "conclusion": "cancelled",
+      "raw_log_sha256": "ebd504d478390c1938bff1f8e0320d11958103ad68bfa388838cee72727605c1"
+    }
+  ],
+  "claimed_passed": false,
+  "resource_cost_retained": true
+}

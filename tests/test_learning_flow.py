@@ -278,19 +278,65 @@ class LearningFlow(unittest.TestCase):
             self.assertEqual(stamp.returncode,0,stamp.stdout+stamp.stderr)
             self.assertTrue(context.show(root)['stamped'])
 
-    def qualified_policy(self):
+    def qualified_policy(self, choice='serial', cost_scale=1):
         f = self.fixture
         p = policies.Evolution(); p.setUp(); self.addCleanup(p.doCleanups)
-        p.state = f.state/'proposals/routing'
+        p.state = f.state/'proposals'/('routing' if cost_scale == 1 else 'routing-costs-'+str(cost_scale))
         protocol = p.protocol('routing')
         (protocol.parent/'baseline.py').write_text('import json\nprint(json.dumps(dict(match=False,choice="baseline",reason="baseline")))\n')
         (protocol.parent/'candidate.py').write_text('# candidate\nimport json,sys\nv=json.load(sys.stdin)\n'
-            'm=v["context"].get("profile")=="small"\nprint(json.dumps(dict(match=m,choice="serial" if m else "baseline",reason="measured small-unit startup")))\n')
+            'm=v["context"].get("profile")=="small"\nprint(json.dumps(dict(match=m,choice=%r if m else "baseline",reason="measured unit costs")))\n' % choice)
         engine = crew.evolution()
-        with mock.patch.object(engine, 'trial', side_effect=p.telemetry):
+        def observations(*args):
+            row, output = p.telemetry(*args)
+            row['elapsed'] *= cost_scale
+            return row, output
+        with mock.patch.object(engine, 'trial', side_effect=observations):
             result = engine.experiment(protocol, p.state)
         self.assertEqual(result['status'], 'enabled')
         return p, protocol, result
+
+    def test_qualified_crew_changes_unknown_cost_baseline_and_respects_explicit_inline(self):
+        f = self.fixture
+        p, _, _ = self.qualified_policy(choice='crew')
+        value = f.write_graph(); value['context']['profile'] = 'small'; f.graph.write_text(json.dumps(value))
+        self.assertEqual(crew.plan(f.project, f.graph)['choice'], 'serial')
+        recommendation = crew.plan(f.project, f.graph, policy_state=p.state)
+        self.assertEqual(recommendation['choice'], 'crew')
+        self.assertEqual(recommendation['reason'], 'qualified-routing-policy')
+        wave = crew.Wave(f.project, crew.begin(f.project, f.graph, 'crew', 'learned-crew', p.state))
+        wave.event('T1', 'dispatch'); wave.event('T2', 'dispatch')
+        for task in ('T1', 'T2'):
+            f.work(wave, task)
+        self.assertTrue(wave.finish()['quality'])
+        explicit = crew.Wave(f.project, crew.begin(f.project, f.graph, 'inline', 'explicit-inline', p.state))
+        self.assertEqual(crew.load(explicit.path)['mode'], 'inline')
+        explicit.event('T1', 'dispatch')
+        with self.assertRaisesRegex(ValueError, 'host capacity'):
+            explicit.event('T2', 'dispatch')
+        f.work(explicit, 'T1'); explicit.event('T2', 'dispatch'); f.work(explicit, 'T2')
+        self.assertTrue(explicit.finish()['quality'])
+
+    def test_qualified_crew_cannot_override_dependencies_capacity_or_observed_budget(self):
+        f = self.fixture
+        p, _, _ = self.qualified_policy(choice='crew')
+        for dependent, capacity in ((True, 2), (False, 1)):
+            value = f.write_graph(deps=dependent)
+            value['context']['profile'] = 'small'; value['capacity'] = capacity
+            f.graph.write_text(json.dumps(value))
+            recommendation = crew.plan(f.project, f.graph, policy_state=p.state)
+            self.assertEqual(recommendation['choice'], 'serial')
+            with self.assertRaisesRegex(ValueError, 'dependency-or-scope-bound'):
+                crew.begin(f.project, f.graph, 'crew', 'impossible-crew', p.state)
+        # Controlled trial cost exceeds the real remaining host allowance;
+        # policy execution itself is fast. This is a routing boundary test.
+        slow, _, _ = self.qualified_policy(choice='crew', cost_scale=100)
+        value = f.write_graph(); value['context']['profile'] = 'small'; f.graph.write_text(json.dumps(value))
+        host.begin(f.project, 'codex', 'qualified-budget-fixture', 90)
+        recommendation = crew.plan(f.project, f.graph, policy_state=slow.state)
+        self.assertEqual(recommendation['choice'], 'stop')
+        with self.assertRaisesRegex(ValueError, 'insufficient-qualified-budget'):
+            crew.begin(f.project, f.graph, 'crew', 'over-budget-crew', slow.state)
 
     def test_qualified_policy_changes_dispatch_and_mismatch_retains_baseline(self):
         f = self.fixture
@@ -372,6 +418,49 @@ class LearningFlow(unittest.TestCase):
         (p.state/'policy-pending.json').write_text('{}')
         with self.assertRaisesRegex(ValueError, 'recovery-required'):
             next_wave.event('T1', 'dispatch')
+
+    def test_changed_qualification_blocks_planning_dispatch_and_native_prepare_but_allows_cancel(self):
+        f = self.fixture
+        p, _, initial = self.qualified_policy()
+        value = f.write_graph(); value['context']['profile'] = 'small'; f.graph.write_text(json.dumps(value))
+        host.begin(f.project, 'codex', 'qualification-consumption-fixture', 90)
+        wave = crew.Wave(f.project, crew.begin(f.project, f.graph, 'crew', 'qualified-before-damage', p.state))
+        path = p.state/initial['run']/'report.json'
+        path.write_bytes(path.read_bytes()+b'changed')
+        with self.assertRaisesRegex(ValueError, 'qualification-invalid'):
+            crew.plan(f.project, f.graph, policy_state=p.state)
+        with self.assertRaisesRegex(ValueError, 'qualification-invalid'):
+            wave.event('T1', 'dispatch')
+        with self.assertRaisesRegex(ValueError, 'qualification-invalid'):
+            host.prepare(f.project, wave.path.stem, 'T1')
+        for task in ('T1', 'T2'):
+            wave.event(task, 'cancel', note='qualification changed before any worker started')
+        self.assertFalse(wave.finish()['quality'])
+
+    def test_same_archive_requalified_on_fresh_inputs_invalidates_old_plan(self):
+        f = self.fixture
+        p, protocol, initial = self.qualified_policy()
+        value = f.write_graph(); value['context']['profile'] = 'small'; f.graph.write_text(json.dumps(value))
+        wave = crew.Wave(f.project, crew.begin(f.project, f.graph, 'crew', 'old-qualification', p.state))
+        fresh = p.protocol('fresh-qualification', offset=3000)
+        for name in ('baseline.py', 'candidate.py'):
+            (fresh.parent/name).write_bytes((protocol.parent/name).read_bytes())
+        config = json.loads(fresh.read_bytes())
+        for index in (6, 7):
+            name = 'holdout-%s.json' % index
+            (fresh.parent/name).write_text(json.dumps({'task': 3100+index}))
+            config['holdout'].append(dict(input=name, expected=name))
+        fresh.write_text(json.dumps(config))
+        engine = crew.evolution()
+        with mock.patch.object(engine, 'trial', side_effect=p.telemetry):
+            current = engine.experiment(fresh, p.state)
+        self.assertEqual(current['enabled'], initial['enabled'])
+        self.assertEqual(current['status'], 'enabled')
+        with self.assertRaisesRegex(ValueError, 'policy changed'):
+            wave.event('T1', 'dispatch')
+        for task in ('T1', 'T2'):
+            wave.event(task, 'cancel', note='fresh qualification requires a new plan; no worker started')
+        self.assertFalse(wave.finish()['quality'])
 
     def test_holdout_rejection_preserves_the_consumed_routing_version(self):
         f = self.fixture

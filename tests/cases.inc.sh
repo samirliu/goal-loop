@@ -1199,28 +1199,34 @@ echo good > "$T/t100/g.txt"; echo bad > "$T/t100/b.txt"; echo real > "$T/t100/su
 contract t100 "- AC-1 | art quality | check: \`true\` | calib: good=g.txt bad=b.txt | expected: judged"
 close_iter t100
 S=$(sha256sum "$T/t100/subject.png" | cut -c1-64)
+G100=$(sha256sum "$T/t100/g.txt" | cut -c1-64)
+B100=$(sha256sum "$T/t100/b.txt" | cut -c1-64)
 # 100a claim with the real verdict only -> calibration-missing
 bind_v t100 "AC-1|PASS|1|DIGEST|cmd|\"looks great\" artifact: subject.png digest: $S"
 out=$(bash "$GATE" --check --project "$T/t100" 2>&1); assert_rc "100a calib declared, no grades -> rc2" 2 $?
 assert_has "100a reason calibration-missing" 'calibration-missing:AC-1/good' "$out"
 assert_has "100a hint routes the controller" 'hint=bind-calib-grades' "$out"
 # 100b bad fixture graded PASS (too-lenient seat) -> refused
-bind_v t100 "AC-1#good|PASS|1|DIGEST|-|\"clean render\" g.txt"
-bind_v t100 "AC-1#bad|PASS|1|DIGEST|-|\"looks fine\" b.txt"
+bind_v t100 "AC-1#good|PASS|1|DIGEST|-|\"clean render\" artifact: g.txt digest: $G100"
+bind_v t100 "AC-1#bad|PASS|1|DIGEST|-|\"looks fine\" artifact: b.txt digest: $B100"
 out=$(bash "$GATE" --check --project "$T/t100" 2>&1); assert_rc "100b lenient seat -> rc2" 2 $?
 assert_has "100b names the bad fixture" 'calibration-missing:AC-1/bad' "$out"
-# 100c correct grades (evidence quotes the fixture it read) -> GO
-bind_v t100 "AC-1#bad|FAIL|1|DIGEST|-|\"broken as shipped\" b.txt"
+# 100c a new artifact/iteration gets fresh content-bound grades. The failed
+# calibration attempt remains; contradictory grades cannot be erased in place.
+echo real-v2 > "$T/t100/subject.png"; close_iter t100
+bind_v t100 "AC-1|PASS|2|DIGEST|cmd|\"v2 reviewed\" artifact: subject.png digest: $(sha256sum "$T/t100/subject.png" | cut -c1-64)"
+bind_v t100 "AC-1#good|PASS|2|DIGEST|-|\"clean render\" artifact: g.txt digest: $G100"
+bind_v t100 "AC-1#bad|FAIL|2|DIGEST|-|\"broken as shipped\" artifact: b.txt digest: $B100"
 bash "$GATE" --check --project "$T/t100" >/dev/null 2>&1; assert_rc "100c calibrated claim -> GO" 0 $?
 # 100e an UNBOUND grade (evidence never names the fixture) is invented -> refused
-bind_v t100 "AC-1#good|PASS|1|DIGEST|-|\"it is good\" unrelated.txt"
+bind_v t100 "AC-1#good|PASS|2|DIGEST|-|\"it is good\" unrelated.txt"
 out=$(bash "$GATE" --check --project "$T/t100" 2>&1); assert_rc "100e unbound grade -> rc2" 2 $?
-assert_has "100e reason good side" 'calibration-missing:AC-1/good' "$out"
-bind_v t100 "AC-1#good|PASS|1|DIGEST|-|\"clean render\" g.txt"   # rebind correctly for 100d
+assert_has "100e reason good side" 'calibration-unbound:AC-1/good' "$out"
+bind_v t100 "AC-1#good|PASS|2|DIGEST|-|\"clean render\" artifact: g.txt digest: $G100"
 # 100d stale grades (next iteration, digest move) void them too: the real
-# verdict is freshly rebound (iter 2), the calib lines stay bound to iter 1.
-echo v2 > "$T/t100/subject.png"; close_iter t100
-bind_v t100 "AC-1|PASS|2|DIGEST|cmd|\"v2 still great\" artifact: subject.png digest: $(sha256sum "$T/t100/subject.png" | cut -c1-64)"
+# verdict is freshly rebound (iter 3), the calib lines stay bound to iter 2.
+echo v3 > "$T/t100/subject.png"; close_iter t100
+bind_v t100 "AC-1|PASS|3|DIGEST|cmd|\"v3 still great\" artifact: subject.png digest: $(sha256sum "$T/t100/subject.png" | cut -c1-64)"
 out=$(bash "$GATE" --check --project "$T/t100" 2>&1); assert_rc "100d stale grades voided -> rc2" 2 $?
 assert_has "100d stale calibration flagged" 'calibration-missing' "$out"
 

@@ -1,0 +1,5 @@
+  ok   - 138 documented fast lane reaches GO on first claim (rc=0)
+  ok   - 138 actual gate output
+  ok   - 138 no false complete from missing receipt
+== results: pass=3 fail=0 ==
+== total: pass=3 fail=0 shards=1 ==

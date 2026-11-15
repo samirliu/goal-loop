@@ -1,0 +1,11 @@
+test_missing_binding_requires_requalification_before_execution (test_policy_qualification.Qualification.test_missing_binding_requires_requalification_before_execution) ... ok
+test_real_legacy_record_and_pending_recover_without_replaying_or_granting_execution (test_policy_qualification.Qualification.test_real_legacy_record_and_pending_recover_without_replaying_or_granting_execution) ... ok
+test_report_or_frozen_evidence_changes_stop_before_program (test_policy_qualification.Qualification.test_report_or_frozen_evidence_changes_stop_before_program) ... ok
+test_resealed_incomplete_phase_is_not_a_valid_qualification (test_policy_qualification.Qualification.test_resealed_incomplete_phase_is_not_a_valid_qualification) ... ok
+test_same_bytes_can_requalify_without_resetting_history_and_stale_feedback_is_marked (test_policy_qualification.Qualification.test_same_bytes_can_requalify_without_resetting_history_and_stale_feedback_is_marked) ... ok
+test_selection_binds_actual_report_and_runs_exact_archive (test_policy_qualification.Qualification.test_selection_binds_actual_report_and_runs_exact_archive) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 1.270s
+
+OK

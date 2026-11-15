@@ -1,0 +1,29 @@
+{
+  "verified": true,
+  "pairs": 45,
+  "raw_outputs": 90,
+  "exposed_inputs": 52,
+  "holdout_evaluations": 2,
+  "transitions": [
+    {
+      "phase": "promotion",
+      "status": "enabled",
+      "pairs": 16,
+      "holdout_gain": 0.6760025057284669
+    },
+    {
+      "phase": "withdrawal",
+      "status": "withdrawn",
+      "pairs": 1,
+      "holdout_gain": null
+    },
+    {
+      "phase": "repair",
+      "status": "enabled",
+      "pairs": 28,
+      "holdout_gain": 0.6880141016393702
+    }
+  ],
+  "later_task": true,
+  "bad_grader_stopped": true
+}

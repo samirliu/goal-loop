@@ -1,0 +1,7 @@
+{
+  "name": "goal-loop",
+  "owner": {"name": "goal-loop maintainers"},
+  "plugins": [
+    {"name": "goal-loop-host", "source": "./", "description": "Goal Loop skill, five scoped agents and native lifecycle hooks."}
+  ]
+}

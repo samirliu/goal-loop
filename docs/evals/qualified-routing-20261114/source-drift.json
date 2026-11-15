@@ -1,0 +1,32 @@
+{
+  "scope": "policy execution only; no workflow or new utility measurement",
+  "changed_source": "tests/test_incumbent.py",
+  "old_sha256": "d3b98a3eb9ca9eeae7afbff4c6f95ed1cb1304e1f51c2e77d5754e913721e131",
+  "current_sha256": "6a83d95a39a6d506040ae64bab65935381726036d044cf8322aaefa860f14886",
+  "records": [
+    {
+      "variant": "frozen_input",
+      "result": 0,
+      "reason": null,
+      "error": "",
+      "decision": {
+        "match": true,
+        "choice": "crew",
+        "reason": "qualified independent regression jobs"
+      },
+      "elapsed": 0.07981754210777581
+    },
+    {
+      "variant": "actual_changed_source",
+      "result": 0,
+      "reason": null,
+      "error": "",
+      "decision": {
+        "match": false,
+        "choice": "baseline",
+        "reason": "qualified independent regression jobs"
+      },
+      "elapsed": 0.07827987498603761
+    }
+  ]
+}

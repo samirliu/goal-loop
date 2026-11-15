@@ -1,0 +1,52 @@
+{
+  "records": [
+    {
+      "case": "later-12",
+      "order": [
+        "baseline",
+        "learned"
+      ],
+      "baseline": {
+        "elapsed": 15.529784332960844,
+        "grade": {
+          "floor": true,
+          "horizon": true,
+          "score": 1
+        }
+      },
+      "learned": {
+        "elapsed": 11.820121124852449,
+        "grade": {
+          "floor": true,
+          "horizon": true,
+          "score": 1
+        }
+      }
+    },
+    {
+      "case": "later-13",
+      "order": [
+        "learned",
+        "baseline"
+      ],
+      "learned": {
+        "elapsed": 9.789699082961306,
+        "grade": {
+          "floor": true,
+          "horizon": true,
+          "score": 1
+        }
+      },
+      "baseline": {
+        "elapsed": 15.3666946250014,
+        "grade": {
+          "floor": true,
+          "horizon": true,
+          "score": 1
+        }
+      }
+    }
+  ],
+  "all_attempts_retained": true,
+  "scope": "full original acceptance with actual qualified-policy consumption; no model calls"
+}

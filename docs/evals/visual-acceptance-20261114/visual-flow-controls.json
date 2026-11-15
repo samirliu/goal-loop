@@ -1,0 +1,12 @@
+{
+  "rubric_same": true,
+  "calibration_same": true,
+  "original_epoch_deadline_same": true,
+  "monotonic_deadline_delta_seconds": 0.006346655776724219,
+  "original_origin_same": true,
+  "host_identity": "controlled test-session inputs on two isolated fixtures; not a native harness lifecycle benchmark",
+  "first_review": "FAIL",
+  "second_review": "PASS",
+  "final_acceptance": "existing bounded settlement; not a claim that all review finished before the deadline",
+  "limit": "The same epoch deadline/origin was used; the two monotonic mappings differ as recorded, so this is not proof of exact cross-instance deadline equality."
+}

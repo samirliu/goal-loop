@@ -1,0 +1,17 @@
+F
+======================================================================
+FAIL: test_one_observed_version_accepts_judgments_and_runs_fresh_original_gate (__main__.ContextSubmit.test_one_observed_version_accepts_judgments_and_runs_fresh_original_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_submit.py", line 48, in test_one_observed_version_accepts_judgments_and_runs_fresh_original_gate
+    self.assertEqual(result.returncode, 0, result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 0 : usage: goal_context.py [-h] [--auto] [--brief]
+                       {show,run,receipt} project [revision] [operation]
+goal_context.py: error: argument action: invalid choice: 'submit' (choose from 'show', 'run', 'receipt')
+
+
+----------------------------------------------------------------------
+Ran 1 test in 2.370s
+
+FAILED (failures=1)

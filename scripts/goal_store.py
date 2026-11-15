@@ -186,43 +186,48 @@ class Store:
             if (not isinstance(obj, dict) or set(obj) != {'version', 'head'}
                     or type(obj['version']) is not int or obj['version'] != 1):
                 raise StoreError('unknown pointer schema')
-            if obj['head'] is not None:
-                self._generation(obj['head'])
+            if obj['head'] is not None and (not isinstance(obj['head'], str) or not _GEN_NAME.fullmatch(obj['head'])):
+                raise StoreError('invalid generation identity')
             return obj['head']
         except StoreError:
             raise
         except (ValueError, TypeError) as e:
             raise StoreError('corrupt pointer') from e
 
-    def _history(self, head):
-        seen, operations = set(), {}
+    def _walk(self, head):
+        """Validate every generation once per observation; never cache across reads."""
+        seen, operations = set(), set()
         while head is not None:
             if head in seen:
                 raise StoreError('cyclic generation history')
             seen.add(head)
-            obj, _ = self._generation(head)
+            obj, files = self._generation(head)
             if obj['op'] in operations:
                 raise StoreError('duplicate committed operation')
-            operations[obj['op']] = (obj['request'], head)
+            operations.add(obj['op'])
+            yield head, obj, files
             head = obj['previous']
-        return operations
+
+    def _history(self, head):
+        return {obj['op']: (obj['request'], name) for name, obj, _ in self._walk(head)}
 
     def read(self):
         """Return (generation id, mapping); validates entire committed chain."""
         head = self._head()
-        if head is None:
-            return None, {}
-        self._history(head)
-        return head, self._generation(head)[1]
+        snapshot = {}
+        for name, _, files in self._walk(head):
+            if name == head:
+                snapshot = files
+        return head, snapshot
 
     def lookup(self, operation_id):
         """Read a committed operation without creating files or moving HEAD."""
         head = self._head()
-        operations = self._history(head)
-        if operation_id not in operations:
-            return None
-        operation_head = operations[operation_id][1]
-        return operation_head, self._generation(operation_head)[1]
+        selected = None
+        for name, obj, files in self._walk(head):
+            if obj['op'] == operation_id:
+                selected = name, files
+        return selected
 
     def commit(self, operation_id, intent, files, expected_head=None, fault=None, lock_timeout=None):
         if not isinstance(operation_id, str) or not operation_id or not isinstance(intent, bytes) or not isinstance(files, dict):
@@ -270,11 +275,7 @@ class Store:
         """
         with self._lock(lock_timeout):
             head = self._head()
-            self._history(head)
-            keep = set()
-            while head is not None:
-                keep.add(head)
-                head = self._generation(head)[0]['previous']
+            keep = {name for name, _, _ in self._walk(head)}
             remove = []
             # Validate the complete cleanup set before deleting anything.
             for path in self.generations.iterdir():

@@ -1,0 +1,28 @@
+{
+  "commit": "5264848ca26df5ee2a021ddcc9388706cc6a1208",
+  "run": 43441054242,
+  "conclusion": "failure",
+  "cause": "Scenario138 extracts and executes the compatibility claim example from SKILL.md. Compaction removed the heading/snippet, producing empty execution and no actual Gate output.",
+  "fix": "Restore executable compatibility example under matching fast-lane heading. No original assertion, test, timeout or Gate changed. Local scenario138 now passes all3 assertions.",
+  "jobs": [
+    {
+      "platform": "macos",
+      "job_id": 131938431295,
+      "conclusion": "failure",
+      "raw_log_sha256": "8b6b18639abaa1a8b060e589577d3815227d3fd4498fe112903dc55e8a11851f",
+      "actual_assertion_failures": [
+        "lint (macos-latest)\tScenario test suite (gate semantics, no API needed)\t2026-11-13T14:23:10.7538510Z   FAIL - 138 actual gate output"
+      ]
+    },
+    {
+      "platform": "ubuntu",
+      "job_id": 131938431655,
+      "conclusion": "failure",
+      "raw_log_sha256": "6c5215274f84d0f7093b0d6959c0b53098d9a1b5a409939aaef8ded0e7f29a43",
+      "actual_assertion_failures": [
+        "lint (ubuntu-latest)\tScenario test suite (gate semantics, no API needed)\t2026-11-13T14:20:09.8927408Z   FAIL - 138 actual gate output"
+      ]
+    }
+  ],
+  "claimed_passed": false
+}

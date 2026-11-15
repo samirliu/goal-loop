@@ -1,0 +1,56 @@
+{
+  "small-store": {
+    "median_seconds": {
+      "before": 0.00020004203543066978,
+      "after": 0.00010895798914134502
+    },
+    "cost_gain": 0.44584657635364366,
+    "after_faster_pairs": 15,
+    "identities_equal": true
+  },
+  "small-digest": {
+    "median_seconds": {
+      "before": 0.0862193750217557,
+      "after": 0.08536845911294222
+    },
+    "cost_gain": 0.011890745317757245,
+    "after_faster_pairs": 12,
+    "identities_equal": true
+  },
+  "small-context": {
+    "median_seconds": {
+      "before": 0.21405025012791157,
+      "after": 0.19005812495015562
+    },
+    "cost_gain": 0.10771561525781281,
+    "after_faster_pairs": 15,
+    "identities_equal": true
+  },
+  "large-store": {
+    "median_seconds": {
+      "before": 0.027108000125735998,
+      "after": 0.02579641598276794
+    },
+    "cost_gain": 0.050456052482174774,
+    "after_faster_pairs": 15,
+    "identities_equal": true
+  },
+  "large-digest": {
+    "median_seconds": {
+      "before": 0.27657595789059997,
+      "after": 0.17348899994976819
+    },
+    "cost_gain": 0.36474915063197055,
+    "after_faster_pairs": 15,
+    "identities_equal": true
+  },
+  "large-context": {
+    "median_seconds": {
+      "before": 0.49262691708281636,
+      "after": 0.3334722078870982
+    },
+    "cost_gain": 0.3228271439227939,
+    "after_faster_pairs": 15,
+    "identities_equal": true
+  }
+}

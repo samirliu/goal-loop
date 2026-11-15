@@ -82,27 +82,11 @@ marketplaces: mattpocock/skills · obra/superpowers-marketplace · anthropics/cl
 
 ## 跨设备（Mac Studio / cc-haha）系统依赖
 
-goal-loop 脚本面是 bash + 常见 UNIX 工具，**无 jq**。macOS 注意：
+goal-loop 需要 POSIX Python 3.10+（目录锁与进程组；本轮验证 3.12/3.14）、Bash 3.2+ 与 GNU awk。无 jq、无 GNU timeout 硬依赖；macOS 系统 Bash 3.2 可用，BSD awk 不能代替 gawk。指纹需要 SHA-256 工具和 sha1sum 或 cksum 后备。
 
-| 工具 | 用途 | macOS |
-|---|---|---|
-| `bash` ≥4 | 关联数组等 | `brew install bash`（系统 3.2 不够） |
-| `sha1sum` | 树指纹 | `brew install coreutils` |
-| `timeout` | check 超时 | coreutils `timeout` / `gtimeout` |
-| `find` `xargs -0` `sort` `awk` `sed` `grep` | digest / parse | 系统自带 |
-| `git` | 可选树指纹 | Xcode CLT / brew |
+先在源码目录执行 `python3 scripts/goal_install.py doctor`。macOS 可安装 `gawk`；Linux 可安装 `gawk`。Doctor 不修改系统。安装采用 [README 的完整插件或 skill 入口](../README.md#install--安装)，不用为了本 skill 额外换 Bash 或默认安装其他外部插件。
 
-**建议安装顺序（新机）：**
-
-```text
-1. brew install bash coreutils git
-2. goal-loop → ~/.claude/skills/goal-loop
-3. companions/contract-forge → ~/.claude/skills/contract-forge
-4. marketplaces: mattpocock + superpowers + claude-plugins-official
-5. 装 P0/P1（上表）
-6. 注册 goal_hook.sh（可选 Stop hook）
-7. 自检: goal-loop tests/run_tests.sh && contract-forge tests/run_fixtures.sh
-```
+完整插件自动提供 5 个角色和 8 类 hooks；skill 安装命令也注册 5 个角色，但预算/worker 事件需显式 bridge。外部 companion 均可选，不构成闭环硬依赖。原生 Windows Python 的完整运行未验证，git-bash 不能替代 fcntl 锁。
 
 ---
 

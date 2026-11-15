@@ -1,0 +1,226 @@
+{
+  "recorded_utc": "2026-11-13T13:51:31.228555+00:00",
+  "baseline_commit": "00e68c2e04d8356d2d6af38759829a3147d17f77",
+  "branch": "perf/direct-submit-20261113",
+  "files": {
+    "SKILL.md": {
+      "sha256": "5d0629fce710f8672d14cba3caefbee93d792bcf9b2fa1bf1b3c5bdd55e4a281",
+      "bytes": 10843
+    },
+    "agents/goal-adjudicator.md": {
+      "sha256": "f7ede0b8f73573a4e6c416d1282fda5d8340226611b2c68c0603ba2b803d73f3",
+      "bytes": 1663
+    },
+    "agents/goal-checker-req.md": {
+      "sha256": "407a8d9d2e85261bfb09b2a0c2ee5d6864a4abb572b4adc25ffeab3cb7c7c73d",
+      "bytes": 3062
+    },
+    "agents/goal-critic.md": {
+      "sha256": "d3034a768937c08f2766bbcdccb2b276df669d950f0f143bca40188a378b5544",
+      "bytes": 2552
+    },
+    "agents/goal-mech-worker.md": {
+      "sha256": "cf95458067dee6950a6fc73d8641bd381519eaeafc1396c6c7e1da37f0ead7d6",
+      "bytes": 1504
+    },
+    "agents/goal-worker.md": {
+      "sha256": "93fc6d5de4e0b3c03d31c5e62b250b277017fe3ebdd3e18667203e1e5e7cfd06",
+      "bytes": 2250
+    },
+    "assets/evidence_cache.sh": {
+      "sha256": "c03dbb8ccb2ed8b0101199f33700b66abff23fac2cadeded86436deccb41db9a",
+      "bytes": 2380
+    },
+    "assets/goal.contract.md": {
+      "sha256": "a1b065ecb9c8d5d93ed1fd5cbf31d1fb51e0e6471e078441cc8422d542287ac3",
+      "bytes": 7336
+    },
+    "assets/pre-reg.template.md": {
+      "sha256": "3f17b602e9bc31149816cecae5812ae1fdc010d4345a39e28766f0ddbc276b7e",
+      "bytes": 1910
+    },
+    "companions/contract-forge/SKILL.md": {
+      "sha256": "a820504b7b60f7eeabafc6cfb7bf1ef93d77f29eadd31ed6a5861485187daba3",
+      "bytes": 3979
+    },
+    "companions/contract-forge/assets/contract.draft.md": {
+      "sha256": "28fa697ae8c8093c499c69d195f15a05196997672bb90fbe240c46d06f63a063",
+      "bytes": 2244
+    },
+    "companions/contract-forge/references/ac-shapes.md": {
+      "sha256": "02785659cda4e3d226840ad82bd02e99515829f625a1087f28e3c240e7e72dc8",
+      "bytes": 3098
+    },
+    "companions/contract-forge/references/interview-tree.md": {
+      "sha256": "fd383d4c470cd806f1a321b5f71b18a4101d860a382c596b976e70b36eb0737d",
+      "bytes": 3350
+    },
+    "companions/contract-forge/references/stamp-checklist.md": {
+      "sha256": "706dbc8f4b784fcc079f3700334f6803cf6ca93a63d59f914f28ebbab4cd6bd5",
+      "bytes": 2207
+    },
+    "companions/contract-forge/scripts/lint_contract.sh": {
+      "sha256": "6a0a322c3a6c300222f4a31b654f60c7e79da369e72b919b54121c576384ff66",
+      "bytes": 10951
+    },
+    "companions/contract-forge/tests/fixtures/bad-calib-on-metric.md": {
+      "sha256": "0c8af67a2e69737dd5d2c09dab4efdaf5afee739aa8871945ee864a3565bde35",
+      "bytes": 281
+    },
+    "companions/contract-forge/tests/fixtures/bad-no-horizon.md": {
+      "sha256": "cf7fbff5b4d6dc04d2bf7fdc9392cdfbd7459d99ee4db351b55d3611ff2deead",
+      "bytes": 532
+    },
+    "companions/contract-forge/tests/fixtures/bad-objective-target.md": {
+      "sha256": "64c23f6de242f893b7e0b370a395c216761b55debc0bdb1ddc861e2c7e0d5dd2",
+      "bytes": 561
+    },
+    "companions/contract-forge/tests/fixtures/bad-pipe-spec.md": {
+      "sha256": "38e4d067ff7fb289ab89a73a61ec4870d27c05023be175cc7427026e48cef3e0",
+      "bytes": 233
+    },
+    "companions/contract-forge/tests/fixtures/bad-window-no-external.md": {
+      "sha256": "89b2518b877a6a22a04a585fdfa87bbf397b0cbe3c2602cabfe90e33f17504f7",
+      "bytes": 261
+    },
+    "companions/contract-forge/tests/fixtures/good-objective-forge.md": {
+      "sha256": "4e7abb8d1c68945c8fed7d9b68e7e447d040d59178556bdeab6a11e99c469522",
+      "bytes": 830
+    },
+    "companions/contract-forge/tests/fixtures/good-pipe-in-backtick.md": {
+      "sha256": "7d7d83d17f633ade2b67d7dc2c9c5b0a89b7d565f1cb0010feecde4869124554",
+      "bytes": 270
+    },
+    "companions/contract-forge/tests/fixtures/good-threshold.md": {
+      "sha256": "e7d922f5605790fca24a499342f6df2894e4152dc2081f434d6cfd6260f4276a",
+      "bytes": 584
+    },
+    "companions/contract-forge/tests/run_fixtures.sh": {
+      "sha256": "341b527a6bd33aefc0ffd91b68008eb17d48663733bfb8d9f53dcdf822c989c7",
+      "bytes": 2010
+    },
+    "references/companions.md": {
+      "sha256": "f004518887cfd11d0e599bd3dc4f0ed8fc91ef73237ddc5aaa7f3906fd2c8fa3",
+      "bytes": 4658
+    },
+    "references/crew.md": {
+      "sha256": "25f2efc6e9d1f439c21d384311945cfdc663cb8bc990c8e419f34e2a4b01fb48",
+      "bytes": 15500
+    },
+    "references/gate.md": {
+      "sha256": "eff07f4714d87178deaee9d164ffa01eff6d92eb1b6f506901065e5e0189741d",
+      "bytes": 21339
+    },
+    "references/host.md": {
+      "sha256": "d2f01792e747f89db9d5f46165609e08fb9667b4eaab5d905929369cd09ae31d",
+      "bytes": 11344
+    },
+    "references/packs/README.md": {
+      "sha256": "4c0b959ea7644cccc65055d8b3b4471767a43b3ae58e6b47c24e2568819a04fd",
+      "bytes": 962
+    },
+    "references/packs/external.md": {
+      "sha256": "25f77d3591b44f9c77a6213897659f3883acd55e0cfda71691cab46000c08d78",
+      "bytes": 2022
+    },
+    "references/packs/gradient.md": {
+      "sha256": "8ab8c80345900566fe9159be3d48bc42fd7a0ea2236d59131897cc86720ae03d",
+      "bytes": 12619
+    },
+    "references/packs/instrument.md": {
+      "sha256": "9ba9e8591472c1d0afe30ad1dc1711e4d4d744f8beef47f36759e8a9f2b569c1",
+      "bytes": 3918
+    },
+    "references/patterns.md": {
+      "sha256": "2dfb30a03ea84b946c93d8c656ba05b212f81fd58695267323e73b1c8e65320d",
+      "bytes": 8754
+    },
+    "scripts/goal_audit.sh": {
+      "sha256": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb",
+      "bytes": 8455
+    },
+    "scripts/goal_bounded.py": {
+      "sha256": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c",
+      "bytes": 4880
+    },
+    "scripts/goal_context.py": {
+      "sha256": "fcba8cd49cc1d00d79d36a243d8d3bf0b41c94178a82975933a0ba29bda28ef0",
+      "bytes": 41441
+    },
+    "scripts/goal_crew.py": {
+      "sha256": "431cdd1936800c6dca9fc03ba46ae71c5f31a7d7cf3edd9621b8f10bb430f591",
+      "bytes": 42372
+    },
+    "scripts/goal_ctl.sh": {
+      "sha256": "599e362b4d72949f4dfa5ac6f7c54abb2e6eae04467dbd07f5c7ad8eec26d3d3",
+      "bytes": 53129
+    },
+    "scripts/goal_evolve.py": {
+      "sha256": "2a660c109648286f655e84bc74f0acb5e0b4a0db08e6ec1e22799e7fb271cca3",
+      "bytes": 39720
+    },
+    "scripts/goal_forge.py": {
+      "sha256": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb",
+      "bytes": 19977
+    },
+    "scripts/goal_gate.sh": {
+      "sha256": "ac2571808ae804f57c9ef5376698f8b54fb4632676d6424bf78ca79f1a94f824",
+      "bytes": 53728
+    },
+    "scripts/goal_hook.sh": {
+      "sha256": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87",
+      "bytes": 2898
+    },
+    "scripts/goal_host.py": {
+      "sha256": "3ea93a92bf125aa5543846e7dd472a6be7e79b56ff2ad50dc546d44e07e1e151",
+      "bytes": 38897
+    },
+    "scripts/goal_host_command.py": {
+      "sha256": "5dd63083301040150fbe7e346052ffdb529754b3fd5415fa90dd9e926b4ae608",
+      "bytes": 4174
+    },
+    "scripts/goal_host_config.py": {
+      "sha256": "fcb9118c8ce1b9a940bfeed1cc289155f4366c301ff2acaa926cb5c0d494f1f5",
+      "bytes": 904
+    },
+    "scripts/goal_loop.sh": {
+      "sha256": "c059480a6b5827efaaccead8bf88ff4544417892b348b47428c934a2fa74a36b",
+      "bytes": 278
+    },
+    "scripts/goal_owner_watch.py": {
+      "sha256": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+      "bytes": 14672
+    },
+    "scripts/goal_parse.sh": {
+      "sha256": "1c33a08b2df1a5764672ee9953783e681a640fa0481197f7e266ee0b22e23b70",
+      "bytes": 24940
+    },
+    "scripts/goal_runner.py": {
+      "sha256": "19d7857fe9e1249071dac1ec105050b6d56b1d778aeb2613e2867ff1f10b7d01",
+      "bytes": 20108
+    },
+    "scripts/goal_store.py": {
+      "sha256": "aca070768478bc8f98f742042c5ce4dd6534c83bab408d451b2912bbdb457f56",
+      "bytes": 74615
+    },
+    "scripts/goal_strategy.awk": {
+      "sha256": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+      "bytes": 6219
+    },
+    "scripts/goal_trace.py": {
+      "sha256": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb",
+      "bytes": 9591
+    },
+    "scripts/goal_tree_digest.py": {
+      "sha256": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d",
+      "bytes": 8401
+    },
+    "README.md": {
+      "sha256": "3d16967b42febd8ba6d9cf8723a09a96bfa5aea0f29c7cae4cb2261b59c0e509",
+      "bytes": 18874
+    }
+  },
+  "new_real_model_positions": 0,
+  "source_status": "Frozen candidate for CI; no new real complex-task evaluation yet",
+  "original_gate_audit_store_runner_unchanged": true
+}

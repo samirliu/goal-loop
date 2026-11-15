@@ -1,0 +1,38 @@
+FF.F.............
+======================================================================
+FAIL: test_enter_from_real_shaped_prompt_keeps_earliest_origin (__main__.ContextEntry.test_enter_from_real_shaped_prompt_keeps_earliest_origin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_submit.py", line 219, in test_enter_from_real_shaped_prompt_keeps_earliest_origin
+    self.assertEqual(value['context']['budget_scope'], 'host-prompt')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'host-prompt-entry' != 'host-prompt'
+- host-prompt-entry
+?            ------
++ host-prompt
+
+
+======================================================================
+FAIL: test_entry_never_enables_auto_approval_without_explicit_flag (__main__.ContextEntry.test_entry_never_enables_auto_approval_without_explicit_flag)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_submit.py", line 206, in test_entry_never_enables_auto_approval_without_explicit_flag
+    self.assertNotEqual(refused.returncode, 0)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+======================================================================
+FAIL: test_mutating_smoke_does_not_stamp (__main__.ContextEntry.test_mutating_smoke_does_not_stamp)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_context_submit.py", line 195, in test_mutating_smoke_does_not_stamp
+    self.assertEqual(result.returncode, 4, result.stdout+result.stderr)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 4 : GATE: VERIFY AC-1|PASS|exit=0
+GATE: NO-GO reason=check-mutated-tree:before=v2-5c129958ce2d944bc9fc60d2754ab600a3e3ee516cf948dc3891f1ec3a3bb479 after=v2-10714f73c25af9dcda0519f50946f0a0e13d51be276b6d7ab59889c42c9e62cf
+
+
+----------------------------------------------------------------------
+Ran 17 tests in 50.176s
+
+FAILED (failures=3)

@@ -1,0 +1,21 @@
+{
+  "comparison": "same active archive before/after qualification, fresh inputs, original statistical history",
+  "task_family": "paths",
+  "seed_offset": 141501,
+  "pairs_per_phase": 20,
+  "trial_seconds": 5,
+  "experiment_seconds": 60,
+  "expected_action": "requalify archived set-safe candidate; no retries or threshold changes",
+  "prior_pointer": {
+    "policy": "89810b0709743790cc2f8f618a863966bba3d952359ba5e1b72a86ffac99217a",
+    "program": "policies/89810b0709743790cc2f8f618a863966bba3d952359ba5e1b72a86ffac99217a.py",
+    "protocol": "4805d9d1d2c5032fc61d8629f571e0f0194176745f11e29aa5ba5c90994a9932",
+    "run": "213c05da391240a8a50977d1d1592c3c",
+    "version": 1
+  },
+  "prior_statistical_budget": {
+    "evaluations": 2,
+    "version": 1
+  },
+  "prior_exposure_sha256": "d741da4d938af5f38ef565a3156add25321aadb0f57462f118d1d005bddf7559"
+}

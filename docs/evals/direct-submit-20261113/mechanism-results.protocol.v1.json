@@ -1,0 +1,62 @@
+{
+  "kind": "Local program-lifecycle diagnostic, no model or real-task utility evidence",
+  "source_hashes": {
+    "baseline": {
+      "scripts/goal_audit.sh": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb",
+      "scripts/goal_bounded.py": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c",
+      "scripts/goal_context.py": "1a64594cc1c0443259dc1fc5ec20506b40655376ddc98bbd2eb22b5416cb4dd0",
+      "scripts/goal_crew.py": "431cdd1936800c6dca9fc03ba46ae71c5f31a7d7cf3edd9621b8f10bb430f591",
+      "scripts/goal_ctl.sh": "599e362b4d72949f4dfa5ac6f7c54abb2e6eae04467dbd07f5c7ad8eec26d3d3",
+      "scripts/goal_evolve.py": "2a660c109648286f655e84bc74f0acb5e0b4a0db08e6ec1e22799e7fb271cca3",
+      "scripts/goal_forge.py": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb",
+      "scripts/goal_gate.sh": "ac2571808ae804f57c9ef5376698f8b54fb4632676d6424bf78ca79f1a94f824",
+      "scripts/goal_hook.sh": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87",
+      "scripts/goal_host.py": "b17fa94e5704a7d11ed619fbecf623b017135bd37d786f56786eb9b819ab84d4",
+      "scripts/goal_host_command.py": "5dd63083301040150fbe7e346052ffdb529754b3fd5415fa90dd9e926b4ae608",
+      "scripts/goal_host_config.py": "fcb9118c8ce1b9a940bfeed1cc289155f4366c301ff2acaa926cb5c0d494f1f5",
+      "scripts/goal_loop.sh": "c059480a6b5827efaaccead8bf88ff4544417892b348b47428c934a2fa74a36b",
+      "scripts/goal_owner_watch.py": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+      "scripts/goal_parse.sh": "1c33a08b2df1a5764672ee9953783e681a640fa0481197f7e266ee0b22e23b70",
+      "scripts/goal_runner.py": "19d7857fe9e1249071dac1ec105050b6d56b1d778aeb2613e2867ff1f10b7d01",
+      "scripts/goal_store.py": "aca070768478bc8f98f742042c5ce4dd6534c83bab408d451b2912bbdb457f56",
+      "scripts/goal_strategy.awk": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+      "scripts/goal_trace.py": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb",
+      "scripts/goal_tree_digest.py": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d"
+    },
+    "candidate": {
+      "scripts/goal_audit.sh": "390235c1b80793f625f257e920c8395c54a8bd389884960b532f444f4b9d1feb",
+      "scripts/goal_bounded.py": "1dca8a78cc349d197ae326576cd0c320f7ce51c96797e5c289a778593405b01c",
+      "scripts/goal_context.py": "fcba8cd49cc1d00d79d36a243d8d3bf0b41c94178a82975933a0ba29bda28ef0",
+      "scripts/goal_crew.py": "431cdd1936800c6dca9fc03ba46ae71c5f31a7d7cf3edd9621b8f10bb430f591",
+      "scripts/goal_ctl.sh": "599e362b4d72949f4dfa5ac6f7c54abb2e6eae04467dbd07f5c7ad8eec26d3d3",
+      "scripts/goal_evolve.py": "2a660c109648286f655e84bc74f0acb5e0b4a0db08e6ec1e22799e7fb271cca3",
+      "scripts/goal_forge.py": "8158dd7ed9b023a90e027768e0117bef7426693fbe0fcac83ed90ac176878ceb",
+      "scripts/goal_gate.sh": "ac2571808ae804f57c9ef5376698f8b54fb4632676d6424bf78ca79f1a94f824",
+      "scripts/goal_hook.sh": "6c1b770650a7d327e8c228b3f1081b2633ada9c4fbba2adde556f3c7e72c4a87",
+      "scripts/goal_host.py": "d633f81e1fd57da9f0dc21d55d86a1f923d7cba85f5df7c7249d09f7f47a8217",
+      "scripts/goal_host_command.py": "5dd63083301040150fbe7e346052ffdb529754b3fd5415fa90dd9e926b4ae608",
+      "scripts/goal_host_config.py": "fcb9118c8ce1b9a940bfeed1cc289155f4366c301ff2acaa926cb5c0d494f1f5",
+      "scripts/goal_loop.sh": "c059480a6b5827efaaccead8bf88ff4544417892b348b47428c934a2fa74a36b",
+      "scripts/goal_owner_watch.py": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd",
+      "scripts/goal_parse.sh": "1c33a08b2df1a5764672ee9953783e681a640fa0481197f7e266ee0b22e23b70",
+      "scripts/goal_runner.py": "19d7857fe9e1249071dac1ec105050b6d56b1d778aeb2613e2867ff1f10b7d01",
+      "scripts/goal_store.py": "aca070768478bc8f98f742042c5ce4dd6534c83bab408d451b2912bbdb457f56",
+      "scripts/goal_strategy.awk": "f8261f403e76fbb0cd0da1e1369016a958e7f4c49a2c6adc5b613ed92435469c",
+      "scripts/goal_trace.py": "edb2deb8bef6af16215a7b370b5df6bbe9ac88cb3fd6edab9f5f0c3e49032dfb",
+      "scripts/goal_tree_digest.py": "f4533f37e2787ce9d73cba3dbf557cfb2c58a8471311bb98bbe2d1c94fead97d"
+    }
+  },
+  "order": [
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate"
+  ],
+  "model_calls": 0,
+  "real_complex_tasks": 0,
+  "quality": "Identical failing repair fixture, actual repair and second-pass check, original receipt/audit/Gate pass",
+  "metric": "All local lifecycle seconds and external protocol CLI calls; not measured model turns, tokens, or billed cost",
+  "limits": "Compares documented mapped file workflow; legacy low-level commands can be manually batched. This is not a lower bound on host calls or proof of end-to-end savings."
+}

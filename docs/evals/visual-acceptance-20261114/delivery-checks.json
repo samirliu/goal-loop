@@ -1,0 +1,34 @@
+[
+  {
+    "check": "docs",
+    "command": [
+      "bash",
+      "tests/docs_consistency.sh"
+    ],
+    "result": 0,
+    "elapsed": 0.5577408329118043,
+    "log": "/tmp/goal-loop-visual-quality-delivery-docs-20261114.log"
+  },
+  {
+    "check": "skill",
+    "command": [
+      "python3.12",
+      "/Users/m/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+      "."
+    ],
+    "result": 0,
+    "elapsed": 0.0455437081400305,
+    "log": "/tmp/goal-loop-visual-quality-delivery-skill-20261114.log"
+  },
+  {
+    "check": "diff",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "result": 0,
+    "elapsed": 0.02045079111121595,
+    "log": "/tmp/goal-loop-visual-quality-delivery-diff-20261114.log"
+  }
+]

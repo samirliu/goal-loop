@@ -15,7 +15,7 @@ set -u
 export LC_ALL=C.UTF-8
 
 here=$(cd "$(dirname "$0")/.." && pwd)
-cd "$here"
+cd "$here" || exit 1
 fail=0
 ok(){ echo "  ok   - $1"; }
 bad(){ fail=1; echo "  FAIL - $1"; }
@@ -61,7 +61,7 @@ while IFS= read -r line; do
 $(printf '%s\n' "$line" | grep -ohE '([A-Za-z0-9_.-]+/)?(references|scripts|assets|tests)/[A-Za-z0-9_][A-Za-z0-9_./-]*' | sort -u)
 EOF
 done < <(grep -hE '(references|scripts|assets|tests)/[A-Za-z0-9_]' \
-        SKILL.md INTEGRATION.md references/*.md assets/goal.contract.md 2>/dev/null | sort -u)
+        SKILL.md references/*.md assets/goal.contract.md 2>/dev/null | sort -u)
 [ "$missing" -eq 0 ] && ok "C1 all internal cited files exist (external skipped=$skipped)"
 
 # C2 version agreement with the VERSION file
@@ -116,10 +116,12 @@ scripts/goal_gate.sh|probe-failed
 scripts/goal_gate.sh|score-regressed
 scripts/goal_gate.sh|missing-strategy-delta
 scripts/goal_ctl.sh|strategy-delta
-scripts/goal_parse.sh|(exit|objective|horizon-waived):
+scripts/goal_parse.sh|(exit|objective|horizon-waived|quality):
 scripts/goal_ctl.sh|gp_ac_body_hash
 scripts/goal_gate.sh|gp_ac_body_hash
-scripts/goal_ctl.sh|gp_hash_std
+scripts/goal_ctl.sh|gp_script_freeze
+scripts/goal_gate.sh|gp_script_freeze
+scripts/goal_parse.sh|gp_hash_std
 SKILL.md|minimize
 references/gate.md|low-water for minimize
 scripts/goal_parse.sh|minimize)  echo "minimize"
@@ -203,8 +205,9 @@ EOF
 
 # C6 generality: case knowledge stays in examples/. Generic skill surfaces
 # must not name any validation case or its domain recipe.
+# The install inventory names example paths as packaging data, not instructions.
 leak=$(grep -nE 'tsp-minimize|logcli|svg-dash|goal-loop-case-|波音|b747|threejs|THREEJS|goal-loop-747' \
-        SKILL.md references/*.md references/packs/*.md scripts/*.sh tests/*.sh assets/* 2>/dev/null | grep -v '^tests/docs_consistency.sh:' || true)
+        SKILL.md references/*.md references/packs/*.md scripts/*.sh tests/*.sh assets/* 2>/dev/null | grep -v -e '^tests/docs_consistency.sh:' -e '^assets/install-files.json:' || true)
 if [ -z "$leak" ]; then
   ok "C6 no case knowledge leaked into generic skill files"
 else

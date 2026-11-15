@@ -1,0 +1,65 @@
+{
+  "verified": true,
+  "cases": [
+    {
+      "case": "incomplete-phase-resealed",
+      "rejected": true,
+      "reason": "incomplete phase"
+    },
+    {
+      "case": "false-benefit-resealed",
+      "rejected": true,
+      "reason": "paired decision mismatch: cost_gain"
+    },
+    {
+      "case": "false-calibration-resealed",
+      "rejected": true,
+      "reason": "calibration output changed"
+    },
+    {
+      "case": "omitted-raw-trial",
+      "rejected": true,
+      "reason": "trial ledger mismatch"
+    },
+    {
+      "case": "changed-runtime",
+      "rejected": true,
+      "reason": "runtime source changed: goal_bounded.py"
+    },
+    {
+      "case": "changed-workflow-source",
+      "rejected": true,
+      "reason": "workflow source changed: /Users/m/repo/goal-loop/scripts/goal_crew.py"
+    },
+    {
+      "case": "known-bad-marked-accepted",
+      "rejected": true,
+      "reason": "workflow false completion"
+    },
+    {
+      "case": "false-learned-execution-mode",
+      "rejected": true,
+      "reason": "actual execution mode mismatch"
+    },
+    {
+      "case": "omitted-consumption-cost",
+      "rejected": true,
+      "reason": "later preparation/archiving omitted"
+    },
+    {
+      "case": "reset-statistical-history",
+      "rejected": true,
+      "reason": "upgrade reset statistical history"
+    },
+    {
+      "case": "omitted-prior-exposure",
+      "rejected": true,
+      "reason": "prior exposure changed"
+    },
+    {
+      "case": "false-hot-path-aggregation",
+      "rejected": true,
+      "reason": "benchmark aggregation changed"
+    }
+  ]
+}

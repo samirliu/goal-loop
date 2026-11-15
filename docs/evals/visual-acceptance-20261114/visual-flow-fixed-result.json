@@ -1,0 +1,48 @@
+{
+  "cold_verdict": "PASS",
+  "findings": [],
+  "attempts_retained": 2,
+  "result": 0,
+  "completion_verified": true,
+  "receipt": {
+    "checks": {
+      "audit": {
+        "command": [
+          "bash",
+          "/Users/m/repo/goal-loop/scripts/goal_audit.sh",
+          "--project",
+          "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-loop-visual-quality-20261114-91zl7rje/visual-flow-fixed"
+        ],
+        "elapsed": 0.17252645804546773,
+        "result": 0,
+        "stderr": "",
+        "stdout": "AUDIT: WARN A8 judge-score-unrecorded (judged ACs present but no numeric judge= in scores.rec; pass --judge-score to close-iteration - R13 divergence guard is inert)\nAUDIT: clean (controller ledger hygiene OK)\n"
+      },
+      "gate": {
+        "command": [
+          "bash",
+          "/Users/m/repo/goal-loop/scripts/goal_gate.sh",
+          "--check",
+          "--project",
+          "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-loop-visual-quality-20261114-91zl7rje/visual-flow-fixed"
+        ],
+        "elapsed": 0.9565079580061138,
+        "result": 0,
+        "stderr": "GATE: NOTE judge-score-unrecorded (AC-1 claimed without a numeric judge score; R13 stays inert - record --judge-score N to activate the divergence guard)\n",
+        "stdout": "GATE: NOTE time-budget-exhausted (graceful delivery of passing work)\nGATE: GO digest=v2-0f3252573e37084bca621c0f3f71b60fc3508ac3f4750cb41d54b71a637fe5c6 iter=1 ac=1 pass=1 unverified=0 mode=threshold\n"
+      }
+    },
+    "completion_verified": true,
+    "head": "548ec205f16ddef969b52e34196c42d636d2e2091b3d625b89958ed5c79a7313",
+    "money": null,
+    "policies": [],
+    "project": "/private/var/folders/dy/gc1bdgjn53b18wm5g19nkv800000gn/T/goal-loop-visual-quality-20261114-91zl7rje/visual-flow-fixed",
+    "reused_units": [],
+    "tokens": null,
+    "unresolved": [],
+    "version": 1
+  },
+  "original_epoch_deadline_preserved": true,
+  "controls": "visual-flow-controls.json",
+  "summary_correction": "The initial derived deadline-preserved boolean was too broad; retain actual epoch/monotonic values and controlled-host limitations. Original raw receipt and runner files are unchanged."
+}

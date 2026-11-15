@@ -1,0 +1,28 @@
+test_broken_grader_does_not_withdraw_an_enabled_policy (test_evolve.Evolution.test_broken_grader_does_not_withdraw_an_enabled_policy) ... ok
+test_changed_grader_leaves_failed_trace_and_preserves_enabled_policy (test_evolve.Evolution.test_changed_grader_leaves_failed_trace_and_preserves_enabled_policy) ... ok
+test_development_gain_then_complete_holdout_regression_keeps_incumbent (test_evolve.Evolution.test_development_gain_then_complete_holdout_regression_keeps_incumbent) ... ok
+test_enough_pairs_before_deadline_does_not_qualify_a_partial_phase (test_evolve.Evolution.test_enough_pairs_before_deadline_does_not_qualify_a_partial_phase) ... ok
+test_former_development_inputs_cannot_be_used_as_holdout (test_evolve.Evolution.test_former_development_inputs_cannot_be_used_as_holdout) ... ok
+test_inconclusive_monitor_retains_incumbent_and_does_not_reset_testing_budget (test_evolve.Evolution.test_inconclusive_monitor_retains_incumbent_and_does_not_reset_testing_budget) ... ok
+test_noop_or_overlapping_tasks_refused_before_state_creation (test_evolve.Evolution.test_noop_or_overlapping_tasks_refused_before_state_creation) ... ok
+test_only_replicated_eligible_cost_improvement_passes (test_evolve.Evolution.test_only_replicated_eligible_cost_improvement_passes) ... ok
+test_real_worker_failure_and_timeout_are_measured_not_dropped (test_evolve.Evolution.test_real_worker_failure_and_timeout_are_measured_not_dropped) ... ok
+test_registry_promotes_and_withdraws_without_reusing_holdout (test_evolve.Evolution.test_registry_promotes_and_withdraws_without_reusing_holdout) ... ok
+test_trial_budget_covers_worker_and_grader_together (test_evolve.Evolution.test_trial_budget_covers_worker_and_grader_together) ... ok
+test_always_fail_grader_is_detected_on_good_sample (test_evolve_calibration.Calibration.test_always_fail_grader_is_detected_on_good_sample) ... ok
+test_always_pass_grader_cannot_enable_incorrect_fast_policy (test_evolve_calibration.Calibration.test_always_pass_grader_cannot_enable_incorrect_fast_policy) ... ok
+test_bad_instrument_preserves_incumbent_and_sequential_budget (test_evolve_calibration.Calibration.test_bad_instrument_preserves_incumbent_and_sequential_budget) ... ok
+test_calibration_source_mutation_cannot_qualify (test_evolve_calibration.Calibration.test_calibration_source_mutation_cannot_qualify) ... ok
+test_calibration_timeout_is_bounded_and_never_a_product_regression (test_evolve_calibration.Calibration.test_calibration_timeout_is_bounded_and_never_a_product_regression) ... ok
+test_expiry_before_calibration_preserves_selection_without_running_instruments (test_evolve_calibration.Calibration.test_expiry_before_calibration_preserves_selection_without_running_instruments) ... ok
+test_feedback_refuses_path_escape_and_pending_transition (test_evolve_calibration.Calibration.test_feedback_refuses_path_escape_and_pending_transition) ... ok
+test_feedback_reports_real_failure_and_next_nonresetting_sample_requirement (test_evolve_calibration.Calibration.test_feedback_reports_real_failure_and_next_nonresetting_sample_requirement) ... ok
+test_good_and_bad_calibration_then_original_paired_qualification (test_evolve_calibration.Calibration.test_good_and_bad_calibration_then_original_paired_qualification) ... ok
+test_malformed_or_escaping_calibration_refused_before_state_creation (test_evolve_calibration.Calibration.test_malformed_or_escaping_calibration_refused_before_state_creation) ... ok
+test_omitting_calibration_cannot_qualify_even_a_legacy_shaped_protocol (test_evolve_calibration.Calibration.test_omitting_calibration_cannot_qualify_even_a_legacy_shaped_protocol) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 4.035s
+
+OK
+EVOLVE_HOLDOUT_REJECTION {"status": "holdout-rejected", "development_gain": 0.5, "holdout_gain": -0.5, "holdout_pairs": 8, "holdout_alpha": 0.008333333333333333, "pointer_unchanged": true, "incumbent_sha256": "b1b5ba90c098a185c4d07e423f324505bd5a7ec2b15b8037aac61d5a5e3c4f4d", "history_preserved": true, "run_enabled_exit": 0, "run_enabled_stdout": "candidate\n"}

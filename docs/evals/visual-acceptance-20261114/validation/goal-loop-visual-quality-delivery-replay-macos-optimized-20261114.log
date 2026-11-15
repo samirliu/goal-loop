@@ -1,0 +1,17 @@
+{
+  "verified": true,
+  "actual_baseline_checks": 7,
+  "supervised_baseline_measurements": 21,
+  "original_contract_now_rejected": true,
+  "original_case_reviewed_views": 6,
+  "original_findings": 3,
+  "actual_acceptance_attempts": 2,
+  "failed_attempt_retained": true,
+  "final_actual_gate": "GO",
+  "unchanged_rubric_and_anchors": true,
+  "epoch_deadline_and_origin_unchanged": true,
+  "monotonic_mapping_difference_seconds": 0.006346655776724219,
+  "positive_uses_bounded_settlement": true,
+  "semantic_grades": "observed independent model judgments, not established by hashes",
+  "scope": "recorded acceptance cases; no native lifecycle or general quality/efficiency benchmark"
+}

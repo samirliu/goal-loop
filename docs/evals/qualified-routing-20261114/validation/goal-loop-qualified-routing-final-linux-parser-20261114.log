@@ -1,0 +1,83 @@
+== goal_parse.sh unit suite ==
+  ok   - score valid: 7
+  ok   - score valid: 7.5
+  ok   - score valid: -10
+  ok   - score valid: 0
+  ok   - score valid: -0.25
+  ok   - score rejected: 1.2.3
+  ok   - score rejected: --5
+  ok   - score rejected: 
+  ok   - score rejected: -.5
+  ok   - score rejected: 1e3
+  ok   - score rejected: abc
+  ok   - natural valid: 12
+  ok   - natural rejected: empty
+  ok   - natural rejected: -3
+  ok   - natural rejected: 1.5
+  ok   - classify exit=0
+  ok   - classify empty
+  ok   - classify judged
+  ok   - classify maximize
+  ok   - classify minimize
+  ok   - classify prose
+  ok   - classify >=5
+  ok   - classify exit=2
+  ok   - classify spaces
+  ok   - ids
+  ok   - cmd with space
+  ok   - check decoy: AC-3 with literal calib: in command is NOT a calib declaration
+  ok   - metric regex
+  ok   - probe
+  ok   - baseline
+  ok   - tolerance
+  ok   - expected numeric
+  ok   - CRLF clean expected
+  ok   - objective ac
+  ok   - objective dir
+  ok   - objective dir minimize
+  ok   - body hash moves on exit: line
+  ok   - extract with capture
+  ok   - extract negative
+  ok   - extract keeps minus through strip
+  ok   - extract no match empty
+  ok   - extract empty regex empty
+  ok   - ansi strip
+  ok   - artifact simple
+  ok   - artifact with spaces
+  ok   - digest hex
+  ok   - no artifact
+  ok   - task crew ok
+  ok   - task fallback ok
+  ok   - bare task rejected (normalize first)
+  ok   - banana rejected
+  ok   - fallback with space rejected
+  ok   - teams backend rejected (removed)
+  ok   - fallback token
+  ok   - task stall-recovered ok
+  ok   - task tool-error-fixed ok
+  ok   - task re-run:stall ok
+  ok   - task re-run:tool-error ok
+  ok   - task re-run:death ok
+  ok   - bad re-run token rejected
+  ok   - fallback still ok
+  ok   - recovery extract
+  ok   - re-run extract
+  ok   - recovery empty when none
+  ok   - latest wins by file order
+  ok   - latest keeps higher iter
+  ok   - conflict same binding
+  ok   - no conflict across bindings
+  ok   - single row no conflict
+  ok   - unknown id no conflict
+  ok   - verdict 6 fields ok
+  ok   - 5-field verdict rejected
+  ok   - CRLF rows conflict-detected
+  ok   - same verdict twice is not a conflict
+  ok   - state crlf
+  ok   - state word
+  ok   - state empty key
+  ok   - state last row wins
+  ok   - state unterminated and literal value
+  ok   - state reread after change
+  ok   - state no file
+== goal_parse unit: pass=81 fail=0 ==

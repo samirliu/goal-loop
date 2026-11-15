@@ -122,7 +122,10 @@ contract, not the ledger).
   known-bad fixture of the AC's subject. The claim is refused until
   `AC-N#good` = PASS and `AC-N#bad` = FAIL are bound at the current
   iteration+digest (derived-id rows in verdicts.rec), and the row's evidence
-  must QUOTE the fixture file it read (an unbound grade is an invented grade).
+  must bind its exact fixture path and full SHA-256 using `artifact:` and
+  `digest:` (an unbound grade is an invented grade). Known-good and known-bad
+  bytes must differ and are frozen at stamp for every task. Contradictory
+  grades on unchanged state are refused for derived ids too.
   R9 extended from the numeric plane to the judgment plane: a seat that cannot
   reject the known-bad case cannot be trusted on the real one. Fixtures exist
   in the tree (stamp validates), fixture decay mid-loop = `calibration-broken`
@@ -136,27 +139,46 @@ contract, not the ledger).
   measurement, so a day-to-settle fact costs one query per window, not one per
   gate exit. `window:` without `external:` is refused at stamp (window caches
   an out-of-tree check - declare both or neither).
+  The same requirement applies to judged ACs: a seat's PASS cannot skip an
+  external query. Cache details bind project, artifact, contract and frozen
+  instruments; old/unbound/future rows are remeasured, and zero disables
+  caching. Verification reports external observations separately from the
+  skipped judgment; pending never becomes a judged PASS.
 - `sd: \`regex one capture group\`` / `var: \`regex\`` (v2.9, R17) extract the
   measurement's spread (stddev / variance, sqrt'd) from the check output. With
   a spread the R11 water-mark band is `max(2*spread/|best|, tolerance)` - the
   noise floor comes from data, not from the author's memory. Declared-but-
-  non-matching = BROKEN (fail-loud), never a silently band-less compare.
+  non-matching or negative dispersion = BROKEN (fail-loud), never a silently
+  band-less compare. Captures are whole decimal values: `.5` is normalized
+  to `0.5`; text suffixes or scientific notation are not numeric prefixes.
 - stderr is captured to the verdict detail (stdout stays the measurement
   channel); a FAIL/BROKEN that says only "failed" is the eval system
   violating fail-loud.
 - Optional contract line `objective: maximize|minimize AC-N` (R11): the gate tracks
   that AC's observed value against `best_score` and refuses a claim that
-  regresses. Stamp still covers only the AC body + `exit:`/`objective:`/
-  `horizon-waived:` lines.
+  regresses. The approval hash covers the AC body + `exit:`/`objective:`/
+  `horizon-waived:`/`quality:` lines; the managed freeze additionally binds
+  original brief/request and calibration bytes.
 - Optional contract line `horizon-waived: <reason>` (v2.9, R19): declares that
   the objective's blind spot is accepted. An objective contract needs either
   >=1 judged AC with `calib:` (the horizon layer) or this waiver - otherwise
   stamp refuses (a gradient without a guard-rail is a Goodhart machine).
+  Without a waiver, completion requires a calibrated horizon PASS; the
+  general UNVERIFIABLE allowance cannot remove the declared guard.
 - Stamp `^approved: [0-9a-f]{8} [0-9]{4}-` = sha1-8 over the AC section body
   PLUS every `^exit:`, `^objective:` and `^horizon-waived:` line (exit policy,
   maximize target and horizon waiver are frozen too - R11/R19 are unpatchable
   after stamping). Direction comes from the objective line; changing it is
   contract-tampered.
+
+The freeze also pins directly named local `check:`/`probe:`/`external:`
+scripts, including `.mjs`/`.cjs`. Transitive imports and command-resolution
+dependencies still require declared trustworthy instruments and scope.
+Quoted literal paths, including spaces, use shell tokenization rather than
+whitespace splitting; malformed quoting refuses stamp before ledger mutation.
+An already stamped contract missing the new brief/calibration bindings needs
+the normal amendment/approval and fresh actual review. Never rewrite managed
+freeze records to manufacture historical approval.
 
 ## 2 Digest + mutation guard
 
@@ -193,6 +215,17 @@ digests by construction.
 
 ## 3 Check order (first failure decides)
 
+For visual-quality work, `quality: visual AC-N views=...` binds a calibrated
+judged quality floor. Original fidelity wording can require the declaration
+even when the author selected only exit-code ACs. Stamp freezes the objective,
+available original host request, view scope and anchor bytes. The named quality
+AC must PASS, and its bound JSON review must cover every declared view with
+current image hashes and an empty unresolved-findings list. A bare adversarial
+clear or the general UNVERIFIABLE allowance cannot waive this floor. See
+[visual acceptance](packs/visual.md) for the schema and semantic review duties.
+Legacy visual contracts missing this coverage require review/amendment; old
+GO receipts remain historical and do not authorize new completion.
+
 ```
 0  state.rec keys complete                    else 4
 0b forge: dry_streak/dry_limit present        else 4
@@ -203,7 +236,7 @@ digests by construction.
 3  iteration <= max_iterations                else 2 (forge: 3 budget-fuse)
 4  no_progress_streak <= limit                else 3 stagnation
 4b last two blocks same error_signature       else 3 repeated-error
-1b check/probe script bodies match stamp freeze else 2 check-script-tampered
+1b check/probe/external scripts, brief and anchor bytes match freeze else 2 check-script-tampered
 5  last block exit_signal=yes                 else 2 not-claimed
 5c adversarial.rec clear@ (iter,digest)      else 2 adversarial-missing /
                                             adversarial-finding
@@ -224,7 +257,7 @@ digests by construction.
 8  judged PASS evidence cited AND artifact    else 2 evidence-missing /
    digest recomputes same                     verdict-unbound [R5]
 8b calib: fixtures graded both ways fresh     else 2 calibration-missing /
-   + EXCLUSIVE fixture citation per grade     calibration-broken [R15]
+   + exact fixture path + full SHA per grade  calibration-broken / calibration-unbound [R15]
 8c judged PASS claims judge=N when the ledger  else 2 judge-score-missing
    already records judge scores                 (NOTE once when it never
                                                 used the judge plane)

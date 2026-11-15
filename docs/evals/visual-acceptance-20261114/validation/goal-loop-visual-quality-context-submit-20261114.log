@@ -1,0 +1,27 @@
+test_broken_smoke_does_not_stamp (test_context_submit.ContextEntry.test_broken_smoke_does_not_stamp) ... ok
+test_enter_from_real_shaped_prompt_keeps_earliest_origin (test_context_submit.ContextEntry.test_enter_from_real_shaped_prompt_keeps_earliest_origin) ... ok
+test_entry_preserves_manual_approval_marker_without_auto_flag (test_context_submit.ContextEntry.test_entry_preserves_manual_approval_marker_without_auto_flag) ... ok
+test_entry_reports_context_store_errors_through_normal_host_error_path (test_context_submit.ContextEntry.test_entry_reports_context_store_errors_through_normal_host_error_path) ... ok
+test_failing_business_criterion_can_be_stamped_before_its_repair (test_context_submit.ContextEntry.test_failing_business_criterion_can_be_stamped_before_its_repair) ... ok
+test_mutating_smoke_does_not_stamp (test_context_submit.ContextEntry.test_mutating_smoke_does_not_stamp) ... ok
+test_numeric_contract_keeps_explicit_observed_counts (test_context_submit.ContextEntry.test_numeric_contract_keeps_explicit_observed_counts) ... ok
+test_one_entry_initializes_binds_and_returns_current_map (test_context_submit.ContextEntry.test_one_entry_initializes_binds_and_returns_current_map) ... ok
+test_single_submission_smokes_then_stamps_original_contract (test_context_submit.ContextEntry.test_single_submission_smokes_then_stamps_original_contract) ... ok
+test_actual_business_failure_stays_failed_and_charges_false_claim (test_context_submit.ContextSubmit.test_actual_business_failure_stays_failed_and_charges_false_claim) ... ok
+test_artifact_change_rejects_before_writing_request_or_booking (test_context_submit.ContextSubmit.test_artifact_change_rejects_before_writing_request_or_booking) ... ok
+test_committed_request_cannot_be_booked_again_with_old_revision (test_context_submit.ContextSubmit.test_committed_request_cannot_be_booked_again_with_old_revision) ... ok
+test_contract_and_plan_changes_reject_old_judgments (test_context_submit.ContextSubmit.test_contract_and_plan_changes_reject_old_judgments) ... ok
+test_derived_protocol_controls_cannot_be_overridden (test_context_submit.ContextSubmit.test_derived_protocol_controls_cannot_be_overridden) ... ok
+test_emitted_submission_requires_only_actual_judgments (test_context_submit.ContextSubmit.test_emitted_submission_requires_only_actual_judgments) ... ok
+test_expired_inherited_budget_is_not_renewed (test_context_submit.ContextSubmit.test_expired_inherited_budget_is_not_renewed) ... ok
+test_manual_counts_cannot_override_automatic_evidence (test_context_submit.ContextSubmit.test_manual_counts_cannot_override_automatic_evidence) ... ok
+test_missing_review_is_not_inferred_from_passing_checks (test_context_submit.ContextSubmit.test_missing_review_is_not_inferred_from_passing_checks) ... ok
+test_one_observed_version_accepts_judgments_and_runs_fresh_original_gate (test_context_submit.ContextSubmit.test_one_observed_version_accepts_judgments_and_runs_fresh_original_gate) ... ok
+test_postcommit_crash_recovers_original_arguments_without_rebooking (test_context_submit.ContextSubmit.test_postcommit_crash_recovers_original_arguments_without_rebooking) ... ok
+test_precommit_crash_retains_exact_request_for_original_recovery (test_context_submit.ContextSubmit.test_precommit_crash_retains_exact_request_for_original_recovery) ... ok
+test_replaced_proposal_invalidates_observed_version (test_context_submit.ContextSubmit.test_replaced_proposal_invalidates_observed_version) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 69.107s
+
+OK

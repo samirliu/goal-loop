@@ -1,0 +1,24 @@
+test_cleanup_handles_shell_special_temporary_directory_path (test_worktree_scope.WorktreeScope.test_cleanup_handles_shell_special_temporary_directory_path) ... ok
+test_dirty_parent_files_do_not_bind_subproject (test_worktree_scope.WorktreeScope.test_dirty_parent_files_do_not_bind_subproject) ... ok
+test_gate_verify_rejects_check_mutating_gitlink_content (test_worktree_scope.WorktreeScope.test_gate_verify_rejects_check_mutating_gitlink_content) ... ok
+test_gitlink_binds_checked_out_commit_and_parent_index_object (test_worktree_scope.WorktreeScope.test_gitlink_binds_checked_out_commit_and_parent_index_object) ... ok
+test_gitlink_edit_invalidates_prior_judged_evidence (test_worktree_scope.WorktreeScope.test_gitlink_edit_invalidates_prior_judged_evidence) ... ok
+test_gitlink_ignored_files_require_explicit_watch (test_worktree_scope.WorktreeScope.test_gitlink_ignored_files_require_explicit_watch) ... ok
+test_gitlink_nesting_limit_fails_closed (test_worktree_scope.WorktreeScope.test_gitlink_nesting_limit_fails_closed) ... ok
+test_gitlink_tracked_path_cannot_follow_symlink_parent (test_worktree_scope.WorktreeScope.test_gitlink_tracked_path_cannot_follow_symlink_parent) ... ok
+test_gitlink_tracked_symlink_hashes_target_without_following_it (test_worktree_scope.WorktreeScope.test_gitlink_tracked_symlink_hashes_target_without_following_it) ... ok
+test_gitlink_tracked_untracked_and_deleted_bytes_are_bound (test_worktree_scope.WorktreeScope.test_gitlink_tracked_untracked_and_deleted_bytes_are_bound) ... ok
+test_initialized_submodule_gitfile_binds_child_bytes (test_worktree_scope.WorktreeScope.test_initialized_submodule_gitfile_binds_child_bytes) ... ok
+test_linked_worktree_uses_the_selected_worktree_bytes (test_worktree_scope.WorktreeScope.test_linked_worktree_uses_the_selected_worktree_bytes) ... ok
+test_nested_gitlinks_bind_content_and_commit_with_awkward_names (test_worktree_scope.WorktreeScope.test_nested_gitlinks_bind_content_and_commit_with_awkward_names) ... ok
+test_shell_fallback_refuses_gitlink_instead_of_partial_digest (test_worktree_scope.WorktreeScope.test_shell_fallback_refuses_gitlink_instead_of_partial_digest) ... ok
+test_unmaterialized_replaced_or_cyclic_gitlink_fails_closed (test_worktree_scope.WorktreeScope.test_unmaterialized_replaced_or_cyclic_gitlink_fails_closed) ... ok
+test_unreadable_gitlink_content_fails_closed (test_worktree_scope.WorktreeScope.test_unreadable_gitlink_content_fails_closed) ... ok
+test_unreadable_top_level_directory_cannot_preserve_a_go (test_worktree_scope.WorktreeScope.test_unreadable_top_level_directory_cannot_preserve_a_go) ... ok
+test_unreadable_untracked_gitlink_directory_fails_closed (test_worktree_scope.WorktreeScope.test_unreadable_untracked_gitlink_directory_fails_closed) ... ok
+test_untracked_nested_repository_is_not_an_empty_directory (test_worktree_scope.WorktreeScope.test_untracked_nested_repository_is_not_an_empty_directory) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 15.503s
+
+OK

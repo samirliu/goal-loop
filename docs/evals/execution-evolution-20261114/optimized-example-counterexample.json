@@ -1,0 +1,14 @@
+[
+  {
+    "version": "before",
+    "returncode": 0,
+    "stdout": "{\"status\": \"enabled\"}\nenabled artifact independently rechecked: PASS\n",
+    "stderr": ""
+  },
+  {
+    "version": "after",
+    "returncode": 1,
+    "stdout": "{\"status\": \"enabled\"}\n",
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 10, in <module>\n    runpy.run_path(script,run_name=\"__main__\")\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<frozen runpy>\", line 294, in run_path\n  File \"<frozen runpy>\", line 98, in _run_module_code\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/Users/m/repo/goal-loop/examples/evolution-dedupe/run.py\", line 176, in <module>\n    raise RuntimeError('enabled artifact failed independent recheck')\nRuntimeError: enabled artifact failed independent recheck\n"
+  }
+]

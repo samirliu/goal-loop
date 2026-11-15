@@ -1,4 +1,18 @@
-# examples/ — validation cases (not part of the skill)
+# examples/ — runnable demonstrations and historical validation cases
+
+The installer includes this directory for offline smoke checks and examples.
+These are protocol demonstrations and fixtures, not acceptance evidence for a
+user's actual deliverable. Historical domain recipes remain in their case dirs.
+
+| Runnable example | What it exercises |
+| --- | --- |
+| [quickstart-one-shot/run.sh](quickstart-one-shot/run.sh) | Real controller close and Gate GO without a model |
+| [learning-edge](learning-edge/README.md) | Local repair/reuse and controlled policy transition/consumption |
+| [evolution-dedupe](evolution-dedupe/README.md) | Paired local tool-policy experiments |
+| [learning-regression](learning-regression/README.md) | Real test workflow with qualified routing and withdrawal |
+| [crew-cost](crew-cost/README.md) | Frozen workload and measured serial/crew comparisons |
+
+## Historical cases
 
 Each subdirectory is a **stress case used to validate this skill**. The
 goal of running a case is to find and fix skill defects, not to ship the
@@ -9,7 +23,8 @@ Rules for this folder:
 
 - Case-specific knowledge stays here. Generic skill files
   (SKILL.md, references/, scripts/, tests/, assets/) must not mention
-  any case name, domain recipe, or case-specific path.
+  any case name, domain recipe, or case-specific path. The packaging inventory
+  may name example paths as data; it does not teach a domain recipe.
 - `case.md` in each case dir: objective, contract sketch, which protocol
   surfaces it is meant to stress, and a findings log (defect → fix commit).
 - Runnable project trees live OUTSIDE the skill repo (e.g.

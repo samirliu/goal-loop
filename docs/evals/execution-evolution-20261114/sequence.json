@@ -1,0 +1,17 @@
+[
+  {
+    "phase": "promotion",
+    "run": "6b1722ea51d941f4991f6394fd834a5a",
+    "status": "enabled"
+  },
+  {
+    "phase": "withdrawal",
+    "run": "614130604912424388993637d98aeafa",
+    "status": "withdrawn"
+  },
+  {
+    "phase": "repair",
+    "run": "213c05da391240a8a50977d1d1592c3c",
+    "status": "enabled"
+  }
+]

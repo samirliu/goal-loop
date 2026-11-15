@@ -1,0 +1,39 @@
+[
+  {
+    "check": "normal",
+    "command": [
+      "python3",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_visual_quality.py",
+      "-v"
+    ],
+    "result": 0,
+    "elapsed": 49.457934458041564,
+    "log": "/tmp/goal-loop-visual-quality-final-26-macos-normal-20261114.log"
+  },
+  {
+    "check": "optimized",
+    "command": [
+      "python3",
+      "-O",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_visual_quality.py",
+      "-v"
+    ],
+    "result": 0,
+    "elapsed": 49.52198849990964,
+    "log": "/tmp/goal-loop-visual-quality-final-26-macos-optimized-20261114.log"
+  }
+]

@@ -1,0 +1,37 @@
+test_bad_declaration_remains_actionable_in_context (test_visual_quality.VisualQuality.test_bad_declaration_remains_actionable_in_context) ... ERROR
+test_bound_complete_review_can_complete_with_original_gate (test_visual_quality.VisualQuality.test_bound_complete_review_can_complete_with_original_gate) ... ok
+test_deterministic_threejs_maintenance_keeps_fast_lane (test_visual_quality.VisualQuality.test_deterministic_threejs_maintenance_keeps_fast_lane) ... ok
+test_ignored_screenshot_change_invalidates_otherwise_bound_review (test_visual_quality.VisualQuality.test_ignored_screenshot_change_invalidates_otherwise_bound_review) ... ok
+test_known_core_defect_blocks_even_with_all_pass_rows_and_clear (test_visual_quality.VisualQuality.test_known_core_defect_blocks_even_with_all_pass_rows_and_clear) ... ok
+test_missing_gallery_is_not_hidden_by_two_other_green_views (test_visual_quality.VisualQuality.test_missing_gallery_is_not_hidden_by_two_other_green_views) ... ok
+test_original_host_request_survives_rewording_and_prompt_reentry (test_visual_quality.VisualQuality.test_original_host_request_survives_rewording_and_prompt_reentry) ... ERROR
+test_original_objective_and_anchor_bytes_are_frozen (test_visual_quality.VisualQuality.test_original_objective_and_anchor_bytes_are_frozen) ... ok
+test_original_visual_intent_cannot_stamp_an_all_mechanical_contract (test_visual_quality.VisualQuality.test_original_visual_intent_cannot_stamp_an_all_mechanical_contract) ... ok
+test_proxy_and_identical_calibration_anchors_do_not_qualify (test_visual_quality.VisualQuality.test_proxy_and_identical_calibration_anchors_do_not_qualify) ... ok
+test_quality_evidence_cannot_escape_project_via_symlink (test_visual_quality.VisualQuality.test_quality_evidence_cannot_escape_project_via_symlink) ... ok
+test_review_json_change_cannot_reuse_the_seat_pass (test_visual_quality.VisualQuality.test_review_json_change_cannot_reuse_the_seat_pass) ... ok
+test_same_image_copied_under_another_filename_is_not_view_coverage (test_visual_quality.VisualQuality.test_same_image_copied_under_another_filename_is_not_view_coverage) ... ok
+test_visual_judgment_cannot_be_waived_as_unverifiable (test_visual_quality.VisualQuality.test_visual_judgment_cannot_be_waived_as_unverifiable) ... ok
+
+======================================================================
+ERROR: test_bad_declaration_remains_actionable_in_context (test_visual_quality.VisualQuality.test_bad_declaration_remains_actionable_in_context)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_visual_quality.py", line 166, in test_bad_declaration_remains_actionable_in_context
+    self.assertIn('unique named views',view['quality']['error']);self.assertNotIn('stamp',view['submissions'])
+                                                                                          ~~~~^^^^^^^^^^^^^^^
+KeyError: 'submissions'
+
+======================================================================
+ERROR: test_original_host_request_survives_rewording_and_prompt_reentry (test_visual_quality.VisualQuality.test_original_host_request_survives_rewording_and_prompt_reentry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/m/repo/goal-loop/tests/test_visual_quality.py", line 107, in test_original_host_request_survives_rewording_and_prompt_reentry
+    self.assertNotIn('stamp',view['submissions'])
+                             ~~~~^^^^^^^^^^^^^^^
+KeyError: 'submissions'
+
+----------------------------------------------------------------------
+Ran 14 tests in 25.379s
+
+FAILED (errors=2)

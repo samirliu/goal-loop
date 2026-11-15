@@ -99,10 +99,14 @@ def run(output):
     def protocol(name, offset):
         folder=output/name;folder.mkdir()
         (folder/'baseline.py').write_bytes(baseline);(folder/'candidate.py').write_bytes(candidate)
-        (folder/'grader.py').write_text('import json,sys\njson.load(sys.stdin)\nprint(json.dumps(dict(floor=True,horizon=True,score=1)))\n')
+        (folder/'grader.py').write_text('import json,sys\nv=json.load(sys.stdin)\n'
+            'p=v["output"].strip()==v["expected"].strip()\nprint(json.dumps(dict(floor=p,horizon=True,score=int(p))))\n')
+        for label, sample in [('good', 'baseline'), ('bad', 'invalid'), ('gold', 'baseline')]:
+            (folder/(label+'.txt')).write_text(sample)
         config=dict(version=1,baseline='baseline.py',candidate='candidate.py',grader='grader.py',
                     development=[],holdout=[],minimum_pairs=6,minimum_cost_gain=.15,quality_tolerance=0,
-                    trial_seconds=2,budget_seconds=30)
+                    trial_seconds=2,budget_seconds=30,
+                    calibration={kind:[dict(output=kind+'.txt',expected='gold.txt')] for kind in ('good','bad')})
         for phase in ('development','holdout'):
             for i in range(6):
                 name=phase+str(i)+'.json';write(folder/name,dict(task=offset+i+(100 if phase=='holdout' else 0)))

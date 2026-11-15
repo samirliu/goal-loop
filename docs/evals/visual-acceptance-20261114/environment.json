@@ -1,0 +1,10 @@
+{
+  "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+  "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+  "node": "v26.11.1",
+  "linux_image": "sha256:116bfb46c2ab980057d41b2a8f1f9bffe83c42ef62e7278bc502c45f4daf4490",
+  "linux_uid": 1000,
+  "linux_init": true,
+  "linux_network": "none",
+  "production_source_files": 92
+}

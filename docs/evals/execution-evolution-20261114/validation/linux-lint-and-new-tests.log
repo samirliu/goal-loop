@@ -1,0 +1,23 @@
+test_always_fail_grader_is_detected_on_good_sample (test_evolve_calibration.Calibration.test_always_fail_grader_is_detected_on_good_sample) ... ok
+test_always_pass_grader_cannot_enable_incorrect_fast_policy (test_evolve_calibration.Calibration.test_always_pass_grader_cannot_enable_incorrect_fast_policy) ... ok
+test_bad_instrument_preserves_incumbent_and_sequential_budget (test_evolve_calibration.Calibration.test_bad_instrument_preserves_incumbent_and_sequential_budget) ... ok
+test_calibration_source_mutation_cannot_qualify (test_evolve_calibration.Calibration.test_calibration_source_mutation_cannot_qualify) ... ok
+test_calibration_timeout_is_bounded_and_never_a_product_regression (test_evolve_calibration.Calibration.test_calibration_timeout_is_bounded_and_never_a_product_regression) ... ok
+test_feedback_refuses_path_escape_and_pending_transition (test_evolve_calibration.Calibration.test_feedback_refuses_path_escape_and_pending_transition) ... ok
+test_feedback_reports_real_failure_and_next_nonresetting_sample_requirement (test_evolve_calibration.Calibration.test_feedback_reports_real_failure_and_next_nonresetting_sample_requirement) ... ok
+test_good_and_bad_calibration_then_original_paired_qualification (test_evolve_calibration.Calibration.test_good_and_bad_calibration_then_original_paired_qualification) ... ok
+test_malformed_or_escaping_calibration_refused_before_state_creation (test_evolve_calibration.Calibration.test_malformed_or_escaping_calibration_refused_before_state_creation) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.428s
+
+OK
+test_each_read_revalidates_even_same_size_and_mtime (test_store_observation.Observations.test_each_read_revalidates_even_same_size_and_mtime) ... ok
+test_future_head_is_observed_by_same_store_instance (test_store_observation.Observations.test_future_head_is_observed_by_same_store_instance) ... ok
+test_selected_current_or_old_operation_cannot_skip_corrupt_ancestry (test_store_observation.Observations.test_selected_current_or_old_operation_cannot_skip_corrupt_ancestry) ... ok
+test_writers_and_recovery_recheck_prior_observations (test_store_observation.Observations.test_writers_and_recovery_recheck_prior_observations) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.022s
+
+OK

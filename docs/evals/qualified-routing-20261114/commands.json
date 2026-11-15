@@ -1,0 +1,399 @@
+{
+  "macos_shell": [
+    {
+      "check": "shell",
+      "command": [
+        "bash",
+        "tests/run_tests.sh",
+        "--jobs=4"
+      ],
+      "result": 0,
+      "elapsed": 155.51108866604045,
+      "log": "validation/goal-loop-qualified-routing-final-macos-shell-20261114.log"
+    },
+    {
+      "check": "parser",
+      "command": [
+        "bash",
+        "tests/test_parse.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.24484229111112654,
+      "log": "validation/goal-loop-qualified-routing-final-macos-parser-20261114.log"
+    },
+    {
+      "check": "companion",
+      "command": [
+        "bash",
+        "companions/contract-forge/tests/run_fixtures.sh"
+      ],
+      "result": 0,
+      "elapsed": 1.0590732910204679,
+      "log": "validation/goal-loop-qualified-routing-final-macos-companion-20261114.log"
+    },
+    {
+      "check": "docs",
+      "command": [
+        "bash",
+        "tests/docs_consistency.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.5169657908845693,
+      "log": "validation/goal-loop-qualified-routing-final-macos-docs-20261114.log"
+    }
+  ],
+  "macos_lint": [
+    {
+      "check": "syntax",
+      "command": [
+        "bash",
+        "-c",
+        "for script in scripts/*.sh devtools/*.sh assets/*.sh companions/contract-forge/scripts/*.sh companions/contract-forge/tests/*.sh; do bash -n \"$script\" || exit 1; done"
+      ],
+      "result": 0,
+      "elapsed": 0.03182345908135176,
+      "log": "validation/goal-loop-qualified-routing-final-macos-syntax-20261114.log"
+    },
+    {
+      "check": "skill",
+      "command": [
+        "python3.12",
+        "/Users/m/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+        "."
+      ],
+      "result": 0,
+      "elapsed": 0.03788304189220071,
+      "log": "validation/goal-loop-qualified-routing-final-macos-skill-20261114.log"
+    },
+    {
+      "check": "diff",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "result": 0,
+      "elapsed": 0.023504457902163267,
+      "log": "validation/goal-loop-qualified-routing-final-macos-diff-20261114.log"
+    }
+  ],
+  "linux_delta_shell": [
+    {
+      "check": "incumbent-fixture",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--name",
+        "goal-loop-qualified-routing-incumbent-fixture-20261114",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "goal-loop-validation:20261114",
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_incumbent.py",
+        "-v"
+      ],
+      "result": 0,
+      "elapsed": 256.9721109580714,
+      "log": "validation/goal-loop-qualified-routing-final-linux-incumbent-fixture-20261114.log"
+    },
+    {
+      "check": "shell",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--name",
+        "goal-loop-qualified-routing-shell-20261114",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "goal-loop-validation:20261114",
+        "bash",
+        "tests/run_tests.sh",
+        "--jobs=4"
+      ],
+      "result": 0,
+      "elapsed": 248.79812379204668,
+      "log": "validation/goal-loop-qualified-routing-final-linux-shell-20261114.log"
+    },
+    {
+      "check": "parser",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--name",
+        "goal-loop-qualified-routing-parser-20261114",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "goal-loop-validation:20261114",
+        "bash",
+        "tests/test_parse.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.22050604200921953,
+      "log": "validation/goal-loop-qualified-routing-final-linux-parser-20261114.log"
+    },
+    {
+      "check": "companion",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--name",
+        "goal-loop-qualified-routing-companion-20261114",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "goal-loop-validation:20261114",
+        "bash",
+        "companions/contract-forge/tests/run_fixtures.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.46715912502259016,
+      "log": "validation/goal-loop-qualified-routing-final-linux-companion-20261114.log"
+    },
+    {
+      "check": "docs",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--name",
+        "goal-loop-qualified-routing-docs-20261114",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "goal-loop-validation:20261114",
+        "bash",
+        "tests/docs_consistency.sh"
+      ],
+      "result": 0,
+      "elapsed": 0.318710041930899,
+      "log": "validation/goal-loop-qualified-routing-final-linux-docs-20261114.log"
+    },
+    {
+      "check": "shellcheck",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--name",
+        "goal-loop-qualified-routing-shellcheck-20261114",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "goal-loop-validation:20261114",
+        "bash",
+        "-c",
+        "shellcheck --severity=warning scripts/*.sh devtools/*.sh"
+      ],
+      "result": 0,
+      "elapsed": 2.048469667090103,
+      "log": "validation/goal-loop-qualified-routing-final-linux-shellcheck-20261114.log"
+    },
+    {
+      "check": "syntax",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--name",
+        "goal-loop-qualified-routing-syntax-20261114",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "goal-loop-validation:20261114",
+        "bash",
+        "-c",
+        "for script in scripts/*.sh devtools/*.sh assets/*.sh companions/contract-forge/scripts/*.sh companions/contract-forge/tests/*.sh; do bash -n \"$script\" || exit 1; done"
+      ],
+      "result": 0,
+      "elapsed": 0.14022937510162592,
+      "log": "validation/goal-loop-qualified-routing-final-linux-syntax-20261114.log"
+    },
+    {
+      "check": "replay",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--name",
+        "goal-loop-qualified-routing-replay-20261114",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "goal-loop-validation:20261114",
+        "python3",
+        "-B",
+        "docs/evals/qualified-routing-20261114/verify.py"
+      ],
+      "result": 0,
+      "elapsed": 1.3555329588707536,
+      "log": "validation/goal-loop-qualified-routing-final-linux-replay-20261114.log"
+    },
+    {
+      "check": "replay-optimized",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--name",
+        "goal-loop-qualified-routing-replay-optimized-20261114",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "goal-loop-validation:20261114",
+        "python3",
+        "-O",
+        "-B",
+        "docs/evals/qualified-routing-20261114/verify.py"
+      ],
+      "result": 0,
+      "elapsed": 1.3442418340127915,
+      "log": "validation/goal-loop-qualified-routing-final-linux-replay-optimized-20261114.log"
+    }
+  ],
+  "full_python_before_fixture_correction": [
+    {
+      "platform": "macos",
+      "command": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "result": 1,
+      "reported_unittest_seconds": 870.849,
+      "log": "validation/goal-loop-qualified-routing-final-python-20261114.log"
+    },
+    {
+      "platform": "linux",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "--user",
+        "1000:1000",
+        "--network",
+        "none",
+        "--name",
+        "goal-loop-qualified-routing-python-20261114",
+        "--mount",
+        "type=bind,src=/Users/m/repo/goal-loop,dst=/repo,readonly",
+        "-w",
+        "/repo",
+        "goal-loop-validation:20261114",
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "result": 1,
+      "reported_unittest_seconds": 1303.283,
+      "log": "validation/goal-loop-qualified-routing-final-linux-python-20261114.log"
+    }
+  ],
+  "macos_affected_suite_after_correction": {
+    "command": [
+      "python3",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_incumbent.py",
+      "-v"
+    ],
+    "result": 0,
+    "reported_unittest_seconds": 163.587,
+    "log": "validation/goal-loop-qualified-routing-incumbent-fixture-macos-20261114.log"
+  },
+  "final_report_docs": {
+    "command": [
+      "bash",
+      "tests/docs_consistency.sh"
+    ],
+    "result": 0,
+    "log": "validation/goal-loop-qualified-routing-final-report-docs-20261114.log"
+  }
+}

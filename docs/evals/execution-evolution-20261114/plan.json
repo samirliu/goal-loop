@@ -1,0 +1,11 @@
+{
+  "objective": "Improve measured execution cost and evidence-driven local strategy evolution",
+  "baseline": "b96af47",
+  "requirements": [
+    "Faster production path on unchanged acceptance, with paired reproducible measurements",
+    "Grader calibration rejects known false passes before strategy trials",
+    "Current original tests, fault recovery and budget semantics remain valid",
+    "Real promotion, counterexample withdrawal and repaired candidate run with fresh holdouts",
+    "Evidence and score distinguish measured local gains from unproven general agent utility"
+  ]
+}

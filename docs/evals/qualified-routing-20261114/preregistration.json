@@ -1,0 +1,12 @@
+{
+  "budget_seconds": 900,
+  "later_cases": 2,
+  "learning_cost_accounting": "record all preparation, trials, failures, checks and later consumption",
+  "minimum_cost_gain": 0.15,
+  "pairs_per_phase": 6,
+  "retries": 0,
+  "scope": "complete repository-subset workflows; local process workers, no agents/models",
+  "seed": 141601,
+  "selection": "72 distinct comparison implementations plus 12 later; seeded shuffle; no cost-based holdout selection",
+  "trial_seconds": 90
+}

@@ -73,16 +73,23 @@ the supplied explanation is semantically correct.
 
 `plan` and `begin` accept `--policy-state PROJECT/.goal/proposals/DIR`. They run
 the existing qualified `goal_evolve.py` archive under the same deadline and
-consume JSON `{"match":true,"choice":"serial","reason":"..."}`; unmatching
-rules must return `match:false, choice:baseline`. These bounded decisions can
-restrict concurrency, never widen permissions, skip checks or force a crew.
+consume JSON `{"match":true,"choice":"serial","reason":"..."}`; choices are
+`baseline`, `serial` and `crew`. Unmatching rules return `match:false,
+choice:baseline`. A crew recommendation requires a calibrated, bound comparison
+that measures actual downstream execution and acceptance, not faster printing
+of a recommendation. It must fit the remaining allowance using the observed
+whole-trial upper cost plus policy overhead, and the graph must permit concurrent
+work. It cannot widen file scope, capacity or permissions, skip checks, override
+an explicit inline request, or dispatch a dependency before adoption.
 `begin` enforces serial as inline mode, and host prepare emits the consumed
 version and focused input/check/repair map in worker_prefix. Invalid output,
-pending transition or stale selection refuses dispatch. No configured policy
+pending transition, missing/damaged qualification or stale selection refuses dispatch. No configured policy
 means the existing measured planner; an unqualified candidate has no effect.
 The receipt records selection, actual input hash, decision and runtime. This is
 context selection, not a filesystem read sandbox. See the [learning example](../examples/learning-edge/README.md)
-for promotion/retention/withdrawal and its evidence limits.
+for promotion/retention/withdrawal mechanics. The [real regression workflow](../examples/learning-regression/README.md)
+also measures original close/audit/Gate and later qualified consumption; these
+local process results do not measure model-provider or native-agent costs.
 
 For native host tools, [the host adapter](host.md) wraps these observations in
 nonce-bound tickets, actual launch/status receipts and the shared deadline.

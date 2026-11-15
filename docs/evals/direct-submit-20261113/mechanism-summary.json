@@ -1,0 +1,44 @@
+{
+  "kind": "Local mechanism diagnostic only; no model turns or complex-task delivery efficacy claim",
+  "groups": {
+    "documented-mapped-file-flow": {
+      "trials": 3,
+      "all_original_receipts_passed": true,
+      "protocol_cli_calls": [
+        12,
+        12,
+        12
+      ],
+      "submitted_field_counts": [
+        10,
+        10,
+        10
+      ],
+      "mean_local_lifecycle_seconds": 7.03508630526873,
+      "mean_protocol_cli_seconds": 7.010476929523672
+    },
+    "direct-submit": {
+      "trials": 3,
+      "all_original_receipts_passed": true,
+      "protocol_cli_calls": [
+        5,
+        5,
+        5
+      ],
+      "submitted_field_counts": [
+        4,
+        4,
+        4
+      ],
+      "mean_local_lifecycle_seconds": 4.940302194406589,
+      "mean_protocol_cli_seconds": 4.916748819639906
+    }
+  },
+  "protocol_cli_reduction": 0.5833333333333333,
+  "submitted_field_reduction": 0.6,
+  "observed_local_lifecycle_reduction": 0.29776238982218484,
+  "model_calls": 0,
+  "real_complex_tasks": 0,
+  "complex_task_adoption_gate": "not tested in this new study; old18-position result remains negative and unchanged",
+  "history": "v1 retained; v2 follows host context StoreError normalization; both source identities recorded before their own local trials"
+}
