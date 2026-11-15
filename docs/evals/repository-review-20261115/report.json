@@ -95,5 +95,41 @@
     "Review and tests are not proof of absence of every bug",
     "No provider/model task or live inference-session hook delivery was tested",
     "No native Windows guarantee"
-  ]
+  ],
+  "post_freeze_fixture_fix": {
+    "candidate": "0712225b0f8ac8dbe6dff2e802b3d2f52f8dd9f5",
+    "macos_full": {
+      "tests": 473,
+      "errors": 1,
+      "success": false
+    },
+    "root_cause": "fixture publishes ready pathname before JSON write completes; reader sees empty bytes",
+    "fix": "write staging JSON and atomically publish with os.replace; no FD, lock, cancellation or timing threshold relaxed",
+    "macos_focused": {
+      "tests": 6,
+      "passed": true
+    },
+    "linux_focused": {
+      "tests": 6,
+      "passed": true,
+      "capability_skips": 2
+    },
+    "mutation": [
+      {
+        "early_publication": true,
+        "passed": false,
+        "error": "JSONDecodeError",
+        "message": "Expecting value: line 1 column 1 (char 0)"
+      },
+      {
+        "early_publication": false,
+        "passed": true
+      }
+    ],
+    "source_sha256": {
+      "before": "63ccbe2d2a124cb25b24fedb5174ae9d5bdeacd8a704ab061c5e38364ce38d14",
+      "after": "e1a4d0d50d9ab8f4cc453d939c33bbeed50559c3cda9f56d8b3bc18b6441fd6c",
+      "unchanged_production_watch": "fe48a659921070f08c1ee8342de51ae49ee5a428a2a325b6d4d8189ea0d191cd"
+    }
+  }
 }

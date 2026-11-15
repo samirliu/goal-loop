@@ -74,13 +74,14 @@ class GroupGuard(unittest.TestCase):
         if mode != 'normal':
             self.assertTrue(ready.exists(), observed)
 
-    def guard_descriptors(self, infinite=False):
+    def guard_descriptors(self, infinite=False, publish_delay=0):
         inherited = resource.getrlimit(resource.RLIMIT_NOFILE)
         if inherited[1] != resource.RLIM_INFINITY and inherited[1] < 2001:
             print('OWNER_GUARD_FD_CAPABILITY ' + json.dumps(
                 dict(nofile=inherited, required_minimum_fd=2000, high_fd_measured=False)), flush=True)
             self.skipTest('actual hard RLIMIT_NOFILE cannot support FD 2000')
         ready = self.root / 'guard-ready.json'
+        staged = self.root / 'guard-ready.tmp'
         lock = self.root / 'lock'
         descriptor = os.open(lock, os.O_CREAT | os.O_RDWR, 0o600)
         fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -93,10 +94,11 @@ class GroupGuard(unittest.TestCase):
                 'fd=fcntl.fcntl(%s,fcntl.F_DUPFD,2000); os.close(%s); '
                 'w._group_guard(); time.sleep(.1); waited=os.waitpid(-1,os.WNOHANG); '
                 'os.close(fd); os.close(1); '
+                'Path(%r).touch(); time.sleep(%r); '
                 'Path(%r).write_text(json.dumps({"guard_alive":waited[0]==0,"guard_wait":waited,'
                 '"nofile_before_fd_setup":before,"nofile":resource.getrlimit(resource.RLIMIT_NOFILE),'
-                '"high_fd":fd})); time.sleep(30)'
-                % (str(WATCH), descriptor, descriptor, str(ready)))
+                '"high_fd":fd})); os.replace(%r,%r); time.sleep(30)'
+                % (str(WATCH), descriptor, descriptor, str(staged), publish_delay, str(staged), str(staged), str(ready)))
         process = subprocess.Popen([sys.executable, '-I', '-c', body], pass_fds=(descriptor,),
                                    start_new_session=True, stdin=subprocess.DEVNULL,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -154,6 +156,11 @@ class GroupGuard(unittest.TestCase):
 
     def test_guard_drops_stdout_and_high_lock_descriptor(self):
         self.guard_descriptors()
+
+    def test_guard_readiness_waits_for_complete_json_publication(self):
+        # The staging file remains empty long enough to reproduce the former
+        # exists()/read_bytes() race if it is exposed as the ready marker.
+        self.guard_descriptors(publish_delay=.25)
 
     def test_unavailable_descriptor_inventories_never_execute_user_command(self):
         marker = self.root / 'must-not-execute'
