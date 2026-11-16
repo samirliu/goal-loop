@@ -171,7 +171,7 @@ grader or success definition. Freeze the comparison and inspect the returned
 enabled/retained/withdrawn decision; exercise run-enabled on a later task.
 Monitor the exact archived active bytes. After a counterexample, preserve the
 withdrawal and generate a repair against new development/holdout inputs in
-the same statistical-budget state. The [recorded agent proposal](../../docs/evals/agent-evolution/README.md)
+the same statistical-budget state. The [recorded agent proposal](../../docs/history.md)
 demonstrates this sequence with independently reconstructed raw outcomes;
 its local execution gains do not measure total agent cost or generalization.
 

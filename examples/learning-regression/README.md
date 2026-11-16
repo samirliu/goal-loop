@@ -20,4 +20,4 @@ python3 -B devtools/consume_regression.py --experiment /tmp/regression-learning-
 
 `raw/` 保存每个完整项目归档、真实进程输出、波次和原终验。`state/` 保存配对、校准、留出预算及实际启用指针。它是可重跑的局部执行实验，不是对模型质量、token 费用、完整原生 agent 效率或跨平台普遍收益的证明。源码、任务形状或平台超出该规则的范围时，应保留基线或重新比较。
 
-本次冻结源码的原始结果、研究成本和局限见[评估记录](../../docs/evals/qualified-routing-20261114/README.md)；不要把生成了程序、打印建议或重复了基线记为新的学习收益。
+本次冻结源码的原始结果、研究成本和局限见[评估记录](../../docs/history.md)；不要把生成了程序、打印建议或重复了基线记为新的学习收益。

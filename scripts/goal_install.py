@@ -36,8 +36,8 @@ def plugin_entry(root=ROOT):
     return text[:end]+binding+text[end:]
 
 
-def inventory():
-    names = json.loads((ROOT/'assets/install-files.json').read_text())
+def read_inventory(filename):
+    names = json.loads((ROOT/'assets'/filename).read_text())
     require(isinstance(names, list) and names and all(isinstance(name, str) and name for name in names),
             'invalid install inventory: expected nonempty file paths')
     require(len(names) == len(set(names)), 'invalid install inventory: duplicate file paths')
@@ -45,9 +45,19 @@ def inventory():
         path = Path(name)
         require(not path.is_absolute() and '..' not in path.parts, 'unsafe install path')
         source = ROOT/path
-        require(source.is_file() and source.resolve().is_relative_to(ROOT), 'missing/escaping payload: '+name)
+        require(source.is_file() and source.resolve().is_relative_to(ROOT),
+                'missing/escaping payload: '+name+'; historical files require a source checkout or complete package')
+    return names
+
+
+def inventory(with_history=False):
+    names = read_inventory('install-files.json')
     require((ROOT/'skills/goal-loop/SKILL.md').read_text() == plugin_entry(),
             'plugin entry is stale; run goal_install.py sync-entry after changing SKILL.md')
+    if with_history:
+        historical = read_inventory('history-files.json')
+        require(not set(names).intersection(historical), 'runtime and history inventories overlap')
+        names += historical
     return names
 
 
@@ -72,6 +82,16 @@ def copy_payload(destination, names):
         shutil.copy2(ROOT/name, target)
 
 
+def build(destination, names):
+    require(not destination.exists(), 'package destination already exists; choose a fresh directory')
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='.goal-package-', dir=destination.parent) as temporary:
+        stage = Path(temporary)/'payload';stage.mkdir()
+        copy_payload(stage, names)
+        require(not destination.exists(), 'package destination appeared during build')
+        stage.rename(destination)
+
+
 def config_parents(destination):
     for name in ('skills', 'agents'):
         path = destination/name
@@ -79,21 +99,18 @@ def config_parents(destination):
                 'installation parent must be a real directory: '+str(path))
 
 
-def install(kind, destination, companion=False):
-    names = inventory()
-    dependencies = doctor()
+def install(kind, destination, companion=False, with_history=False):
+    names = ['LICENSE', 'VERSION', 'assets/history-files.json', *read_inventory('history-files.json')] if kind == 'history' else inventory(with_history)
+    dependencies = None if kind == 'history' else doctor()
     destination = Path(destination).absolute()
     require(not destination.is_symlink(), 'destination cannot be a symlink')
-    if kind == 'plugin':
-        require(not destination.exists(), 'plugin destination already exists; choose a fresh directory')
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(prefix='.goal-plugin-', dir=destination.parent) as temporary:
-            stage = Path(temporary)/'payload';stage.mkdir()
-            copy_payload(stage, names)
-            require(not destination.exists(), 'plugin destination appeared during build')
-            stage.rename(destination)
+    if kind in ('plugin', 'history'):
+        build(destination, names)
         return dict(kind=kind, path=str(destination), files=len(names), dependencies=dependencies,
-                    invoke='/goal-loop-host:goal-loop', hooks='bundled; activated by the host plugin loader')
+                    bytes=sum((ROOT/name).stat().st_size for name in names),
+                    profile='history' if kind == 'history' else 'complete' if with_history else 'runtime',
+                    invoke='/goal-loop-host:goal-loop' if kind == 'plugin' else None,
+                    hooks='bundled; activated by the host plugin loader' if kind == 'plugin' else None)
     config_parents(destination)
     targets = [destination/'skills/goal-loop', *[destination/'agents'/(name+'.md') for name in ROLES]]
     if companion:
@@ -131,7 +148,8 @@ def install(kind, destination, companion=False):
                     shutil.rmtree(target) if target.is_dir() else target.unlink()
                 raise
     return dict(kind=kind,path=str(targets[0]),agents=list(ROLES),companion=companion,
-                dependencies=dependencies,hooks='not installed; use the explicit host bridge or the full plugin')
+                dependencies=dependencies,profile='complete' if with_history else 'runtime',
+                hooks='not installed; use the explicit host bridge or the full plugin')
 
 
 def main():
@@ -139,12 +157,16 @@ def main():
     commands=parser.add_subparsers(dest='command',required=True)
     commands.add_parser('doctor');commands.add_parser('sync-entry')
     build=commands.add_parser('plugin');build.add_argument('--output',required=True)
+    build.add_argument('--with-history',action='store_true',help='include frozen historical evidence for offline research')
     skill=commands.add_parser('skill');skill.add_argument('--config-dir',required=True);skill.add_argument('--with-companion',action='store_true')
+    skill.add_argument('--with-history',action='store_true',help='include frozen historical evidence')
+    history=commands.add_parser('history');history.add_argument('--output',required=True)
     args=parser.parse_args()
     if args.command=='sync-entry':
         target=ROOT/'skills/goal-loop/SKILL.md';target.parent.mkdir(parents=True,exist_ok=True);target.write_text(plugin_entry());return
     result=doctor() if args.command=='doctor' else install(args.command,
-        args.output if args.command=='plugin' else args.config_dir,getattr(args,'with_companion',False))
+        args.output if args.command in ('plugin','history') else args.config_dir,
+        getattr(args,'with_companion',False),getattr(args,'with_history',False))
     print(json.dumps(result,ensure_ascii=False,indent=2))
 
 

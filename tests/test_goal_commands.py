@@ -426,7 +426,7 @@ class ControlIntegrity(unittest.TestCase):
                               capture_output=True, text=True, timeout=25)
 
     def test_smoke_cannot_stamp_a_check_that_mutates_management_state(self):
-        for name in ('control.json', 'clear-pending.json', 'cleared.json'):
+        for name in ('control.json', 'clear-pending.json', 'cleared.json', 'pre-reg.md'):
             with self.subTest(name=name):
                 root, state = self.case('Path(%r).write_text("changed by check")\n' % ('.goal/'+name))
                 result = self.submit(root, 'stamp', {})

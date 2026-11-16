@@ -197,26 +197,17 @@ def _monotonic_limit(previous, boot, now, candidate):
     return candidate
 
 
-def _publish_budget(state, commits, head, snapshot, value, action):
+def _publish_budget(state, head, snapshot, value, action):
     """One commit point and recovery path for script and host observations."""
     files = {'runner.json': store._encode(value), 'runner.clock': ('%s\n' % value['clock']).encode('ascii'),
              'runner.deadline': ('%s\n' % value['deadline']).encode('ascii')}
     if any(snapshot.get(name) != data for name, data in files.items()):
-        updated = dict(snapshot)
-        # Operation-specific retry receipts do not belong to this commit.
-        updated.pop(store._CLOSE_META, None)
-        updated.pop(store._MUTATION_META, None)
-        updated.update(files)
-        meta = json.loads(snapshot[store._VIEW_META])
-        meta['views'].update({name: store._hash(data) for name, data in files.items()})
-        updated[store._VIEW_META] = store._encode(meta)
         def fault(stage):
             if os.environ.get('GOAL_RUNNER_FAULT') == stage:
                 os._exit(91)
-        commits.commit('runner-' + uuid.uuid4().hex, store._encode({'action': action, 'clock': value['clock']}),
-                       updated, expected_head=head, fault=fault)
-        # A crash here leaves a mismatched projection, never valid old time.
-        store._restore_views(state, files)
+        store.publish_views(state, 'runner', files, 'runner-' + uuid.uuid4().hex,
+                            store._encode({'action': action, 'clock': value['clock']}),
+                            expected_head=head, fault=fault)
 
 
 def adopt_host(state, origin, seconds):
@@ -258,7 +249,7 @@ def adopt_host(state, origin, seconds):
             value['scope'] = 'host-' + earliest['kind'] + '-entry'
         value.update(version=2, origin=earliest, deadline=deadline, clock=now,
                      monotonic=dict(boot=boot, deadline=mono_end))
-        _publish_budget(state, commits, head, snapshot, value, 'adopt-host')
+        _publish_budget(state, head, snapshot, value, 'adopt-host')
         return value
 
 
@@ -371,7 +362,7 @@ def budget(state, action, started, wallclock, now):
                                    timely=action == 'delivered' and now < deadline and mono_now < mono_end)
         elif action not in ('begin', 'observe'):
             raise store.StoreError('unknown-budget-action')
-        _publish_budget(state, commits, head, snapshot, value, action)
+        _publish_budget(state, head, snapshot, value, action)
         remaining = max(0, math.ceil(min(deadline-now, mono_end-time.monotonic())))
         print('%s %s %s %.9f' % (deadline, now, remaining, mono_end))
         if action in ('delivered', 'incomplete'):

@@ -4,6 +4,7 @@ Used by controller commits, retry receipts, journal recovery, runner budget
 publication and entrypoint locking. No external action is replayed by recovery.
 """
 import base64
+from collections import namedtuple
 import contextlib
 import errno
 import hashlib
@@ -35,9 +36,10 @@ def empty_ledger(state):
     if state.is_symlink() or not state.is_dir():
         raise StoreError('invalid goal directory')
     names = {p.name for p in state.iterdir()}
-    if not names <= {'history', 'cleared.json'}:
+    retained = retained_fields()
+    if not names <= retained:
         return False
-    if (state/'history').is_symlink() or (state/'cleared.json').is_symlink():
+    if any((state/name).is_symlink() for name in retained):
         raise StoreError('symlink goal history refused')
     return True
 
@@ -388,7 +390,7 @@ def _access_exec(argv):
                 fcntl.flock(fd, (fcntl.LOCK_EX if mode in write_modes else fcntl.LOCK_SH) | fcntl.LOCK_NB)
             except OSError as exc:
                 raise StoreError('ledger-busy; retry after current operation') from exc
-        if (state/'clear-pending.json').exists():
+        if (state/CLEAR_PENDING).exists():
             raise StoreError('clear-recovery-required: run goal_commands.py recover')
         actual_mode = os.environ.get('GOAL_ACCESS_MODE') if inherited is not None else ('write' if mode in write_modes else 'read')
         if actual_mode not in ('read', 'write', 'exclusive-read'):
@@ -449,23 +451,68 @@ def _access_exec(argv):
             os.close(fd)
 
 
-_CLOSE_FILES = ('state.rec', 'loop-log.md', 'scores.rec',
-                'evidence/adversarial.rec', 'evidence/faults.rec')
 _OPERATION = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$')
 _SHA256 = re.compile(r'^[0-9a-f]{64}$')
 _CLOSE_META = '.close-commit.json'
 _MUTATION_META = '.mutation-commit.json'
 _VIEW_META = '.ledger-views.json'
-_VIEW_FILES = {'state.rec', 'loop-log.md', 'scores.rec', 'verdicts.rec', 'check_freeze',
-               'evidence/adversarial.rec', 'evidence/faults.rec'}
-_RUNNER_FILES = {'runner.clock', 'runner.deadline', 'runner.json'}
-_CONTROL_FILES = {'control.json'}
-_MUTATION_FILES = {
-    'init': ('state.rec', 'loop-log.md', 'verdicts.rec', 'work-plan.md'),
-    'stamp': ('state.rec', 'goal.md', 'check_freeze', 'pre-reg.md'),
-    'bind': ('verdicts.rec', 'state.rec'),
-    'forge': ('state.rec', 'check_freeze', 'evidence/raw/0.txt'),
+StateField = namedtuple('StateField', 'view writers guard retained recovery append_pattern',
+                        defaults=(None, (), True, False, None, None))
+# One declaration controls writer scopes, check mutation guards, managed view
+# capture/validation/recovery and retained clear entries. New views bind their
+# absence by default; only the original required views are mandatory in old
+# manifests. Observed views preserve the existing legacy runner import policy.
+STATE_FIELDS = {
+    'state.rec': StateField('required', ('init', 'stamp', 'bind', 'close')),
+    'loop-log.md': StateField('required', ('init', 'close')),
+    'scores.rec': StateField('required', ('close',)),
+    'verdicts.rec': StateField('required', ('init', 'bind')),
+    'goal.md': StateField(writers=('stamp',)),
+    'check_freeze': StateField('required', ('stamp', 'forge')),
+    'pre-reg.md': StateField(writers=('stamp',)),
+    'work-plan.md': StateField(writers=('init',)),
+    'baseline.md': StateField(),
+    'interfaces.md': StateField(),
+    'forge-plan.json': StateField(),
+    'evidence/adversarial.rec': StateField('required', ('close',)),
+    'evidence/faults.rec': StateField('required', ('close',)),
+    'evidence/raw/0.txt': StateField('observed', ('forge',)),
+    'evidence/runtime': StateField(guard=False, append_pattern=r'[0-9a-f]{32}\.json'),
+    'control.json': StateField('bound', ('control',)),
+    'runner.clock': StateField('observed', ('runner',)),
+    'runner.deadline': StateField('observed', ('runner',)),
+    'runner.json': StateField('observed', ('runner',)),
+    'store/commits/current': StateField(),
+    'store/pending': StateField(recovery='transaction'),
+    'clear-pending.json': StateField(recovery='clear'),
+    'cleared.json': StateField(retained=True),
+    'history': StateField(guard=False, retained=True),
 }
+_RAW_VIEW = re.compile(r'evidence/raw/(0|[1-9][0-9]*)\.txt')
+
+
+def writer_fields(writer):
+    return tuple(name for name, field in STATE_FIELDS.items() if writer in field.writers)
+
+
+def retained_fields():
+    return {name for name, field in STATE_FIELDS.items() if field.retained}
+
+
+def recovery_file(kind):
+    names = [name for name, field in STATE_FIELDS.items() if field.recovery == kind]
+    if len(names) != 1:
+        raise StoreError('missing/ambiguous recovery field: '+kind)
+    return names[0]
+
+
+CONTROL_FILE, = writer_fields('control')
+CLEAR_PENDING = recovery_file('clear')
+MAIN_PENDING = recovery_file('transaction')
+_CLOSE_FILES = writer_fields('close')
+_VIEW_FILES = {name for name, field in STATE_FIELDS.items() if field.view == 'required'}
+_RUNNER_FILES = set(writer_fields('runner'))
+_MUTATION_FILES = {kind: writer_fields(kind) for kind in ('init', 'stamp', 'bind', 'forge')}
 
 
 def _close_request(args):
@@ -656,13 +703,18 @@ def _capture_files(state, names):
 
 
 def _is_view(name):
-    return name in _VIEW_FILES | _RUNNER_FILES | _CONTROL_FILES or re.fullmatch(r'evidence/raw/(0|[1-9][0-9]*)\.txt', name) is not None
+    field = STATE_FIELDS.get(name)
+    return bool(field and field.view) or _RAW_VIEW.fullmatch(name) is not None
 
 
-def _view_names(state, include_runner=True):
-    names = set(_VIEW_FILES)
-    if include_runner:
-        names.update(name for name in _RUNNER_FILES if (state / name).exists() or (state / name).is_symlink())
+def _view_names(state, include_runner=True, *, new_commit=False):
+    names = set()
+    for name, field in STATE_FIELDS.items():
+        if not field.view or not include_runner and 'runner' in field.writers:
+            continue
+        if (field.view == 'required' or field.view == 'bound' and new_commit
+                or field.view == 'observed' and ((state/name).exists() or (state/name).is_symlink())):
+            names.add(name)
     raw = state / 'evidence/raw'
     if raw.exists():
         for path in raw.iterdir():
@@ -686,7 +738,7 @@ def attach_views(state, snapshot):
         approved = current
     # New commits bind control absence too. Older manifests remain readable;
     # their existing host sidecar is adopted on the next controller write.
-    files = _capture_files(state, _view_names(state) | _CONTROL_FILES)
+    files = _capture_files(state, _view_names(state, new_commit=True))
     views = {name: _hash(data) if data is not None else None for name, data in files.items()}
     snapshot.update({name: data for name, data in files.items() if data is not None})
     for name, data in files.items():
@@ -765,7 +817,7 @@ def _committed_views(snapshot):
 
 def verify_views(state):
     state = Path(state)
-    if (state/'clear-pending.json').exists():
+    if (state/CLEAR_PENDING).exists():
         raise StoreError('clear-recovery-required: run goal_commands.py recover')
     head, snapshot = Store(state / 'store/commits').read()
     if head is None:
@@ -783,15 +835,51 @@ def verify_views(state):
 
 def guard_digest(state):
     state = Path(state)
-    names = _view_names(state) | {'goal.md', 'work-plan.md', 'baseline.md', 'interfaces.md',
-                                 'forge-plan.json', 'store/commits/current', 'store/pending',
-                                 'control.json', 'clear-pending.json', 'cleared.json'}
+    names = _view_names(state) | {name for name, field in STATE_FIELDS.items() if field.guard}
     output_iteration = os.environ.get('GOAL_RAW_OUTPUT_ITERATION')
     if (os.environ.get('GOAL_ACCESS_MODE') == 'write' and os.environ.get('GOAL_CLOSE_OPERATION')
             and output_iteration is not None and re.fullmatch(r'[1-9][0-9]*', output_iteration)):
         names.discard('evidence/raw/' + output_iteration + '.txt')
     files = _capture_files(state, names)
     return _hash(_encode({name: _hash(data) if data is not None else None for name, data in files.items()}))
+
+
+def publish_views(state, writer, files, operation, intent, *, expected_head,
+                  fault=None, preserve_receipts=False):
+    """Caller holds the ledger writer lock; one commit point publishes a group.
+
+    The registry owns the exact write scope. Recovery uses the same view
+    manifest, including missing markers; publication never renews a budget.
+    """
+    state = Path(state)
+    if (state/MAIN_PENDING).exists() or (state/CLEAR_PENDING).exists():
+        raise StoreError('recovery-required: run recover before publishing managed views')
+    scope = set(writer_fields(writer))
+    if (not scope or set(files) != scope or any(not _is_view(name) for name in scope)
+            or any(data is not None and not isinstance(data, bytes) for data in files.values())):
+        raise StoreError('invalid managed writer scope: '+writer)
+    head = verify_views(state)
+    commits = Store(state/'store/commits')
+    current, snapshot = commits.read()
+    if current != head or head != expected_head:
+        raise Conflict('managed view baseline changed')
+    updated = dict(snapshot)
+    if not preserve_receipts:
+        updated.pop(_CLOSE_META, None)
+        updated.pop(_MUTATION_META, None)
+    meta = json.loads(snapshot[_VIEW_META])
+    for name, data in files.items():
+        meta['views'][name] = _hash(data) if data is not None else None
+        if data is None:
+            updated.pop(name, None)
+        else:
+            updated[name] = data
+    updated[_VIEW_META] = _encode(meta)
+    result = commits.commit(operation, intent, updated, expected_head=head, fault=fault)
+    # A crash between publication and installation is a refused projection.
+    # Original recover restores the committed group, without replaying tools.
+    _restore_views(state, files)
+    return result
 
 
 def restore_committed_views(state, allow_legacy=False):

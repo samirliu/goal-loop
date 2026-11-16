@@ -1,6 +1,6 @@
 # goal-loop
 
-**v4.3.1** — 用冻结的验收契约、可恢复账本和确定性门控推进长任务。宿主负责模型与原生 worker，goal-loop 负责目标、证据、预算与完成判定。
+**v4.4.0** — 用冻结的验收契约、可恢复账本和确定性门控推进长任务。宿主负责模型与原生 worker，goal-loop 负责目标、证据、预算与完成判定。
 
 默认先串行完成业务；只有测量支持净收益时才使用 crew。视觉逼真度、内容正确性和外部结果需要相应判读或结算，不能用文件存在、像素统计或生产者自评替代。
 
@@ -60,7 +60,7 @@ CLAUDE_CODE_USE_NATIVE_FILE_SEARCH=1 claude-haha
 
 依赖：POSIX Python 3.10+、Bash 3.2+、GNU awk 和常见 UNIX 工具；SHA-256 需 `sha256sum`、`shasum` 或 `openssl` 之一。macOS 系统 Bash 可用，需另备 gawk（例如 `brew install gawk`）；Linux 可安装 `gawk`。无 jq、无 GNU timeout 硬依赖。Doctor 只检查依赖，不自动安装软件。
 
-包由 [安装清单](assets/install-files.json) 构建，不携带 `.git`、未跟踪文件、本地配置或 `devtools/`；随包保留离线参考和历史证据，完整包约 200 MiB。分发包含 [MIT 许可证](LICENSE)。原生 Windows Python 的锁/进程组能力未覆盖。
+默认包约 1 MiB，由 [运行清单](assets/install-files.json) 构建，仅携带运行资源、当前说明和可运行示例；开发评测资料、历史案例和归档单独保留。历史证据可通过 `goal_install.py history --output /ABS/history` 导出，或给 plugin/skill 安装加 `--with-history` 构建完整包；见[历史证据与分发](docs/history.md)。分发不携带 `.git`、未跟踪文件或本地配置，包含 [MIT 许可证](LICENSE)。原生 Windows Python 的锁/进程组能力未覆盖。
 
 ## 使用与完成判定
 
@@ -156,6 +156,10 @@ python3 devtools/check_claude_install.py --harness-root /ABS/claude-code-haha --
 
 该检查使用隔离配置、管理 CLI、实际加载器、安装示例与合成 hook 回放，不调用模型 API。回放不能证明真实推理会话中的自动事件投递。
 
+固定模型与预算的多任务配对评测见源码中的 `devtools/README.md`。新的 cohort 入口支持四类
+任务、多种子轮换顺序、独立截止采集、原验收与整次尝试计量。报告保留失败和取消，并汇总
+成功率、所有尝试耗时、单位合格交付成本及 token/费用覆盖率；合成校准不作为模型收益。
+
 正常 skill/plugin 不启动另一个宿主。需要显式外部开发评测时使用源码中的 `devtools/goal_loop.sh`；旧 `scripts/goal_loop.sh` 仅返回迁移提示和 rc=4。`--dry-run` 可无 API 演练，实际模型调用需要相应任务授权。
 
 当前说明、可运行示例与历史评估入口见 [文档索引](docs/README.md)；历史计划和冻结实验不代表当前工作树已验证。
@@ -164,4 +168,4 @@ python3 devtools/check_claude_install.py --harness-root /ABS/claude-code-haha --
 
 门控能验证声明和证据是否一致，需求覆盖仍依赖可靠复审；共享用户权限也不构成 OS 沙箱。预算和取消只覆盖已观察的本机入口与所属进程组，不证明服务端计算已取消。未采集的 tokens/费用保持 unknown。
 
-已有局部工具策略的成本收益证据，不支持相对原生 `/goal` 的通用优势、默认 crew 更快或跨任务自动进化。比较需固定模型、输入、验收和总预算，并保留失败、取消及完整成本；历史数据与适用范围见 [评估索引](docs/evals/README.md)。
+已有局部工具策略的成本收益证据，不支持相对原生 `/goal` 的通用优势、默认 crew 更快或跨任务自动进化。比较需固定模型、输入、验收和总预算，并保留失败、取消及完整成本；历史数据与适用范围见 [历史评估入口](docs/history.md)。

@@ -48,10 +48,13 @@ class Installation(unittest.TestCase):
 
     def test_every_runtime_module_and_role_is_in_the_inventory(self):
         names=set(json.loads((ROOT/'assets/install-files.json').read_text()))
+        history=set(json.loads((ROOT/'assets/history-files.json').read_text()))
         for folder in ['scripts','references','assets','agents','companions','examples']:
             for path in (ROOT/folder).rglob('*'):
                 if path.is_file() and '__pycache__' not in path.parts and path.suffix!='.pyc':
-                    self.assertIn(path.relative_to(ROOT).as_posix(),names)
+                    name=path.relative_to(ROOT).as_posix()
+                    target=history if name.startswith(('examples/agent-evals/','examples/case-')) else names
+                    self.assertIn(name,target)
 
     def test_generated_entry_retains_the_complete_canonical_protocol(self):
         spec=importlib.util.spec_from_file_location('install_entry',ROOT/'scripts/goal_install.py')
@@ -74,9 +77,46 @@ class Installation(unittest.TestCase):
             self.assertTrue((self.skill/'agents'/(role+'.md')).is_file())
         for name in ['scripts/goal_quality.py','scripts/goal_evolve.py','scripts/goal_crew.py',
                      'scripts/goal_host.py','references/packs/visual.md','docs/transaction-state.md',
-                     'docs/evals/native-host/claude-haha/w5-headless-v3/report.json']:
+                     'docs/history.md']:
             self.assertTrue((self.skill/name).is_file(),name)
+        self.assertFalse((self.skill/'docs/evals').exists())
         self.assertTrue((self.config/'skills/contract-forge/SKILL.md').is_file())
+
+    def test_runtime_is_small_and_historical_archives_remain_separate(self):
+        runtime=set(json.loads((ROOT/'assets/install-files.json').read_text()))
+        history=set(json.loads((ROOT/'assets/history-files.json').read_text()))
+        self.assertFalse(runtime & history)
+        self.assertLess(sum((self.relocated/name).stat().st_size for name in runtime), 5*1024*1024)
+        self.assertTrue(any(name.endswith('.tar.gz') for name in history))
+        self.assertTrue(any(name.endswith('.tar.xz') for name in history))
+        self.assertTrue(all((ROOT/name).is_file() for name in history))
+        self.assertFalse(any((self.relocated/name).exists() for name in history))
+        self.assertFalse((self.relocated/'examples/agent-evals').exists())
+
+    def test_explicit_complete_package_and_independent_history_preserve_source_bytes(self):
+        with tempfile.TemporaryDirectory(prefix='goal-history-install-') as tmp:
+            full=Path(tmp)/'complete';archive=Path(tmp)/'history'
+            self.run_install(ROOT,'plugin','--output',str(full),'--with-history')
+            self.run_install(ROOT,'history','--output',str(archive))
+            runtime=set(json.loads((ROOT/'assets/install-files.json').read_text()))
+            history=set(json.loads((ROOT/'assets/history-files.json').read_text()))
+            for name in history:
+                digest=hashlib.sha256((ROOT/name).read_bytes()).digest()
+                self.assertEqual(hashlib.sha256((full/name).read_bytes()).digest(),digest,name)
+                self.assertEqual(hashlib.sha256((archive/name).read_bytes()).digest(),digest,name)
+            actual={p.relative_to(archive).as_posix() for p in archive.rglob('*') if p.is_file()}
+            self.assertEqual(actual, history | {'LICENSE', 'VERSION', 'assets/history-files.json'})
+            self.assertTrue(all((full/name).is_file() for name in runtime))
+            self.run_install(full,'doctor')
+
+    def test_runtime_package_cannot_export_absent_history_or_leave_partial_output(self):
+        with tempfile.TemporaryDirectory(prefix='goal-thin-history-') as tmp:
+            for action in ('history','plugin'):
+                target=Path(tmp)/action
+                argv=[action,'--output',str(target)]+(['--with-history'] if action=='plugin' else [])
+                result=self.run_install(self.relocated,*argv,expected=2)
+                self.assertIn('historical files require',result.stderr)
+                self.assertFalse(target.exists())
 
     def test_existing_settings_and_hooks_are_not_replaced(self):
         self.assertEqual(self.settings.read_text(),'{"permissions":{"allow":["Read"]},"hooks":{}}\n')

@@ -79,7 +79,7 @@ def load(path):
 
 
 def goal_control(root):
-    path = safe(Path(root)/'.goal/control.json')
+    path = safe(Path(root)/'.goal'/store.CONTROL_FILE)
     if not path.exists():
         return None
     value = load(path)
@@ -148,7 +148,7 @@ def begin(project, backend, session, seconds, origin=None, request=None):
     root = Path(project).resolve(strict=True)
     state = root / '.goal'
     require(not state.is_symlink(), 'symlink goal directory refused')
-    require(not (state/'clear-pending.json').exists(), 'clear-recovery-required: run recover')
+    require(not (state/store.CLEAR_PENDING).exists(), 'clear-recovery-required: run recover')
     control = goal_control(root)
     require(not control or control['mode'] != 'paused', 'goal paused; use resume with its original budget')
     if store.empty_ledger(state):
@@ -794,7 +794,7 @@ def hook(payload, backend, project=None):
                  and re.match(r'^\s*/(?:goal-loop|goal-loop-host:goal-loop)\s+\S', prompt) is not None
                  and prompt.split(maxsplit=1)[1].strip() not in ('status', 'continue', 'resume', '继续'))
     origin = capture(backend, session, 'prompt') if event == 'UserPromptSubmit' and (requested or project is not None) else None
-    if requested and (root/'.goal/clear-pending.json').exists():
+    if requested and (root/'.goal'/store.CLEAR_PENDING).exists():
         raise ValueError('clear-recovery-required: run recover before a new goal')
     if requested and goal_control(root) and goal_control(root)['mode'] == 'paused':
         raise ValueError('goal paused; use resume or clear before a new goal')

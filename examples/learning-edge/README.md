@@ -21,4 +21,4 @@ python3 -B devtools/replay_learning.py --baseline /path/to/frozen-before --curre
 python3 -B tests/test_learning_flow.py
 ```
 
-完整本轮证据入口为 [执行记录](../../docs/deepening-execution.md)。
+完整本轮证据入口为 [执行记录](../../docs/history.md)。

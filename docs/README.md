@@ -1,6 +1,6 @@
 # 文档索引
 
-当前版本 **4.3.1**。安装和日常使用以[仓库 README](../README.md)、[根 SKILL](../SKILL.md)及下列能力说明为准；插件入口由根 SKILL 生成。历史计划、暂停说明和冻结评估只对各自记录的版本有效。
+当前版本 **4.4.0**。安装和日常使用以[仓库 README](../README.md)、[根 SKILL](../SKILL.md)及下列能力说明为准；插件入口由根 SKILL 生成。历史计划、暂停说明和冻结评估只对各自记录的版本有效。
 
 ## 当前实现
 
@@ -15,7 +15,12 @@
 | crew、角色、宿主预算与事件 | [Crew](../references/crew.md) / [Host](../references/host.md) |
 | 主账本、锁、提交身份与恢复边界 | [事务状态](transaction-state.md) |
 | 可执行示例和历史压力案例 | [Examples](../examples/README.md) |
-| 冻结实验、原始反例与复验范围 | [评估索引](evals/README.md) |
+| 冻结实验、原始反例与复验范围 | [历史证据与分发](history.md) |
+
+4.4.0 默认分发约 1 MiB 的运行包；历史报告、压缩归档和开发评测资料单独导出，完整离线包
+通过 `--with-history` 显式选择。固定状态字段由统一登记表派生保护、提交与恢复规则，预算和
+暂停控制共用发布器。源码中的 `devtools/README.md` 提供固定模型/预算、多任务多种子配对
+评测及回执计量；离线校准与真实模型结果分别标记，缺失成本保持 unknown。
 
 4.3.1 将控制状态纳入原不可变账本、门控写入检查和恢复；验收脚本不能改动暂停状态后仍获得 GO，提交点两侧中断不会续期或丢失围栏。旧控制回执在下一次管理写入或 check 时保留原内容纳入账本。
 
@@ -29,9 +34,9 @@
 
 ## 历史资料
 
-- [v4.1.1 优化计划](optimization-plan-v4.1.1.md)：原始问题、工作包和验收设计。
-- [P0/P1 历史审计](p0-p1-status.md)：当时的接入、暂停与原始失败记录。
-- [深化执行记录](deepening-execution.md)及[原评估设计](evaluation-design.md)：已有实验及其不支持整体提速的边界。
-- [2026-10-24 断点图](deepen-2026-10-24.md)、[研究笔记](agent-harness-四篇精读.md)、`superpowers/` 与 `run-friction/`：设计和实践背景，不能作为当前调用手册。
+- [历史资料入口](history.md)提供在线索引、独立历史包与完整离线包的构建方式。
+- 源码中的 `optimization-plan-v4.1.1.md`、`p0-p1-status.md`、`deepening-execution.md`、
+  `evaluation-design.md`、`deepen-2026-10-24.md`、研究笔记、`superpowers/` 与 `run-friction/`
+  保留当时的设计、失败和结论，不能作为当前调用手册。
 
-清理保留历史源码、日志和失败；临时复跑目录不纳入源码或安装包。修改运行资源、入口或许可证时，应同步 `assets/install-files.json`；修改根 SKILL 后运行 `goal_install.py sync-entry`。源码回归命令集中在 README 和 CI。
+历史源码、日志和失败保持跟踪；默认运行包不再携带历史证据，临时复跑目录也不纳入分发。修改运行资源、入口或许可证时，同步 `assets/install-files.json`；历史资源列入 `assets/history-files.json`。修改根 SKILL 后运行 `goal_install.py sync-entry`。源码回归命令集中在 README 和 CI。

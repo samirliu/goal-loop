@@ -8,13 +8,18 @@ import argparse
 import datetime
 import importlib.util
 import json
+import os
+import re
 from pathlib import Path
 import subprocess
 import sys
 
+sys.dont_write_bytecode = True
+
 spec=importlib.util.spec_from_file_location('delivery_records',Path(__file__).with_name('evaluate_delivery.py'))
 records=importlib.util.module_from_spec(spec);spec.loader.exec_module(records)
 read,sha,tree=records.read,records.sha,records.tree
+metrics=records.load(Path(__file__).with_name('delivery_metrics.py'))
 
 
 def require(value, message):
@@ -41,13 +46,15 @@ def classify(protocol, manifest, report, events, status):
     bare=manifest['variant']=='bare'
     required={'independent'} if bare else {'independent','audit','gate'}
     settings=[v['payload'] for v in events if v['type']=='turn_context']
-    require(settings and all(v.get('model')==protocol['model'] and v.get('effort')==protocol['effort'] for v in settings),
+    require((settings or protocol['version']==3 and status!='completed')
+            and all(v.get('model')==protocol['model'] and v.get('effort')==protocol['effort'] for v in settings),
             'model/effort differs or unknown')
     identities=[v['payload'].get('id') for v in events if v['type']=='session_meta']
-    require(identities==[report['session']], 'native session identity differs')
+    require(identities==[report['session']] or protocol['version']==3 and not identities and not report['session'],
+            'native session identity differs')
     finals=[v for v in events if v['type']=='response_item' and v['payload'].get('type')=='message'
             and v['payload'].get('role')=='assistant' and v['payload'].get('phase')=='final_answer' and text(v['payload']).strip()]
-    normal=bool(finals) and timestamp(finals[-1]['timestamp'])<=manifest['execution_deadline_epoch'] and status=='completed'
+    normal=bool(finals) and bool(settings) and timestamp(finals[-1]['timestamp'])<=manifest['execution_deadline_epoch'] and status=='completed'
     checks=report['checks']
     passed=set(checks)==required and all(v.get('result')==0 and
         manifest['entry']<=v.get('started',-1)<=v.get('finished',float('inf'))<=manifest['deadline'] for v in checks.values())
@@ -56,30 +63,128 @@ def classify(protocol, manifest, report, events, status):
     calls=[v['payload'] for v in events if v['type']=='response_item' and v['payload'].get('type') in ('function_call','custom_tool_call')]
     require(not any('spawn_agent' in v.get('name','') or 'spawn_agent' in v.get('input','') or
                     'create_thread' in v.get('input','') for v in calls), 'unbudgeted internal worker')
-    return dict(qualified=normal and passed and report['finished']<=manifest['deadline'], normal_final=normal,
+    metrics.number(report['finished']-manifest['entry'],'attempt seconds')
+    return dict(qualified=normal and passed and report['finished']<=manifest['deadline']
+                and report.get('capture_qualified',True), normal_final=normal, settings_verified=bool(settings),
                 checks_passed=passed, tool_calls=len(calls),
                 protocol_lookup_calls=sum(protocol_lookup(v) for v in calls),
                 failures=int(not(normal and passed)), seconds=report['finished']-manifest['entry'])
 
 
+def artifact_matches(expected, actual, observations, path=''):
+    """Only registered append-only telemetry may grow during rechecks."""
+    if expected==actual:return True
+    if (not isinstance(expected,dict) or not isinstance(actual,dict)
+            or expected.get('kind')!='directory' or actual.get('kind')!='directory'
+            or expected.get('mode')!=actual.get('mode')):
+        return False
+    before,after=expected['entries'],actual['entries']
+    extra=set(after)-set(before)
+    if extra:
+        pattern=observations.get(path)
+        if pattern is None or any(re.fullmatch(pattern,name) is None or after[name].get('kind')!='file' for name in extra):
+            return False
+    return all(name in after and artifact_matches(value,after[name],observations,(path+'/' if path else '')+name)
+               for name,value in before.items())
+
+
+def captured(root, folder, protocol, planned, manifest):
+    """Translate independent collection; never replace it with a late check."""
+    native=records.load(root/'frozen/native-harness/devtools/native_eval_capture.py')
+    path=folder/'capture-manifest.json';declaration=read(path)
+    receipt=read(folder/'capture/report.json')
+    require(receipt['manifest_sha256']==sha(path), 'capture manifest changed')
+    require(declaration['position']==planned['position'] and declaration['group']==planned['variant']
+            and declaration['model']==protocol['model'] and declaration['effort']==protocol['effort']
+            and declaration['seconds']==protocol['seconds'] and declaration['execution_seconds']==protocol['execution_seconds']
+            and declaration['agent_path']==manifest['agent_path'] and declaration['max_internal_workers']==0,
+            'capture settings/identity/budget differs')
+    work=folder/'work'
+    case=next(c for c in protocol['cases'] if c['id']==planned['case'])
+    expected=[dict(name='independent',argv=[sys.executable,'-B',str(root/'frozen/grade.py'),
+                '--project',str(work),'--family',case['family'],'--seed',str(case['seed'])],cwd=str(work))]
+    if planned['variant']!='bare':
+        expected += [dict(name=name,argv=['bash',str(root/'sources'/planned['variant']/'scripts'/script),
+                     *args,'--project',str(work)],cwd=str(work)) for name,script,args in
+                     [('audit','goal_audit.sh',[]),('gate','goal_gate.sh',['--check'])]]
+    require(declaration['checks']==expected and declaration['goal_loop']==(planned['variant']!='bare')
+            and declaration['initial_workspace']==str(root/'frozen'/case['id'])
+            and declaration['work']==str(work) and declaration['artifacts']==[str(work)],
+            'capture acceptance/workspace declaration differs')
+    for check in expected:
+        if check['name'] in receipt['checks']:
+            actual=receipt['checks'][check['name']]
+            if 'command' in actual:
+                require(actual.get('command_sha256')==native.command_identity(check['argv'],check['cwd']),
+                        'original acceptance command differs')
+            else:
+                require(actual.get('result') is None and not receipt['qualified'], 'original acceptance command missing')
+    frozen=[root/'protocol.json',root/'frozen',root/'frozen'/case['id'],root/'sources',folder/'manifest.json']
+    require(declaration['frozen']=={str(p):native.fingerprint(p) for p in frozen}, 'capture frozen inputs changed')
+    require(receipt['collector_runtime']=={str(p):native.fingerprint(p) for p in native.RUNTIME}, 'collector runtime changed')
+    require(receipt['entry']==manifest['entry'] and receipt['entry_epoch']==manifest['entry_epoch'], 'capture entry changed')
+    require(receipt['deadline']==receipt['entry']+protocol['seconds']
+            and receipt['execution_deadline']==receipt['entry']+protocol['execution_seconds']
+            and receipt['deadline_epoch']==receipt['entry_epoch']+protocol['seconds']
+            and receipt['execution_deadline_epoch']==receipt['entry_epoch']+protocol['execution_seconds'], 'capture deadline changed')
+    require(sha(folder/'capture/events.jsonl')==receipt['events_sha256'], 'capture events changed')
+    if receipt['qualified']:
+        require(not receipt['reasons'] and receipt['native_task_terminals_observed'], 'capture qualification lacks terminal evidence')
+        require(artifact_matches(receipt['artifacts'][declaration['work']],native.fingerprint(work),
+                                 protocol['posthoc_observations']), 'accepted artifact changed after capture')
+    manifest=dict(manifest,epoch=receipt['entry_epoch'],deadline=receipt['deadline'],
+                  execution_deadline=receipt['execution_deadline'],execution_deadline_epoch=receipt['execution_deadline_epoch'])
+    report=dict(session=receipt['session_id'],checks=receipt['checks'],finished=receipt['finished'],
+                events_sha256=receipt['events_sha256'],human_interventions=None,
+                capture_qualified=receipt['qualified'])
+    usage=metrics.accounting(None,protocol['model'],receipt['session_id'])
+    if (folder/'accounting.json').exists():
+        accounting=read(folder/'accounting.json')
+        require(sha(folder/'host-accounting.json')==accounting['receipt_sha256'], 'accounting receipt changed')
+        usage=metrics.accounting(read(folder/'host-accounting.json'),protocol['model'],receipt['session_id'])
+        report['human_interventions']=accounting['human_interventions']
+    report.update(usage)
+    return manifest,report,folder/'capture/events.jsonl'
+
+
 def verify(root, replay=True):
     protocol=read(root/'protocol.json')
-    require(protocol['version']==2 and 0<len(protocol['order'])<=protocol['maximum_positions']<=8, 'invalid bounded protocol')
+    version=protocol['version'];limit=8 if version==2 else 72
+    require(version in (2,3) and 0<len(protocol['order'])<=protocol['maximum_positions']<=limit, 'invalid bounded protocol')
     require(len(protocol['order'])==protocol['scheduled_positions'], 'scheduled positions changed')
-    require(0<protocol['execution_seconds']<protocol['seconds']<=360, 'invalid budget')
+    require(0<protocol['execution_seconds']<protocol['seconds']<=(360 if version==2 else 600), 'invalid budget')
+    if version==3:
+        cases=protocol['cases'];variants={'bare',*protocol['source']}
+        require(len({case['id'] for case in cases})==len(cases), 'duplicate task identities')
+        require(all(len({c['seed'] for c in cases if c['family']==family})==sum(c['family']==family for c in cases)
+                    for family in {c['family'] for c in cases}), 'duplicate matched seeds')
+        scheduled={(row['case'],row['variant']) for row in protocol['order']}
+        require(len(scheduled)==len(protocol['order']) and scheduled=={(case['id'],v) for case in cases for v in variants},
+                'missing/duplicate matched arms')
+        require([r['position'] for r in protocol['order']]==list(range(1,len(protocol['order'])+1)), 'cohort order changed')
+        require(protocol['evidence_kind'] in ('live-native','calibration-fixture')
+                and protocol['minimum_pairs']>=3 and 0<protocol['minimum_cost_gain']<1, 'invalid evidence policy')
     require(tree(root/'frozen')==protocol['frozen'], 'frozen evaluator/task bytes changed')
     for variant, expected in protocol['source'].items():
         require(tree(root/'sources'/variant)==expected, 'source changed: '+variant)
     rows=[]
     for planned in protocol['order']:
         folder=root/str(planned['position'])
-        require((folder/'report.json').exists(), 'missing scheduled position; do not drop failures')
-        manifest=read(folder/'manifest.json'); report=read(folder/'report.json')
+        report_path=folder/('report.json' if version==2 else 'capture/report.json')
+        require(report_path.exists(), 'missing scheduled position; do not drop failures')
+        manifest=read(folder/'manifest.json')
         require(all(manifest[k]==v for k,v in planned.items()), 'position identity differs')
         require(manifest['protocol_sha256']==sha(root/'protocol.json'), 'protocol changed after begin')
+        if version==3:
+            manifest,report,events_path=captured(root,folder,protocol,planned,manifest)
+        else:
+            report=read(report_path);events_path=folder/'events.jsonl'
+            if 'accounting_sha256' in report:
+                require(sha(folder/'host-accounting.json')==report['accounting_sha256'], 'accounting receipt changed')
+                report.update(metrics.accounting(read(folder/'host-accounting.json'),protocol['model'],report['session']))
         require(manifest['deadline']==manifest['entry']+protocol['seconds'] and
                 manifest['execution_deadline']==manifest['entry']+protocol['execution_seconds'], 'position budget changed')
-        require(sha(folder/'events.jsonl')==report['events_sha256'], 'filtered native events changed')
+        require(sha(events_path)==report['events_sha256'], 'filtered native events changed')
         case=next(v for v in protocol['cases'] if v['id']==planned['case'])
         for name in ('TASK.md','public.py'):
             require(sha(folder/'work'/name)==case['inputs'][name]['sha256'], 'business acceptance input changed')
@@ -87,12 +192,12 @@ def verify(root, replay=True):
         # inferred from the worker's final prose or a work-plan tick.
         terminal=read(folder/'host-terminal.json')
         agents=terminal['agents']
-        matching=[v for v in agents if v['agent_name']=='/root/delivery_'+str(planned['position'])]
+        matching=[v for v in agents if v['agent_name']==manifest.get('agent_path','/root/delivery_'+str(planned['position']))]
         require(len(matching)==1, 'missing/ambiguous native terminal')
         status=matching[0]['agent_status']
         if isinstance(status,dict):status=next(iter(status))
         require(status in ('completed','error','cancelled','interrupted','shutdown'), 'worker still active or terminal unknown')
-        events=[json.loads(v) for v in (folder/'events.jsonl').read_text().splitlines()]
+        events=[json.loads(v) for v in events_path.read_text().splitlines()]
         result=classify(protocol,manifest,report,events,status)
         rechecks={}
         if replay:
@@ -103,22 +208,22 @@ def verify(root, replay=True):
                                     '--project',str(folder/'work')]) for name,script,args in
                              [('audit','goal_audit.sh',[]),('gate','goal_gate.sh',['--check'])]]
             for name,command in commands:
-                done=subprocess.run(command,cwd=folder/'work',capture_output=True,text=True,timeout=15)
+                done=subprocess.run(command,cwd=folder/'work',capture_output=True,text=True,timeout=15,
+                                    env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))
                 rechecks[name]=dict(result=done.returncode,stdout=done.stdout,stderr=done.stderr)
             if result['qualified']:
                 require(all(v['result']==0 for v in rechecks.values()), 'recorded delivery fails independent replay')
         rows.append(dict(**planned,**result,status=status,posthoc=rechecks,human_interventions=report['human_interventions'],
-                         tokens=None,money=None,server_compute=None))
+                         tokens=report.get('tokens'),money=report.get('money'),currency=report.get('currency'),server_compute=None))
     totals={}
     for variant in sorted({v['variant'] for v in rows}):
         subset=[v for v in rows if v['variant']==variant]; count=sum(v['qualified'] for v in subset); cost=sum(v['seconds'] for v in subset)
-        totals[variant]=dict(attempts=len(subset),qualified=count,normal_finals=sum(v['normal_final'] for v in subset),
-            failed=sum(not v['qualified'] for v in subset),all_attempt_wall_seconds=cost,
-            wall_seconds_per_qualified=cost/count if count else None,
+        totals[variant]=dict(**metrics.aggregate(subset),normal_finals=sum(v['normal_final'] for v in subset),
             protocol_lookup_calls=sum(v['protocol_lookup_calls'] for v in subset),
-            tool_calls=sum(v['tool_calls'] for v in subset),human_interventions=sum(v['human_interventions'] for v in subset),
-            tokens=None,money=None,server_compute=None)
-    return dict(verified=True,scope=protocol['inferential_scope'],rows=rows,totals=totals)
+            tool_calls=sum(v['tool_calls'] for v in subset),server_compute=None)
+    result=dict(verified=True,scope=protocol['inferential_scope'],rows=rows,totals=totals)
+    if version==3:result.update(metrics.cohort(rows,protocol),evidence_kind=protocol['evidence_kind'])
+    return result
 
 
 if __name__=='__main__':

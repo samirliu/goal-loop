@@ -20,7 +20,7 @@ python3 -B examples/evolution-dedupe/run.py --output /tmp/my-dedupe-experiment -
 `--seed-offset` 为新试验生成不同输入，`--pairs` 在运行前声明两阶段样本数。
 `--task-family values|paths|hash-collisions` 提供本示例的三种输入分布。
 监测必须比较实际启用的归档字节，不能用“逻辑相同”的程序替换版本身份。
-一次真实提案、退化撤回、修复和迁移验证已[完整归档](../../docs/evals/agent-evolution/README.md)。
+一次真实提案、退化撤回、修复和迁移验证已[完整归档](../../docs/history.md)。
 
 通用入口：
 

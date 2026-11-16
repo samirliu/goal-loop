@@ -391,7 +391,7 @@ def improvement_view(root, ledger_fd):
 
 
 def compile_view(root, state, fd, auto=False):
-    crew.require(not (state/'clear-pending.json').exists(), 'clear-recovery-required: run goal_commands.py recover')
+    crew.require(not (state/store.CLEAR_PENDING).exists(), 'clear-recovery-required: run goal_commands.py recover')
     if (state/'store/pending').exists():
         return recovery_view(root, state, auto)
     head = store.verify_views(state)
@@ -416,7 +416,7 @@ def compile_view(root, state, fd, auto=False):
     quality_info = quality.context(root)
     instruments = instrument_view(root, state, fd, settlement_cap) if stamped else None
     sessions, end_command = controller_view(root, state)
-    control_path = state/'control.json'
+    control_path = state/store.CONTROL_FILE
     control_bytes = read_input(control_path)
     control = None
     if control_bytes is not None:
@@ -618,11 +618,11 @@ def show(project, auto=False):
         return initial_view(root, auto)[0]
     # compile_view validates the views immediately, under this same lock.
     with access(project, recovery=True, verify=False) as (root, state, fd):
-        if (state/'clear-pending.json').exists():
+        if (state/store.CLEAR_PENDING).exists():
             command = shlex.join([sys.executable, '-I', str(HERE/'goal_commands.py'), 'recover', '--project', str(root)])
             return dict(version=2, project=str(root), next='recover-clear',
                         actions={'recover': dict(command=command, executes=command)},
-                        recovery=dict(source=str(state/'clear-pending.json'), next='Finish the same archive; no checks or external tools are replayed.'))
+                        recovery=dict(source=str(state/store.CLEAR_PENDING), next='Finish the same archive; no checks or external tools are replayed.'))
         if store.empty_ledger(state):
             return initial_view(root, auto)[0]
         value, _ = compile_view(root, state, fd, auto)

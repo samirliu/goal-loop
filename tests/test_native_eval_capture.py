@@ -215,6 +215,8 @@ class CaptureFixtures(unittest.TestCase):
                 result, calls, _ = self.fake(actions)
                 self.assertFalse(result['qualified'])
                 self.assertEqual(calls, [])
+                if variant in ('model','effort'):
+                    self.assertTrue(result['settings_drift'])
             self.reset_attempt()
 
     def test_late_terminal_and_delayed_observation_past_outer_fail(self):

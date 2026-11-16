@@ -29,7 +29,7 @@ host = module('goal_host')
 store, budget, require = host.store, host.budget, host.require
 COMMANDS = ('status', 'pause', 'resume', 'clear', 'check', 'recover', 'doctor', 'help')
 ALIASES = {'continue': 'resume', '继续': 'resume'}
-CLEAR_PENDING = 'clear-pending.json'
+CLEAR_PENDING = store.CLEAR_PENDING
 
 
 def context_result(action, *args):
@@ -140,20 +140,11 @@ def publish_control(state, control):
     """Publish control intent at the existing immutable commit point."""
     require(not (state/'store/pending').exists(), 'recovery-required: run recover before changing goal control')
     head = store.verify_views(state)
-    commits = store.Store(state/'store/commits')
-    current, snapshot = commits.read()
-    require(current == head, 'goal control ledger changed')
     raw = store._encode(dict(payload=control, sha256=store._hash(store._encode(control))))
-    updated = dict(snapshot)
-    updated['control.json'] = raw
-    meta = json.loads(snapshot[store._VIEW_META])
-    meta['views']['control.json'] = store._hash(raw)
-    updated[store._VIEW_META] = store._encode(meta)
-    commits.commit('control-'+uuid.uuid4().hex, store._encode(control), updated,
-                   expected_head=head, fault=lambda stage:fault('control-'+stage))
-    # A crash after publication leaves a refused projection. Original recover
-    # installs this same committed fence before any host can dispatch again.
-    store._restore_views(state, {'control.json':raw})
+    store.publish_views(state, 'control', {store.CONTROL_FILE:raw},
+                        'control-'+uuid.uuid4().hex, store._encode(control),
+                        expected_head=head, fault=lambda stage:fault('control-'+stage),
+                        preserve_receipts=True)
     fault('control-installed')
 
 
@@ -269,7 +260,7 @@ def archive_path(state, record):
     names = set()
     for row in record['entries']:
         require(isinstance(row, dict) and set(row) == {'name', 'device', 'inode'}
-                and isinstance(row['name'], str) and row['name'] not in ('', '.', '..', 'history', 'cleared.json', CLEAR_PENDING, '.archive.json')
+                and isinstance(row['name'], str) and row['name'] not in store.retained_fields() | {'', '.', '..', CLEAR_PENDING, '.archive.json'}
                 and '/' not in row['name'] and '\\' not in row['name'] and '\0' not in row['name']
                 and row['name'] not in names and type(row['device']) is int and type(row['inode']) is int,
                 'invalid clear entry')
@@ -294,7 +285,7 @@ def finish_clear(state):
             store._fsync_dir(archive)
             store._fsync_dir(state)
             fault('moved-'+row['name'])
-    allowed = {'history', 'cleared.json', CLEAR_PENDING}
+    allowed = store.retained_fields() | {CLEAR_PENDING}
     require({p.name for p in state.iterdir()} <= allowed, 'clear conflict: new entries appeared; preserve them before recovery')
     meta = host.safe(archive/'.archive.json')
     require(not meta.exists() or host.load(meta) == record, 'clear archive metadata changed')
@@ -324,7 +315,7 @@ def clear(project):
             head = store.verify_views(state)
             value = runner(state)
             entries = [dict(name=p.name, device=p.lstat().st_dev, inode=p.lstat().st_ino)
-                       for p in sorted(state.iterdir()) if p.name not in ('history', 'cleared.json')]
+                       for p in sorted(state.iterdir()) if p.name not in store.retained_fields()]
             record = dict(version=1, project=str(root), run=value['run'] if value else None, head=head,
                           archive='history/'+uuid.uuid4().hex, cleared_at=time.time(), entries=entries)
             archive = archive_path(state, record)
@@ -356,7 +347,7 @@ def check(project):
         require(not (state/CLEAR_PENDING).exists() and not (state/'store/pending').exists(), 'recovery-required: run recover first')
         store.verify_views(state)
         _, snapshot = store.Store(state/'store/commits').read()
-        if 'control.json' not in json.loads(snapshot[store._VIEW_META])['views']:
+        if store.CONTROL_FILE not in json.loads(snapshot[store._VIEW_META])['views']:
             control = host.goal_control(root)
             if control is not None:
                 publish_control(state, control)

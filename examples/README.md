@@ -1,6 +1,6 @@
 # examples/ — runnable demonstrations and historical validation cases
 
-The installer includes this directory for offline smoke checks and examples.
+The default installer includes the runnable demonstrations below for offline smoke checks.
 These are protocol demonstrations and fixtures, not acceptance evidence for a
 user's actual deliverable. Historical domain recipes remain in their case dirs.
 
@@ -19,6 +19,9 @@ Each subdirectory is a **stress case used to validate this skill**. The
 goal of running a case is to find and fix skill defects, not to ship the
 case deliverable. Cases may be abandoned mid-way once they have exposed
 enough friction.
+
+Historical `case-*` directories and the developer `agent-evals` harness ship
+only with the optional history payload. See [history distribution](../docs/history.md).
 
 Rules for this folder:
 

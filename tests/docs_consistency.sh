@@ -207,7 +207,7 @@ EOF
 # must not name any validation case or its domain recipe.
 # The install inventory names example paths as packaging data, not instructions.
 leak=$(grep -nE 'tsp-minimize|logcli|svg-dash|goal-loop-case-|波音|b747|threejs|THREEJS|goal-loop-747' \
-        SKILL.md references/*.md references/packs/*.md scripts/*.sh tests/*.sh assets/* 2>/dev/null | grep -v -e '^tests/docs_consistency.sh:' -e '^assets/install-files.json:' || true)
+        SKILL.md references/*.md references/packs/*.md scripts/*.sh tests/*.sh assets/* 2>/dev/null | grep -v -e '^tests/docs_consistency.sh:' -e '^assets/install-files.json:' -e '^assets/history-files.json:' || true)
 if [ -z "$leak" ]; then
   ok "C6 no case knowledge leaked into generic skill files"
 else

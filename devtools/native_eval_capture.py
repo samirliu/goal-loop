@@ -66,6 +66,12 @@ def sha(path):
     return h.hexdigest()
 
 
+def command_identity(argv, cwd):
+    """Bind original arguments even when display text must be redacted."""
+    data=json.dumps(dict(argv=argv,cwd=cwd),sort_keys=True,separators=(',',':'),ensure_ascii=True)
+    return hashlib.sha256(data.encode('ascii')).hexdigest()
+
+
 def fingerprint(path):
     """Hash bytes and modes, including directory membership; never follow links."""
     path = Path(path)
@@ -184,8 +190,11 @@ class NativeSession:
         elif kind == 'turn_context':
             require(self.current == payload.get('turn_id') and self.current is not None,
                     'native settings have no matching active turn')
-            require(payload.get('model') == self.capture.manifest['model'] and
-                    payload.get('effort') == self.capture.manifest['effort'], 'model/effort differs or unknown')
+            settings_match=(payload.get('model') == self.capture.manifest['model'] and
+                            payload.get('effort') == self.capture.manifest['effort'])
+            if not settings_match:
+                self.capture.settings_drift=True
+            require(settings_match, 'model/effort differs or unknown')
             kept = {k: payload[k] for k in ('turn_id', 'root_turn_id', 'model', 'effort',
                     'approval_policy', 'sandbox_policy', 'permission_profile') if k in payload}
             self.settings.append(kept)
@@ -254,6 +263,7 @@ class Capture:
         self.deadline = self.execution_deadline = self.entry
         self.deadline_epoch = self.execution_deadline_epoch = self.entry_epoch
         self.peak = 0
+        self.settings_drift = False
 
     def prepare(self):
         require(sha(self.manifest_path) == self.expected_sha, 'frozen manifest hash differs')
@@ -262,7 +272,8 @@ class Capture:
         self.manifest = m
         require(m.get('version') == 1 and type(m.get('position')) is int and 0 < m['position'] < 1000,
                 'unsupported manifest/position')
-        require(m.get('agent_path') == '/root/efficiency_%03d' % m['position'] and
+        require(isinstance(m.get('agent_path'), str) and
+                re.fullmatch(r'/root(?:/[A-Za-z0-9_-]+)+', m['agent_path']) is not None and
                 all(isinstance(m.get(k), str) and m[k] for k in ('parent_thread_id', 'model', 'effort', 'group')),
                 'missing frozen native identity/settings')
         for key in ('seconds', 'execution_seconds'):
@@ -448,6 +459,7 @@ class Capture:
         for channel, value in (('stdout', stdout), ('stderr', stderr)):
             (self.output / (check['name'] + '.' + channel + '.txt')).write_text(value, encoding='utf-8')
         return dict(command=check['argv'], cwd=check['cwd'], supervisor_command=argv,
+                    command_sha256=command_identity(check['argv'],check['cwd']),
                     supervisor_returncode=proc.returncode, result=result, stdout=stdout, stderr=stderr,
                     started=start, started_epoch=wall, finished=end, finished_epoch=self.clock.time(),
                     local_cleanup=cleanup)
@@ -542,6 +554,7 @@ class Capture:
         worker_tasks = [t for sid, s in self.sessions.items() if sid != self.session_id for t in s.tasks.values()]
         report = dict(version=1, position=self.manifest.get('position'), group=self.manifest.get('group'),
                       qualified=not self.reasons, reasons=self.reasons, normal_final=normal,
+                      settings_drift=self.settings_drift,
                       manifest_sha256=self.expected_sha, entry=self.entry, entry_epoch=self.entry_epoch,
                       ready_epoch=self.ready_epoch, finished=now, finished_epoch=wall,
                       elapsed_seconds=now-self.entry, deadline=self.deadline, deadline_epoch=self.deadline_epoch,
