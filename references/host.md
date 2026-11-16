@@ -42,7 +42,8 @@
 地图 `instruments` 在盖戳后提前检查原冻结校验脚本：发现变化则列出路径并停止建议新派工。还原原字节或走已授权的契约修订，不能改冻结记录。这个检查不代替最终 Gate。
 
 显式 `/goal-loop …目标` 或插件 `/goal-loop-host:goal-loop …目标` 的 UserPromptSubmit hook 记录 prompt 起点；普通
-对话、无参 status/continue 不创建目标。之后在开始执行时调用：
+对话与管理命令不创建目标。无参数查看 status；七个管理子命令、help 及兼容别名先分流到
+`goal_commands.py`，hook 返回绑定实际 backend/session 的准确命令，见[管理命令](commands.md)。之后在开始执行时调用：
 
 下文 `${GOAL_SKILL}` 代表已安装 skill 的绝对目录；PROJECT 使用实际项目路径。
 

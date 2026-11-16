@@ -84,6 +84,9 @@ if [ "$operation_id_seen" -eq 1 ]; then
 fi
 
 sd="$project/.goal"
+if [ "$cmd" = recover ] && [ -e "$sd/clear-pending.json" ]; then
+  exec python3 -I "$here/goal_commands.py" recover --project "$project"
+fi
 [ "$checks_from_verify$close_receipt" = 00 ] || [ "$cmd" = close-iteration ] || { echo 'CTL: ERROR measured-close-flags-need-close-iteration' >&2; exit 4; }
 [ "$close_receipt$no_gate" != 11 ] || { echo 'CTL: ERROR receipt-needs-gate' >&2; exit 4; }
 [ "$checks_from_verify$checks_seen" != 11 ] || { echo 'CTL: ERROR measured-close-rejects-manual-counts' >&2; exit 4; }
@@ -696,8 +699,7 @@ case "$cmd" in
       python3 -I "$here/goal_forge.py" status --project "$project" || echo 'CTL: FORGE coverage=unverified'
     fi
     g(){ state_get "$1"; }
-    left="off"
-    d=$(g deadline); if [ -n "$d" ] && [ "$d" != 0 ]; then left=$(( d - $(date +%s) ))s; [ "$left" = "" ] && left=0s; fi
+    left=$(python3 -I "$here/goal_runner.py" time-left "$sd") || exit 4
     # STEP line (v2.7): the loop's four steps are a cycle; "where am I" is
     # derived from ledger facts (stamp present? blocks written? claim present?
     # gate verdict recorded), not asked of the controller. This is the
@@ -792,6 +794,7 @@ case "$cmd" in
     case "$tb_now" in ''|*[!0-9]*) tb_now=0 ;; esac
     expired=0
     [ "$dl_now" -gt 0 ] && [ "$(date +%s)" -ge "$dl_now" ] && expired=1
+    [ "$left" != 0s ] || expired=1
     if [ "${unbooked:-0}" = 1 ]; then
       echo "CTL: NEXT reason=unbooked-wave hint=close-iteration"
       echo "CTL:   -> close-iteration now (work-plan ticked / work product exists but no loop-log row) - do NOT dispatch another wave first"

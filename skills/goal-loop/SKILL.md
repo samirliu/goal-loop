@@ -6,6 +6,7 @@ description: |-
   Use for /goal-loop, multi-step delivery, or iterative optimization with
   objective checks. Supports resumable disk state and verifier calibration.
   Includes bounded recursive improvement of evidenced execution policies.
+  Management: status, pause, resume, clear, check, recover, doctor, help.
   Not for trivial one-pass tasks or pure Q&A.
 ---
 
@@ -13,9 +14,29 @@ description: |-
 本插件的实施目录是 `${CLAUDE_PLUGIN_ROOT}`。下文 `<skill>`、`${GOAL_SKILL}` 和所有相对资源路径都以此目录为准，宿主显示的 Base directory 仅是发现入口。给 worker/checker 的资源路径须从实施目录构造为绝对路径。调用本插件的角色时使用 `goal-loop-host:goal-worker`、`goal-loop-host:goal-mech-worker`、`goal-loop-host:goal-critic`、`goal-loop-host:goal-checker-req`、`goal-loop-host:goal-adjudicator`；其余契约、预算、权限和终验协议不变。
 
 
-# Goal Loop (v4.2.1)
+# Goal Loop (v4.3.1)
 
 契约定义成功，原收账与门控验证完成。持久状态在 `.goal/`；机械参数由执行地图派生，模型负责需求、实现和实际复审。
+
+## 管理命令：先分流，再执行
+
+参数首词是 `status / pause / resume / clear / check / recover / doctor / help` 时，先执行管理命令，不进入新目标流程；无参数等同 `status`，`continue / 继续` 等同 `resume`。管理子命令不接行内目标或其他参数，多余参数只显示 help。完整插件调用 `/goal-loop-host:goal-loop <命令>`，独立 skill 调用 `/goal-loop <命令>`。
+
+优先复制 UserPromptSubmit 提供的准确命令，它已绑定实际项目及宿主身份。无 hook 时用 `python3 -I "<skill>/scripts/goal_commands.py" <命令> --project "<project>"`；`resume` 必须另传实际 `--backend BACKEND --session SESSION`，不得猜身份。已有自动批准授权时，resume 可加 `--auto` 沿用该授权。
+
+| 命令 | 行为 |
+|---|---|
+| `status` | 只读显示目标、进度、有效剩余预算、阻塞和 worker；历史验收不是当前 GO |
+| `pause` | 暂停目标、保留原截止，请求 worker 取消；如有 cancellation_pending，实际 interrupt 并 reconcile 真实终态 |
+| `resume` | 核对恢复、原截止与取消终态；仅 `resumed=true` 时按返回的 context 接续原目标，不能以新原文覆盖 |
+| `clear` | 请求停止并等待真实 worker 终态后，将旧运行归档到 `.goal/history/`；保留目录锁 inode，随后可开始新目标 |
+| `check` | 实际重跑原 audit/Gate；只有 completion_verified=true 且 rc=0 才可宣告当前 GO |
+| `recover` | 恢复原账本事务或被打断的 clear，不重放外部工具、不续期 |
+| `doctor` / `help` | 检查安装、依赖与版本，或显示命令用法；不创建目标 |
+
+除 resume 成功后继续业务外，管理调用完成即报告本次结果，不自动启动目标工作。clear 返回未清除/取消待确认时，依据本次清除授权完成 interrupt/reconcile 后重试；不能删除账本或把“已请求取消”写成“已停止”。详细边界见 `references/commands.md`。
+
+控制状态由原不可变账本保护，校验器改动后不得交付。已有事务 pending 时先 recover，再 pause；控制提交中断同样通过 recover 恢复原已提交围栏，不改预算。
 
 ## 五条不变量（唯一的法律）
 
@@ -83,7 +104,7 @@ description: |-
 
 停车只有四类：不可逆/破坏性；安全敏感；工作区外共享副作用（merge/push/发布）；盖戳后契约需修改。已有授权继续沿用。其他冲突裁决并入账：`Ruling: 决定 — 理由 — 错了损失什么`。
 
-GO（rc=0）交付；BLOCKED（rc=3）报告；NO-GO（rc=2）修复后继续。Stop hook 可选；不能覆盖预算或把重复续跑当进展。无参 `/goal-loop` 用 context/status 接续，不创建新目标。
+GO（rc=0）交付；BLOCKED（rc=3）报告；NO-GO（rc=2）修复后重新取图并提交新的实际判断，历史请求只走 retry-close。Stop hook 可选；不能覆盖预算或把重复续跑当进展。无参 `/goal-loop` 只查看状态，不创建新目标。
 
 正常运行只用宿主模型、工具和原生 worker，不启动第二宿主、模型客户端、服务或队列。独立开发运行器仅在仓库 `devtools/` 显式选择。安装依赖检查：`python3 -I "<skill>/scripts/goal_install.py" doctor`；安装冒烟：`bash "<skill>/examples/quickstart-one-shot/run.sh"`。源码仓库的开发回归另用 `tests/run_tests.sh`、`tests/docs_consistency.sh`，不随安装包分发；安装冒烟不能代替实际目标验收。
 

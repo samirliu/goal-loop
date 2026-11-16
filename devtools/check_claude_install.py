@@ -38,7 +38,7 @@ def check(harness, output, bun):
     env.pop('CLAUDE_CODE_USE_NATIVE_FILE_SEARCH', None)
     receipts = []
 
-    def run(name, argv, *, extra=None, stdin=None):
+    def run(name, argv, *, extra=None, stdin=None, expected=0):
         result = subprocess.run([str(x) for x in argv], cwd=project,
                                 env={**env, **(extra or {})}, input=stdin,
                                 text=True, capture_output=True, timeout=60)
@@ -46,7 +46,7 @@ def check(harness, output, bun):
         (output/(name+'.stderr')).write_text(result.stderr)
         receipts.append(dict(name=name, argv=[str(x) for x in argv], exit=result.returncode))
         (output/'commands.json').write_text(json.dumps(receipts, indent=2)+'\n')
-        require(result.returncode == 0, name+' failed; see '+str(output))
+        require(result.returncode == expected, name+' failed; see '+str(output))
         return result.stdout
 
     version = (ROOT/'VERSION').read_text().strip()
@@ -89,7 +89,7 @@ def check(harness, output, bun):
         'const plugins=await loadAllPluginsCacheOnly(); const skills=[];\n'
         'for(const s of await getPluginSkills()) skills.push({name:s.name,prompt:await s.getPromptForCommand("install-probe",{})});\n'
         'const agents=(await loadPluginAgents()).map(a=>({name:a.agentType,tools:a.tools,model:a.model,prompt:a.getSystemPrompt()}));\n'
-        'console.log(JSON.stringify({skills,agents,plugins:plugins.enabled.map(p=>({name:p.name,path:p.path,hooks:p.hooksConfig||p.hooks})),errors:plugins.errors}));\n'
+        'await Bun.write(Bun.stdout,JSON.stringify({skills,agents,plugins:plugins.enabled.map(p=>({name:p.name,path:p.path,hooks:p.hooksConfig||p.hooks})),errors:plugins.errors})+"\\n");\n'
         'process.exit(0);\n')
 
     def plugin_probe(label, path=None):
@@ -125,7 +125,7 @@ def check(harness, output, bun):
         'import {getAgentDefinitionsWithOverrides} from '+imp('tools/AgentTool/loadAgentsDir.ts')+';\n'
         'const skills=[]; for(const s of await getSkillDirCommands(process.cwd())) if(["goal-loop","contract-forge"].includes(s.name)) skills.push({name:s.name,prompt:await s.getPromptForCommand("install-probe",{})});\n'
         'const a=await getAgentDefinitionsWithOverrides(process.cwd());\n'
-        'console.log(JSON.stringify({skills,agents:a.activeAgents.filter(a=>a.agentType.startsWith("goal-")).map(a=>({name:a.agentType,tools:a.tools,model:a.model,prompt:a.getSystemPrompt()})),failedFiles:a.failedFiles}));\n'
+        'await Bun.write(Bun.stdout,JSON.stringify({skills,agents:a.activeAgents.filter(a=>a.agentType.startsWith("goal-")).map(a=>({name:a.agentType,tools:a.tools,model:a.model,prompt:a.getSystemPrompt()})),failedFiles:a.failedFiles})+"\\n");\n'
         'process.exit(0);\n')
     skill_env = {'CLAUDE_CONFIG_DIR': str(skill_config)}
     default = json.loads(run('skill-default-loader', [bun, 'run', skill_probe], extra=skill_env))
@@ -201,10 +201,47 @@ def check(harness, output, bun):
     run('settlement-end', shlex.split(release))
     settlement_hook('settlement-follow-up', 'echo user-follow-up')
     require((settlement/'.goal/runner.json').read_bytes() == original_runner, 'settlement renewed original budget')
+    controls = (output/'management project').resolve(); controls.mkdir()
+    run('management-init', ['bash', ctl, 'init', '--project', controls])
+    for name in ('answer', 'check.py'):
+        shutil.copy2(settlement/name, controls/name)
+    (controls/'.goal/goal.md').write_text('# Goal\n\n## Objective\n\nDeliver answer\n\n## Acceptance criteria\n\n'
+        '- AC-1 | answer correct | check: `python3 check.py` | expected: exit=0\n\n## Approval\n\napproved: PENDING\n')
+    (controls/'.goal/work-plan.md').write_text('- [ ] T1 answer | files=answer\n')
+    run('management-enter', [sys.executable, '-I', host, 'begin', controls, 'claude', 'management-replay', '120'])
+    run('management-stamp', ['bash', ctl, 'stamp', '--auto', '--project', controls])
+    management_budget = (controls/'.goal/runner.json').read_bytes()
+    userprompt = data['plugins'][0]['hooks']['UserPromptSubmit'][0]['hooks'][0]['command']
+    observed_controls = []
+    for action in ('status', 'pause', 'resume', 'check', 'recover', 'doctor', 'clear'):
+        payload = dict(hook_event_name='UserPromptSubmit', session_id='management-replay', cwd=str(controls),
+                       prompt='/goal-loop-host:goal-loop '+action)
+        decision = json.loads(run('management-'+action+'-prompt', ['/bin/sh', '-c', userprompt],
+                                  extra=hook_env, stdin=json.dumps(payload)))
+        argv = [sys.executable, '-I', (relocated/'scripts/goal_commands.py').resolve(), action, '--project', controls,
+                '--backend', 'claude', '--session', 'management-replay']
+        expected_command = shlex.join([str(x) for x in argv])
+        require(expected_command in decision['hookSpecificOutput']['additionalContext'], action+' did not route with actual identity')
+        # A successful script exit and a hook hint alone do not prove that
+        # the installed lifecycle or fresh acceptance commands work.
+        result = json.loads(run('management-'+action, argv, expected=2 if action == 'check' else 0))
+        if action == 'pause':
+            require(result['state'] == 'paused', 'installed pause did not fence the goal')
+        if action == 'resume':
+            require(result['resumed'] and result['host']['session'] == 'management-replay', 'installed resume lost identity')
+            require((controls/'.goal/runner.json').read_bytes() == management_budget, 'installed resume renewed budget')
+        if action == 'check':
+            require(not result['completion_verified'], 'unclaimed installed product was accepted')
+        if action == 'clear':
+            archive = Path(result['archive'])
+            require((archive/'runner.json').read_bytes() == management_budget, 'installed clear lost the old budget')
+            require(not (controls/'.goal/runner.json').exists(), 'installed clear kept the old current run')
+        observed_controls.append(action)
     summary = dict(host=host_version, version=version, persistent_install=True,
                    version_cache_and_relocation=True, plugin_skills=2, plugin_roles=5, hook_commands_replayed=events,
                    standalone_roles_missing_by_default=missing_default, standalone_with_native_file_search=True,
                    installed_go=['skill', 'plugin'], expired_hook_to_go_and_end=True,
+                   management_commands=observed_controls, pause_resume_retains_deadline=True, clear_retains_archive=True,
                    companion_fixtures=['skill', 'plugin'], settings_preserved=True,
                    inference_tested=False, live_hook_delivery_tested=False)
     (output/'report.json').write_text(json.dumps(summary, indent=2)+'\n')

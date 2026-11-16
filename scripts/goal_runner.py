@@ -393,6 +393,9 @@ if __name__ == '__main__':
         elif len(sys.argv) == 3 and sys.argv[1] == 'gate-limit':
             cap, expired = gate_limit(sys.argv[2])
             print('%s %s' % ('none' if cap is None else '%.9f' % cap, int(expired)))
+        elif len(sys.argv) == 3 and sys.argv[1] == 'time-left':
+            cap, _ = gate_limit(sys.argv[2], settlement=False)
+            print('off' if cap is None else '%ss' % math.ceil(max(0, cap-time.monotonic())))
         else:
             raise store.StoreError('invalid-runner-command')
     except (store.StoreError, OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as exc:

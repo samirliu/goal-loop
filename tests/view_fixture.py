@@ -25,7 +25,12 @@ def publish_fixture(project, permitted_root):
     head, snapshot = commits.read()
     if head is None and not (state / 'state.rec').exists():
         return
-    actual = store._capture_files(state, store._view_names(state))
+    names = store._view_names(state)
+    if store._VIEW_META in snapshot:
+        # Keep optional committed views, including an explicit missing control
+        # receipt. Fixture setup must not publish a change for untouched input.
+        names.update(store._committed_views(snapshot))
+    actual = store._capture_files(state, names)
     if (store._VIEW_META in snapshot and actual == store._committed_views(snapshot)
             and store.json.loads(snapshot[store._VIEW_META]).get('version') == 2
             and store.json.loads(snapshot[store._VIEW_META]).get('approved') == store.current_approval(state)):

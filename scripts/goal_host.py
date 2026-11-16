@@ -78,6 +78,18 @@ def load(path):
     return obj['payload']
 
 
+def goal_control(root):
+    path = safe(Path(root)/'.goal/control.json')
+    if not path.exists():
+        return None
+    value = load(path)
+    require(set(value) == {'version', 'project', 'run', 'mode', 'updated'}
+            and value['project'] == str(Path(root).resolve()) and value['mode'] in ('active', 'paused')
+            and (value['run'] is None or isinstance(value['run'], str) and re.fullmatch(r'[0-9a-f]{32}', value['run']))
+            and type(value['updated']) in (int, float) and math.isfinite(value['updated']), 'invalid goal control receipt')
+    return value
+
+
 @contextlib.contextmanager
 def locked(project, create=False):
     root, path = folder(project, create)
@@ -136,7 +148,10 @@ def begin(project, backend, session, seconds, origin=None, request=None):
     root = Path(project).resolve(strict=True)
     state = root / '.goal'
     require(not state.is_symlink(), 'symlink goal directory refused')
-    if not state.exists():
+    require(not (state/'clear-pending.json').exists(), 'clear-recovery-required: run recover')
+    control = goal_control(root)
+    require(not control or control['mode'] != 'paused', 'goal paused; use resume with its original budget')
+    if store.empty_ledger(state):
         result = subprocess.run(['bash', str(Path(__file__).with_name('goal_ctl.sh')), 'init', '--project', str(root)],
                                 capture_output=True, timeout=30)
         require(result.returncode == 0, 'goal initialization failed')
@@ -176,16 +191,25 @@ def enter(project, seconds, backend=None, session=None, request=None):
     """Discover only a unique recorded host identity; never invent a session."""
     root, path = folder(project)
     with locked(root):
+        sessions = [load(p) for p in sorted(path.glob('session-*.json'))]
         rows = [load(p) for p in sorted(path.glob('prompt-*.json'))]
         identities = {(r['origin']['backend'], r['origin']['session']) for r in rows
                       if r.get('project') == str(root)}
+        control = goal_control(root)
+        if control and control['mode'] == 'active':
+            # Only an explicit resume retires its old, bound sessions. A new
+            # unbound prompt still makes automatic discovery ambiguous.
+            retired = {(r['backend'], r['session']) for r in sessions
+                       if not r.get('active') and r.get('project') == str(root)}
+            identities -= retired
+            identities.update((r['backend'], r['session']) for r in sessions
+                              if r.get('active') and r.get('project') == str(root))
         if backend is not None:
             identities = {p for p in identities if p[0] == backend}
         if session is not None:
             identities = {p for p in identities if p[1] == session}
         if not identities:
-            rows = [load(p) for p in sorted(path.glob('session-*.json'))]
-            identities = {(r['backend'], r['session']) for r in rows if r.get('active')
+            identities = {(r['backend'], r['session']) for r in sessions if r.get('active')
                           and r.get('project') == str(root) and (backend is None or r['backend'] == backend)
                           and (session is None or r['session'] == session)}
         require(len(identities) == 1, 'missing/ambiguous recorded host identity; use begin with actual backend/session')
@@ -194,6 +218,8 @@ def enter(project, seconds, backend=None, session=None, request=None):
 
 
 def active(path, root, session=None, backend=None, include_ended=False, recovery=False):
+    control = goal_control(root)
+    require(include_ended or not control or control['mode'] != 'paused', 'goal paused; use resume')
     sessions = [load(p) for p in sorted(path.glob('session-*.json'))]
     sessions = [s for s in sessions if (s.get('active') or include_ended) and (session is None or s['session'] == session)
                 and (backend is None or s['backend'] == backend)]
@@ -222,6 +248,8 @@ def active(path, root, session=None, backend=None, include_ended=False, recovery
 
 
 def limits(root, with_identity=False):
+    control = goal_control(root)
+    require(not control or control['mode'] != 'paused', 'goal paused; no dispatch')
     with crew.read_ledger(root) as (state, _):
         cap, expired = budget.gate_limit(state, settlement=False)
         value = budget.runner_data((state / 'runner.json').read_bytes())
@@ -543,7 +571,7 @@ def end(project, session=None, backend=None):
         for row in attempts(path):
             if row['session'] == current['session'] and row['backend'] == current['backend']:
                 _cancel(path, path / ('attempt-' + row['id'] + '.json'), row)
-        current['active'] = False
+        current.update(active=False, paused=False)
         save(session_path(path, current['backend'], current['session']), current)
         return dict(current, cancellation='requested; observe actual native worker terminals separately',
                     completion_verified=False)
@@ -703,7 +731,15 @@ def control_command(root, path, current, payload):
     python = [sys.executable, '-I']
     context = python + [str(here/'goal_context.py')]
     host = python + [str(here/'goal_host.py')]
+    management = python + [str(here/'goal_commands.py')]
     target = str(root)
+    if argv[:len(management)] == management and not sep:
+        args = argv[len(management):]
+        return (len(args) >= 3 and args[0] in ('status', 'pause', 'resume', 'clear', 'check', 'recover', 'doctor', 'help')
+                and args[1:3] == ['--project', target]
+                and (args[3:] in ([], ['--backend', current['backend'], '--session', current['session']])
+                     or args[0] == 'resume' and args[3:] in (
+                         ['--auto'], ['--backend', current['backend'], '--session', current['session'], '--auto'])))
     if argv[:len(context)] == context:
         args = argv[len(context):]
         if len(args) < 2 or args[1] != target:
@@ -743,11 +779,26 @@ def hook(payload, backend, project=None):
         return {}
     root = Path(target).resolve(strict=True)
     prompt = payload.get('prompt', '')
+    if event == 'UserPromptSubmit' and isinstance(prompt, str):
+        commands = module('goal_commands') if re.match(r'^\s*/(?:goal-loop|goal-loop-host:goal-loop)(?:\s|$)', prompt) else None
+        action = commands.prompt_action(prompt) if commands else None
+        if action is not None:
+            tail = prompt.strip().split(maxsplit=1)
+            invalid = len(tail) > 1 and len(tail[1].split()) > 1
+            return {'hookSpecificOutput': {'hookEventName': 'UserPromptSubmit', 'additionalContext':
+                ('Unexpected management arguments; show help without changing the goal. ' if invalid else 'goal-loop management request. ')+
+                'Run exactly: '+commands.command('help' if invalid else action, root, backend, session)+
+                '\nDo not initialize, capture a new original request, or start goal work for status/pause/clear/check/recover/doctor/help. '
+                'Resume continues only when its result says resumed=true. For pending cancellations, interrupt native workers and reconcile actual terminal receipts first.'}}
     requested = (event == 'UserPromptSubmit' and isinstance(prompt, str)
                  and re.match(r'^\s*/(?:goal-loop|goal-loop-host:goal-loop)\s+\S', prompt) is not None
                  and prompt.split(maxsplit=1)[1].strip() not in ('status', 'continue', 'resume', '继续'))
     origin = capture(backend, session, 'prompt') if event == 'UserPromptSubmit' and (requested or project is not None) else None
-    if requested and not (root / '.goal').exists():
+    if requested and (root/'.goal/clear-pending.json').exists():
+        raise ValueError('clear-recovery-required: run recover before a new goal')
+    if requested and goal_control(root) and goal_control(root)['mode'] == 'paused':
+        raise ValueError('goal paused; use resume or clear before a new goal')
+    if requested and store.empty_ledger(root/'.goal'):
         initialized = subprocess.run(['bash', str(Path(__file__).with_name('goal_ctl.sh')), 'init', '--project', str(root)],
                                      capture_output=True, timeout=3)
         require(initialized.returncode == 0, 'goal initialization failed at prompt entry')
@@ -781,7 +832,8 @@ def hook(payload, backend, project=None):
     if event == 'PreToolUse':
         try:
             worker = payload.get('agent_id') is not None
-            if not current.get('active'):
+            control = goal_control(root)
+            if not current.get('active') or control and control['mode'] == 'paused':
                 return deny('host session ended; worker remains fenced') if worker else {}
             if not worker and (payload.get('tool_name') in ('Read', 'Grep', 'Glob', 'AskUserQuestion', 'TaskGet', 'TaskList')
                                or control_command(root, path, current, payload)):

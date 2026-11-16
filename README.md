@@ -1,6 +1,6 @@
 # goal-loop
 
-**v4.2.1** — 用冻结的验收契约、可恢复账本和确定性门控推进长任务。宿主负责模型与原生 worker，goal-loop 负责目标、证据、预算与完成判定。
+**v4.3.1** — 用冻结的验收契约、可恢复账本和确定性门控推进长任务。宿主负责模型与原生 worker，goal-loop 负责目标、证据、预算与完成判定。
 
 默认先串行完成业务；只有测量支持净收益时才使用 crew。视觉逼真度、内容正确性和外部结果需要相应判读或结算，不能用文件存在、像素统计或生产者自评替代。
 
@@ -63,6 +63,26 @@ CLAUDE_CODE_USE_NATIVE_FILE_SEARCH=1 claude-haha
 包由 [安装清单](assets/install-files.json) 构建，不携带 `.git`、未跟踪文件、本地配置或 `devtools/`；随包保留离线参考和历史证据，完整包约 200 MiB。分发包含 [MIT 许可证](LICENSE)。原生 Windows Python 的锁/进程组能力未覆盖。
 
 ## 使用与完成判定
+
+插件入口支持以下管理子命令，无参数等同 `status`：
+
+```text
+/goal-loop-host:goal-loop status
+/goal-loop-host:goal-loop pause
+/goal-loop-host:goal-loop resume
+/goal-loop-host:goal-loop clear
+/goal-loop-host:goal-loop check
+/goal-loop-host:goal-loop recover
+/goal-loop-host:goal-loop doctor
+```
+
+`help` 显示用法，`continue` / `继续` 是 resume 的兼容别名。独立 skill 使用 `/goal-loop <命令>`。
+暂停和恢复沿用原截止；clear 将旧运行完整归档到 `.goal/history/`，待真实 worker 终态确认后才清除当前目标。
+check 实际执行原 audit/Gate，recover 不重放外部工具。管理调用不会被保存为新目标；
+详细行为与无 hook 的调用方式见[管理命令](references/commands.md)。
+
+暂停/恢复的控制状态进入同一不可变账本。验收脚本改动控制状态会被拒绝；
+提交中断时，recover 恢复已提交的控制状态和原预算。已有账本事务 pending 时先 recover，再 pause。
 
 在会话中给出目标与预算。先保留原始请求，逐项写能失败的 AC；批准后冻结契约。已有自动批准授权才使用 `--auto`。预算从最早可观察入口计算，stamp、resume 和重试不会续期。
 

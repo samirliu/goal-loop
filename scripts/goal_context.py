@@ -215,7 +215,12 @@ def recovery_view(root, state, auto):
 
 def initial_view(root, auto):
     info = root.stat()
-    binding = dict(project=[info.st_dev, info.st_ino], state_exists=False, auto=auto)
+    state = root/'.goal'
+    current = state.stat() if state.exists() else None
+    marker = read_input(state/'cleared.json') if state.exists() else None
+    binding = dict(project=[info.st_dev, info.st_ino], state_exists=state.exists(), auto=auto,
+                   directory=[current.st_dev, current.st_ino] if current else None,
+                   cleared=store._hash(marker) if marker else None)
     revision = store._hash(store._encode(binding))
     commands = {'init': ['bash', str(HERE/'goal_ctl.sh'), 'init', '--project', str(root),
                          '--operation-id', 'context-init-'+revision[:20]]}
@@ -386,6 +391,7 @@ def improvement_view(root, ledger_fd):
 
 
 def compile_view(root, state, fd, auto=False):
+    crew.require(not (state/'clear-pending.json').exists(), 'clear-recovery-required: run goal_commands.py recover')
     if (state/'store/pending').exists():
         return recovery_view(root, state, auto)
     head = store.verify_views(state)
@@ -410,6 +416,14 @@ def compile_view(root, state, fd, auto=False):
     quality_info = quality.context(root)
     instruments = instrument_view(root, state, fd, settlement_cap) if stamped else None
     sessions, end_command = controller_view(root, state)
+    control_path = state/'control.json'
+    control_bytes = read_input(control_path)
+    control = None
+    if control_bytes is not None:
+        spec = importlib.util.spec_from_file_location('context_control_host', HERE/'goal_host.py')
+        host = importlib.util.module_from_spec(spec); spec.loader.exec_module(host)
+        control = host.goal_control(root)
+    paused = control is not None and control['mode'] == 'paused'
     waves = [crew.load(p) for p in sorted((state/'evidence/crew').glob('*.json'))]
     units, policies = {}, {}
     for wave in sorted(waves, key=lambda w: w['started']):
@@ -443,18 +457,24 @@ def compile_view(root, state, fd, auto=False):
     binding['evidence'] = store.guard_digest(state)
     binding['crew'] = store._hash(store._encode(waves))
     blocks = re.split(r'^## iteration\b', log, flags=re.M)
-    claimed = len(blocks) > 1 and re.search(r'^exit_signal=yes\s*$', blocks[-1], re.M) is not None
+    claim_intent = len(blocks) > 1 and re.search(r'^exit_signal=yes\s*$', blocks[-1], re.M) is not None
+    last_digest = re.search(r'^digest=(\S+)\s*$', blocks[-1], re.M)
+    # An exit declaration is not an accepted product. A rejected/stale claim
+    # must expose a fresh close after repair; retry-close stays historical.
+    claimed = (claim_intent and counters.get('last_reason', 'ok') == 'ok'
+               and last_digest is not None and last_digest[1] == artifact)
     ticked = any(s.startswith('- [x]') for s in plan.splitlines())
     unbooked = (len(blocks) == 1 and ticked) or any(w['finished'] is not None and
         (w.get('book_iteration') == int(counters['iteration']) or len(blocks) == 1) for w in waves)
     improvement, improvement_commands = improvement_view(root, fd)
     execution, exec_commands, exec_details, exec_input = execution_view(root, state, head, waves,
-        stamped and not expired and not claimed and not unbooked,
+        stamped and not expired and not paused and not claimed and not unbooked,
         improvement.get('routing_state') if improvement else None)
     binding['execution'] = execution
     if improvement is not None:
         binding['improvement'] = improvement['binding']
     binding['host_sessions'] = sessions
+    binding['control'] = store._hash(control_bytes) if control_bytes is not None else None
     binding['instruments'] = instruments
     binding['implementation'] = {path.name: store._hash(path.read_bytes()) for path in sorted(HERE.iterdir())
                                  if path.is_file() and path.suffix in ('.py', '.sh', '.awk')}
@@ -488,6 +508,8 @@ def compile_view(root, state, fd, auto=False):
             prior = store._close_committed(state, op, intent)
             if prior is not None:
                 details['close']['parameters'] = dict(close['values'], historical_result=prior[0]['result'])
+                commands['close'] = None
+                details['close']['missing'] = [dict(name='fresh_judgments', source='Use submissions.close or save a new close_input.template. The old request is available only as retry-close.')]
         if claimed:
             # Do not suggest another close/work wave after an exit declaration.
             commands.pop('close', None)
@@ -509,23 +531,28 @@ def compile_view(root, state, fd, auto=False):
             commands = {k: v for k, v in commands.items() if k in ('status', 'receipt', 'retry-close')}
         else:
             commands.pop('gate', None)
-            commands.pop('receipt', None)
+            if not claim_intent:
+                commands.pop('receipt', None)
     if instruments and instruments['error']:
         commands = {k: v for k, v in commands.items() if k in ('status', 'receipt', 'close', 'retry-close')}
         next_step = 'repair-instrument-freeze'
-    if stamped and not claimed and not unbooked and not (instruments and instruments['error']):
+    if stamped and not claimed and not paused and not unbooked and not (instruments and instruments['error']):
         commands.update({k:v for k, v in improvement_commands.items()
                          if not expired or k == 'recover-improvement'})
     if 'recover-improvement' in improvement_commands:
         commands['recover-improvement'] = improvement_commands['recover-improvement']
     if end_command:
         commands['end'] = end_command
+    if paused:
+        commands = {k:v for k, v in commands.items() if k in ('status', 'receipt', 'close', 'retry-close', 'recover-improvement', 'end')}
+        next_step = 'paused-use-resume-or-clear'
     value = dict(version=2, project=str(root), revision=revision, binding=binding,
                  goal=objective[1].strip() if objective else (contract.splitlines() or ['Goal contract not authored'])[0], stamped=stamped,
                  acceptance=[line for line in contract.splitlines() if re.match(r'^- AC-[0-9]+\b', line)],
                  iteration=counters.get('iteration'), breaker=counters.get('breaker'),
                  deadline_epoch=None if cap is None else time.time()+cap-time.monotonic(), deadline_monotonic=cap,
                  budget_scope=runner['scope'] if runner else 'contract-only',
+                 paused=paused, claim_intent=claim_intent, claim_current=bool(claimed),
                  remaining_seconds=None if cap is None else max(0, cap-time.monotonic()),
                  expired=expired, accepted=[s for s in plan.splitlines() if s.startswith('- [x]')],
                  read_deadline=settlement_cap,
@@ -591,6 +618,13 @@ def show(project, auto=False):
         return initial_view(root, auto)[0]
     # compile_view validates the views immediately, under this same lock.
     with access(project, recovery=True, verify=False) as (root, state, fd):
+        if (state/'clear-pending.json').exists():
+            command = shlex.join([sys.executable, '-I', str(HERE/'goal_commands.py'), 'recover', '--project', str(root)])
+            return dict(version=2, project=str(root), next='recover-clear',
+                        actions={'recover': dict(command=command, executes=command)},
+                        recovery=dict(source=str(state/'clear-pending.json'), next='Finish the same archive; no checks or external tools are replayed.'))
+        if store.empty_ledger(state):
+            return initial_view(root, auto)[0]
         value, _ = compile_view(root, state, fd, auto)
         return value
 
@@ -614,7 +648,7 @@ def run(project, revision, action, auto=False):
         fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
         try:
             store.fcntl.flock(fd, store.fcntl.LOCK_EX | store.fcntl.LOCK_NB)
-            crew.require(not (root/'.goal').exists(), 'stale-context: ledger already initialized')
+            crew.require(store.empty_ledger(root/'.goal'), 'stale-context: ledger already initialized')
             value, commands = initial_view(root, auto)
             crew.require(value['revision'] == revision, 'stale-context: regenerate context')
             os.execvp(commands[action][0], commands[action])

@@ -27,6 +27,21 @@ class StoreError(RuntimeError):
     pass
 
 
+def empty_ledger(state):
+    """A cleared directory retains its lock inode and archived runs only."""
+    state = Path(state)
+    if not state.exists():
+        return True
+    if state.is_symlink() or not state.is_dir():
+        raise StoreError('invalid goal directory')
+    names = {p.name for p in state.iterdir()}
+    if not names <= {'history', 'cleared.json'}:
+        return False
+    if (state/'history').is_symlink() or (state/'cleared.json').is_symlink():
+        raise StoreError('symlink goal history refused')
+    return True
+
+
 class Conflict(StoreError):
     pass
 
@@ -373,6 +388,8 @@ def _access_exec(argv):
                 fcntl.flock(fd, (fcntl.LOCK_EX if mode in write_modes else fcntl.LOCK_SH) | fcntl.LOCK_NB)
             except OSError as exc:
                 raise StoreError('ledger-busy; retry after current operation') from exc
+        if (state/'clear-pending.json').exists():
+            raise StoreError('clear-recovery-required: run goal_commands.py recover')
         actual_mode = os.environ.get('GOAL_ACCESS_MODE') if inherited is not None else ('write' if mode in write_modes else 'read')
         if actual_mode not in ('read', 'write', 'exclusive-read'):
             raise StoreError('invalid inherited access mode')
@@ -442,6 +459,7 @@ _VIEW_META = '.ledger-views.json'
 _VIEW_FILES = {'state.rec', 'loop-log.md', 'scores.rec', 'verdicts.rec', 'check_freeze',
                'evidence/adversarial.rec', 'evidence/faults.rec'}
 _RUNNER_FILES = {'runner.clock', 'runner.deadline', 'runner.json'}
+_CONTROL_FILES = {'control.json'}
 _MUTATION_FILES = {
     'init': ('state.rec', 'loop-log.md', 'verdicts.rec', 'work-plan.md'),
     'stamp': ('state.rec', 'goal.md', 'check_freeze', 'pre-reg.md'),
@@ -638,7 +656,7 @@ def _capture_files(state, names):
 
 
 def _is_view(name):
-    return name in _VIEW_FILES | _RUNNER_FILES or re.fullmatch(r'evidence/raw/(0|[1-9][0-9]*)\.txt', name) is not None
+    return name in _VIEW_FILES | _RUNNER_FILES | _CONTROL_FILES or re.fullmatch(r'evidence/raw/(0|[1-9][0-9]*)\.txt', name) is not None
 
 
 def _view_names(state, include_runner=True):
@@ -666,7 +684,9 @@ def attach_views(state, snapshot):
         if approved is not None and current != approved:
             raise StoreError('contract-approval-mismatch: an approved contract cannot be restamped')
         approved = current
-    files = _capture_files(state, _view_names(state))
+    # New commits bind control absence too. Older manifests remain readable;
+    # their existing host sidecar is adopted on the next controller write.
+    files = _capture_files(state, _view_names(state) | _CONTROL_FILES)
     views = {name: _hash(data) if data is not None else None for name, data in files.items()}
     snapshot.update({name: data for name, data in files.items() if data is not None})
     for name, data in files.items():
@@ -745,6 +765,8 @@ def _committed_views(snapshot):
 
 def verify_views(state):
     state = Path(state)
+    if (state/'clear-pending.json').exists():
+        raise StoreError('clear-recovery-required: run goal_commands.py recover')
     head, snapshot = Store(state / 'store/commits').read()
     if head is None:
         raise StoreError('ledger-migration-required: run goal_ctl.sh migrate')
@@ -762,7 +784,8 @@ def verify_views(state):
 def guard_digest(state):
     state = Path(state)
     names = _view_names(state) | {'goal.md', 'work-plan.md', 'baseline.md', 'interfaces.md',
-                                 'forge-plan.json', 'store/commits/current', 'store/pending'}
+                                 'forge-plan.json', 'store/commits/current', 'store/pending',
+                                 'control.json', 'clear-pending.json', 'cleared.json'}
     output_iteration = os.environ.get('GOAL_RAW_OUTPUT_ITERATION')
     if (os.environ.get('GOAL_ACCESS_MODE') == 'write' and os.environ.get('GOAL_CLOSE_OPERATION')
             and output_iteration is not None and re.fullmatch(r'[1-9][0-9]*', output_iteration)):
